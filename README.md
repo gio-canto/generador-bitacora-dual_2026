@@ -19,22 +19,25 @@
 
 **Generador de Bitácora Dual 2026** es una aplicación web estática para elaborar bitácoras semanales del modelo de Educación Dual. Su asistente divide el proceso en cinco etapas, conserva una vista previa exacta del documento y genera un PDF A4 horizontal directamente en el dispositivo.
 
-Funciona para estudiantes de distintas especialidades, semestres, grupos, planteles y empresas. No requiere crear una cuenta, instalar programas ni enviar información personal a un servidor.
+Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semestre y participan con alguna de las empresas u organismos disponibles. No requiere crear una cuenta, instalar programas ni enviar información personal a un servidor.
 
 ## Funciones principales
 
 - Asistente progresivo de cinco etapas.
-- Plantel, especialidad, semestre, grupo y periodo personalizables.
-- Registro del alumno y de la empresa u organismo receptor.
+- Plantel institucional precargado y grupo editable.
+- Seis especialidades disponibles: Programación, Contabilidad, Inteligencia Artificial, Comercio Electrónico, Administración de Recursos Humanos y Ofimática.
+- Semestres permitidos del cuarto al sexto.
+- Catálogo de empresas y organismos receptores.
 - Generación automática de jornadas de martes a viernes.
 - Horarios predeterminados editables.
 - Estados de jornada laboral, sin labores o día inhábil.
 - Descripción de actividades con Markdown básico.
 - Límite y contador de caracteres por jornada.
 - Áreas o departamentos independientes por día.
-- Firmas de quien elabora, da visto bueno y autoriza.
-- Cuarto espacio opcional para instructor formador.
-- Catálogo de instructores y opción personalizada.
+- Nombre de quien elabora sincronizado automáticamente con el alumno.
+- Datos de Vo.Bo. de M. en A. Vepsania Marino Martínez precargados.
+- Autorización de Mtra. Karen Paulina Solís Catalán precargada para el Consejo; captura personalizada para las demás empresas.
+- Catálogo de instructores disponible únicamente para el Consejo y captura manual para las demás empresas.
 - Vista previa exacta en formato A4 horizontal.
 - Advertencia automática cuando el contenido rebasa una página.
 - Descarga directa del PDF sin servicios externos.
@@ -47,7 +50,7 @@ Funciona para estudiantes de distintas especialidades, semestres, grupos, plante
 
 | Etapa | Información solicitada |
 |---|---|
-| 1. Datos escolares | Plantel, especialidad, semestre, grupo y periodo |
+| 1. Datos escolares | Plantel, especialidad, semestre y grupo |
 | 2. Participantes | Nombre del alumno y empresa receptora |
 | 3. Semana | Fechas, horarios, estados, áreas y actividades |
 | 4. Responsables | Firmas, cargos e instructor opcional |
