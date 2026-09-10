@@ -473,6 +473,7 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
               <option value="laboral" ${!entry.status || entry.status === "laboral" ? "selected" : ""}>Con labores</option>
               <option value="sin_labores" ${entry.status === "sin_labores" ? "selected" : ""}>Sin labores</option>
               <option value="inhabil" ${entry.status === "inhabil" ? "selected" : ""}>Día inhábil</option>
+              <option value="falta" ${entry.status === "falta" ? "selected" : ""}>Falta</option>
             </select>
           </div>
           <div class="field"><label>Entrada</label><input data-index="${index}" data-key="start" type="time" value="${escapeHtml(entry.start)}" ${entry.status && entry.status !== "laboral" ? "disabled" : ""}></div>
@@ -481,8 +482,8 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
           <button class="icon-btn" data-delete="${index}" title="Eliminar día">×</button>
         </div>
         <div class="field" style="margin-top:9px">
-          <label>Actividad</label>
-          <textarea data-index="${index}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="Puedes usar **negritas**, *cursivas* y listas con -" ${entry.status && entry.status !== "laboral" ? "disabled" : ""}>${escapeHtml(entry.activity)}</textarea>
+          <label>${entry.status === "falta" ? "Justificación de la falta" : "Actividad"}</label>
+          <textarea data-index="${index}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${entry.status === "falta" ? "Ej. Falta médica, condiciones ambientales u otro motivo" : "Puedes usar **negritas**, *cursivas* y listas con -"}" ${entry.status && entry.status !== "laboral" && entry.status !== "falta" ? "disabled" : ""}>${escapeHtml(entry.activity)}</textarea>
           <div class="counter"><span data-count="${index}">${entry.activity.length}</span>/${ACTIVITY_LIMIT}</div>
         </div>
       `;
@@ -688,6 +689,10 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
   function saveRecord() {
     if (!entries.length) {
       alert("Agrega al menos un día antes de guardar.");
+      return;
+    }
+    if (entries.some((entry) => entry.status === "falta" && !String(entry.activity || "").trim())) {
+      alert("Escribe la justificación de cada falta antes de guardar.");
       return;
     }
     const record = collectRecord();
@@ -936,13 +941,18 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
 
     const rows = entries.map((entry) => {
       const status = entry.status || "laboral";
-      const special = status === "sin_labores" || status === "inhabil";
-      const specialLabel = status === "sin_labores" ? "SIN LABORES" : (status === "inhabil" ? "DÍA INHÁBIL" : "");
+      const special = status !== "laboral";
+      const specialLabel = status === "sin_labores" ? "SIN LABORES" : (status === "inhabil" ? "DÍA INHÁBIL" : (status === "falta" ? "FALTA" : ""));
 
       const dateLines = wrapPlain(formatDate(entry.date), widths[0] - 2.6, sizes.other, "bold");
-      const activityLines = special
-        ? wrapPlain(specialLabel, widths[1] - 3.2, sizes.activity, "bold")
-        : wrapStyled(entry.activity, widths[1] - 3.2, sizes.activity, markdownEnabled);
+      const activityLines = status === "falta"
+        ? [
+            ...wrapPlain(specialLabel, widths[1] - 3.2, sizes.activity, "bold"),
+            ...wrapStyled(entry.activity, widths[1] - 3.2, sizes.activity, markdownEnabled)
+          ]
+        : special
+          ? wrapPlain(specialLabel, widths[1] - 3.2, sizes.activity, "bold")
+          : wrapStyled(entry.activity, widths[1] - 3.2, sizes.activity, markdownEnabled);
       const timeLines = special
         ? wrapPlain("-", widths[2] - 2.6, sizes.other)
         : wrapPlain(formatTime(entry.start) + " - " + formatTime(entry.end), widths[2] - 2.6, sizes.other);
@@ -1285,6 +1295,10 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
       alert("Agrega al menos un día.");
       return;
     }
+    if (entries.some((entry) => entry.status === "falta" && !String(entry.activity || "").trim())) {
+      alert("Escribe la justificación de cada falta antes de descargar el PDF.");
+      return;
+    }
     if (!model.fits) {
       alert("El contenido excede el espacio de una página. Reduce el texto antes de exportar.");
       return;
@@ -1462,7 +1476,17 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
       document.getElementById("weekDate").focus();
       return false;
     }
-    const workCards = [...document.querySelectorAll("#days .day-card:not(.nonwork)")];
+    const dayCards = [...document.querySelectorAll("#days .day-card")];
+    const absenceWithoutReason = dayCards.find(card =>
+      card.querySelector('[data-key="status"]')?.value === "falta" &&
+      !card.querySelector('textarea[data-key="activity"]')?.value.trim()
+    );
+    if (index === 2 && absenceWithoutReason) {
+      announce("Escribe la justificación de cada falta");
+      absenceWithoutReason.querySelector('textarea[data-key="activity"]')?.focus();
+      return false;
+    }
+    const workCards = dayCards.filter(card => card.querySelector('[data-key="status"]')?.value === "laboral");
     if (index === 2 && workCards.length && !workCards.some(card => card.querySelector("textarea")?.value.trim())) {
       announce("Describe al menos una actividad");
       document.querySelector("#days textarea")?.focus();
