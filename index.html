@@ -263,6 +263,12 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
 @media(max-width:580px){.hero{padding:34px 5px 22px}.step-panel{border-radius:22px}.topbar{border-radius:19px}.brand-logo{width:156px}.actions{gap:5px}.actions .btn{padding:9px 10px}.actions #saveState{display:none}}
 @media(prefers-contrast:more){.topbar,.wizard-nav,.step-panel,.panel,.record{border-color:#6e6e73}input,textarea,select{border-color:#6e6e73}}
 @media(prefers-reduced-transparency:reduce){.topbar,.wizard-nav{background:#fff;backdrop-filter:none}}
+.welcome-dialog{width:min(92vw,440px);padding:0;border:0;border-radius:24px;color:var(--ink);background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.22)}
+.welcome-dialog::backdrop{background:rgba(18,18,20,.42);backdrop-filter:blur(8px)}
+.welcome-content{padding:28px}.welcome-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#0071e3;color:#fff;font-size:20px;font-weight:700}.welcome-content h2{margin:20px 0 8px;font-size:28px;line-height:1.05;letter-spacing:-.04em}.welcome-content p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}.welcome-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:24px}
+.tour-layer{position:fixed;inset:0;z-index:90}.tour-focus{position:fixed;z-index:91;border:2px solid #2997ff;border-radius:18px;box-shadow:0 0 0 9999px rgba(18,18,20,.55),0 0 0 5px rgba(41,151,255,.2);pointer-events:none;transition:transform .28s cubic-bezier(.22,1,.36,1),width .28s cubic-bezier(.22,1,.36,1),height .28s cubic-bezier(.22,1,.36,1)}
+.tour-card{position:fixed;z-index:92;width:min(340px,calc(100vw - 24px));padding:18px;border-radius:20px;background:#fff;box-shadow:0 18px 60px rgba(0,0,0,.24)}.tour-progress{color:#0071e3;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}.tour-card h3{margin:8px 0 6px;font-size:19px;letter-spacing:-.025em}.tour-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.48}.tour-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:17px}.tour-controls div{display:flex;gap:7px}.tour-skip{padding:8px 4px;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:650}.tour-skip:hover{color:var(--ink)}
+@media(max-width:580px){.welcome-actions{grid-template-columns:1fr}.tour-card{padding:16px}.actions #tourBtn{padding-inline:10px}}
 </style>
 </head>
 <body>
@@ -271,6 +277,7 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
   <a class="brand" href="#inicio" aria-label="Ir al inicio"><img class="brand-logo" src="Assets/Edu.png" alt="Educación Dual" width="6250" height="851" decoding="async" fetchpriority="high"></a>
   <div class="actions">
     <span class="pill" id="saveState">Nueva</span>
+    <button class="btn" id="tourBtn" type="button">Tutorial</button>
     <button class="btn secondary" id="newBtn" type="button">Nueva bitácora</button>
     <button class="btn" id="saveBtn" type="button">Guardar</button>
     <button class="btn primary" id="pdfBtn" type="button">Descargar PDF</button>
@@ -294,6 +301,31 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
     <section class="step-panel" data-step="4"><div class="step-head"><span class="step-count">Paso 5 de 5</span><h2>Revisa y genera el PDF</h2><p>La vista mantiene el formato A4 horizontal y avisa si el contenido rebasa una página.</p></div><div class="preview-shell"><section class="panel preview"><div class="preview-top"><div><strong style="font-size:12.4px">Vista exacta del PDF</strong><div class="muted">A4 horizontal · Times New Roman · PDF directo</div></div><span class="pill" id="fitState">Cabe en una página</span></div><div class="canvas-wrap"><canvas id="preview" width="1782" height="1260"></canvas></div></section></div><div class="management-grid"><section class="management-card"><h3>Registros guardados</h3><p>Abre, duplica o elimina semanas anteriores.</p><div class="records" id="records"></div></section><section class="management-card"><h3>Respaldo de información</h3><p>Exporta o importa todos los registros en formato JSON.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="backupBtn" type="button">Exportar respaldo</button><label class="btn" style="cursor:pointer;display:inline-flex;align-items:center">Importar respaldo<input hidden type="file" accept=".json,application/json" id="importFile"></label><button class="btn" id="resetBtn" type="button">Restablecer Semana 1</button></div></section></div><div class="step-actions"><button class="btn wizard-prev" type="button">Atrás</button><div class="step-actions-right"><button class="btn" id="mobileSave" type="button">Guardar registro</button><button class="btn primary" id="mobilePdf" type="button">Descargar PDF</button></div></div></section>
   </div>
 </main>
+</div>
+
+<dialog class="welcome-dialog" id="welcomeDialog" aria-labelledby="welcomeTitle">
+  <div class="welcome-content">
+    <div class="welcome-mark" aria-hidden="true">?</div>
+    <h2 id="welcomeTitle">¿Es tu primera vez por aquí?</h2>
+    <p>Puedo mostrarte cómo llenar, guardar y descargar tu bitácora. Solo tomará unos segundos.</p>
+    <div class="welcome-actions">
+      <button class="btn primary" id="firstTimeYes" type="button">Sí, enséñame</button>
+      <button class="btn" id="firstTimeNo" type="button">No, ya lo conozco</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="tour-layer" id="tourLayer" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden>
+  <div class="tour-focus" id="tourFocus" aria-hidden="true"></div>
+  <section class="tour-card" id="tourCard">
+    <div class="tour-progress" id="tourProgress"></div>
+    <h3 id="tourTitle"></h3>
+    <p id="tourText"></p>
+    <div class="tour-controls">
+      <button class="tour-skip" id="tourSkip" type="button">Saltar tutorial</button>
+      <div><button class="btn" id="tourBack" type="button">Atrás</button><button class="btn primary" id="tourNext" type="button">Siguiente</button></div>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -1523,6 +1555,128 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
     highestStep = 0;
     showStep(0, true);
   });
+
+  const ONBOARDING_KEY = "bitacora_dual_onboarding_v1";
+  const welcomeDialog = document.getElementById("welcomeDialog");
+  const tourLayer = document.getElementById("tourLayer");
+  const tourFocus = document.getElementById("tourFocus");
+  const tourCard = document.getElementById("tourCard");
+  const tourSteps = [
+    {
+      selector: ".brand-logo",
+      title: "Tu generador de bitácoras",
+      text: "Aquí puedes preparar la bitácora semanal y conservar el formato institucional."
+    },
+    {
+      selector: ".actions",
+      title: "Acciones principales",
+      text: "Inicia una bitácora, guarda el avance en este navegador, repite el tutorial o descarga el PDF."
+    },
+    {
+      selector: ".wizard-nav",
+      title: "Cinco etapas claras",
+      text: "El indicador muestra dónde estás. Podrás regresar a cualquier etapa que ya hayas completado."
+    },
+    {
+      selector: ".step-panel.active .fields",
+      title: "Completa solo lo necesario",
+      text: "Cada etapa solicita una parte de la información. Los datos escolares disponibles ya están delimitados."
+    },
+    {
+      selector: ".step-panel.active .wizard-next",
+      title: "Avanza paso a paso",
+      text: "Pulsa Continuar para registrar al alumno, la empresa, la semana y los responsables. Al final podrás revisar y descargar el PDF."
+    }
+  ];
+  let tourIndex = 0;
+
+  function saveOnboarding(value) {
+    try { localStorage.setItem(ONBOARDING_KEY, value); } catch {}
+  }
+
+  function positionTour() {
+    if (tourLayer.hidden) return;
+    const target = document.querySelector(tourSteps[tourIndex].selector);
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    const gap = 8;
+    const left = Math.max(gap, rect.left - 6);
+    const top = Math.max(gap, rect.top - 6);
+    const width = Math.min(window.innerWidth - left - gap, rect.width + 12);
+    const height = Math.min(window.innerHeight - top - gap, rect.height + 12);
+    tourFocus.style.transform = `translate(${left}px,${top}px)`;
+    tourFocus.style.width = width + "px";
+    tourFocus.style.height = height + "px";
+
+    const cardRect = tourCard.getBoundingClientRect();
+    const below = rect.bottom + 16;
+    const cardTop = below + cardRect.height <= window.innerHeight - 12
+      ? below
+      : Math.max(12, rect.top - cardRect.height - 16);
+    const cardLeft = Math.max(12, Math.min(window.innerWidth - cardRect.width - 12, rect.left));
+    tourCard.style.top = cardTop + "px";
+    tourCard.style.left = cardLeft + "px";
+  }
+
+  function renderTour() {
+    const item = tourSteps[tourIndex];
+    const target = document.querySelector(item.selector);
+    document.getElementById("tourProgress").textContent = `Paso ${tourIndex + 1} de ${tourSteps.length}`;
+    document.getElementById("tourTitle").textContent = item.title;
+    document.getElementById("tourText").textContent = item.text;
+    document.getElementById("tourBack").disabled = tourIndex === 0;
+    document.getElementById("tourNext").textContent = tourIndex === tourSteps.length - 1 ? "Terminar" : "Siguiente";
+    target?.scrollIntoView({ behavior: "smooth", block: "center" });
+    requestAnimationFrame(() => requestAnimationFrame(positionTour));
+    setTimeout(positionTour, 260);
+  }
+
+  function startTour() {
+    if (welcomeDialog.open) welcomeDialog.close();
+    tourIndex = 0;
+    tourLayer.hidden = false;
+    document.querySelector(".shell").inert = true;
+    document.body.style.overflow = "hidden";
+    renderTour();
+    document.getElementById("tourNext").focus();
+  }
+
+  function endTour(value = "completed") {
+    tourLayer.hidden = true;
+    document.querySelector(".shell").inert = false;
+    document.body.style.overflow = "";
+    saveOnboarding(value);
+    document.getElementById("tourBtn").focus();
+  }
+
+  document.getElementById("firstTimeYes").addEventListener("click", () => {
+    saveOnboarding("started");
+    startTour();
+  });
+  document.getElementById("firstTimeNo").addEventListener("click", () => {
+    saveOnboarding("skipped");
+    welcomeDialog.close();
+  });
+  welcomeDialog.addEventListener("cancel", event => event.preventDefault());
+  document.getElementById("tourBtn").addEventListener("click", startTour);
+  document.getElementById("tourSkip").addEventListener("click", () => endTour("skipped"));
+  document.getElementById("tourBack").addEventListener("click", () => {
+    if (tourIndex > 0) { tourIndex -= 1; renderTour(); }
+  });
+  document.getElementById("tourNext").addEventListener("click", () => {
+    if (tourIndex === tourSteps.length - 1) { endTour(); return; }
+    tourIndex += 1;
+    renderTour();
+  });
+  tourLayer.addEventListener("keydown", event => {
+    if (event.key === "Escape") endTour("skipped");
+  });
+  window.addEventListener("resize", positionTour);
+  window.addEventListener("scroll", positionTour, { passive: true });
+
+  let onboardingState = null;
+  try { onboardingState = localStorage.getItem(ONBOARDING_KEY); } catch {}
+  if (!onboardingState) requestAnimationFrame(() => welcomeDialog.showModal());
 })();
 </script>
 </body>
