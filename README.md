@@ -46,6 +46,18 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Diseño adaptable para computadora, tableta y teléfono.
 - Compatibilidad con movimiento y transparencia reducidos.
 
+## Empresas y organismos disponibles
+
+- Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG).
+- Instituto Tecnológico de Chilpancingo (ITCH).
+- Sistema de Universidad Virtual de la Universidad Autónoma de Guerrero (UAGro Virtual).
+- 100% Natural Aeropuerto S.A. de C.V. (100% Natural).
+- Chilpancingo Inn, S.A. de C.V. (Holiday Inn).
+- Automóviles de Iguala, S.A. de C.V. (Nissan).
+- Distribuidora Automotriz Acapulco, S.A. de C.V. (Chevrolet Chilpancingo).
+- Operadora de Guerrero Duaabsa, S.A. de C.V. (KFC).
+- “La Avispa”, Museo Interactivo.
+
 ## Flujo de trabajo
 
 | Etapa | Información solicitada |
