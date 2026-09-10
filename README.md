@@ -30,7 +30,8 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Catálogo de empresas y organismos receptores.
 - Generación automática de jornadas de martes a viernes.
 - Horarios predeterminados editables.
-- Estados de jornada laboral, sin labores o día inhábil.
+- Estados de jornada con labores, sin labores, día inhábil o falta.
+- Justificación personalizada y obligatoria cuando se registra una falta.
 - Descripción de actividades con Markdown básico.
 - Límite y contador de caracteres por jornada.
 - Áreas o departamentos independientes por día.
