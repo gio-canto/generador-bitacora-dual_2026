@@ -268,7 +268,9 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
 .welcome-content{padding:28px}.welcome-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#0071e3;color:#fff;font-size:20px;font-weight:700}.welcome-content h2{margin:20px 0 8px;font-size:28px;line-height:1.05;letter-spacing:-.04em}.welcome-content p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}.welcome-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:24px}
 .tour-layer{position:fixed;inset:0;z-index:90}.tour-focus{position:fixed;z-index:91;border:2px solid #2997ff;border-radius:18px;box-shadow:0 0 0 9999px rgba(18,18,20,.55),0 0 0 5px rgba(41,151,255,.2);pointer-events:none;transition:transform .28s cubic-bezier(.22,1,.36,1),width .28s cubic-bezier(.22,1,.36,1),height .28s cubic-bezier(.22,1,.36,1)}
 .tour-card{position:fixed;z-index:92;width:min(340px,calc(100vw - 24px));padding:18px;border-radius:20px;background:#fff;box-shadow:0 18px 60px rgba(0,0,0,.24)}.tour-progress{color:#0071e3;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}.tour-card h3{margin:8px 0 6px;font-size:19px;letter-spacing:-.025em}.tour-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.48}.tour-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:17px}.tour-controls div{display:flex;gap:7px}.tour-skip{padding:8px 4px;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:650}.tour-skip:hover{color:var(--ink)}
+.credits-dialog{width:min(92vw,680px);max-height:min(88dvh,760px);padding:0;border:0;border-radius:28px;color:var(--ink);background:#fff;box-shadow:0 26px 90px rgba(0,0,0,.28)}.credits-dialog::backdrop{background:rgba(18,18,20,.55);backdrop-filter:blur(10px)}.credits-shell{padding:clamp(24px,5vw,42px);overflow:auto}.credits-top{display:flex;gap:20px;align-items:center}.credits-avatar{width:104px;height:104px;flex:0 0 auto;object-fit:cover;border-radius:28px;box-shadow:0 10px 30px rgba(0,0,0,.16)}.credits-eyebrow{display:inline-block;margin-bottom:7px;color:#0071e3;font-size:12px;font-weight:750;letter-spacing:.04em}.credits-dialog h2{margin:0;font-size:clamp(27px,5vw,42px);line-height:1;letter-spacing:-.05em;text-wrap:balance}.credits-copy{margin:26px 0 0;font-size:15px;line-height:1.65;color:#3a3a3c}.credits-copy p{margin:0 0 13px}.credits-tag{display:inline-block;padding:7px 10px;border-radius:10px;background:#f0f0f2;color:#1d1d1f;font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace}.credits-quote{margin:24px 0;padding:18px 20px;border-left:3px solid #0071e3;border-radius:0 14px 14px 0;background:#f5f5f7;color:#525256;font-size:14px;line-height:1.55}.credits-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}.credits-actions a{text-decoration:none;display:inline-flex;align-items:center}
 @media(max-width:580px){.welcome-actions{grid-template-columns:1fr}.tour-card{padding:16px}.actions #tourBtn{padding-inline:10px}}
+@media(max-width:520px){.credits-top{align-items:flex-start}.credits-avatar{width:78px;height:78px;border-radius:22px}.credits-actions>*{flex:1;justify-content:center}}
 </style>
 </head>
 <body>
@@ -327,6 +329,23 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
     </div>
   </section>
 </div>
+
+<dialog class="credits-dialog" id="creditsDialog" aria-labelledby="creditsTitle">
+  <div class="credits-shell">
+    <div class="credits-top">
+      <img class="credits-avatar" src="https://avatars.githubusercontent.com/u/205862753?v=4" alt="Foto de perfil de Gio Antonio Canto Gómez" width="104" height="104" loading="lazy" referrerpolicy="no-referrer">
+      <div><span class="credits-eyebrow">Easter egg desbloqueado :3</span><h2 id="creditsTitle">Sistema de creación de bitácoras duales :3</h2></div>
+    </div>
+    <div class="credits-copy">
+      <p>Ideado y creado por <strong>Gio Antonio Canto Gómez</strong> (<strong>COCYTIEG</strong>).</p>
+      <p>Apoyado por ChatGPT Sol Media.</p>
+      <p>Hecho para todos los estudiantes a quienes les da flojera hacer esta bitácora. Creado en 2026.</p>
+      <span class="credits-tag">Made by furries :3</span>
+    </div>
+    <blockquote class="credits-quote">“A veces parece que lo hacen a posta que sean dificiles alguna veces con lo facil que es tomarte el tiempo para ayudar a tus compañeros, hazlo a veces”</blockquote>
+    <div class="credits-actions"><button class="btn" id="creditsClose" type="button">Volver a la bitácora</button><a class="btn primary" href="https://github.com/gio-canto" target="_blank" rel="noopener noreferrer">Ver GitHub de Gio</a></div>
+  </div>
+</dialog>
 
 <script>
 "use strict";
@@ -1556,36 +1575,71 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
     showStep(0, true);
   });
 
-  const ONBOARDING_KEY = "bitacora_dual_onboarding_v1";
+  const ONBOARDING_KEY = "bitacora_dual_onboarding_v2";
   const welcomeDialog = document.getElementById("welcomeDialog");
   const tourLayer = document.getElementById("tourLayer");
   const tourFocus = document.getElementById("tourFocus");
   const tourCard = document.getElementById("tourCard");
   const tourSteps = [
     {
-      selector: ".brand-logo",
-      title: "Tu generador de bitácoras",
-      text: "Aquí puedes preparar la bitácora semanal y conservar el formato institucional."
+      section: 0,
+      selector: '.step-panel[data-step="0"] .fields',
+      title: "1. Datos escolares",
+      text: "Comienza con el plantel, la especialidad, el semestre y el grupo. Las opciones permitidas ya están preparadas para evitar errores."
     },
     {
-      selector: ".actions",
-      title: "Acciones principales",
-      text: "Inicia una bitácora, guarda el avance en este navegador, repite el tutorial o descarga el PDF."
+      section: 0,
+      selector: '.step-panel[data-step="0"] .wizard-next',
+      title: "Termina la primera sección",
+      text: "Cuando los datos escolares estén correctos, Continuar te llevará al alumno y la empresa. En este tutorial cambiaremos de sección automáticamente."
     },
     {
-      selector: ".wizard-nav",
-      title: "Cinco etapas claras",
-      text: "El indicador muestra dónde estás. Podrás regresar a cualquier etapa que ya hayas completado."
+      section: 1,
+      selector: '.step-panel[data-step="1"] .fields',
+      title: "2. Alumno y empresa",
+      text: "Escribe el nombre completo y elige la empresa receptora. El nombre del alumno se usará automáticamente en Elaboró."
     },
     {
-      selector: ".step-panel.active .fields",
-      title: "Completa solo lo necesario",
-      text: "Cada etapa solicita una parte de la información. Los datos escolares disponibles ya están delimitados."
+      section: 1,
+      selector: '#company',
+      title: "La empresa ajusta los responsables",
+      text: "Si eliges COCYTIEG se cargan Karen y los instructores del Consejo. En las demás empresas podrás personalizar esos datos."
     },
     {
-      selector: ".step-panel.active .wizard-next",
-      title: "Avanza paso a paso",
-      text: "Pulsa Continuar para registrar al alumno, la empresa, la semana y los responsables. Al final podrás revisar y descargar el PDF."
+      section: 2,
+      selector: '.step-panel[data-step="2"] .fields.three',
+      title: "3. Genera la semana",
+      text: "Elige una fecha de referencia y los horarios habituales. Después genera automáticamente los días de martes a viernes."
+    },
+    {
+      section: 2,
+      selector: '#days',
+      title: "Registra cada jornada",
+      text: "Cada día puede tener labores, estar sin labores, ser inhábil o marcarse como falta. Las faltas siempre requieren una justificación personalizada."
+    },
+    {
+      section: 3,
+      selector: '.step-panel[data-step="3"] .section',
+      title: "4. Revisa los responsables",
+      text: "Elaboró toma el nombre del alumno y Vepsania permanece en Vo.Bo. Revisa o completa la persona que autoriza."
+    },
+    {
+      section: 3,
+      selector: '#instructorBox',
+      title: "Instructor formador",
+      text: "Activa este espacio solo si debe aparecer en el documento. El catálogo del Consejo se muestra únicamente para COCYTIEG."
+    },
+    {
+      section: 4,
+      selector: '.preview-shell',
+      title: "5. Revisa el documento",
+      text: "La vista previa muestra cómo quedará el PDF. Comprueba que todo cabe correctamente antes de descargarlo."
+    },
+    {
+      section: 4,
+      selector: '.step-panel[data-step="4"] .step-actions',
+      title: "Guarda y descarga",
+      text: "Guarda el registro para retomarlo después o descarga el PDF final. Al terminar el tutorial volverás al primer paso para comenzar desde cero."
     }
   ];
   let tourIndex = 0;
@@ -1620,6 +1674,7 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
 
   function renderTour() {
     const item = tourSteps[tourIndex];
+    if (step !== item.section) showStep(item.section, true);
     const target = document.querySelector(item.selector);
     document.getElementById("tourProgress").textContent = `Paso ${tourIndex + 1} de ${tourSteps.length}`;
     document.getElementById("tourTitle").textContent = item.title;
@@ -1646,6 +1701,8 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
     document.querySelector(".shell").inert = false;
     document.body.style.overflow = "";
     saveOnboarding(value);
+    highestStep = 0;
+    showStep(0, true);
     document.getElementById("tourBtn").focus();
   }
 
@@ -1677,6 +1734,12 @@ input,textarea,select{border-color:transparent;background:#f5f5f7;border-radius:
   let onboardingState = null;
   try { onboardingState = localStorage.getItem(ONBOARDING_KEY); } catch {}
   if (!onboardingState) requestAnimationFrame(() => welcomeDialog.showModal());
+
+  const creditsDialog = document.getElementById("creditsDialog");
+  document.getElementById("student").addEventListener("input", event => {
+    if (event.target.value.trim().toLowerCase() === "uwu" && !creditsDialog.open) creditsDialog.showModal();
+  });
+  document.getElementById("creditsClose").addEventListener("click", () => creditsDialog.close());
 })();
 </script>
 </body>
