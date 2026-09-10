@@ -24,6 +24,8 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 ## Funciones principales
 
 - Asistente progresivo de cinco etapas.
+- Pregunta de bienvenida en el primer acceso y tutorial guiado opcional.
+- Botón permanente para volver a abrir el tutorial.
 - Plantel institucional precargado y grupo editable.
 - Seis especialidades disponibles: Programación, Contabilidad, Inteligencia Artificial, Comercio Electrónico, Administración de Recursos Humanos y Ofimática.
 - Semestres permitidos del cuarto al sexto.
