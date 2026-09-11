@@ -1,0 +1,41 @@
+name: Prepare Beta 0.34
+on:
+  push:
+    branches:
+      - tmp/easteregg-034
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: tmp/easteregg-034
+      - name: Update easter egg and version
+        shell: python
+        run: |
+          from pathlib import Path
+
+          index = Path('index.html')
+          text = index.read_text(encoding='utf-8')
+          old = 'document.getElementById("student").addEventListener("input",e=>{if(e.target.value.trim().toLowerCase()==="uwu"&&!credits.open)credits.showModal()});'
+          new = 'const EASTER_EGG_NAMES=new Set(["uwu","legoshi","jack","haru","louis","furry","xd","lol","anton","mark scout","helly riggs","dylan george","hatsune miku"]);const normalizeEasterEggName=value=>String(value||"").trim().toLowerCase().replace(/\\s+/g," ");document.getElementById("student").addEventListener("input",e=>{if(EASTER_EGG_NAMES.has(normalizeEasterEggName(e.target.value))&&!credits.open)credits.showModal()});'
+          if old not in text:
+              raise SystemExit('No se encontro el disparador original del easter egg')
+          index.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          readme = Path('README.md')
+          text = readme.read_text(encoding='utf-8').replace('Beta%200.33','Beta%200.34').replace('**Beta 0.33**','**Beta 0.34**')
+          readme.write_text(text, encoding='utf-8')
+
+          faq = Path('faq/index.html')
+          text = faq.read_text(encoding='utf-8').replace('Beta 0.33','Beta 0.34')
+          faq.write_text(text, encoding='utf-8')
+      - name: Commit prepared files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html README.md faq/index.html
+          git commit -m "Preparar Beta 0.34 con easter eggs ampliados"
+          git push
