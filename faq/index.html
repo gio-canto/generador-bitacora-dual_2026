@@ -7,267 +7,70 @@
 <meta name="description" content="Preguntas frecuentes sobre Educación Dual, la bitácora semanal y el Generador de Bitácora Dual 2026 del CBTis No. 134.">
 <title>Preguntas frecuentes · Bitácora Dual 2026</title>
 <style>
-:root{
-  --bg:#f5f5f7;
-  --card:#fff;
-  --ink:#1d1d1f;
-  --muted:#6e6e73;
-  --blue:#0071e3;
-  --blue-soft:rgba(0,113,227,.09);
-  --green:#248a3d;
-  --amber:#9a6700;
-  --line:rgba(0,0,0,.08);
-  --shadow:0 12px 36px rgba(0,0,0,.07);
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--bg)}
-body{
-  margin:0;
-  min-height:100vh;
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
-  background:
-    radial-gradient(circle at 10% 0%,rgba(0,113,227,.09),transparent 25%),
-    radial-gradient(circle at 92% 12%,rgba(175,82,222,.07),transparent 24%),
-    var(--bg);
-}
-a{color:var(--blue)}
-button,input{font:inherit}
-.shell{width:min(980px,calc(100% - 24px));margin:0 auto;padding:12px 0 72px}
-.topbar{
-  position:sticky;
-  top:10px;
-  z-index:20;
-  min-height:64px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-  padding:11px 13px 11px 15px;
-  border:1px solid rgba(255,255,255,.72);
-  border-radius:22px;
-  background:rgba(250,250,252,.80);
-  box-shadow:0 8px 30px rgba(0,0,0,.07);
-  backdrop-filter:blur(24px) saturate(150%);
-  -webkit-backdrop-filter:blur(24px) saturate(150%);
-}
-.brand{display:flex;align-items:center;text-decoration:none;min-width:0}
-.brand img{display:block;width:clamp(158px,23vw,230px);height:auto;max-height:36px;object-fit:contain;object-position:left center}
-.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:40px;
-  padding:9px 13px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:#fff;
-  color:var(--ink);
-  text-decoration:none;
-  font-size:13px;
-  font-weight:650;
-  transition:.15s ease;
-}
-.btn:hover{background:#f8f8fa}.btn:active{transform:scale(.97)}
-.btn.primary{color:#fff;background:var(--blue);border-color:var(--blue)}
-.btn.primary:hover{background:#0077ed}
-.hero{padding:58px 4px 30px}
-.eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--blue);font-size:12px;font-weight:760;letter-spacing:.05em;text-transform:uppercase}
-.hero h1{max-width:760px;margin:10px 0 13px;font-size:clamp(42px,7vw,68px);line-height:.98;letter-spacing:-.06em}
-.hero>p{max-width:720px;margin:0;color:var(--muted);font-size:clamp(16px,2vw,19px);line-height:1.55}
-.notice{margin-top:22px;padding:15px 17px;border-radius:18px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.85);box-shadow:0 7px 22px rgba(0,0,0,.04);color:#525256;font-size:13px;line-height:1.5}
-.notice strong{color:var(--ink)}
-.search-wrap{position:relative;margin:2px 0 18px}
-.search-wrap:before{content:"⌕";position:absolute;left:16px;top:50%;transform:translateY(-52%);color:var(--muted);font-size:21px;pointer-events:none}
-#faqSearch{width:100%;height:50px;padding:0 16px 0 44px;border:1px solid var(--line);border-radius:16px;outline:0;background:#fff;color:var(--ink);box-shadow:0 5px 18px rgba(0,0,0,.035);font-size:15px}
-#faqSearch:focus{box-shadow:0 0 0 4px rgba(0,113,227,.13)}
-.faq-list{display:grid;gap:10px}
-details{
-  overflow:hidden;
-  border:1px solid rgba(0,0,0,.06);
-  border-radius:20px;
-  background:var(--card);
-  box-shadow:0 7px 24px rgba(0,0,0,.045);
-}
-details[open]{box-shadow:var(--shadow)}
-summary{position:relative;cursor:pointer;list-style:none;padding:19px 52px 19px 20px;font-size:16px;font-weight:700;line-height:1.35;letter-spacing:-.015em}
-summary::-webkit-details-marker{display:none}
-summary:after{content:"+";position:absolute;right:19px;top:50%;transform:translateY(-50%);width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:#f2f2f4;color:#525256;font-size:20px;font-weight:400;transition:.18s ease}
-details[open] summary:after{content:"−";background:var(--blue-soft);color:var(--blue)}
-.answer{padding:0 20px 21px;color:#3a3a3c;font-size:14px;line-height:1.68}
-.answer p{margin:0 0 11px}.answer p:last-child{margin-bottom:0}
-.answer ul,.answer ol{margin:9px 0 11px;padding-left:22px}.answer li{margin:5px 0}
-.answer code{padding:2px 6px;border-radius:7px;background:#f2f2f4;color:#1d1d1f;font:650 12px ui-monospace,SFMono-Regular,Menlo,monospace}
-.tip,.important,.example{margin:13px 0 0;padding:12px 14px;border-radius:14px;font-size:13px;line-height:1.5}
-.tip{background:rgba(36,138,61,.08);color:#256332}.important{background:rgba(255,159,10,.10);color:#73510b}.example{background:var(--blue-soft);color:#174f8a}
-.contribute{margin-top:28px;padding:24px;border-radius:24px;background:#fff;border:1px solid rgba(0,0,0,.06);box-shadow:var(--shadow)}
-.contribute h2{margin:0 0 7px;font-size:26px;letter-spacing:-.035em}.contribute p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}.contribute-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}
-.empty{display:none;padding:30px 18px;text-align:center;color:var(--muted)}
-.footer{padding:34px 6px 0;text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
-@media(max-width:620px){
-  .shell{width:min(100% - 16px,980px);padding-top:8px}.topbar{top:7px;border-radius:19px}.brand img{width:145px}.actions .secondary{display:none}
-  .hero{padding:40px 5px 23px}.hero h1{font-size:clamp(38px,13vw,54px)}
-  summary{padding:17px 48px 17px 17px;font-size:15px}.answer{padding:0 17px 18px}.contribute{padding:20px;border-radius:20px}
-}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
-@media(prefers-reduced-transparency:reduce){.topbar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}}
+:root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--muted:#6e6e73;--blue:#0071e3;--blue-soft:rgba(0,113,227,.09);--green:#248a3d;--amber:#9a6700;--line:rgba(0,0,0,.08);--shadow:0 12px 36px rgba(0,0,0,.07)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--bg)}body{margin:0;min-height:100vh;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;background:radial-gradient(circle at 10% 0%,rgba(0,113,227,.09),transparent 25%),radial-gradient(circle at 92% 12%,rgba(175,82,222,.07),transparent 24%),var(--bg)}a{color:var(--blue)}button,input{font:inherit}.shell{width:min(980px,calc(100% - 24px));margin:0 auto;padding:12px 0 72px}.topbar{position:sticky;top:10px;z-index:20;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 13px 11px 15px;border:1px solid rgba(255,255,255,.72);border-radius:22px;background:rgba(250,250,252,.80);box-shadow:0 8px 30px rgba(0,0,0,.07);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%)}.brand{display:flex;align-items:center;text-decoration:none;min-width:0}.brand img{display:block;width:clamp(158px,23vw,230px);height:auto;max-height:36px;object-fit:contain;object-position:left center}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:9px 13px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);text-decoration:none;font-size:13px;font-weight:650;transition:.15s ease}.btn:hover{background:#f8f8fa}.btn:active{transform:scale(.97)}.btn.primary{color:#fff;background:var(--blue);border-color:var(--blue)}.btn.primary:hover{background:#0077ed}.hero{padding:58px 4px 30px}.eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--blue);font-size:12px;font-weight:760;letter-spacing:.05em;text-transform:uppercase}.hero h1{max-width:760px;margin:10px 0 13px;font-size:clamp(42px,7vw,68px);line-height:.98;letter-spacing:-.06em}.hero>p{max-width:720px;margin:0;color:var(--muted);font-size:clamp(16px,2vw,19px);line-height:1.55}.notice{margin-top:22px;padding:15px 17px;border-radius:18px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.85);box-shadow:0 7px 22px rgba(0,0,0,.04);color:#525256;font-size:13px;line-height:1.5}.notice strong{color:var(--ink)}.search-wrap{position:relative;margin:2px 0 18px}.search-wrap:before{content:"⌕";position:absolute;left:16px;top:50%;transform:translateY(-52%);color:var(--muted);font-size:21px;pointer-events:none}#faqSearch{width:100%;height:50px;padding:0 16px 0 44px;border:1px solid var(--line);border-radius:16px;outline:0;background:#fff;color:var(--ink);box-shadow:0 5px 18px rgba(0,0,0,.035);font-size:15px}#faqSearch:focus{box-shadow:0 0 0 4px rgba(0,113,227,.13)}.faq-list{display:grid;gap:10px}details{overflow:hidden;border:1px solid rgba(0,0,0,.06);border-radius:20px;background:var(--card);box-shadow:0 7px 24px rgba(0,0,0,.045)}details[open]{box-shadow:var(--shadow)}summary{position:relative;cursor:pointer;list-style:none;padding:19px 52px 19px 20px;font-size:16px;font-weight:700;line-height:1.35;letter-spacing:-.015em}summary::-webkit-details-marker{display:none}summary:after{content:"+";position:absolute;right:19px;top:50%;transform:translateY(-50%);width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:#f2f2f4;color:#525256;font-size:20px;font-weight:400;transition:.18s ease}details[open] summary:after{content:"−";background:var(--blue-soft);color:var(--blue)}.answer{padding:0 20px 21px;color:#3a3a3c;font-size:14px;line-height:1.68}.answer p{margin:0 0 11px}.answer p:last-child{margin-bottom:0}.answer ul,.answer ol{margin:9px 0 11px;padding-left:22px}.answer li{margin:5px 0}.answer code{padding:2px 6px;border-radius:7px;background:#f2f2f4;color:#1d1d1f;font:650 12px ui-monospace,SFMono-Regular,Menlo,monospace}.tip,.important,.example{margin:13px 0 0;padding:12px 14px;border-radius:14px;font-size:13px;line-height:1.5}.tip{background:rgba(36,138,61,.08);color:#256332}.important{background:rgba(255,159,10,.10);color:#73510b}.example{background:var(--blue-soft);color:#174f8a}.directory-links{display:grid;gap:8px;margin:12px 0}.directory-links a{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:13px;background:#f7f7f9;text-decoration:none;font-weight:650}.directory-links a:after{content:"↗"}.example-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.example-gallery.single{grid-template-columns:minmax(0,1fr)}.example-media{overflow:hidden;border:1px solid var(--line);border-radius:17px;background:#f5f5f7}.example-media img{display:block;width:100%;height:auto;max-height:520px;object-fit:contain;background:#eeeef0}.example-caption{padding:10px 12px;color:var(--muted);font-size:12px;line-height:1.45}.asset-missing{display:none;padding:30px 16px;text-align:center;color:var(--muted);font-size:12px}.model-entry{margin-top:13px;padding:15px;border-radius:16px;background:#f5f5f7}.model-entry strong{display:block;margin-bottom:7px}.model-entry ul{margin-bottom:0}.contribute{margin-top:28px;padding:24px;border-radius:24px;background:#fff;border:1px solid rgba(0,0,0,.06);box-shadow:var(--shadow)}.contribute h2{margin:0 0 7px;font-size:26px;letter-spacing:-.035em}.contribute p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}.contribute-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}.empty{display:none;padding:30px 18px;text-align:center;color:var(--muted)}.footer{padding:34px 6px 0;text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:620px){.shell{width:min(100% - 16px,980px);padding-top:8px}.topbar{top:7px;border-radius:19px}.brand img{width:145px}.actions .secondary{display:none}.hero{padding:40px 5px 23px}.hero h1{font-size:clamp(38px,13vw,54px)}summary{padding:17px 48px 17px 17px;font-size:15px}.answer{padding:0 17px 18px}.contribute{padding:20px;border-radius:20px}.example-gallery{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}@media(prefers-reduced-transparency:reduce){.topbar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}}
 </style>
 </head>
 <body>
 <div class="shell">
-  <header class="topbar">
-    <a class="brand" href="../" aria-label="Volver al generador"><img src="../Assets/Edu.png" alt="Educación Dual" width="6250" height="851"></a>
-    <div class="actions">
-      <a class="btn secondary" href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">GitHub</a>
-      <a class="btn primary" href="../">Abrir generador</a>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <span class="eyebrow">Ayuda · Educación Dual</span>
-      <h1>Preguntas frecuentes.</h1>
-      <p>Respuestas rápidas para llenar, firmar y entregar tu bitácora semanal, además de resolver dudas comunes del Generador de Bitácora Dual 2026.</p>
-      <div class="notice"><strong>Importante:</strong> esta guía busca facilitar el proceso. Si una indicación de tu empresa, de Vinculación o del CBTis No. 134 es diferente, sigue siempre la instrucción oficial que te hayan dado para tu caso.</div>
-    </section>
-
-    <div class="search-wrap"><input id="faqSearch" type="search" placeholder="Buscar una duda…" aria-label="Buscar en preguntas frecuentes"></div>
-
-    <section class="faq-list" id="faqList">
-      <details data-search="modalidad dual educacion escuela empresa aprendizaje">
-        <summary>¿Qué es la modalidad dual?</summary>
-        <div class="answer"><p>La <strong>Educación Dual</strong> combina la formación escolar con aprendizaje práctico dentro de una empresa u organismo. Parte de lo que aprendes se desarrolla en el plantel y otra parte se realiza directamente en un entorno de trabajo real, donde participas en actividades relacionadas con tu formación y recibes seguimiento.</p><p>La idea no es solamente “ir a trabajar”: debes aprender, aplicar conocimientos, desarrollar competencias y dejar evidencia de las actividades realizadas durante tu estancia.</p></div>
-      </details>
-
-      <details data-search="bitacora semanal evidencia actividades horarios empresa firmas">
-        <summary>¿Qué es una bitácora de la modalidad dual?</summary>
-        <div class="answer"><p>Es el documento semanal donde registras <strong>qué días asististe, tus horarios, el área donde estuviste y las actividades que realizaste</strong>. También incluye los espacios de responsables y firmas que permiten validar la información.</p><p>Piensa en ella como la evidencia resumida de tu semana dentro de la empresa u organismo receptor.</p></div>
-      </details>
-
-      <details data-search="porque entregar obligatoria evidencia seguimiento escuela vinculacion">
-        <summary>¿Por qué tengo que entregarla?</summary>
-        <div class="answer"><p>Porque permite al plantel llevar seguimiento de tu participación en Educación Dual y documentar las actividades desarrolladas en la empresa. Además, las firmas ayudan a comprobar que la información registrada fue revisada por las personas responsables.</p><div class="important"><strong>No la dejes para el final.</strong> Lo más fácil es actualizarla cada semana mientras todavía recuerdas con claridad lo que hiciste.</div></div>
-      </details>
-
-      <details data-search="como entregar imprimir tres copias empresa alumno cbtis vinculacion directora firmas">
-        <summary>¿Cómo entrego mi bitácora?</summary>
-        <div class="answer"><p>Como recomendación práctica, imprime <strong>3 copias</strong> cuando tu proceso y tu empresa lo permitan:</p><ol><li>Una para la empresa u organismo.</li><li>Una para ti, como respaldo.</li><li>Una para el CBTis No. 134.</li></ol><p>Primero reúne las firmas que correspondan en la empresa. Después pasa con la <strong>Dirección o Departamento de Vinculación</strong> para la revisión, firma y recepción del ejemplar destinado al plantel. Posteriormente entrega la copia de la empresa y conserva la tuya.</p><div class="important"><strong>Para el plantel, el ejemplar indispensable es el que se entrega al CBTis No. 134.</strong> Las copias adicionales son una recomendación para que tú y la empresa tengan respaldo. Consulta con tu empresa por si maneja un procedimiento diferente.</div></div>
-      </details>
-
-      <details data-search="empresa no aparece listado github colaborar pull request agregar">
-        <summary>¿Qué pasa si mi empresa no aparece en el listado?</summary>
-        <div class="answer"><p>No te preocupes. El catálogo puede ampliarse. Si tu empresa u organismo no aparece, puedes colaborar agregándolo al proyecto y enviando un <strong>pull request</strong> en GitHub.</p><p>Al hacerlo, revisa que el nombre oficial de la empresa esté escrito correctamente y evita subir datos personales innecesarios.</p><div class="tip">El proyecto es colaborativo: si detectas algo que falta o quedó desactualizado, puedes ayudar a que el siguiente estudiante ya lo encuentre corregido.</div></div>
-      </details>
-
-      <details data-search="una fecha de esa semana primer dia martes generar martes viernes manual">
-        <summary>“Una fecha de esa semana”, ¿qué significa?</summary>
-        <div class="answer"><p>Es una fecha que sirve para identificar la semana que vas a registrar. Para evitar confusiones, puedes elegir <strong>el primer día en que te corresponde laborar esa semana</strong>. Por ejemplo, si normalmente comienzas el martes, selecciona ese martes.</p><p>Después pulsa <strong>“Generar martes a viernes”</strong> y el sistema creará automáticamente las jornadas de esa semana. Si tu caso es diferente, también puedes agregar y ajustar los días manualmente.</p><div class="example"><strong>Ejemplo:</strong> si tu semana comienza el martes 8 de septiembre, selecciona el 8 de septiembre y genera la semana.</div></div>
-      </details>
-
-      <details data-search="markdown negritas cursivas listas formato actividad">
-        <summary>¿Qué es Markdown?</summary>
-        <div class="answer"><p>Markdown es una forma sencilla de dar formato al texto usando algunos símbolos. En este generador se utiliza principalmente dentro de las actividades.</p><ul><li><code>**texto**</code> convierte el texto en <strong>negritas</strong>.</li><li><code>*texto*</code> lo muestra en <em>cursivas</em>.</li><li>Comenzar una línea con <code>-</code> crea una lista con viñetas.</li></ul><p>No necesitas saber programación. Si no quieres utilizarlo, puedes escribir tus actividades normalmente o desactivar la opción de formato Markdown.</p></div>
-      </details>
-
-      <details data-search="falte falta dia inhabil calendario oficial suspension">
-        <summary>¿Qué pasa si falto?</summary>
-        <div class="answer"><p>Depende del motivo:</p><ul><li>Si no hubo actividades porque fue un <strong>día inhábil del calendario oficial</strong>, selecciona <strong>“Día inhábil”</strong>.</li><li>Si tú no asististe por una situación personal, utiliza <strong>“Falta”</strong> y escribe la justificación correspondiente.</li></ul><p>No uses “Falta” para un día que oficialmente no era laborable.</p></div>
-      </details>
-
-      <details data-search="enferme accidente no pude trabajar falta autorizacion avisar directora vinculacion empresa jefe inmediato justificar">
-        <summary>Me enfermé o me pasó algo y no pude trabajar, ¿qué hago?</summary>
-        <div class="answer"><p>Antes que nada, <strong>avisa y solicita la autorización que corresponda</strong>. Comunícate tanto con Vinculación como con tu empresa y, de ser posible, con tu jefe inmediato. No esperes hasta el momento de entregar la bitácora para informar la ausencia.</p><p>En el generador selecciona <strong>“Falta”</strong> y escribe de manera breve y clara por qué no asististe. Conserva cualquier comprobante que te soliciten.</p><div class="important">La bitácora registra lo ocurrido; no sustituye el procedimiento de aviso, permiso o justificación que tenga el plantel o la empresa.</div></div>
-      </details>
-
-      <details data-search="empresa cerro faltaron no hubo labores supervisor ausente sin labores">
-        <summary>En mi empresa no hubo labores, ¿qué hago?</summary>
-        <div class="answer"><p>Si la empresa suspendió actividades, cerró ese día o por alguna razón <strong>no hubo labores para ti</strong>, selecciona <strong>“Sin labores”</strong>.</p><p>Si solamente faltó una persona o tu supervisor, pero tú sí realizaste actividades, entonces registra el día como <strong>“Con labores”</strong> y describe lo que hiciste normalmente.</p></div>
-      </details>
-
-      <details data-search="autorizo quien autoriza jefe inmediato superior responsable empresa vinculacion consejo directora investigacion holiday inn recursos humanos">
-        <summary>“Autorizó”, ¿quién autoriza?</summary>
-        <div class="answer"><p>En esta sección se coloca, por regla general, a tu <strong>jefe inmediato o responsable principal dentro de la empresa</strong>: la persona que supervisa tu participación en Educación Dual y que puede validar tus actividades.</p><p>La persona exacta depende de cada empresa. Por ejemplo, en el Consejo puede corresponder a la <strong>Directora de Investigación y Proyectos Estratégicos</strong>; en una empresa hotelera podría ser la persona responsable de Recursos Humanos u otra jefatura designada.</p><p>Si no sabes quién debe aparecer, pregunta a Vinculación o directamente al responsable de Educación Dual de tu empresa. Ellos deben indicarte quién tiene esa función en tu caso.</p></div>
-      </details>
-
-      <details data-search="instructor formador que es cuando usar segundo responsable encargado area consejo informatica firma">
-        <summary>¿Qué es “Instructor formador” y en qué casos se usa?</summary>
-        <div class="answer"><p>Es un espacio para casos donde, además del responsable que autoriza, existe otra persona que <strong>trabaja directamente contigo, supervisa tus tareas o puede certificar que las actividades se realizaron</strong>.</p><p>Por ejemplo, en el Consejo el responsable principal puede ser la Directora de Investigación y Proyectos Estratégicos, pero un estudiante puede estar asignado al Área de Informática con su encargado. En un caso así, la firma del encargado puede servir como validación adicional antes de que la autoridad correspondiente autorice la bitácora.</p><p><strong>No siempre se utiliza.</strong> Si tu empresa no maneja una figura equivalente, deja desactivada esta opción. Si tienes duda, confirma con tu empresa o con Vinculación antes de incluir a alguien.</p></div>
-      </details>
-
-      <details data-search="formato desuso viejo cambio actualizar proyecto pull request gio canto instagram html informatica">
-        <summary>El formato quedó en desuso o cambió, ¿qué hago?</summary>
-        <div class="answer"><p>Si el CBTis, Vinculación o las empresas cambian el formato, <strong>no tengas miedo de actualizar el proyecto</strong>. Puedes proponer la corrección mediante un pull request en GitHub para que el generador siga siendo útil.</p><p>Si no sabes hacerlo, no manejas HTML o tienes una duda técnica, puedes contactar directamente a <strong>Gio Canto</strong>, creador del proyecto, mediante sus redes.</p><p><a href="https://www.instagram.com/gio_canto_g/" target="_blank" rel="noopener noreferrer">Instagram de Gio Canto · @gio_canto_g</a></p></div>
-      </details>
-
-      <details data-search="como hacer pull request github fork rama editar commit contribuir">
-        <summary>¿Cómo hago un pull request?</summary>
-        <div class="answer"><p>Un pull request es una propuesta para incorporar tus cambios al proyecto original. Una forma sencilla de hacerlo desde GitHub es:</p><ol><li>Abre el <a href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">repositorio del generador</a>.</li><li>Si no tienes permisos directos, pulsa <strong>Fork</strong> para crear una copia en tu cuenta.</li><li>Crea una rama o edita el archivo que necesitas modificar.</li><li>Haz el cambio y crea un <strong>commit</strong> explicando brevemente qué corregiste.</li><li>En GitHub, elige <strong>Contribute → Open pull request</strong>.</li><li>Describe qué cambiaste, por qué es necesario y, si aplica, cómo comprobaste que funciona.</li><li>Envía el pull request para revisión.</li></ol><div class="tip">Procura hacer cambios pequeños y claros. Antes de enviarlos, prueba que el generador siga funcionando tanto en computadora como en teléfono.</div></div>
-      </details>
-
-      <details data-search="que escribir actividades descripcion trabajo breve evidencia tareas">
-        <summary>¿Qué debo escribir en “Actividades”?</summary>
-        <div class="answer"><p>Escribe lo que realmente realizaste durante esa jornada, de forma concreta. Es mejor describir acciones que poner frases demasiado generales.</p><div class="example"><strong>Mejor:</strong> “Configuración de GitHub para control de versiones y revisión del diseño de la base de datos.”<br><strong>Evita:</strong> “Trabajé en informática.”</div><p>Puedes usar varias viñetas cuando hiciste más de una actividad.</p></div>
-      </details>
-
-      <details data-search="me equivoque editar corregir antes firmar pdf registro">
-        <summary>Me equivoqué al llenar la bitácora, ¿puedo corregirla?</summary>
-        <div class="answer"><p>Sí. Corrige la información en el generador y vuelve a guardar o descargar el PDF. Hazlo <strong>antes de recopilar firmas o entregar el documento</strong>. Si el ejemplar ya fue firmado o recibido, consulta con Vinculación antes de sustituirlo.</p></div>
-      </details>
-
-      <details data-search="pdf excede una pagina espacio fijo reducir texto cabe una pagina">
-        <summary>¿Qué hago si el PDF dice que excede una página?</summary>
-        <div class="answer"><p>Reduce o resume el texto de las actividades sin eliminar información importante. El generador mantiene el formato de una sola página y bloquea la descarga cuando el contenido ya no cabe correctamente.</p><p>Usa frases claras, elimina repeticiones y evita explicar en la bitácora cosas que pueden resumirse en una oración.</p></div>
-      </details>
-
-      <details data-search="respaldo json guardar registros otro navegador computadora exportar importar">
-        <summary>¿Cómo evito perder mis bitácoras guardadas?</summary>
-        <div class="answer"><p>En la sección final utiliza <strong>“Exportar respaldo”</strong>. Se descargará un archivo JSON con tus registros. Guárdalo en un lugar seguro.</p><p>Si cambias de navegador o computadora, puedes usar <strong>“Importar respaldo”</strong> para recuperar esos registros.</p><div class="important">Los registros normales se guardan en el navegador. Si borras los datos del sitio sin tener un respaldo, puedes perderlos.</div></div>
-      </details>
-
-      <details data-search="privacidad datos servidor nombres actividades local navegador cookies">
-        <summary>¿Mis datos se envían a un servidor?</summary>
-        <div class="answer"><p>No. El generador funciona del lado del navegador: los registros se almacenan localmente, el respaldo se genera en tu dispositivo y el PDF se crea directamente ahí. El proyecto no necesita una base de datos remota para procesar tus bitácoras.</p><p>Aun así, evita publicar en GitHub respaldos, bitácoras reales o archivos que contengan datos personales.</p></div>
-      </details>
-
-      <details data-search="caso diferente duda no aparece opcion vinculacion empresa preguntar">
-        <summary>Mi caso no aparece aquí, ¿qué hago?</summary>
-        <div class="answer"><p>Si la duda afecta firmas, faltas, horarios, entrega o responsabilidades, confirma primero con <strong>Vinculación y con tu empresa</strong>. Ellos pueden darte la indicación aplicable a tu situación concreta.</p><p>Si la duda es sobre el funcionamiento del generador, puedes abrir un issue en GitHub o proponer una mejora mediante pull request.</p></div>
-      </details>
-    </section>
-
-    <div class="empty" id="emptyState">No encontré una pregunta con esas palabras. Prueba con otro término.</div>
-
-    <section class="contribute">
-      <h2>¿Falta algo?</h2>
-      <p>Este generador puede mejorar con cada generación de estudiantes. Si una empresa, responsable, formato o procedimiento cambió, propón la actualización para que la información no se quede atrás.</p>
-      <div class="contribute-actions">
-        <a class="btn primary" href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">Colaborar en GitHub</a>
-        <a class="btn" href="https://www.instagram.com/gio_canto_g/" target="_blank" rel="noopener noreferrer">Contactar a Gio</a>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">Generador de Bitácora Dual 2026 · Ayuda para estudiantes de Educación Dual</footer>
+<header class="topbar"><a class="brand" href="../" aria-label="Volver al generador"><img src="../Assets/Edu.png" alt="Educación Dual" width="6250" height="851"></a><div class="actions"><a class="btn secondary" href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">GitHub</a><a class="btn primary" href="../">Abrir generador</a></div></header>
+<main>
+<section class="hero"><span class="eyebrow">Ayuda · Educación Dual</span><h1>Preguntas frecuentes.</h1><p>Respuestas rápidas para llenar, firmar y entregar tu bitácora semanal, además de resolver dudas comunes del Generador de Bitácora Dual 2026.</p><div class="notice"><strong>Importante:</strong> esta guía busca facilitar el proceso. Si una indicación de tu empresa, de Vinculación o del CBTis No. 134 es diferente, sigue siempre la instrucción oficial que te hayan dado para tu caso.</div></section>
+<div class="search-wrap"><input id="faqSearch" type="search" placeholder="Buscar una duda…" aria-label="Buscar en preguntas frecuentes"></div>
+<section class="faq-list" id="faqList">
+<details data-search="modalidad dual educacion escuela empresa aprendizaje"><summary>¿Qué es la modalidad dual?</summary><div class="answer"><p>La <strong>Educación Dual</strong> combina la formación escolar con aprendizaje práctico dentro de una empresa u organismo. Parte de lo que aprendes se desarrolla en el plantel y otra parte directamente en un entorno de trabajo real, donde realizas actividades relacionadas con tu formación y recibes seguimiento.</p><p>No es solamente “ir a trabajar”: debes aprender, aplicar conocimientos, desarrollar competencias y dejar evidencia de tus actividades.</p></div></details>
+<details data-search="bitacora semanal evidencia actividades horarios empresa firmas"><summary>¿Qué es una bitácora de la modalidad dual?</summary><div class="answer"><p>Es el documento semanal donde registras <strong>qué días asististe, tus horarios, el área donde estuviste y las actividades que realizaste</strong>. También incluye los espacios de responsables y firmas que permiten validar la información.</p></div></details>
+<details data-search="porque entregar obligatoria evidencia seguimiento escuela vinculacion"><summary>¿Por qué tengo que entregarla?</summary><div class="answer"><p>Porque permite al plantel llevar seguimiento de tu participación en Educación Dual y documentar las actividades desarrolladas en la empresa. Las firmas ayudan a comprobar que la información fue revisada por las personas responsables.</p><div class="important"><strong>No la dejes para el final.</strong> Actualízala cada semana mientras todavía recuerdas con claridad lo que hiciste.</div></div></details>
+<details data-search="como entregar imprimir tres copias empresa alumno cbtis vinculacion directora firmas"><summary>¿Cómo entrego mi bitácora?</summary><div class="answer"><p>Como recomendación práctica, imprime <strong>3 copias</strong> cuando tu proceso y tu empresa lo permitan:</p><ol><li>Una para la empresa u organismo.</li><li>Una para ti, como respaldo.</li><li>Una para el CBTis No. 134.</li></ol><p>Primero reúne las firmas que correspondan en la empresa. Después pasa con la <strong>Dirección o Departamento de Vinculación</strong> para la revisión, firma y recepción del ejemplar destinado al plantel. Posteriormente entrega la copia de la empresa y conserva la tuya.</p><div class="important"><strong>Para el plantel, el ejemplar indispensable es el que se entrega al CBTis No. 134.</strong> Las otras dos copias son una recomendación. Consulta siempre con tu empresa por si maneja otro procedimiento.</div></div></details>
+<details data-search="empresa no aparece listado github colaborar pull request agregar"><summary>¿Qué pasa si mi empresa no aparece en el listado?</summary><div class="answer"><p>No tengas miedo: el catálogo puede ampliarse. Si tu empresa u organismo no aparece, puedes colaborar agregándolo al proyecto y enviando un <strong>pull request</strong> en GitHub.</p><p>Revisa que el nombre oficial esté escrito correctamente y evita subir datos personales innecesarios.</p></div></details>
+<details data-search="una fecha de esa semana primer dia martes generar martes viernes manual"><summary>“Una fecha de esa semana”, ¿qué significa?</summary><div class="answer"><p>Es una fecha que sirve para identificar la semana que vas a registrar. Si normalmente comienzas a laborar los martes, selecciona <strong>el martes correspondiente a esa semana</strong>.</p><p>Después pulsa <strong>“Generar martes a viernes”</strong> y el sistema creará automáticamente los cuatro días. Si tu horario es diferente, puedes hacerlo manualmente día por día.</p></div></details>
+<details data-search="markdown negritas cursivas listas formato actividad"><summary>¿Qué es Markdown?</summary><div class="answer"><p>Markdown es una forma sencilla de dar formato al texto con símbolos. No necesitas saber programación.</p><ul><li><code>**texto**</code> = <strong>negritas</strong>.</li><li><code>*texto*</code> = <em>cursivas</em>.</li><li>Una línea que comienza con <code>-</code> crea una viñeta.</li></ul><p>También puedes escribir normalmente o desactivar Markdown.</p></div></details>
+<details data-search="falte falta dia inhabil calendario oficial suspension"><summary>¿Qué pasa si falto?</summary><div class="answer"><p>Si no hubo actividades porque fue un <strong>día inhábil del calendario oficial</strong>, selecciona <strong>“Día inhábil”</strong>. Si tú no asististe por una situación personal, utiliza <strong>“Falta”</strong> y escribe la justificación correspondiente.</p></div></details>
+<details data-search="enferme accidente no pude trabajar falta autorizacion avisar directora vinculacion empresa jefe inmediato justificar"><summary>Me enfermé o me pasó algo y no pude trabajar, ¿qué hago?</summary><div class="answer"><p>Antes que nada, <strong>avisa y solicita la autorización correspondiente</strong>. Comunícate con Vinculación, con tu empresa y con tu jefe inmediato. No esperes hasta entregar la bitácora.</p><p>En el generador selecciona <strong>“Falta”</strong> y escribe de forma breve por qué no asististe. Conserva los comprobantes que te soliciten.</p><div class="important">La bitácora registra lo ocurrido; no sustituye el procedimiento de aviso, permiso o justificación.</div></div></details>
+<details data-search="empresa cerro faltaron no hubo labores supervisor ausente sin labores"><summary>En mi empresa no hubo labores, ¿qué hago?</summary><div class="answer"><p>Si la empresa suspendió actividades, cerró ese día o por cualquier otro motivo <strong>no hubo labores para ti</strong>, selecciona <strong>“Sin labores”</strong>. Si solamente faltó una persona o tu supervisor, pero tú sí realizaste actividades, registra el día como <strong>“Con labores”</strong>.</p></div></details>
+<details data-search="autorizo quien autoriza jefe inmediato superior responsable empresa vinculacion consejo directora investigacion holiday inn recursos humanos"><summary>“Autorizó”, ¿quién autoriza?</summary><div class="answer"><p>Por regla general, aquí va tu <strong>jefe inmediato o responsable principal dentro de la empresa</strong>: quien supervisa tu participación en Educación Dual y puede validar tus actividades.</p><p>La persona exacta depende de cada empresa. En el Consejo puede corresponder a la Dirección de Investigación y Proyectos Estratégicos; en un hotel podría ser Recursos Humanos u otra jefatura designada.</p><p>Si tienes duda, pregunta a Vinculación o al responsable de Educación Dual en tu empresa.</p></div></details>
+<details data-search="cargo que es puesto persona directorio consejo cocytieg tecnm uagro virtual contrato pagina 8 karen"><summary>“Cargo”, ¿qué es eso?</summary><div class="answer"><p>El <strong>cargo</strong> es el puesto o función oficial que tiene una persona dentro de la institución o empresa. Por ejemplo: puedes saber que la persona se llama <strong>M.C. Karen Paulina Solís Catalán</strong>, pero todavía necesitar saber cuál es su cargo oficial para escribirlo correctamente en la bitácora.</p><p>La opción más segura es <strong>preguntárselo directamente a la persona</strong> o consultar el directorio oficial de su institución:</p><div class="directory-links"><a href="https://cocytieg.gob.mx/directorio" target="_blank" rel="noopener noreferrer">COCYTIEG · Directorio</a><a href="https://chilpancingo.tecnm.mx/pages/directorio.php" target="_blank" rel="noopener noreferrer">TecNM Campus Chilpancingo · Directorio</a><a href="https://virtual.uagro.mx/directorio.php" target="_blank" rel="noopener noreferrer">UAGro Virtual · Directorio</a></div><p>Otra opción es revisar tu <strong>contrato o documentación de Educación Dual</strong>. En el modelo usado como referencia, la información del responsable suele aparecer alrededor de la <strong>página 8</strong>, aunque la ubicación puede variar según la versión del documento.</p><div class="example-gallery"><figure class="example-media"><img data-example-base="Ej1" alt="Ejemplo 1 de dónde localizar nombre y cargo en el contrato"><div class="asset-missing">Ej1 todavía no está disponible en Assets.</div><figcaption class="example-caption">Ejemplo 1 · Busca el nombre de la persona y el puesto que aparece asociado.</figcaption></figure><figure class="example-media"><img data-example-base="Ej2" alt="Ejemplo 2 de dónde localizar nombre y cargo en el contrato"><div class="asset-missing">Ej2 todavía no está disponible en Assets.</div><figcaption class="example-caption">Ejemplo 2 · Verifica el cargo oficial antes de copiarlo a la bitácora.</figcaption></figure></div><div class="important">No inventes el cargo ni lo deduzcas solo por lo que hace la persona. Si no estás seguro, confirma con ella, con la empresa o con Vinculación.</div></div></details>
+<details data-search="instructor formador que es cuando usar segundo responsable encargado area consejo informatica firma"><summary>¿Qué es “Instructor formador” y en qué casos se usa?</summary><div class="answer"><p>Es un espacio para casos donde, además del responsable que autoriza, existe otra persona que <strong>trabaja directamente contigo, supervisa tus tareas o puede certificar que las actividades sí se realizaron</strong>.</p><p>Por ejemplo, en el Consejo tu jefe inmediato puede ser la Directora de Investigación y Proyectos Estratégicos, pero puedes estar asignado al Área de Informática con su encargado. En ese caso, la firma del encargado permite acreditar el trabajo realizado antes de la autorización correspondiente.</p><p><strong>No siempre se utiliza.</strong> Si tu empresa no maneja una figura similar, deja desactivada esta opción y confirma con la empresa o con Vinculación.</p></div></details>
+<details data-search="instructor ya no labora cambio responsable temporal empresa vinculacion"><summary>¿Qué pasa si mi instructor ya no labora en la empresa?</summary><div class="answer"><p>No coloques automáticamente a otra persona. Primero <strong>consulta con la directora o el área de Vinculación</strong> para saber cómo se manejará tu caso.</p><p>Si la empresa asignó un encargado temporal o un nuevo responsable, pregunta directamente en la empresa quién debe firmar o aparecer en la bitácora y desde qué fecha aplica el cambio.</p><div class="important">La persona que figure como responsable debe corresponder a la situación real. No mantengas el nombre de alguien que ya no labora ahí solo porque estaba precargado en el sistema.</div></div></details>
+<details data-search="telefono movil celular puedo usar limitaciones pdf pantalla"><summary>Estoy en teléfono, ¿puedo usar el generador?</summary><div class="answer"><p><strong>Sí.</strong> El generador está diseñado para funcionar también en teléfono. Puedes llenar la información, guardar registros y generar el PDF desde un navegador móvil compatible.</p><p>Sin embargo, puede haber <strong>limitaciones por el tamaño de la pantalla, el navegador o la administración de archivos del teléfono</strong>. Para una revisión final más cómoda del PDF, una computadora puede ser mejor.</p><div class="tip">Si trabajas desde el teléfono, revisa especialmente la vista previa antes de descargar y conserva un respaldo JSON de tus registros.</div></div></details>
+<details data-search="ejemplo ver bitacora guia ej3 modelo como hacer actividades"><summary>¿Me puedo guiar por un ejemplo? ¿Puedo ver uno?</summary><div class="answer"><p>Sí. Usa los ejemplos como <strong>referencia de estructura</strong>, no para copiar actividades que no realizaste. Cada bitácora debe describir lo que realmente ocurrió en tu empresa.</p><div class="example-gallery single"><figure class="example-media"><img data-example-base="Ej3" alt="Ejemplo de una bitácora correctamente elaborada"><div class="asset-missing">Ej3 todavía no está disponible en Assets.</div><figcaption class="example-caption">Ejemplo 3 · Referencia visual de una bitácora terminada.</figcaption></figure></div><div class="model-entry"><strong>Ejemplo sencillo de una jornada bien redactada</strong><ul><li><strong>Fecha:</strong> 08/09/2026</li><li><strong>Horario:</strong> 10:00 a.m. – 2:00 p.m.</li><li><strong>Área:</strong> Área de Informática</li><li><strong>Actividad 1:</strong> Revisión de requerimientos del sistema asignado y organización de tareas.</li><li><strong>Actividad 2:</strong> Diseño preliminar de la base de datos y definición de entidades principales.</li><li><strong>Actividad 3:</strong> Actualización del proyecto en GitHub para control de versiones.</li></ul></div><p>Una buena actividad responde, de manera breve, a <strong>qué hiciste, sobre qué trabajaste y qué avance obtuviste</strong>. Evita frases vagas como “hice cosas de informática” o “trabajé normal”.</p></div></details>
+<details data-search="formato desuso viejo cambio actualizar proyecto pull request gio canto instagram html informatica"><summary>El formato quedó en desuso o cambió, ¿qué hago?</summary><div class="answer"><p>Si el CBTis, Vinculación o las empresas cambian el formato, <strong>actualiza o propón actualizar el proyecto</strong>. Puedes enviar un pull request para que el generador siga siendo útil.</p><p>Si no sabes hacerlo, no manejas HTML o tienes una duda técnica, puedes contactar directamente a <strong>Gio Canto</strong>, creador del proyecto.</p><p><a href="https://www.instagram.com/gio_canto_g/" target="_blank" rel="noopener noreferrer">Instagram de Gio Canto · @gio_canto_g</a></p></div></details>
+<details data-search="como hacer pull request github fork rama editar commit contribuir"><summary>¿Cómo hago un pull request?</summary><div class="answer"><ol><li>Abre el <a href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">repositorio del generador</a>.</li><li>Si no tienes permisos directos, pulsa <strong>Fork</strong>.</li><li>Crea una rama o edita el archivo que necesitas modificar.</li><li>Haz el cambio y crea un <strong>commit</strong> explicando qué corregiste.</li><li>Elige <strong>Contribute → Open pull request</strong>.</li><li>Describe el cambio y cómo comprobaste que funciona.</li><li>Envía el pull request para revisión.</li></ol><div class="tip">Haz cambios pequeños y claros, y prueba el generador en computadora y teléfono antes de enviarlos.</div></div></details>
+<details data-search="que escribir actividades descripcion trabajo breve evidencia tareas"><summary>¿Qué debo escribir en “Actividades”?</summary><div class="answer"><p>Escribe lo que realmente realizaste durante esa jornada, de forma concreta. Describe acciones y resultados, no frases genéricas.</p><div class="example"><strong>Mejor:</strong> “Configuración de GitHub para control de versiones y revisión del diseño de la base de datos.”<br><strong>Evita:</strong> “Trabajé en informática.”</div></div></details>
+<details data-search="me equivoque editar corregir antes firmar pdf registro"><summary>Me equivoqué al llenar la bitácora, ¿puedo corregirla?</summary><div class="answer"><p>Sí. Corrige la información y vuelve a guardar o descargar el PDF. Hazlo <strong>antes de recopilar firmas o entregar el documento</strong>. Si ya fue firmado o recibido, consulta con Vinculación antes de sustituirlo.</p></div></details>
+<details data-search="pdf excede una pagina espacio fijo reducir texto cabe una pagina"><summary>¿Qué hago si el PDF dice que excede una página?</summary><div class="answer"><p>Resume el texto de las actividades sin eliminar información importante. Usa frases claras y elimina repeticiones. El generador mantiene el formato de una sola página y evita exportarlo cuando el contenido ya no cabe correctamente.</p></div></details>
+<details data-search="respaldo json guardar registros otro navegador computadora exportar importar"><summary>¿Cómo evito perder mis bitácoras guardadas?</summary><div class="answer"><p>En la sección final utiliza <strong>“Exportar respaldo”</strong>. Se descargará un archivo JSON con tus registros. Si cambias de navegador o computadora, usa <strong>“Importar respaldo”</strong>.</p><div class="important">Si borras los datos del sitio sin respaldo, puedes perder los registros almacenados localmente.</div></div></details>
+<details data-search="privacidad datos servidor nombres actividades local navegador cookies"><summary>¿Mis datos se envían a un servidor?</summary><div class="answer"><p>No. El generador funciona del lado del navegador: los registros se almacenan localmente, el respaldo se genera en tu dispositivo y el PDF se crea directamente ahí.</p><p>No publiques en GitHub respaldos, bitácoras reales o archivos con datos personales.</p></div></details>
+<details data-search="caso diferente duda no aparece opcion vinculacion empresa preguntar"><summary>Mi caso no aparece aquí, ¿qué hago?</summary><div class="answer"><p>Si la duda afecta firmas, faltas, horarios, entrega o responsables, confirma primero con <strong>Vinculación y con tu empresa</strong>. Si es sobre el generador, puedes abrir un issue en GitHub o proponer una mejora mediante pull request.</p></div></details>
+</section>
+<div class="empty" id="emptyState">No encontré una pregunta con esas palabras. Prueba con otro término.</div>
+<section class="contribute"><h2>¿Falta algo?</h2><p>Este generador puede mejorar con cada generación de estudiantes. Si una empresa, responsable, formato o procedimiento cambió, propón la actualización para que la información no se quede atrás.</p><div class="contribute-actions"><a class="btn primary" href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">Colaborar en GitHub</a><a class="btn" href="https://www.instagram.com/gio_canto_g/" target="_blank" rel="noopener noreferrer">Contactar a Gio</a></div></section>
+</main>
+<footer class="footer">Generador de Bitácora Dual 2026 · Ayuda para estudiantes de Educación Dual</footer>
 </div>
 <script>
 (() => {
   "use strict";
-  const input = document.getElementById("faqSearch");
-  const items = [...document.querySelectorAll("#faqList details")];
-  const empty = document.getElementById("emptyState");
-  const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const input=document.getElementById("faqSearch");
+  const items=[...document.querySelectorAll("#faqList details")];
+  const empty=document.getElementById("emptyState");
+  const normalize=value=>String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+  input.addEventListener("input",()=>{const query=normalize(input.value.trim());let visible=0;items.forEach(item=>{const haystack=normalize(item.textContent+" "+(item.dataset.search||""));const match=!query||haystack.includes(query);item.hidden=!match;if(match)visible+=1});empty.style.display=visible?"none":"block"});
 
-  input.addEventListener("input", () => {
-    const query = normalize(input.value.trim());
-    let visible = 0;
-    items.forEach(item => {
-      const haystack = normalize(item.textContent + " " + (item.dataset.search || ""));
-      const match = !query || haystack.includes(query);
-      item.hidden = !match;
-      if (match) visible += 1;
-    });
-    empty.style.display = visible ? "none" : "block";
+  const extensions=["png","PNG","jpg","JPG","jpeg","JPEG","webp","WEBP"];
+  document.querySelectorAll("img[data-example-base]").forEach(img=>{
+    const base=img.dataset.exampleBase;
+    let index=0;
+    const missing=img.parentElement.querySelector(".asset-missing");
+    const tryNext=()=>{
+      if(index>=extensions.length){img.style.display="none";if(missing)missing.style.display="block";return}
+      img.src=`../Assets/${base}.${extensions[index++]}`;
+    };
+    img.addEventListener("load",()=>{img.style.display="block";if(missing)missing.style.display="none"});
+    img.addEventListener("error",tryNext);
+    tryNext();
   });
 })();
 </script>
