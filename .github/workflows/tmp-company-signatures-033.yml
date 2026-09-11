@@ -1,0 +1,45 @@
+name: Prepare Beta 0.33
+on:
+  push:
+    branches: ["tmp/company-signatures-033"]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update company labels and version
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          needle='function buildPageModel(){'
+          helper='''function companySignatureName(company){const value=String(company||"").trim(),m=value.match(/\\(([^()]+)\\)\\s*$/);return(m?.[1]||value).trim()}\nfunction authoritySignatureRoles(role,company){let lines=String(role||"").split("\\n").map(x=>x.trim()).filter(Boolean);if(company===COUNCIL)lines=lines.filter(x=>!/^cocy?ti?e?g$/i.test(x.replace(/[^a-z]/gi,"")));const companyName=companySignatureName(company);if(companyName)lines.push(companyName);return lines}\n'''
+          if 'function companySignatureName(company)' not in s:
+              if needle not in s: raise SystemExit('buildPageModel marker not found')
+              s=s.replace(needle,helper+needle,1)
+          old='''const cells=[{h:"Elaboró",n:id.authorities.elaboroName,r:id.authorities.elaboroRole.split("\\n").filter(Boolean),on:true},{h:"Vo.Bo",n:id.authorities.voboName,r:id.authorities.voboRole.split("\\n").filter(Boolean),on:true},{h:"Autorizó",n:id.authorities.autorizoName,r:id.authorities.autorizoRole.split("\\n").filter(Boolean),on:true},{h:"Vo.Bo",n:id.instructor.name,r:[id.instructor.roleMain,id.instructor.note].filter(Boolean),on:id.instructor.enabled}];'''
+          new='''const companyName=companySignatureName(id.company),cells=[{h:"Elaboró",n:id.authorities.elaboroName,r:id.authorities.elaboroRole.split("\\n").filter(Boolean),on:true},{h:"Vo.Bo",n:id.authorities.voboName,r:id.authorities.voboRole.split("\\n").filter(Boolean),on:true},{h:"Autorizó",n:id.authorities.autorizoName,r:authoritySignatureRoles(id.authorities.autorizoRole,id.company),on:true},{h:"Vo.Bo",n:id.instructor.name,r:[id.instructor.roleMain,id.instructor.note,companyName].filter(Boolean),on:id.instructor.enabled}];'''
+          if old not in s: raise SystemExit('signature cells marker not found')
+          s=s.replace(old,new,1)
+          if 'cell.r.slice(0,3)' not in s: raise SystemExit('signature slice marker not found')
+          s=s.replace('cell.r.slice(0,3)','cell.r.slice(0,4)',1)
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('README.md')
+          s=p.read_text(encoding='utf-8').replace('Beta%200.32','Beta%200.33').replace('**Beta 0.32**','**Beta 0.33**')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('faq/index.html')
+          s=p.read_text(encoding='utf-8').replace('Beta 0.32','Beta 0.33')
+          p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html README.md faq/index.html
+          git commit -m "Preparar Beta 0.33 con empresa en firmas"
+          git push
