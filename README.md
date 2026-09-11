@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.31-0071E3)](#versión-y-estado)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.32-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -190,13 +190,9 @@ Después de habilitarlo, cada cambio en **main** inicia un nuevo despliegue.
 
 Antes de importar información, conserva una copia del respaldo actual.
 
-## Versión y estado
+## Versión
 
-**Versión actual: Beta 0.31.**
-
-Mientras el proyecto permanezca en la serie **0.x**, se utiliza la convención **0.X**, donde **X corresponde al número total de commits acumulados en la rama `main`** al momento de publicar la revisión. Esta actualización constituye el commit 31, por lo que la versión resultante es **0.31**.
-
-El proyecto continúa en beta: pueden cambiar empresas, responsables, reglas de entrega, compatibilidad móvil o detalles del formato. Si detectas algo desactualizado, consulta primero la indicación oficial de Vinculación o de tu empresa y después propón la corrección en el repositorio.
+**Beta 0.32**
 
 ## Desarrollo y colaboración
 
