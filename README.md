@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.32-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.33-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -192,7 +192,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.32**
+**Beta 0.33**
 
 ## Desarrollo y colaboración
 
