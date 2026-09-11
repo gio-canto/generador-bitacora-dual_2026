@@ -187,4 +187,71 @@ const welcome=document.getElementById("welcomeDialog"),layer=document.getElement
   syncTecUI(false);
 })();
 </script>
+<script>
+(()=>{
+  "use strict";
+  const TEC_COMPANY="Instituto Tecnológico de Chilpancingo (ITCH)";
+  const company=document.getElementById("company");
+  const select=document.getElementById("tecnmAutorizoPreset");
+  const role=document.getElementById("autorizoRole");
+  const name=document.getElementById("autorizoName");
+  const fireInput=element=>element.dispatchEvent(new Event("input",{bubbles:true}));
+  function ensureTecImmediateBoss(){
+    if(!company||!select||!role||!name||company.value!==TEC_COMPANY||select.value==="__custom__")return;
+    const base=role.value.replace(/\s*\n?Jefe inmediato\s*$/i,"").trim();
+    const next=(base?base+"\n":"")+"Jefe inmediato";
+    if(role.value!==next){role.value=next;fireInput(role)}
+  }
+  select?.addEventListener("change",()=>setTimeout(ensureTecImmediateBoss,0));
+  company?.addEventListener("change",()=>setTimeout(ensureTecImmediateBoss,0));
+  name?.addEventListener("input",()=>setTimeout(ensureTecImmediateBoss,0));
+  document.addEventListener("click",event=>{
+    if(event.target.closest("[data-open],[data-copy],#newBtn,#resetBtn,#restoreBtn"))setTimeout(ensureTecImmediateBoss,20);
+  });
+  setTimeout(ensureTecImmediateBoss,0);
+
+  const originalDrawImage=CanvasRenderingContext2D.prototype.drawImage;
+  CanvasRenderingContext2D.prototype.drawImage=function(image,...args){
+    if(args.length===4&&image&&image.naturalWidth&&image.naturalHeight&&String(image.src||"").includes("Assets/Edu.png")){
+      const [dx,dy,dw,dh]=args;
+      const adjustedW=dw*.9625;
+      const adjustedH=adjustedW/(image.naturalWidth/image.naturalHeight);
+      const adjustedX=dx+(dw-adjustedW)/2;
+      const adjustedY=dy+(dh-adjustedH)/2;
+      return originalDrawImage.call(this,image,adjustedX,adjustedY,adjustedW,adjustedH);
+    }
+    return originalDrawImage.call(this,image,...args);
+  };
+
+  const originalFillText=CanvasRenderingContext2D.prototype.fillText;
+  const signatureState=new WeakMap();
+  CanvasRenderingContext2D.prototype.fillText=function(text,x,y,maxWidth){
+    const result=maxWidth===undefined?originalFillText.call(this,text,x,y):originalFillText.call(this,text,x,y,maxWidth);
+    if(text!=="Elaboró"&&text!=="Vo.Bo"&&text!=="Autorizó")return result;
+    let state=signatureState.get(this.canvas)||{vobo:0};
+    if(text==="Elaboró")state.vobo=0;
+    let label="";
+    if(text==="Elaboró")label="FIRMA DEL ALUMNO:";
+    else if(text==="Autorizó")label="FIRMA DEL ASESOR DE LA EMPRESA:";
+    else if(text==="Vo.Bo"){
+      state.vobo+=1;
+      if(state.vobo===1)label="FIRMA DE VINCULACIÓN CBTIS 134:";
+    }
+    signatureState.set(this.canvas,state);
+    if(!label)return result;
+    const ppm=this.canvas.width/297;
+    const previous={font:this.font,textAlign:this.textAlign,textBaseline:this.textBaseline,fillStyle:this.fillStyle};
+    this.font=`400 ${5.4*25.4/72*ppm}px "Times New Roman", Times, serif`;
+    this.textAlign="center";
+    this.textBaseline="alphabetic";
+    this.fillStyle="#555";
+    originalFillText.call(this,label,x,y+3.7*ppm);
+    this.font=previous.font;
+    this.textAlign=previous.textAlign;
+    this.textBaseline=previous.textBaseline;
+    this.fillStyle=previous.fillStyle;
+    return result;
+  };
+})();
+</script>
 </body></html>

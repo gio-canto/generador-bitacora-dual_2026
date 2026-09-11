@@ -4,12 +4,13 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.31-0071E3)](#versión-y-estado)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
-[![HTML5](https://img.shields.io/badge/HTML5-aplicación-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
+[![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
 [![Licencia MIT](https://img.shields.io/badge/licencia-MIT-075BD8)](LICENSE)
 
-[Abrir aplicación](https://gio-canto.github.io/generador-bitacora-dual_2026/) · [Reportar un problema](https://github.com/gio-canto/generador-bitacora-dual_2026/issues) · [Ver cambios](https://github.com/gio-canto/generador-bitacora-dual_2026/commits/main)
+[Abrir aplicación](https://gio-canto.github.io/generador-bitacora-dual_2026/) · [Preguntas frecuentes](https://gio-canto.github.io/generador-bitacora-dual_2026/faq/) · [Reportar un problema](https://github.com/gio-canto/generador-bitacora-dual_2026/issues) · [Ver cambios](https://github.com/gio-canto/generador-bitacora-dual_2026/commits/main)
 
 </div>
 
@@ -24,8 +25,8 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 ## Funciones principales
 
 - Asistente progresivo de cinco etapas.
-- Pregunta de bienvenida en el primer acceso y tutorial guiado opcional por las cinco secciones.
-- Botón permanente para volver a abrir el tutorial.
+- Pregunta de bienvenida en el primer acceso y tutorial guiado opcional.
+- Botón permanente de **Dudas** y acceso a un FAQ independiente con ejemplos y recomendaciones.
 - Pantalla de créditos oculta mediante un easter egg en el nombre del alumno.
 - Plantel institucional precargado y grupo editable.
 - Seis especialidades disponibles: Programación, Contabilidad, Inteligencia Artificial, Comercio Electrónico, Administración de Recursos Humanos y Ofimática.
@@ -35,16 +36,19 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Horarios predeterminados editables.
 - Estados de jornada con labores, sin labores, día inhábil o falta.
 - Justificación personalizada y obligatoria cuando se registra una falta.
-- Descripción de actividades con Markdown básico.
-- Límite y contador de caracteres por jornada.
+- Descripción de actividades con Markdown básico y contador de caracteres.
 - Áreas o departamentos independientes por día.
 - Nombre de quien elabora sincronizado automáticamente con el alumno.
 - Datos de Vo.Bo. de M. en A. Vepsania Marino Martínez precargados.
-- Autorización de Mtra. Karen Paulina Solís Catalán precargada para el Consejo; captura personalizada para las demás empresas.
-- Catálogo de instructores disponible únicamente para el Consejo y captura manual para las demás empresas.
+- Autorización de Mtra. Karen Paulina Solís Catalán precargada para COCYTIEG.
+- Catálogo de instructores disponible para COCYTIEG.
+- Catálogo de responsables de **Autorizó** para el TecNM Campus Chilpancingo, con opción personalizada.
+- En los responsables precargados del TecNM, el cargo incluye también la función **Jefe inmediato**.
 - Vista previa exacta en formato A4 horizontal.
+- Etiquetas de firma en el PDF para alumno, asesor de empresa y Vinculación CBTis No. 134.
 - Advertencia automática cuando el contenido rebasa una página.
-- Descarga directa del PDF sin servicios externos.
+- Descarga directa del PDF; en teléfonos compatibles se utiliza primero el menú nativo para compartir o guardar el archivo.
+- Recordatorio posterior a la generación del PDF con recomendaciones de impresión, firmas y tinta azul.
 - Historial local con apertura, duplicado y eliminación.
 - Exportación e importación de respaldos JSON.
 - Diseño adaptable para computadora, tableta y teléfono.
@@ -82,6 +86,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 6. Revisa responsables e instructor.
 7. Comprueba que el documento cabe en una página.
 8. Guarda el registro y descarga el PDF.
+9. Revisa las recomendaciones de entrega y recopila las firmas correspondientes.
 
 ## Privacidad y almacenamiento
 
@@ -104,7 +109,7 @@ La aplicación funciona completamente del lado del cliente:
 | Orientación | Horizontal |
 | Tipografía | Times New Roman compatible |
 | Resolución | Aproximadamente 300 dpi |
-| Contenido | Encabezado, datos escolares, tabla semanal y firmas |
+| Contenido | Encabezado, datos escolares, tabla semanal, etiquetas y espacios de firma |
 | Validación | Detección de desbordamiento de una página |
 
 ## Tecnologías
@@ -127,6 +132,10 @@ generador-bitacora-dual_2026/
 ├── .github/
 │   └── workflows/
 │       └── pages.yml
+├── Assets/
+│   └── Edu.png
+├── faq/
+│   └── index.html
 ├── .nojekyll
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -181,11 +190,19 @@ Después de habilitarlo, cada cambio en **main** inicia un nuevo despliegue.
 
 Antes de importar información, conserva una copia del respaldo actual.
 
-## Desarrollo
+## Versión y estado
 
-La aplicación permanece en un solo archivo HTML para facilitar el uso sin instalación, la distribución sin conexión, la revisión académica y la publicación directa en servicios estáticos.
+**Versión actual: Beta 0.31.**
 
-Consulta [CONTRIBUTING.md](CONTRIBUTING.md) antes de proponer cambios.
+Mientras el proyecto permanezca en la serie **0.x**, se utiliza la convención **0.X**, donde **X corresponde al número total de commits acumulados en la rama `main`** al momento de publicar la revisión. Esta actualización constituye el commit 31, por lo que la versión resultante es **0.31**.
+
+El proyecto continúa en beta: pueden cambiar empresas, responsables, reglas de entrega, compatibilidad móvil o detalles del formato. Si detectas algo desactualizado, consulta primero la indicación oficial de Vinculación o de tu empresa y después propón la corrección en el repositorio.
+
+## Desarrollo y colaboración
+
+La aplicación permanece en un solo archivo HTML principal para facilitar el uso sin instalación, la distribución sin conexión, la revisión académica y la publicación directa en servicios estáticos.
+
+Consulta [CONTRIBUTING.md](CONTRIBUTING.md) antes de proponer cambios. Los pull requests deben evitar datos personales reales y, cuando afecten el generador, probarse tanto en computadora como en teléfono.
 
 ## Seguridad
 
