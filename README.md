@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.34-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.35-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -34,6 +34,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Catálogo de empresas y organismos receptores.
 - Generación automática de jornadas de martes a viernes.
 - Horarios predeterminados editables.
+- Horarios y área predeterminados ajustados automáticamente según la empresa seleccionada, sin impedir modificaciones manuales.
 - Estados de jornada con labores, sin labores, día inhábil o falta.
 - Justificación personalizada y obligatoria cuando se registra una falta.
 - Descripción de actividades con Markdown básico y contador de caracteres.
@@ -192,7 +193,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.34**
+**Beta 0.35**
 
 ## Desarrollo y colaboración
 
