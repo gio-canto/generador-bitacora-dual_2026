@@ -1,7 +1,5 @@
 name: Prepare Beta 0.38
-on:
-  push:
-    branches: [tmp/beta-038]
+on: [push]
 permissions:
   contents: write
 jobs:
@@ -10,26 +8,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Apply Beta 0.38 patches
+        shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
-
-          index = Path('index.html')
-          s = index.read_text()
-          s = s.replace('<option value="Operadora de Guerrero Duaabsa, S.A. de C.V. (KFC)">Operadora de Guerrero Duaabsa, S.A. de C.V. (KFC)</option>', '')
-          s = s.replace('.welcome-dialog,.credits-dialog,.delivery-dialog{padding:0;border:0;color:var(--ink);background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.22)}','.welcome-dialog,.credits-dialog,.delivery-dialog,.status-dialog{padding:0;border:0;color:var(--ink);background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.22)}')
-          s = s.replace('.delivery-dialog{width:min(92vw,530px);max-height:min(90dvh,720px);border-radius:26px}','.delivery-dialog{width:min(92vw,530px);max-height:min(90dvh,720px);border-radius:26px}.status-dialog{width:min(92vw,500px);border-radius:26px}')
-          s = s.replace('.welcome-dialog::backdrop,.credits-dialog::backdrop{background:rgba(18,18,20,.48);backdrop-filter:blur(8px)}','.welcome-dialog::backdrop,.credits-dialog::backdrop{background:rgba(18,18,20,.48);backdrop-filter:blur(8px)}.status-dialog::backdrop{background:rgba(18,18,20,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}')
-          marker = '.credits-shell{padding:clamp(24px,5vw,42px);overflow:auto}'
-          styles = '.status-shell{padding:30px}.status-mark{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;background:var(--blue);color:#fff;font-size:21px;font-weight:800}.status-dialog[data-status="falta"] .status-mark{background:#ff3b30}.status-dialog[data-status="sin_labores"] .status-mark{background:#ff9f0a}.status-dialog[data-status="inhabil"] .status-mark{background:#5856d6}.status-shell h2{margin:20px 0 8px;font-size:28px;line-height:1.05;letter-spacing:-.04em}.status-shell p{margin:0;color:#4a4a4f;font-size:14px;line-height:1.6}.status-note{margin-top:16px;padding:13px 14px;border-radius:15px;background:#f5f5f7;color:var(--muted);font-size:12px;line-height:1.5}.status-actions{display:flex;justify-content:flex-end;margin-top:22px}'
-          if marker not in s: raise SystemExit('credits-shell marker missing')
-          s = s.replace(marker, styles + marker, 1)
-          delivery_marker = '<dialog class="delivery-dialog" id="deliveryDialog" aria-labelledby="deliveryTitle">'
-          status_html = '<dialog class="status-dialog" id="statusDialog" aria-labelledby="statusTitle"><div class="status-shell"><div class="status-mark" id="statusMark" aria-hidden="true">!</div><h2 id="statusTitle">Recordatorio</h2><p id="statusMessage"></p><div class="status-note">Esta ventana se muestra solo la primera vez que eliges este estado durante la sesión.</div><div class="status-actions"><button class="btn primary" id="statusClose" type="button">Entendido</button></div></div></dialog>\n'
-          if delivery_marker not in s: raise SystemExit('delivery marker missing')
-          s = s.replace(delivery_marker, status_html + delivery_marker, 1)
-          old = '''function showStatusNotice(status){
+          index=Path('index.html'); s=index.read_text()
+          s=s.replace('<option value="Operadora de Guerrero Duaabsa, S.A. de C.V. (KFC)">Operadora de Guerrero Duaabsa, S.A. de C.V. (KFC)</option>','')
+          s=s.replace('.welcome-dialog,.credits-dialog,.delivery-dialog{padding:0;border:0;color:var(--ink);background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.22)}','.welcome-dialog,.credits-dialog,.delivery-dialog,.status-dialog{padding:0;border:0;color:var(--ink);background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.22)}')
+          s=s.replace('.delivery-dialog{width:min(92vw,530px);max-height:min(90dvh,720px);border-radius:26px}','.delivery-dialog{width:min(92vw,530px);max-height:min(90dvh,720px);border-radius:26px}.status-dialog{width:min(92vw,500px);border-radius:26px}')
+          s=s.replace('.welcome-dialog::backdrop,.credits-dialog::backdrop{background:rgba(18,18,20,.48);backdrop-filter:blur(8px)}','.welcome-dialog::backdrop,.credits-dialog::backdrop{background:rgba(18,18,20,.48);backdrop-filter:blur(8px)}.status-dialog::backdrop{background:rgba(18,18,20,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}')
+          marker='.credits-shell{padding:clamp(24px,5vw,42px);overflow:auto}'
+          styles='.status-shell{padding:30px}.status-mark{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;background:var(--blue);color:#fff;font-size:21px;font-weight:800}.status-dialog[data-status="falta"] .status-mark{background:#ff3b30}.status-dialog[data-status="sin_labores"] .status-mark{background:#ff9f0a}.status-dialog[data-status="inhabil"] .status-mark{background:#5856d6}.status-shell h2{margin:20px 0 8px;font-size:28px;line-height:1.05;letter-spacing:-.04em}.status-shell p{margin:0;color:#4a4a4f;font-size:14px;line-height:1.6}.status-note{margin-top:16px;padding:13px 14px;border-radius:15px;background:#f5f5f7;color:var(--muted);font-size:12px;line-height:1.5}.status-actions{display:flex;justify-content:flex-end;margin-top:22px}'
+          assert marker in s
+          s=s.replace(marker,styles+marker,1)
+          delivery='<dialog class="delivery-dialog" id="deliveryDialog" aria-labelledby="deliveryTitle">'
+          status='<dialog class="status-dialog" id="statusDialog" aria-labelledby="statusTitle"><div class="status-shell"><div class="status-mark" id="statusMark" aria-hidden="true">!</div><h2 id="statusTitle">Recordatorio</h2><p id="statusMessage"></p><div class="status-note">Esta ventana se muestra solo la primera vez que eliges este estado durante la sesión.</div><div class="status-actions"><button class="btn primary" id="statusClose" type="button">Entendido</button></div></div></dialog>\n'
+          assert delivery in s
+          s=s.replace(delivery,status+delivery,1)
+          old='''function showStatusNotice(status){
   const message=STATUS_NOTICES[status];
   if(!message||statusNoticesSeen.has(status))return;
   statusNoticesSeen.add(status);
@@ -37,7 +34,7 @@ jobs:
   const title=status==="falta"?"Antes de registrar la falta":status==="sin_labores"?"Antes de marcar Sin labores":"Antes de marcar Día inhábil";
   alert(title+"\\n\\n"+message);
 }'''
-          new = '''function showStatusNotice(status){
+          new='''function showStatusNotice(status){
   const message=STATUS_NOTICES[status];
   if(!message||statusNoticesSeen.has(status))return;
   statusNoticesSeen.add(status);
@@ -45,18 +42,15 @@ jobs:
   const dialog=$("#statusDialog"),title=$("#statusTitle"),body=$("#statusMessage"),mark=$("#statusMark");
   const meta=status==="falta"?{title:"Antes de registrar la falta",mark:"!"}:status==="sin_labores"?{title:"Antes de marcar Sin labores",mark:"i"}:{title:"Antes de marcar Día inhábil",mark:"★"};
   if(!dialog){alert(meta.title+"\\n\\n"+message);return}
-  dialog.dataset.status=status;
-  title.textContent=meta.title;
-  body.textContent=message;
-  mark.textContent=meta.mark;
+  dialog.dataset.status=status;title.textContent=meta.title;body.textContent=message;mark.textContent=meta.mark;
   if(typeof dialog.showModal==="function")dialog.showModal();else alert(meta.title+"\\n\\n"+message)
 }'''
-          if old not in s: raise SystemExit('showStatusNotice block missing')
-          s = s.replace(old,new,1)
-          hook = 'function attachEvents(){$("#newBtn").onclick=newBlank;'
-          repl = 'function attachEvents(){$("#statusClose")?.addEventListener("click",()=>$("#statusDialog")?.close());$("#statusDialog")?.addEventListener("cancel",()=>$("#statusDialog")?.close());$("#newBtn").onclick=newBlank;'
-          if hook not in s: raise SystemExit('attachEvents hook missing')
-          s = s.replace(hook,repl,1)
+          assert old in s
+          s=s.replace(old,new,1)
+          hook='function attachEvents(){$("#newBtn").onclick=newBlank;'
+          repl='function attachEvents(){$("#statusClose")?.addEventListener("click",()=>$("#statusDialog")?.close());$("#statusDialog")?.addEventListener("cancel",()=>$("#statusDialog")?.close());$("#newBtn").onclick=newBlank;'
+          assert hook in s
+          s=s.replace(hook,repl,1)
           index.write_text(s)
 
           readme=Path('README.md'); r=readme.read_text()
@@ -69,12 +63,10 @@ jobs:
           faq=Path('faq/index.html'); f=faq.read_text()
           f=f.replace('.release-disclosure .release-list{padding:0 12px 12px}', '.release-disclosure .release-list{padding:0 12px 12px;max-height:320px;overflow-y:auto;overscroll-behavior:contain}')
           pattern=re.compile(r'<section class="release-notes" aria-labelledby="releaseNotesTitle">.*?</section>\n<section class="contribute">.*?</section>',re.S)
-          m=pattern.search(f)
-          if not m: raise SystemExit('release/contribute block missing')
+          m=pattern.search(f); assert m
           block=m.group(0)
           contribute=re.search(r'<section class="contribute">.*?</section>',block,re.S).group(0).replace('Beta 0.37','Beta 0.38')
-          articles=re.findall(r'<article class="release-item">.*?</article>',block,re.S)
-          if not articles: raise SystemExit('release articles missing')
+          articles=re.findall(r'<article class="release-item">.*?</article>',block,re.S); assert articles
           older=[a.replace('<span>Actual</span>','') for a in articles]
           current='<article class="release-item"><div class="release-head"><strong>Beta 0.38</strong><span>Actual</span></div><ul><li>KFC fue retirado del catálogo de empresas disponibles.</li><li>Los recordatorios de Falta, Sin labores y Día inhábil ahora aparecen en ventanas visuales integradas al diseño del sistema.</li><li>Las notas de actualización se movieron al final, después de “¿Falta algo?”.</li><li>Solo la versión actual se muestra directamente; las versiones anteriores quedan dentro de una lista desplegable con desplazamiento para ocupar menos pantalla.</li></ul></article>'
           release='<section class="release-notes" aria-labelledby="releaseNotesTitle"><span class="version-chip">Beta 0.38</span><h2 id="releaseNotesTitle">Notas de actualización</h2><p class="release-intro">Cambios recientes del Generador de Bitácora Dual 2026.</p>'+current+'<details class="release-disclosure"><summary>Ver versiones anteriores</summary><div class="release-list">'+''.join(older)+'</div></details></section>'
