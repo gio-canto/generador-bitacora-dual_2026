@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.38-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.39-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -38,7 +38,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - UAGro Virtual y Chevrolet Chilpancingo utilizan 09:00–14:00 como horario predeterminado.
 - Estados de jornada con labores, sin labores, día inhábil o falta.
 - Justificación obligatoria para **Falta** y **Sin labores**; **Día inhábil** utiliza una justificación automática basada en el calendario escolar vigente.
-- Avisos preventivos la primera vez que se selecciona Falta, Sin labores o Día inhábil durante la sesión, mostrados en ventanas visuales integradas al diseño del sistema.
+- Avisos preventivos en ventanas visuales: **Falta** recuerda siempre avisar a Vinculación y al jefe inmediato; **Sin labores** y **Día inhábil** se recuerdan la primera vez por sesión.
 - Recordatorio final de que las firmas deben ser autógrafas y no se permiten firmas digitales.
 - Descripción de actividades con Markdown básico y contador de caracteres.
 - Áreas o departamentos independientes por día.
@@ -196,7 +196,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.38**
+**Beta 0.39**
 
 ## Desarrollo y colaboración
 
