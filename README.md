@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.35-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.36-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -36,7 +36,9 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Horarios predeterminados editables.
 - Horarios y área predeterminados ajustados automáticamente según la empresa seleccionada, sin impedir modificaciones manuales.
 - Estados de jornada con labores, sin labores, día inhábil o falta.
-- Justificación personalizada y obligatoria cuando se registra una falta.
+- Justificación obligatoria para **Falta** y **Sin labores**; **Día inhábil** utiliza una justificación automática basada en el calendario escolar vigente.
+- Avisos preventivos la primera vez que se selecciona Falta, Sin labores o Día inhábil durante la sesión.
+- Recordatorio final de que las firmas deben ser autógrafas y no se permiten firmas digitales.
 - Descripción de actividades con Markdown básico y contador de caracteres.
 - Áreas o departamentos independientes por día.
 - Nombre de quien elabora sincronizado automáticamente con el alumno.
@@ -60,7 +62,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG).
 - Instituto Tecnológico de Chilpancingo (ITCH).
 - Sistema de Universidad Virtual de la Universidad Autónoma de Guerrero (UAGro Virtual).
-- 100% Natural Aeropuerto S.A. de C.V. (100% Natural).
+- El Buen Tzin S.A. de C.V. (100% Natural).
 - Chilpancingo Inn, S.A. de C.V. (Holiday Inn).
 - Automóviles de Iguala, S.A. de C.V. (Nissan).
 - Distribuidora Automotriz Acapulco, S.A. de C.V. (Chevrolet Chilpancingo).
@@ -193,7 +195,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.35**
+**Beta 0.36**
 
 ## Desarrollo y colaboración
 
