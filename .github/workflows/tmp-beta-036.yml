@@ -14,12 +14,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: tmp/beta-036
-      - name: Apply Beta 0.36 changes
-        run: python .github/patch-beta-036.py
+      - name: Repair Beta 0.36 prepared files
+        run: python .github/repair-beta-036.py
       - name: Commit prepared files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html README.md faq/index.html
-          git commit -m "Preparar Beta 0.36 con avisos y justificaciones"
+          git add index.html faq/index.html
+          git commit -m "Corregir estructura final de Beta 0.36"
           git push origin HEAD:tmp/beta-036
