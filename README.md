@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.36-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.37-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -25,7 +25,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 ## Funciones principales
 
 - Asistente progresivo de cinco etapas.
-- Pregunta de bienvenida en el primer acceso y tutorial guiado opcional.
+- Tutorial guiado que se inicia automáticamente en el primer acceso y puede abrirse nuevamente desde el botón **Tutorial**.
 - Botón permanente de **Dudas** y acceso a un FAQ independiente con ejemplos y recomendaciones.
 - Pantalla de créditos oculta mediante un easter egg en el nombre del alumno.
 - Plantel institucional precargado y grupo editable.
@@ -35,6 +35,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Generación automática de jornadas de martes a viernes.
 - Horarios predeterminados editables.
 - Horarios y área predeterminados ajustados automáticamente según la empresa seleccionada, sin impedir modificaciones manuales.
+- UAGro Virtual y Chevrolet Chilpancingo utilizan 09:00–14:00 como horario predeterminado.
 - Estados de jornada con labores, sin labores, día inhábil o falta.
 - Justificación obligatoria para **Falta** y **Sin labores**; **Día inhábil** utiliza una justificación automática basada en el calendario escolar vigente.
 - Avisos preventivos la primera vez que se selecciona Falta, Sin labores o Día inhábil durante la sesión.
@@ -195,7 +196,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.36**
+**Beta 0.37**
 
 ## Desarrollo y colaboración
 
