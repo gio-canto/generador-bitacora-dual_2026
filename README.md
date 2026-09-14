@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.37-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.38-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -38,7 +38,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - UAGro Virtual y Chevrolet Chilpancingo utilizan 09:00–14:00 como horario predeterminado.
 - Estados de jornada con labores, sin labores, día inhábil o falta.
 - Justificación obligatoria para **Falta** y **Sin labores**; **Día inhábil** utiliza una justificación automática basada en el calendario escolar vigente.
-- Avisos preventivos la primera vez que se selecciona Falta, Sin labores o Día inhábil durante la sesión.
+- Avisos preventivos la primera vez que se selecciona Falta, Sin labores o Día inhábil durante la sesión, mostrados en ventanas visuales integradas al diseño del sistema.
 - Recordatorio final de que las firmas deben ser autógrafas y no se permiten firmas digitales.
 - Descripción de actividades con Markdown básico y contador de caracteres.
 - Áreas o departamentos independientes por día.
@@ -56,6 +56,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Historial local con apertura, duplicado y eliminación.
 - Exportación e importación de respaldos JSON.
 - Diseño adaptable para computadora, tableta y teléfono.
+- Historial de actualizaciones compacto: la versión actual se muestra directamente y las anteriores quedan en una lista desplegable con desplazamiento.
 - Compatibilidad con movimiento y transparencia reducidos.
 
 ## Empresas y organismos disponibles
@@ -67,7 +68,6 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Chilpancingo Inn, S.A. de C.V. (Holiday Inn).
 - Automóviles de Iguala, S.A. de C.V. (Nissan).
 - Distribuidora Automotriz Acapulco, S.A. de C.V. (Chevrolet Chilpancingo).
-- Operadora de Guerrero Duaabsa, S.A. de C.V. (KFC).
 - “La Avispa”, Museo Interactivo.
 
 ## Flujo de trabajo
@@ -196,7 +196,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.37**
+**Beta 0.38**
 
 ## Desarrollo y colaboración
 
