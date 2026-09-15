@@ -1,0 +1,26 @@
+name: Fix Beta 0.40 FAQ
+on:
+  push:
+    branches:
+      - tmp/beta-040-fix
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('faq/index.html')
+          s=p.read_text()
+          old='<details data-search="falta sin labores dia inhabil aviso directora vinculacion jefe inmediato justificar calendario dgeti dual"><summary>¿Qué pasa cuando selecciono Falta, Sin labores o Día inhábil?</summary><div class="answer"><p>El generador muestra recordatorios según el estado seleccionado:</p><ul><li><strong>Falta:</strong> el aviso aparece <strong>cada vez que selecciones Falta</strong>, aunque ya lo hayas visto antes. Recuerda avisar a la directora de Vinculación y a tu jefe inmediato, además de escribir la justificación.</li><li><strong>Sin labores:</strong> el aviso aparece la primera vez de la sesión; recuerda informar a la directora de Vinculación que la empresa no laborará y escribir la justificación correspondiente.</li><li><strong>Día inhábil:</strong> el aviso aparece la primera vez de la sesión. Úsalo únicamente cuando corresponda a un día feriado o inhábil del calendario escolar oficial vigente de la <strong>DGETI</strong> y de Educación Dual. El generador coloca automáticamente la leyenda <code>Falta de acuerdo con el calendario escolar vigente</code>.</li></ul><div class="important">Selecciona el estado que realmente corresponda. Si Vinculación o tu empresa te dan una indicación específica, esa instrucción tiene prioridad.</div></div></details>'
+          new='<details data-search="falta sin labores dia inhabil aviso directora vinculacion jefe inmediato justificar calendario dgeti dual cbtis sep"><summary>¿Qué pasa cuando selecciono Falta, Sin labores o Día inhábil?</summary><div class="answer"><p><strong>Cada vez</strong> que selecciones cualquiera de estos tres estados, el generador mostrará una ventana de recordatorio.</p><ul><li><strong>Falta:</strong> recuerda avisar a la directora de Vinculación y a tu jefe inmediato, además de escribir la justificación.</li><li><strong>Sin labores:</strong> recuerda avisar a la directora de Vinculación que <strong>en tu empresa no laborarán</strong> y escribe la justificación correspondiente.</li><li><strong>Día inhábil:</strong> esta opción es <strong>exclusiva</strong> para fechas contempladas como inhábiles o feriados en los calendarios oficiales vigentes de <strong>DGETI, CBTis, SEP</strong> y en el calendario interno propio aplicable a Educación Dual. El generador coloca automáticamente la leyenda <code>Falta de acuerdo con el calendario escolar vigente</code>.</li></ul><div class="important">Selecciona el estado que realmente corresponda. Si Vinculación o tu empresa te dan una indicación específica, esa instrucción tiene prioridad.</div></div></details>'
+          if old not in s: raise SystemExit('FAQ block not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - run: rm -f .github/workflows/tmp-beta-040-fix.yml
+      - run: git config user.name "github-actions[bot]"
+      - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: git add faq/index.html .github/workflows/tmp-beta-040-fix.yml && git commit -m "Corregir FAQ Beta 0.40" && git push
