@@ -1,0 +1,17 @@
+name: Prepare Beta 0.40
+on:
+  push:
+    branches:
+      - tmp/beta-040
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/beta040_patch.py
+      - run: rm -f .github/workflows/tmp-beta-040.yml .github/beta040_patch.py
+      - run: git config user.name "github-actions[bot]"
+      - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: git add index.html README.md faq/index.html .github/workflows/tmp-beta-040.yml .github/beta040_patch.py && git commit -m "Preparar Beta 0.40 con avisos persistentes" && git push
