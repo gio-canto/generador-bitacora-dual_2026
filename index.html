@@ -53,28 +53,19 @@ const COUNCIL="Consejo de Ciencia, Tecnología e Innovación del Estado de Guerr
 const NATURAL_COMPANY="El Buen Tzin S.A. de C.V. (100% Natural)";
 const LEGACY_COMPANY_ALIASES={"100% Natural Aeropuerto S.A. de C.V. (100% Natural)":NATURAL_COMPANY};
 const INHABIL_JUSTIFICATION="Falta de acuerdo con el calendario escolar vigente";
-const STATUS_NOTICE_KEY="bitacora_dual_status_notices_v1";
 const STATUS_NOTICES={
   falta:"No olvides avisar a la directora de Vinculación sobre tu falta y a tu jefe inmediato.",
-  sin_labores:"No olvides avisar a la directora de Vinculación que tu empresa no laborará.",
-  inhabil:"Día inhábil solo aplica para días feriados o inhábiles de acuerdo con el calendario escolar oficial vigente de la DGETI y de Educación Dual."
+  sin_labores:"No olvides avisar a la directora de Vinculación que en tu empresa no laborarán.",
+  inhabil:"Esta opción es exclusiva para los días contemplados como inhábiles o feriados en los calendarios oficiales vigentes de la DGETI, CBTis, SEP y el calendario interno propio aplicable a Educación Dual."
 };
-let statusNoticesSeen=new Set();
-try{statusNoticesSeen=new Set(JSON.parse(sessionStorage.getItem(STATUS_NOTICE_KEY)||"[]"))}catch{}
 function showStatusNotice(status){
   const message=STATUS_NOTICES[status];
   if(!message)return;
-  const alwaysRemind=status==="falta";
-  if(!alwaysRemind&&statusNoticesSeen.has(status))return;
-  if(!alwaysRemind){
-    statusNoticesSeen.add(status);
-    try{sessionStorage.setItem(STATUS_NOTICE_KEY,JSON.stringify([...statusNoticesSeen]))}catch{}
-  }
   const dialog=$("#statusDialog"),title=$("#statusTitle"),body=$("#statusMessage"),mark=$("#statusMark"),note=$("#statusNote");
   const meta=status==="falta"?{title:"Antes de registrar la falta",mark:"!"}:status==="sin_labores"?{title:"Antes de marcar Sin labores",mark:"i"}:{title:"Antes de marcar Día inhábil",mark:"★"};
   if(!dialog){alert(meta.title+"\n\n"+message);return}
   dialog.dataset.status=status;title.textContent=meta.title;body.textContent=message;mark.textContent=meta.mark;
-  if(note)note.textContent=alwaysRemind?"Este recordatorio aparecerá cada vez que selecciones Falta.":"Este recordatorio se muestra solo la primera vez que eliges este estado durante la sesión.";
+  if(note)note.textContent="Este recordatorio aparecerá cada vez que selecciones este estado.";
   if(typeof dialog.showModal==="function")dialog.showModal();else alert(meta.title+"\n\n"+message)
 }
 
