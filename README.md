@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.42-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.43-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -39,6 +39,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - Estados de jornada con labores, sin labores, día inhábil o falta.
 - Justificación obligatoria para **Falta** y **Sin labores**; **Día inhábil** utiliza una justificación automática basada en el calendario escolar vigente.
 - Avisos preventivos en ventanas visuales: **Falta**, **Sin labores** y **Día inhábil** muestran su recordatorio cada vez que se seleccionan.
+- La alerta de **Día inhábil** incluye accesos directos al Modelo de Formación Dual y a DGETI para consultar fuentes oficiales si existe duda.
 - Recordatorio final de que las firmas deben ser autógrafas y no se permiten firmas digitales.
 - Descripción de actividades con Markdown básico y contador de caracteres.
 - Áreas o departamentos independientes por día.
@@ -197,7 +198,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.42**
+**Beta 0.43**
 
 ## Desarrollo y colaboración
 
