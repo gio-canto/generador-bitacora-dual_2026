@@ -1,0 +1,26 @@
+name: Fix Beta 0.41 status note
+on:
+  push:
+    branches:
+      - tmp/beta-041
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('<div class="status-note" id="statusNote">Recordatorio del estado seleccionado.</div>','')
+          if 'id="statusNote"' in s:
+              raise SystemExit('statusNote todavía existe')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - run: rm -f .github/workflows/tmp-beta-041-fix.yml
+      - run: git config user.name "github-actions[bot]"
+      - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: git add index.html .github/workflows/tmp-beta-041-fix.yml && git commit -m "Quitar nota redundante de alertas" && git push
