@@ -61,11 +61,10 @@ const STATUS_NOTICES={
 function showStatusNotice(status){
   const message=STATUS_NOTICES[status];
   if(!message)return;
-  const dialog=$("#statusDialog"),title=$("#statusTitle"),body=$("#statusMessage"),mark=$("#statusMark"),note=$("#statusNote");
+  const dialog=$("#statusDialog"),title=$("#statusTitle"),body=$("#statusMessage"),mark=$("#statusMark");
   const meta=status==="falta"?{title:"Antes de registrar la falta",mark:"!"}:status==="sin_labores"?{title:"Antes de marcar Sin labores",mark:"i"}:{title:"Antes de marcar Día inhábil",mark:"★"};
   if(!dialog){alert(meta.title+"\n\n"+message);return}
   dialog.dataset.status=status;title.textContent=meta.title;body.textContent=message;mark.textContent=meta.mark;
-  if(note)note.textContent="Este recordatorio aparecerá cada vez que selecciones este estado.";
   if(typeof dialog.showModal==="function")dialog.showModal();else alert(meta.title+"\n\n"+message)
 }
 
