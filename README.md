@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.41-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.42-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -38,7 +38,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - UAGro Virtual y Chevrolet Chilpancingo utilizan 09:00–14:00 como horario predeterminado.
 - Estados de jornada con labores, sin labores, día inhábil o falta.
 - Justificación obligatoria para **Falta** y **Sin labores**; **Día inhábil** utiliza una justificación automática basada en el calendario escolar vigente.
-- Avisos preventivos en ventanas visuales: **Falta** recuerda siempre avisar a Vinculación y al jefe inmediato; **Sin labores** y **Día inhábil** se recuerdan la primera vez por sesión.
+- Avisos preventivos en ventanas visuales: **Falta**, **Sin labores** y **Día inhábil** muestran su recordatorio cada vez que se seleccionan.
 - Recordatorio final de que las firmas deben ser autógrafas y no se permiten firmas digitales.
 - Descripción de actividades con Markdown básico y contador de caracteres.
 - Áreas o departamentos independientes por día.
@@ -50,6 +50,7 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - En los responsables precargados del TecNM, el cargo incluye también la función **Jefe inmediato**.
 - Vista previa exacta en formato A4 horizontal.
 - Etiquetas de firma en el PDF para alumno, asesor de empresa y Vinculación CBTis No. 134.
+- Los rótulos **FALTA**, **SIN LABORES** y **DÍA INHÁBIL** se muestran en negrita dentro del PDF.
 - Advertencia automática cuando el contenido rebasa una página.
 - Descarga directa del PDF; en teléfonos compatibles se utiliza primero el menú nativo para compartir o guardar el archivo.
 - Recordatorio posterior a la generación del PDF con recomendaciones de impresión, firmas y tinta azul.
@@ -196,7 +197,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.41**
+**Beta 0.42**
 
 ## Desarrollo y colaboración
 
