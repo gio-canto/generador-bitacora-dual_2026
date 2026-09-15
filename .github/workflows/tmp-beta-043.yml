@@ -1,0 +1,20 @@
+name: Prepare Beta 0.43
+on:
+  push:
+    branches:
+      - tmp/beta-043
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/beta043_patch.py
+      - run: rm -f .github/workflows/tmp-beta-043.yml .github/beta043_patch.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html README.md faq/index.html .github/workflows/tmp-beta-043.yml .github/beta043_patch.py
+          git commit -m "Preparar Beta 0.43 con ayudas de Día inhábil"
+          git push
