@@ -122,7 +122,7 @@ new_script=r'''<script>
 </script>'''
 
 pattern=r'<script>\s*\(\(\)=>\{\s*"use strict";\s*const AUDIO_SRC="Assets/Asset_vt_in_nocy\.mp3";.*?</script>'
-index2,n=re.subn(pattern,new_script,index,count=1,flags=re.S)
+index2,n=re.subn(pattern,lambda _m:new_script,index,count=1,flags=re.S)
 if n!=1:
     raise SystemExit(f'No se encontró exactamente un bloque del easter egg: {n}')
 index=index2
@@ -141,7 +141,6 @@ index_path.write_text(index,encoding='utf-8')
 readme_path.write_text(readme,encoding='utf-8')
 faq_path.write_text(faq,encoding='utf-8')
 
-# Validaciones de contenido sin exponer disparadores en notas públicas.
 if 'Beta 0.47' not in readme or 'Beta 0.47' not in faq:
     raise SystemExit('No se actualizó la versión')
 release=faq.split('<section class="release-notes"',1)[1]
