@@ -1,0 +1,193 @@
+[
+  {
+    "id": "company-1",
+    "name": "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)",
+    "start": "10:00",
+    "end": "14:00",
+    "area": "Área de Informática",
+    "representatives": [
+      {
+        "name": "Mtra. Karen Paulina Solís Catalán",
+        "role": "Directora de Investigación y Proyectos Estratégicos\nJefa inmediata\nCOCyTEG"
+      }
+    ],
+    "instructors": [
+      {
+        "name": "Ing. Emmanuel Sandoval Mejía",
+        "roleMain": "Encargado de Informática"
+      },
+      {
+        "name": "L.C. Mario Alberto Sánchez Heredia",
+        "roleMain": "Subdirección de Administración, Finanzas y Archivo"
+      },
+      {
+        "name": "Ing. José Alberto Mier Mancilla",
+        "roleMain": "Departamento de Apropiación Social de la Ciencia"
+      },
+      {
+        "name": "L.C. Martha Isabel Cerdenares Bravo",
+        "roleMain": "Departamento de Vinculación Interinstitucional"
+      },
+      {
+        "name": "Dr. Edson Adrian Alvarez Alvarez",
+        "roleMain": "Departamento de Fortalecimiento a la Investigación e Innovación Tecnológica"
+      },
+      {
+        "name": "Lic. Ana Denis Lucena Vargas",
+        "roleMain": "Departamento de Propiedad Intelectual y Emprendimiento"
+      }
+    ]
+  },
+  {
+    "id": "company-2",
+    "name": "Instituto Tecnológico de Chilpancingo (ITCH)",
+    "start": "08:00",
+    "end": "15:00",
+    "area": "Área de Informática",
+    "representatives": [
+      {
+        "name": "Mtra. Areli Barcenas Nava",
+        "role": "Directora del Tecnológico Nacional de México Campus Chilpancingo\nJefe inmediato"
+      },
+      {
+        "name": "Dra. Yanet Evangelista Alcocer",
+        "role": "Subdirectora de Planeación y Vinculación\nJefe inmediato"
+      },
+      {
+        "name": "Mtro. César Pineda Pineda",
+        "role": "Jefe del Departamento de Planeación, Programación y Presupuestación\nJefe inmediato"
+      },
+      {
+        "name": "M.C. María Esther Durán Figueroa",
+        "role": "Jefa del Departamento de Gestión Tecnológica y Vinculación\nJefe inmediato"
+      },
+      {
+        "name": "Mtra. Talía Covarrubias González",
+        "role": "Jefa del Departamento de Comunicación y Difusión\nJefe inmediato"
+      },
+      {
+        "name": "Ramón Campos Castro",
+        "role": "Jefe del Departamento de Actividades Extraescolares\nJefe inmediato"
+      },
+      {
+        "name": "Mtro. Moisés Vázquez Peña",
+        "role": "Jefe del Departamento de Servicios Escolares\nJefe inmediato"
+      },
+      {
+        "name": "Dra. Viridiana Ramírez Fernández",
+        "role": "Jefa del Centro de Información\nJefe inmediato"
+      },
+      {
+        "name": "Mtro. Sergio Ricardo Zagal Barrera",
+        "role": "Subdirector\nJefe inmediato"
+      },
+      {
+        "name": "Víctor Castro Chino",
+        "role": "Jefe del Departamento de Ciencias Básicas\nJefe inmediato"
+      },
+      {
+        "name": "Mtro. Toledo Rodríguez Corona",
+        "role": "Jefe del Departamento de Sistemas y Computación\nJefe inmediato"
+      },
+      {
+        "name": "Mtro. Casildo Castizo Lucas",
+        "role": "Jefe del Departamento de Ciencias de la Tierra\nJefe inmediato"
+      },
+      {
+        "name": "Mtra. Yasmin Dayren Castañón Rivas",
+        "role": "Jefa del Departamento de Ciencias Económico Administrativas\nJefe inmediato"
+      },
+      {
+        "name": "Mtra. Adriana Maldonado Bravo",
+        "role": "Jefa del Departamento de Desarrollo Académico\nJefe inmediato"
+      },
+      {
+        "name": "Mtro. Aldo Olivar Herrera",
+        "role": "Jefe del Departamento de División de Estudios Profesionales\nJefe inmediato"
+      },
+      {
+        "name": "Dra. Mirna Castro Bello",
+        "role": "Jefa del Departamento de División de Estudios de Posgrado e Investigación\nJefe inmediato"
+      },
+      {
+        "name": "Mtra. Andrea Arzate Salgado",
+        "role": "Subdirectora de Servicios Administrativos\nJefe inmediato"
+      },
+      {
+        "name": "Ing. Gerardo Mondragón Balandrano",
+        "role": "Jefe del Departamento de Recursos Humanos\nJefe inmediato"
+      },
+      {
+        "name": "Lic. Miguel Ángel Bueno Pólito",
+        "role": "Jefe del Departamento de Recursos Financieros\nJefe inmediato"
+      },
+      {
+        "name": "Lic. Inocencio Ramos Robles",
+        "role": "Jefe del Departamento de Recursos Materiales y Servicios\nJefe inmediato"
+      },
+      {
+        "name": "M.C. Oscar Gabriel Flores López",
+        "role": "Jefe del Centro de Cómputo\nJefe inmediato"
+      },
+      {
+        "name": "Lic. Jorge Arturo Ocampo Pineda",
+        "role": "Jefe del Departamento de Mantenimiento y Equipo\nJefe inmediato"
+      }
+    ],
+    "instructors": []
+  },
+  {
+    "id": "company-3",
+    "name": "Sistema de Universidad Virtual de la Universidad Autónoma de Guerrero (UAGro Virtual)",
+    "start": "09:00",
+    "end": "14:00",
+    "area": "Área de Informática",
+    "representatives": [],
+    "instructors": []
+  },
+  {
+    "id": "company-4",
+    "name": "El Buen Tzin S.A. de C.V. (100% Natural)",
+    "start": "10:00",
+    "end": "15:00",
+    "area": "Área de Informática",
+    "representatives": [],
+    "instructors": []
+  },
+  {
+    "id": "company-5",
+    "name": "Chilpancingo Inn, S.A. de C.V. (Holiday Inn)",
+    "start": "09:00",
+    "end": "14:00",
+    "area": "Área de Informática",
+    "representatives": [],
+    "instructors": []
+  },
+  {
+    "id": "company-6",
+    "name": "Automóviles de Iguala, S.A. de C.V. (Nissan)",
+    "start": "08:00",
+    "end": "15:00",
+    "area": "Área de Informática",
+    "representatives": [],
+    "instructors": []
+  },
+  {
+    "id": "company-7",
+    "name": "Distribuidora Automotriz Acapulco, S.A. de C.V. (Chevrolet Chilpancingo)",
+    "start": "09:00",
+    "end": "14:00",
+    "area": "Área de Informática",
+    "representatives": [],
+    "instructors": []
+  },
+  {
+    "id": "company-8",
+    "name": "La Avispa, Museo Interactivo",
+    "start": "10:00",
+    "end": "15:00",
+    "area": "Área de Informática",
+    "representatives": [],
+    "instructors": []
+  }
+]

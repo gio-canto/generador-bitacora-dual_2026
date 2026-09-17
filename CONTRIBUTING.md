@@ -1,29 +1,17 @@
 # Contribuir
 
-Gracias por mejorar el Generador de Bitácora Dual 2026.
+Gracias por ayudar a simplificar las bitácoras de Educación Dual.
 
-## Antes de comenzar
+1. Crea una rama a partir de `main`.
+2. Instala Node.js 24 y ejecuta `npm ci`.
+3. Trabaja con `npm run dev`.
+4. Modifica catálogos en `src/data/` o componentes y reglas en su módulo correspondiente.
+5. Ejecuta `npm run check` y revisa el PDF si modificaste su contenido o diseño.
+6. Actualiza `CHANGELOG.md` y la documentación aplicable.
+7. Abre un pull request con problema, solución y verificación.
 
-1. Revisa los problemas abiertos.
-2. Evita incluir datos personales o bitácoras reales.
-3. Mantén el proyecto sin dependencias externas cuando sea posible.
-4. Conserva la compatibilidad con GitHub Pages.
+Usa datos ficticios en pruebas. No publiques bitácoras personales, respaldos, credenciales ni capturas con información privada. Conserva la licencia y los créditos. Los nombres de autoridades precargados deben actualizarse con información confirmada.
 
-## Proponer un cambio
+En cambios visuales revisa teléfono, iPad y escritorio, teclado, foco, contraste, movimiento reducido, campos largos y estados vacíos o de error. No cambies silenciosamente el formato institucional del PDF.
 
-1. Crea una rama descriptiva.
-2. Realiza cambios pequeños y enfocados.
-3. Prueba el flujo completo de cinco etapas.
-4. Comprueba la vista previa y la descarga del PDF.
-5. Verifica el diseño en computadora y teléfono.
-6. Abre un pull request con una explicación clara.
-
-## Lista de verificación
-
-- [ ] El formulario no pierde información al cambiar de etapa.
-- [ ] El PDF se descarga y abre correctamente.
-- [ ] Los registros locales se pueden guardar y recuperar.
-- [ ] La importación y exportación JSON siguen funcionando.
-- [ ] No existen errores en la consola.
-- [ ] Los controles se pueden usar con teclado.
-- [ ] No se añadieron datos personales al repositorio.
+El flujo de GitHub Actions verifica el pull request y despliega `dist/` cuando se integra en `main`.

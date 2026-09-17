@@ -1,0 +1,19 @@
+[
+  {
+    "id": "cbtis-134",
+    "name": "CENTRO DE BACHILLERATO TECNOLÓGICO INDUSTRIAL Y DE SERVICIOS NO. 134",
+    "shortName": "CBTis No. 134",
+    "voboName": "M. en A. Vepsania Marino Martínez",
+    "voboRole": "Jefa del Departamento de Vinculación con el Sector Productivo\nCBTis No. 134",
+    "specialties": [
+      "Programación",
+      "Contabilidad",
+      "Inteligencia Artificial",
+      "Comercio Electrónico",
+      "Administración de Recursos Humanos",
+      "Ofimática"
+    ],
+    "semesters": ["4", "5", "6"],
+    "groups": ["A", "B", "C", "D"]
+  }
+]
