@@ -22,4 +22,4 @@ La prioridad de esta corrección es recuperar comportamiento e identidad visual.
 
 ## Parte 2
 
-`src/components/Profile.jsx` monta un componente React independiente en la portada. Usa `blobatar/react` y `src/services/profile.js`; no envía el nombre a un servicio externo. El controlador original sigue a cargo del formulario. `src/domain/presentation.js` concentra las reglas del martes, nombres de firma y disparadores secretos. La hoja de estilos aplica animaciones cortas con alternativas de movimiento reducido.
+`src/components/Profile.jsx` monta un componente React independiente en la barra superior. Usa `blobatar/react` y `src/services/profile.js`; no envía el nombre a un servicio externo. El controlador original sigue a cargo del formulario. `src/domain/presentation.js` concentra las reglas del martes, nombres de firma y disparadores secretos. La hoja de estilos aplica animaciones cortas con alternativas de movimiento reducido.
