@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.48.0-beta.2 · Anti-fool upgrate — corrección del rediseño
+
+- Se recuperan el diseño de Beta 0.47, la FAQ, el tutorial guiado, los avisos, créditos e interacción Virtual Insanity.
+- Vuelven los controles originales de jornadas, líneas disponibles, historial y responsables de TecNM.
+- Se elimina la pantalla Catálogos: la configuración se edita en los JSON del repositorio.
+- Sileo queda reservado a una importación de respaldo completada, con carga diferida.
+- La vista previa agrupa cambios y evita dibujar cuando está oculta; la resolución del PDF no cambia.
+- Se recuperan una sola vez el borrador y el historial de beta.1 sin borrar sus datos de origen.
+- Importar conserva los registros actuales y valida el archivo antes de escribir. Regenerar jornadas con actividades pide confirmación.
+- React conserva una frontera de compatibilidad con el controlador original. Se revierte la sustitución visual completa de beta.1.
+
+
 ## [0.48.0-beta.1] · Anti-fool upgrate · 2026-09-17
 
 Continúa en beta. El nombre de esta actualización se conserva tal como fue solicitado.

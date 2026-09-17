@@ -1,5 +1,5 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.48.0-beta.1";
+export const VERSION = "0.48.0-beta.2";
 export const RELEASE = "Anti-fool upgrate";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();

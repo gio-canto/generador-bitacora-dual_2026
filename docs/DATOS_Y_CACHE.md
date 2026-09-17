@@ -1,25 +1,14 @@
-# Datos, migración y caché
+# Datos y caché
 
-## Almacenamiento local
+Las bitácoras permanecen en el navegador. No hay cuentas ni sincronización entre dispositivos.
 
-`bitacora_dual_react_v1` contiene `schemaVersion`, `version`, `draft`, `records` y `catalogs`. El borrador se escribe tras 250 ms sin cambios y al ocultar o cerrar la página. Una escritura fallida se muestra al usuario; exportar JSON sigue disponible.
+- Historial: `bitacora_dual_clean_v3`.
+- Borrador: `bitacora_dual_draft_v1`.
+- La primera apertura tras beta.1 recupera su historial y borrador. Conserva intacto `bitacora_dual_react_v1` como copia de recuperación; una marca evita repetir la migración.
+- Los catálogos se leen exclusivamente del código. Los cambios locales de catálogos de beta.1 no sustituyen esa configuración; sus datos de origen no se eliminan.
+- Exportar respaldo descarga el historial en el formato JSON original. Guarda primero la bitácora para incluirla.
+- Importar acepta el formato original y los respaldos de beta.1; valida estructura y tamaño máximo de 5 MB, pide confirmación y agrega registros. Las coincidencias de identificador reciben un identificador nuevo para evitar sobrescribir registros existentes.
 
-Al iniciar sin datos React se leen `bitacora_dual_clean_v3` y `bitacora_dual_draft_v1`. Las claves anteriores no se borran. Si se detecta información incompatible, el autoguardado se detiene y se ofrece un archivo de recuperación. No se inicia con la bitácora personal de ejemplo en dispositivos nuevos.
+El service worker guarda una versión identificada por el contenido del generador, FAQ y recursos compilados. Solo limpia cachés propias. Las actualizaciones se aplican al pulsar Actualizar y se solicita guardar el borrador antes de recargar. Sileo, audio y ejemplos no se precargan. Sileo requiere conexión la primera vez que se importa un respaldo; si no carga, aparece una confirmación nativa.
 
-No edites el mismo espacio de trabajo en varias pestañas a la vez: se comparte `localStorage` y la última escritura puede prevalecer. No hay sincronización entre dispositivos.
-
-## Respaldos
-
-El respaldo nuevo incluye registros, borrador y catálogos. Se siguen aceptando las listas de registros exportadas por la beta anterior. Los límites son 5 MB y 1,000 registros por importación. Los duplicados exactos se omiten; una colisión de ID con contenido distinto crea una copia. Se confirma antes de restaurar el borrador y los catálogos.
-
-Los registros existentes nunca se eliminan por importar. Si hay borrador en el respaldo, el borrador actual se conserva en el historial. Las copias de trabajo incompletas se pueden volver a abrir y corregir.
-
-## Caché de la aplicación
-
-Vite da nombres con hash a JavaScript y CSS. `build-sw.mjs` genera un service worker con caché `bitacora-dual-<hash>`. Precarga el programa, el FAQ y el encabezado. El audio y los ejemplos no se descargan anticipadamente.
-
-Se sirven los recursos de la compilación instalada para evitar mezclar HTML viejo con scripts nuevos. Una actualización espera: la interfaz avisa, guarda el borrador y activa la nueva versión al elegir **Actualizar ahora**. La activación elimina únicamente cachés antiguas cuyo nombre empieza por `bitacora-dual-`; nunca borra `localStorage` ni cachés de otros proyectos.
-
-La primera visita necesita conexión. El navegador puede desalojar la caché o el almacenamiento, y el modo privado puede limitarlo. Un service worker no sustituye un respaldo. La aplicación funciona también si el navegador no admite el service worker.
-
-El despliegue conserva el mismo dominio y ruta de GitHub Pages; mover a otro dominio no trasladará el almacenamiento automáticamente.
+Limpiar los datos del sitio elimina el historial local. La caché de archivos no es un respaldo de las bitácoras.

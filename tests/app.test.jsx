@@ -1,87 +1,54 @@
-import { afterEach, beforeEach, it, expect, vi } from "vitest";
-import {
-  render,
-  screen,
-  cleanup,
-  fireEvent,
-  within,
-} from "@testing-library/react";
+import { it, expect, vi } from "vitest";
+import { render, fireEvent } from "@testing-library/react";
 import App from "../src/App.jsx";
-vi.mock("sileo", () => ({
-  Toaster: () => null,
-  sileo: {
-    success: vi.fn(),
-    warning: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    action: vi.fn(),
+vi.stubGlobal(
+  "IntersectionObserver",
+  class {
+    observe() {}
+    disconnect() {}
   },
-}));
-beforeEach(() => localStorage.clear());
-afterEach(cleanup);
-it("completa el flujo, detecta errores y guarda una bitácora", () => {
+);
+vi.stubGlobal("devicePixelRatio", 1);
+it("recupera la interfaz original, genera cuatro días y conserva sus herramientas", async () => {
+  localStorage.clear();
   render(<App />);
-  fireEvent.click(
-    screen.getByRole("button", { name: "Continuar", exact: true }),
-  );
-  fireEvent.click(
-    screen.getByRole("button", { name: "Continuar", exact: true }),
-  );
-  expect(screen.getByText("Escribe tu nombre completo.")).toBeTruthy();
-  fireEvent.change(screen.getByLabelText("Nombre completo del alumno"), {
-    target: { value: "Alumno de Prueba" },
+  const $ = (id) => document.getElementById(id);
+  expect(document.body.textContent).toContain("Crea tu bitácora");
+  expect(document.body.textContent).not.toContain("Guardar catálogos");
+  for (const id of [
+    "tourBtn",
+    "welcomeDialog",
+    "guardDialog",
+    "statusDialog",
+    "deliveryDialog",
+    "addDayBtn",
+    "records",
+    "backupBtn",
+    "importFile",
+    "restoreBtn",
+    "tecnmAutorizoPreset",
+  ])
+    expect($(id), id).toBeTruthy();
+  fireEvent.input($("student"), { target: { value: "Alumno de Prueba" } });
+  fireEvent.change($("company"), {
+    target: { value: "Instituto Tecnológico de Chilpancingo (ITCH)" },
   });
-  fireEvent.change(screen.getByLabelText("Empresa receptora"), {
-    target: {
-      value:
-        "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)",
-    },
-  });
-  fireEvent.click(
-    screen.getByRole("button", { name: "Continuar", exact: true }),
-  );
-  fireEvent.change(screen.getByLabelText("Fecha de referencia"), {
-    target: { value: "2026-09-17" },
-  });
-  fireEvent.click(screen.getByRole("button", { name: "Generar semana" }));
-  for (const field of screen.getAllByLabelText("Actividades realizadas"))
-    fireEvent.change(field, {
-      target: { value: "Realicé las pruebas del sistema de constancias." },
-    });
-  fireEvent.click(
-    screen.getByRole("button", { name: "Continuar", exact: true }),
-  );
-  expect(screen.getByLabelText("Nombre de quien autoriza").value).toContain(
-    "Karen",
-  );
-  fireEvent.click(
-    screen.getByRole("button", { name: "Continuar", exact: true }),
-  );
-  expect(screen.getByText("Datos completos")).toBeTruthy();
-  fireEvent.click(screen.getByRole("button", { name: "Guardar bitácora" }));
-  fireEvent.click(screen.getByRole("button", { name: "Historial" }));
-  expect(
-    within(screen.getByRole("dialog")).getByText("Alumno de Prueba"),
-  ).toBeTruthy();
-});
-it("conserva el easter egg uwu", () => {
-  render(<App />);
-  fireEvent.click(
-    screen.getByRole("button", { name: "Continuar", exact: true }),
-  );
-  fireEvent.change(screen.getByLabelText("Nombre completo del alumno"), {
-    target: { value: "uwu" },
-  });
-  expect(screen.getByRole("dialog")).toBeTruthy();
-  expect(screen.getByText("Made by furries :3")).toBeTruthy();
-});
-it("permite editar un catálogo sin modificar la bitácora existente", async () => {
-  render(<App />);
-  fireEvent.click(screen.getByRole("button", { name: "Catálogos" }));
-  const field = await screen.findByLabelText("Nombre corto del plantel");
-  fireEvent.change(field, { target: { value: "CBTis 134 actualizado" } });
-  fireEvent.click(screen.getByRole("button", { name: "Guardar catálogos" }));
-  expect(
-    screen.getByRole("option", { name: "CBTis 134 actualizado" }),
-  ).toBeTruthy();
+  expect($("defaultStart").value).toBe("08:00");
+  expect($("tecnmAutorizoPreset").options.length).toBeGreaterThan(20);
+  fireEvent.change($("weekDate"), { target: { value: "2026-09-17" } });
+  fireEvent.click($("weekBtn"));
+  expect(document.querySelectorAll("#days .day-card").length).toBe(4);
+  fireEvent.click($("addDayBtn"));
+  expect($("guardTitle").textContent).toBe("Máximo de 4 días");
+  fireEvent.click($("guardConfirm"));
+  window.dispatchEvent(new Event("pagehide"));
+  const draft = JSON.parse(localStorage.getItem("bitacora_dual_draft_v1"));
+  expect(draft.entries.map((e) => e.date)).toEqual([
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+  ]);
+  expect(draft.identity.student).toBe("Alumno de Prueba");
+  expect(draft.entries[0].start).toBe("08:00");
 });

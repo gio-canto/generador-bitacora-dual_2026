@@ -26,6 +26,22 @@ createRoot(document.getElementById("root")).render(
     <App />
   </ErrorBoundary>,
 );
+window.addEventListener("bitacora-update", (event) => {
+  if (document.getElementById("updateNotice")) return;
+  const banner = document.createElement("div");
+  banner.id = "updateNotice";
+  banner.className = "update-notice";
+  banner.append("Hay una actualización disponible. ");
+  const button = document.createElement("button");
+  button.className = "btn";
+  button.textContent = "Actualizar";
+  button.onclick = () => {
+    window.dispatchEvent(new Event("pagehide"));
+    event.detail.postMessage({ type: "SKIP_WAITING" });
+  };
+  banner.append(button);
+  document.querySelector(".topbar")?.after(banner);
+});
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker

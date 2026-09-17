@@ -7,10 +7,10 @@ const core = [
   "./Assets/Edu.png",
   "./faq/",
   "./faq/index.html",
-  ...files.map((f) => "./assets/" + f),
+  ...files.filter(f => !f.startsWith("sileo-host-")).map((f) => "./assets/" + f),
 ];
 const hash = createHash("sha256");
-for (const f of ["dist/index.html", ...files.map((f) => "dist/assets/" + f)])
+for (const f of ["dist/index.html", "dist/faq/index.html", ...files.map((f) => "dist/assets/" + f)])
   hash.update(await readFile(f));
 const cache = "bitacora-dual-" + hash.digest("hex").slice(0, 12);
 await writeFile(

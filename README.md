@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.48.0--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.48.0--beta.2-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,36 +13,34 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.48: Anti-fool upgrate
+## Beta 0.48.0-beta.2 · Anti-fool upgrate
 
-La aplicación y las preguntas frecuentes ahora utilizan **React + Vite**. Conserva el formato A4 horizontal, las cuatro jornadas de martes a viernes y los catálogos de la beta anterior, con una estructura modular y controles pensados para teléfono, iPad y computadora.
-
-> [!IMPORTANT]
-> Continúa en **beta**. El documento debe revisarse antes de imprimirse o entregarse. Los nombres y cargos precargados son referencias del proyecto; confirma quién corresponde a tu caso.
+Corrección del rediseño: vuelve la interfaz original de Beta 0.47, con su navegación, tutorial, ayuda y funciones. React se conserva como punto de entrada con una capa de compatibilidad para el controlador original. La FAQ vuelve a su implementación estática original.
 
 ## Qué puedes hacer
 
-- Completar cinco etapas con ayuda contextual y errores junto a cada campo.
-- Agregar y editar escuelas, especialidades, semestres, grupos, empresas, horarios, representantes e instructores desde **Catálogos**.
-- Revisar fechas duplicadas, semanas incompatibles, horarios invertidos y justificaciones incompletas antes de exportar.
-- Ajustar cada jornada; usar Markdown, falta, sin labores o día inhábil.
-- Guardar automáticamente el borrador, abrir y duplicar bitácoras, buscar en el historial y deshacer una eliminación.
-- Exportar respaldos con historial, borrador y catálogos; importar sin borrar los registros existentes.
-- Ampliar la vista previa y descargar el PDF, con opción de compartir en dispositivos compatibles.
-- Recibir notificaciones de **Sileo**. Los errores de formulario permanecen junto al campo.
-- Seguir usando la aplicación sin conexión después de que su caché se haya instalado. Los ejemplos y el audio se cargan bajo demanda.
+- Completar los cinco pasos originales y usar el tutorial guiado.
+- Generar martes a viernes o agregar jornadas manualmente, con un máximo de cuatro.
+- Editar horarios, actividades, responsables e instructor de cada bitácora.
+- Usar Markdown y los estados Falta, Sin labores y Día inhábil, con sus recordatorios.
+- Ver las líneas disponibles antes de exceder una hoja y exportar el PDF A4 horizontal.
+- Recuperar el borrador, guardar, abrir, duplicar y eliminar registros con confirmación.
+- Exportar el historial e importar respaldos sin borrar los registros actuales.
+- Consultar la ayuda, los ejemplos y las notas de versión originales.
 
-No hay cuentas ni servidor de bitácoras. Los datos se conservan en el navegador; no se sincronizan automáticamente entre dispositivos. Los créditos y easter eggs siguen formando parte del proyecto.
+**Los catálogos se modifican únicamente en el código**, en `src/data/schools.json` y `src/data/companies.json`. No hay pantalla Catálogos. Consulta [la guía de configuración](docs/CATALOGOS.md).
+
+Sileo se carga solo al terminar una importación de respaldo. Guardar, escribir y navegar no generan notificaciones Sileo. El estado del guardado se muestra en el indicador original.
+
+No hay cuentas ni servidor de bitácoras. Los datos permanecen en el navegador. Para respaldar una semana, guárdala y usa Exportar respaldo en el último paso.
 
 ## Uso rápido
 
 1. Selecciona escuela, especialidad, semestre y grupo.
 2. Escribe el nombre del alumno y elige la empresa.
-3. Selecciona una fecha, genera la semana y describe las cuatro jornadas.
-4. Revisa los nombres y cargos de los responsables.
-5. Comprueba la vista previa, guarda la bitácora y descarga el PDF.
-
-**Historial → Exportar respaldo** crea una copia trasladable a otro navegador. **Catálogos** modifica únicamente los datos de este dispositivo; para cambiar los datos predeterminados para todos, edita los JSON del repositorio.
+3. Genera la semana y describe las cuatro jornadas.
+4. Revisa los responsables.
+5. Revisa la vista previa, guarda y descarga el PDF.
 
 ## Desarrollo local
 
@@ -70,47 +68,14 @@ npm run preview
 
 Sileo ya está declarado y fijado en `package-lock.json`; se incorporó con `npm i sileo`. No se descargan librerías desde CDN durante el uso.
 
-## Estructura
-
-| Ubicación | Responsabilidad |
-| --- | --- |
-| `src/components/` | Campos, jornadas, responsables, historial, catálogos, FAQ y diálogos |
-| `src/data/schools.json` | Planteles, oferta escolar y Vinculación |
-| `src/data/companies.json` | Empresas, horarios, áreas, representantes e instructores |
-| `src/data/faq.json` | Contenido de ayuda de confianza mantenido en Git |
-| `src/domain/` | Reglas de validación, fechas y catálogos |
-| `src/services/` | Almacenamiento, respaldo, dibujo y entrega del PDF |
-| `src/hooks/` | Estado y autoguardado del espacio de trabajo |
-| `public/Assets/` | Encabezado institucional, ejemplos y audio |
-| `scripts/build-sw.mjs` | Caché de recursos de cada compilación |
-| `tests/` | Pruebas automatizadas |
-
 ## Documentación
 
-- [Editar escuelas, empresas y personas](docs/CATALOGOS.md)
-- [Arquitectura y diseño](docs/ARQUITECTURA.md)
-- [Datos, migración y caché](docs/DATOS_Y_CACHE.md)
-- [Comprobaciones de la beta](docs/PRUEBAS.md)
-- [Cómo contribuir](CONTRIBUTING.md)
-- [Seguridad](SECURITY.md)
-- [Historial de cambios](CHANGELOG.md)
+- [Arquitectura y límites de la integración React](docs/ARQUITECTURA.md)
+- [Configuración de catálogos](docs/CATALOGOS.md)
+- [Datos, respaldos y caché](docs/DATOS_Y_CACHE.md)
+- [Verificación](docs/PRUEBAS.md)
+- [Notas de versión](CHANGELOG.md)
 
-## Despliegue
+## Contribuir
 
-GitHub Actions ejecuta instalación reproducible, pruebas y compilación. Los pull requests se verifican sin desplegar. Los cambios en `main` publican **solamente `dist/`** en GitHub Pages.
-
-La configuración de Pages debe conservar **GitHub Actions** como origen. Se mantienen las rutas `/generador-bitacora-dual_2026/` y `/generador-bitacora-dual_2026/faq/`.
-
-## Alcance y accesibilidad
-
-Diseño claro inspirado en principios de Apple: controles de al menos 44 px, tipografía del sistema, foco visible, retorno de foco en diálogos, ayuda por etapa y preferencias de movimiento, transparencia y contraste. Es una implementación web propia, no una biblioteca oficial de Apple.
-
-El formato PDF sigue siendo institucional y compartido por los planteles. Agregar un plantel no cambia automáticamente el logotipo ni las reglas académicas. Se admite un turno por día, con salida posterior a entrada; no se modelan turnos nocturnos.
-
-El PDF se genera como imagen de alta resolución en una página: su texto no es seleccionable. Borrar el almacenamiento del navegador puede eliminar los datos locales. Mantén respaldos.
-
-## Autor y licencia
-
-**Gio Antonio Canto Gómez** · [@gio-canto](https://github.com/gio-canto)
-
-[Licencia MIT](LICENSE). Creado para facilitar la documentación semanal de Educación Dual.
+Conserva la interfaz original y verifica las funciones existentes antes de cambiar un flujo. Describe el problema, el cambio y las comprobaciones en cada propuesta. Continúa en beta.

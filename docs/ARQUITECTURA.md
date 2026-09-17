@@ -1,34 +1,21 @@
-# Arquitectura y diseño
+# Arquitectura
 
-Aplicación estática React con dos entradas Vite: generador y FAQ. No necesita base de datos ni servidor de aplicación.
+Sitio estático compilado con Vite. La corrección beta.2 restaura el HTML, CSS y los controladores de Beta 0.47. React monta una frontera estable en `App.jsx`; el controlador original administra su contenido. Es una capa de compatibilidad, **no una migración completa a componentes declarativos**. No se debe remontar esa frontera durante la sesión. Los cambios en desarrollo requieren recarga completa.
 
-| Capa | Responsabilidad |
+| Archivo | Responsabilidad |
 | --- | --- |
-| Datos JSON | Catálogos y respuestas del FAQ |
-| Dominio | Generación de fechas, registros y reglas de validez |
-| Servicios | Persistencia, importación/exportación, PDF y descarga |
-| Componentes | Formulario, vista previa, editor, historial y diálogos |
-| `useWorkspace` | Estado persistente y autoguardado |
-| `App` | Coordinación del flujo y acciones del usuario |
+| `src/legacy/shell.html` | Interfaz original, sin scripts ni datos introducidos por usuarios |
+| `src/styles.css` | Estilos originales y ajustes pequeños de accesibilidad táctil |
+| `src/legacy/editor.js` | Jornadas, presupuesto de líneas, historial, formulario y PDF |
+| `src/legacy/guide.js` | Navegación, bienvenida, tutorial y créditos |
+| `src/legacy/people.js` | Selector de responsables de TecNM |
+| `src/legacy/signatures.js` | Sincronización del cargo de jefe inmediato |
+| `src/legacy/easter-egg.js` | Interacción Virtual Insanity |
+| `src/data/*.json` | Catálogos editados en el repositorio |
+| `src/services/recover-original.js` | Recuperación de datos de beta.1 |
+| `src/services/rare-notification.jsx` | Carga diferida de Sileo tras importar un respaldo |
+| `faq/index.html` | FAQ original con buscador, ejemplos y versiones |
 
-El PDF conserva el motor de dibujo anterior, ahora con datos explícitos como argumentos. No consulta el DOM del formulario ni modifica prototipos globales. Vista previa y exportación usan el mismo modelo de página. La salida es un JPEG de alta resolución dentro de un PDF A4 horizontal.
+La vista previa espera 120 ms desde la última modificación y solo dibuja si su panel es visible. La exportación mantiene la resolución original de 11.81 píxeles/mm. Los ajustes del logotipo y etiquetas de firma se aplican dentro del motor, sin modificar prototipos globales de Canvas.
 
-La importación trata el JSON como datos no confiables: comprueba estructura, tamaño y catálogos antes de modificar el estado. React representa los valores del alumno como texto. El FAQ utiliza HTML estático revisado en Git; nunca acepta HTML del usuario.
-
-## Criterios visuales
-
-La base existente ya empleaba gris claro, blanco, azul y tipografía del sistema. Se conserva esa identidad con menos decoración, controles táctiles y agrupación por tarea. No se agregan secciones comerciales, imágenes ornamentales ni pantallas de demostración.
-
-Parámetros de diseño aplicados: variación 3/10, movimiento 2/10, densidad 4/10. La legibilidad y la prevención de errores tienen prioridad. Inspiración Apple implementada con CSS propio: tipografía del sistema, respuesta al presionar, translucidez limitada a la barra, radios de 12 px en controles y 20–24 px en paneles.
-
-En móvil los campos usan una columna; la navegación conserva cinco etapas y nombres. En iPad el contenido aprovecha el ancho disponible. Se admite teclado, foco visible, movimiento reducido, transparencia reducida y contraste aumentado. Sileo comunica resultados transitorios; los errores importantes permanecen en el formulario.
-
-## Agregar funciones
-
-1. Ubica la regla en `src/domain/` si no necesita navegador.
-2. Usa `src/services/` para efectos y exportación.
-3. Crea componentes centrados en una tarea, con datos mediante props.
-4. Añade pruebas cuando exista riesgo de pérdida de información, error de fechas o cambio del PDF.
-5. Actualiza notas de versión y documentación.
-
-No guardes estado en variables globales ni vuelvas a enlazar campos mediante selectores DOM. No introduzcas servicios externos para procesar bitácoras sin revisar el alcance y actualizar la información de privacidad.
+La prioridad de esta corrección es recuperar comportamiento e identidad visual. La extracción futura de componentes React debe hacerse por partes, con pruebas de equivalencia antes de sustituir los controladores originales.

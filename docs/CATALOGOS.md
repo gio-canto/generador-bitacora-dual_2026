@@ -1,14 +1,8 @@
-# Editar catálogos
+# Editar catálogos en el código
 
-## Desde la aplicación
+No existe una pantalla de administración de catálogos para el usuario. Los campos del formulario siguen permitiendo ajustar la bitácora individual.
 
-Abre **Catálogos**. Elige **Escuelas** o **Empresas**, selecciona un elemento y edítalo, o pulsa **Agregar**. Guarda cuando termines. Los datos de las bitácoras existentes no se reescriben.
-
-En escuelas, escribe una especialidad, semestre o grupo por línea. Cada plantel tiene nombre completo, nombre corto y responsable de Vinculación. En empresas, define entrada, salida y área predeterminadas; agrega personas con nombre y cargo. Si hay varios representantes, el alumno debe elegir al que corresponda.
-
-Estos cambios son locales. **Historial → Exportar respaldo** permite trasladar también los catálogos.
-
-## Cambiar los valores para todas las personas
+## Configuración compartida
 
 Edita `src/data/schools.json` o `src/data/companies.json`. No hace falta modificar componentes React. Conserva los `id` existentes: identifican cada elemento. Usa un identificador nuevo para cada alta.
 
@@ -47,6 +41,6 @@ Ejemplo de escuela:
 
 Los horarios usan `HH:mm`, con salida posterior a entrada. Cada lista necesita al menos un elemento. Evita nombres repetidos. Los cargos admiten saltos de línea; el PDF reserva hasta cuatro líneas, incluida la empresa cuando corresponda. No inventes nombres, cargos ni relaciones de supervisión.
 
-Después ejecuta `npm run check`. Los usuarios que hayan personalizado sus catálogos mantienen su copia local; un cambio en Git no la sobrescribe.
+Después ejecuta `npm run check`. La configuración publicada se aplica a todos. Los registros existentes conservan sus propios datos. El selector de instructores precargados de la interfaz original corresponde a COCYTIEG; para otras empresas el instructor se captura manualmente.
 
 El logotipo compartido vive en `public/Assets/Edu.png`. Confirma que el formato corresponda a cada nuevo plantel antes de distribuirlo.
