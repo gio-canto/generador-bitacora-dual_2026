@@ -393,4 +393,80 @@ const welcome=document.getElementById("welcomeDialog"),layer=document.getElement
   };
 })();
 </script>
-\n<script>\n(()=>{\n  "use strict";\n  const AUDIO_SRC="Assets/Asset_vt_in_nocy.mp3";\n  const shell=document.querySelector(".shell"),overlay=document.getElementById("virtualEaster"),student=document.getElementById("student");\n  if(!shell||!overlay||!student)return;\n  const normalize=value=>String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();\n  let active=false,finishing=false,raf=0,audio=null,safetyTimer=0,finaleTimer=0,saved=null,studentArmed=true,weekArmed=true;\n  function restoreFocus(){\n    if(!saved)return;\n    window.scrollTo({left:saved.scrollX,top:saved.scrollY,behavior:"auto"});\n    const el=saved.focus;\n    if(el&&el.isConnected){\n      try{el.focus({preventScroll:true})}catch{try{el.focus()}catch{}}\n      if(typeof saved.selectionStart==="number"&&typeof el.setSelectionRange==="function"){try{el.setSelectionRange(saved.selectionStart,saved.selectionEnd)}catch{}}\n    }\n  }\n  function cleanup(){\n    clearTimeout(safetyTimer);clearTimeout(finaleTimer);cancelAnimationFrame(raf);\n    if(audio){audio.pause();audio.removeAttribute("src");try{audio.load()}catch{}audio=null}\n    overlay.classList.remove("show");\n    setTimeout(()=>{\n      overlay.hidden=true;\n      shell.style.transform=saved?.transform||"";\n      shell.style.transition=saved?.transition||"";\n      shell.style.willChange=saved?.willChange||"";\n      document.body.classList.remove("virtual-insanity-running");\n      restoreFocus();active=false;finishing=false;saved=null;\n    },430);\n  }\n  function finale(){\n    if(!active||finishing)return;finishing=true;\n    clearTimeout(safetyTimer);cancelAnimationFrame(raf);\n    shell.style.transition="transform 1.15s cubic-bezier(.22,1,.36,1)";\n    shell.style.transform="translate3d(0,0,0)";\n    overlay.hidden=false;requestAnimationFrame(()=>overlay.classList.add("show"));\n    finaleTimer=setTimeout(cleanup,2500);\n  }\n  function animate(start,now){\n    if(!active||finishing)return;\n    const t=(now-start)/1000,reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;\n    const amp=reduced?12:Math.min(78,innerWidth*.075),vamp=reduced?2:9;\n    const x=Math.sin(t*.72)*amp+Math.sin(t*.27)*amp*.32;\n    const y=Math.sin(t*.41)*vamp;\n    const scale=reduced?1:1.004+Math.sin(t*.31)*.003;\n    shell.style.transform=`translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0) scale(${scale.toFixed(4)})`;\n    raf=requestAnimationFrame(n=>animate(start,n));\n  }\n  function trigger(){\n    if(active)return;active=true;finishing=false;\n    const focus=document.activeElement;\n    saved={scrollX:window.scrollX,scrollY:window.scrollY,focus,selectionStart:typeof focus?.selectionStart==="number"?focus.selectionStart:null,selectionEnd:typeof focus?.selectionEnd==="number"?focus.selectionEnd:null,transform:shell.style.transform,transition:shell.style.transition,willChange:shell.style.willChange};\n    document.body.classList.add("virtual-insanity-running");\n    shell.style.transition="none";shell.style.willChange="transform";\n    const start=performance.now();raf=requestAnimationFrame(n=>animate(start,n));\n    audio=new Audio(AUDIO_SRC);audio.preload="auto";audio.volume=.88;\n    audio.addEventListener("ended",finale,{once:true});\n    audio.addEventListener("loadedmetadata",()=>{if(Number.isFinite(audio.duration)&&audio.duration>0){clearTimeout(safetyTimer);safetyTimer=setTimeout(finale,Math.min(90000,Math.max(8000,(audio.duration+2)*1000)))}});\n    audio.play().catch(()=>{clearTimeout(safetyTimer);safetyTimer=setTimeout(finale,10000)});\n    safetyTimer=setTimeout(finale,60000);\n  }\n  student.addEventListener("input",()=>{\n    const hit=normalize(student.value)==="jamiroquai";\n    if(hit&&studentArmed)trigger();\n    studentArmed=!hit;\n  });\n  document.addEventListener("input",event=>{\n    if(!event.target.matches?.('#days textarea[data-key="activity"]'))return;\n    const hit=[...document.querySelectorAll('#days textarea[data-key="activity"]')].some(el=>normalize(el.value).includes("virtual insanity"));\n    if(hit&&weekArmed)trigger();\n    weekArmed=!hit;\n  });\n  document.addEventListener("keydown",event=>{if(active&&event.key==="Escape")finale()});\n})();\n</script>\n</body></html>
+
+<script>
+(()=>{
+  "use strict";
+  const AUDIO_SRC="Assets/Asset_vt_in_nocy.mp3";
+  const shell=document.querySelector(".shell"),overlay=document.getElementById("virtualEaster"),student=document.getElementById("student");
+  if(!shell||!overlay||!student)return;
+  const normalize=value=>String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();
+  let active=false,finishing=false,raf=0,audio=null,safetyTimer=0,finaleTimer=0,saved=null,studentArmed=true,weekArmed=true;
+  function restoreFocus(){
+    if(!saved)return;
+    window.scrollTo({left:saved.scrollX,top:saved.scrollY,behavior:"auto"});
+    const el=saved.focus;
+    if(el&&el.isConnected){
+      try{el.focus({preventScroll:true})}catch{try{el.focus()}catch{}}
+      if(typeof saved.selectionStart==="number"&&typeof el.setSelectionRange==="function"){try{el.setSelectionRange(saved.selectionStart,saved.selectionEnd)}catch{}}
+    }
+  }
+  function cleanup(){
+    clearTimeout(safetyTimer);clearTimeout(finaleTimer);cancelAnimationFrame(raf);
+    if(audio){audio.pause();audio.removeAttribute("src");try{audio.load()}catch{}audio=null}
+    overlay.classList.remove("show");
+    setTimeout(()=>{
+      overlay.hidden=true;
+      shell.style.transform=saved?.transform||"";
+      shell.style.transition=saved?.transition||"";
+      shell.style.willChange=saved?.willChange||"";
+      document.body.classList.remove("virtual-insanity-running");
+      restoreFocus();active=false;finishing=false;saved=null;
+    },430);
+  }
+  function finale(){
+    if(!active||finishing)return;finishing=true;
+    clearTimeout(safetyTimer);cancelAnimationFrame(raf);
+    shell.style.transition="transform 1.15s cubic-bezier(.22,1,.36,1)";
+    shell.style.transform="translate3d(0,0,0)";
+    overlay.hidden=false;requestAnimationFrame(()=>overlay.classList.add("show"));
+    finaleTimer=setTimeout(cleanup,2500);
+  }
+  function animate(start,now){
+    if(!active||finishing)return;
+    const t=(now-start)/1000,reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const amp=reduced?12:Math.min(78,innerWidth*.075),vamp=reduced?2:9;
+    const x=Math.sin(t*.72)*amp+Math.sin(t*.27)*amp*.32;
+    const y=Math.sin(t*.41)*vamp;
+    const scale=reduced?1:1.004+Math.sin(t*.31)*.003;
+    shell.style.transform=`translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0) scale(${scale.toFixed(4)})`;
+    raf=requestAnimationFrame(n=>animate(start,n));
+  }
+  function trigger(){
+    if(active)return;active=true;finishing=false;
+    const focus=document.activeElement;
+    saved={scrollX:window.scrollX,scrollY:window.scrollY,focus,selectionStart:typeof focus?.selectionStart==="number"?focus.selectionStart:null,selectionEnd:typeof focus?.selectionEnd==="number"?focus.selectionEnd:null,transform:shell.style.transform,transition:shell.style.transition,willChange:shell.style.willChange};
+    document.body.classList.add("virtual-insanity-running");
+    shell.style.transition="none";shell.style.willChange="transform";
+    const start=performance.now();raf=requestAnimationFrame(n=>animate(start,n));
+    audio=new Audio(AUDIO_SRC);audio.preload="auto";audio.volume=.88;
+    audio.addEventListener("ended",finale,{once:true});
+    audio.addEventListener("loadedmetadata",()=>{if(Number.isFinite(audio.duration)&&audio.duration>0){clearTimeout(safetyTimer);safetyTimer=setTimeout(finale,Math.min(90000,Math.max(8000,(audio.duration+2)*1000)))}});
+    audio.play().catch(()=>{clearTimeout(safetyTimer);safetyTimer=setTimeout(finale,10000)});
+    safetyTimer=setTimeout(finale,60000);
+  }
+  student.addEventListener("input",()=>{
+    const hit=normalize(student.value)==="jamiroquai";
+    if(hit&&studentArmed)trigger();
+    studentArmed=!hit;
+  });
+  document.addEventListener("input",event=>{
+    if(!event.target.matches?.('#days textarea[data-key="activity"]'))return;
+    const hit=[...document.querySelectorAll('#days textarea[data-key="activity"]')].some(el=>normalize(el.value).includes("virtual insanity"));
+    if(hit&&weekArmed)trigger();
+    weekArmed=!hit;
+  });
+  document.addEventListener("keydown",event=>{if(active&&event.key==="Escape")finale()});
+})();
+</script>
+</body></html>
