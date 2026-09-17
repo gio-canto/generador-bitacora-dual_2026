@@ -1,0 +1,19 @@
+name: Prepare Beta 0.46
+on:
+  push:
+    branches: [tmp/beta-046]
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/beta046_patch.py
+      - run: |
+          rm -f .github/workflows/tmp-beta-046.yml .github/beta046_patch.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Preparar Beta 0.46 con mejoras de interacción"
+          git push
