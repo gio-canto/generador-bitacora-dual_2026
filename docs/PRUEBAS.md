@@ -16,3 +16,7 @@ La prueba del servicio PDF extraído cubre su formato; el generador restaurado c
 - Activar una actualización y comprobar que no pierde el borrador.
 
 `qa/responsive.html` permite revisar generador y FAQ en esos anchos; no es parte de la navegación del usuario.
+
+## Anti-fool upgrate · Parte 2
+
+26 pruebas automatizadas pasan. Cubren martes y horarios, cambio de año, nombres cortos, perfil local sin palabras secretas, configuración del instructor, controles plegados y salida de Virtual Insanity hacia los créditos. Se comprobó en el navegador publicado el perfil Blobatar, guardado con Sileo, campos de semana, créditos e instructor automático. La revisión en 390 px detectó y corrigió un desbordamiento del checkbox invisible del interruptor de instructor.
