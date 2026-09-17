@@ -33,3 +33,7 @@ Antes de publicar cambios de interfaz, revisar:
 | Sin conexión | Programa disponible tras instalar caché; datos intactos |
 
 El menú nativo de compartir depende de la compatibilidad y permisos del navegador. Se debe verificar en un iPhone/iPad real antes de declarar soporte certificado para una versión concreta de iOS.
+
+## Revisión adaptable sin herramientas externas
+
+La ruta de mantenimiento `qa/responsive.html` carga la aplicación real en un marco de 390, 768 o 1024 px. Sirve para comprobar los puntos de adaptación del CSS y el FAQ. Comparte el almacenamiento de la aplicación; utiliza datos ficticios. No aparece en la navegación del alumno ni simula el motor de Safari.
