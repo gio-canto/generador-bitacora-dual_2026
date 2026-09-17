@@ -44,22 +44,9 @@ export function startPeople() {
           : "Responsable que autoriza";
       const isTec = PEOPLE.length > 1;
       field.hidden = !isTec;
-      const matched = matchCurrent();
-      if (isTec) {
-        if (
-          fromCompanyChange &&
-          lastCompany !== TEC_COMPANY &&
-          !matched &&
-          (name.value.trim() || role.value.trim())
-        )
-          clearAuthority();
-        const current = matchCurrent();
-        select.value = current ? current.name : "__custom__";
-      } else {
-        if (fromCompanyChange && lastCompany === TEC_COMPANY && matched)
-          clearAuthority();
-        select.value = "__custom__";
-      }
+      if(fromCompanyChange&&lastCompany!==company.value&&PEOPLE.length!==1)clearAuthority();
+      const current=matchCurrent();
+      select.value=isTec&&current?current.name:"__custom__";
       lastCompany = company.value;
     }
     select.addEventListener("change", () => {

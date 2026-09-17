@@ -66,6 +66,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     },
   });
   expect($("instructorEnabled").checked).toBe(true);
+  expect($("autorizoName").value).toContain("Karen Paulina");
   fireEvent.click($("instructorEnabled"));
   window.dispatchEvent(new Event("pagehide"));
   expect(
