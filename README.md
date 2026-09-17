@@ -4,7 +4,7 @@
 
 ### Crea, administra y exporta bitácoras semanales de Educación Dual desde el navegador
 
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.43-0071E3)](#versión)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-Beta%200.44-0071E3)](#versión)
 [![GitHub Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![HTML5](https://img.shields.io/badge/HTML5-aplicaci%C3%B3n-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
 [![Sin dependencias](https://img.shields.io/badge/dependencias-0-087F5B)](#tecnologías)
@@ -42,6 +42,11 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 - La alerta de **Día inhábil** incluye accesos directos al Modelo de Formación Dual y a DGETI para consultar fuentes oficiales si existe duda.
 - Recordatorio final de que las firmas deben ser autógrafas y no se permiten firmas digitales.
 - Descripción de actividades con Markdown básico y contador de caracteres.
+- Límite dinámico de líneas por jornada: el espacio disponible se recalcula con base en lo escrito en los otros días y bloquea contenido que haría rebasar una hoja.
+- Validación obligatoria de exactamente 4 jornadas y mínimo 4 palabras legibles por actividad o justificación.
+- Grupo restringido a A, B, C o D.
+- Autoguardado del borrador en el almacenamiento local del navegador, con recuperación al volver a abrir la aplicación.
+- Aviso no restrictivo para nombres de alumno o responsables con menos de 3 palabras.
 - Áreas o departamentos independientes por día.
 - Nombre de quien elabora sincronizado automáticamente con el alumno.
 - Datos de Vo.Bo. de M. en A. Vepsania Marino Martínez precargados.
@@ -99,13 +104,14 @@ Funciona para estudiantes del CBTis No. 134 que cursan del cuarto al sexto semes
 La aplicación funciona completamente del lado del cliente:
 
 - Los registros se guardan mediante Web Storage.
+- El borrador en curso se guarda automáticamente en Web Storage para recuperarlo después de cerrar o recargar el navegador.
 - Los respaldos se generan como archivos JSON locales.
 - El PDF se construye dentro del navegador.
 - No existe base de datos remota.
 - No se utilizan cookies de seguimiento.
 - No se transmiten nombres, actividades ni documentos.
 
-> Borrar los datos del sitio en el navegador también elimina los registros locales. Se recomienda exportar respaldos periódicamente.
+> Borrar los datos del sitio en el navegador también elimina los registros y el borrador local. El autoguardado permite recuperar el progreso en el mismo navegador y dispositivo; para cambiar de dispositivo o protegerse ante pérdida del equipo, se recomienda exportar respaldos JSON periódicamente.
 
 ## Formato de salida
 
@@ -198,7 +204,7 @@ Antes de importar información, conserva una copia del respaldo actual.
 
 ## Versión
 
-**Beta 0.43**
+**Beta 0.44**
 
 ## Desarrollo y colaboración
 
