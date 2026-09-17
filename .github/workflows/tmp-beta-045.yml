@@ -1,0 +1,23 @@
+name: Prepare Beta 0.45
+on:
+  push:
+    branches:
+      - tmp/beta-045
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: tmp/beta-045
+      - run: python3 .github/beta045_patch.py
+      - run: rm -f .github/workflows/tmp-beta-045.yml .github/beta045_patch.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html README.md faq/index.html .github
+          git diff --cached --quiet && exit 0
+          git commit -m "Preparar Beta 0.45 con textos simplificados"
+          git push origin HEAD:tmp/beta-045
