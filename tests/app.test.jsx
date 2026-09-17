@@ -1,5 +1,5 @@
 import { it, expect, vi } from "vitest";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import App from "../src/App.jsx";
 vi.stubGlobal(
   "IntersectionObserver",
@@ -13,6 +13,13 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   localStorage.clear();
   render(<App />);
   const $ = (id) => document.getElementById(id);
+  await waitFor(()=>expect($("welcomeDialog").open).toBe(true));
+  expect($("welcomeDialog").textContent).toContain("¿Ya le sabes?");
+  fireEvent.click($("firstTimeYes"));
+  expect($("tourLayer").hidden).toBe(false);
+  fireEvent.click($("tourSkip"));
+  expect(localStorage.getItem("bitacora_dual_onboarding_v3")).toBe("skipped");
+  expect($("profileSlot").closest(".topbar")).toBeTruthy();
   expect(document.body.textContent).toContain("Crea tu bitácora");
   expect(document.body.textContent).not.toContain("Guardar catálogos");
   for (const id of [
@@ -77,4 +84,17 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect($("creditsDialog").open).toBe(true);
   fireEvent.click($("creditsClose"));
   expect($("creditsDialog").open).toBe(false);
+  fireEvent.input($("student"),{target:{value:"Alumno de Prueba"}});
+  for(const field of document.querySelectorAll('#days textarea[data-key="activity"]'))fireEvent.input(field,{target:{value:"Revisé los datos del sistema y corregí errores."}});
+  vi.spyOn(HTMLCanvasElement.prototype,"toBlob").mockImplementation(callback=>callback({arrayBuffer:async()=>new ArrayBuffer(4)}));
+  URL.createObjectURL=vi.fn(()=>"blob:test");URL.revokeObjectURL=vi.fn();
+  vi.spyOn(HTMLAnchorElement.prototype,"click").mockImplementation(()=>{});
+  const before=JSON.parse(localStorage.getItem("bitacora_dual_clean_v3")).length;
+  fireEvent.click($("pdfBtn"));
+  await waitFor(()=>expect(JSON.parse(localStorage.getItem("bitacora_dual_clean_v3"))).toHaveLength(before+1));
+  await waitFor(()=>expect($("pdfBtn").disabled).toBe(false));
+  fireEvent.click($("pdfBtn"));
+  await waitFor(()=>expect($("pdfBtn").disabled).toBe(false));
+  expect(JSON.parse(localStorage.getItem("bitacora_dual_clean_v3"))).toHaveLength(before+1);
+  expect($("saveState").textContent).toBe("Guardado");
 });

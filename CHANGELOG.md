@@ -1,5 +1,12 @@
 # Notas de versión
 
+## 0.49.0-beta.2 · Anti-fool upgrate · Parte 2
+
+- Nombre y Blobatar en la barra de navegación superior, con menú compacto.
+- Descargar PDF guarda automáticamente la bitácora validada en el historial; repetir la descarga actualiza el mismo registro.
+- Bienvenida de primera visita con lenguaje juvenil y botones Ver tutorial / Saltar tutorial. La decisión se recuerda al completar o saltar el recorrido.
+
+
 ## 0.49.0-beta.1 · Anti-fool upgrate · Parte 2
 
 - Registra la semana pide martes, entrada y salida; valida fecha y horario antes de generar o reemplazar jornadas.

@@ -13,10 +13,9 @@ export function Profile() {
   if (!name) return null;
   return (
     <details className="profile-menu">
-      <summary>
+      <summary title={name} aria-label={`Perfil de ${name}`}>
         <Blobatar name={name} size={38} alt="" />
         <span>
-          <small>Tu nombre en este navegador</small>
           <strong>{name}</strong>
         </span>
       </summary>
@@ -25,6 +24,7 @@ export function Profile() {
         <button
           className="btn"
           onClick={() => {
+            document.querySelector(".profile-menu")?.removeAttribute("open");
             window.dispatchEvent(new Event("bitacora-edit-name"));
           }}
         >

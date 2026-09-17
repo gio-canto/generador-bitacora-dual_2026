@@ -612,7 +612,8 @@ export function startEditor() {
         currentId = d.currentId || null;
         entries = deepCopy(d.entries).slice(0, MAX_DAYS);
         fillIdentity(d.identity);
-        $("#weekDate").value = weekDates(d.weekDate || entries[0]?.date)[0] || "";
+        $("#weekDate").value =
+          weekDates(d.weekDate || entries[0]?.date)[0] || "";
         $("#defaultStart").value =
           d.defaultStart || companyDefaults($("#company").value).start;
         $("#defaultEnd").value =
@@ -918,7 +919,7 @@ export function startEditor() {
     function loadRecord(r) {
       currentId = r.id;
       entries = deepCopy(r.entries || []).slice(0, MAX_DAYS);
-      $("#weekDate").value=weekDates(entries[0]?.date)[0]||"";
+      $("#weekDate").value = weekDates(entries[0]?.date)[0] || "";
       $("#markdown").checked = r.markdown !== false;
       fillIdentity(r);
       renderDays();
@@ -965,13 +966,15 @@ export function startEditor() {
         return;
       }
       if (!(await confirmShortNames("all"))) return;
-      const r = collectRecord();
-      currentId = r.id;
+      persistRecord(collectRecord());
+    }
+    function persistRecord(r, quiet = false) {
       const all = readStore(),
         i = all.findIndex((x) => x.id === r.id);
       if (i >= 0) all[i] = r;
       else all.unshift(r);
-      if (!writeStore(all)) return;
+      if (!writeStore(all)) return false;
+      currentId = r.id;
       dirty = false;
       setSaveState("Guardado");
       renderRecords();
@@ -979,11 +982,13 @@ export function startEditor() {
       rememberName(r.student);
       $("#historyDisclosure").open = false;
       $("#backupDisclosure").open = false;
-      notify(
-        "success",
-        "Bitácora guardada",
-        "La encontrarás en Registros guardados.",
-      );
+      if (!quiet)
+        notify(
+          "success",
+          "Bitácora guardada",
+          "La encontrarás en Registros guardados.",
+        );
+      return true;
     }
     function renderRecords() {
       const h = $("#records"),
@@ -1863,6 +1868,7 @@ export function startEditor() {
         );
         return;
       }
+      const saved = persistRecord(collectRecord(), true);
       const b = $("#pdfBtn"),
         mb = $("#mobilePdf"),
         old = b.textContent,
@@ -1878,7 +1884,7 @@ export function startEditor() {
         canvas.width = 1;
         canvas.height = 1;
         const delivered = await deliverPdf(blob, safeFileName());
-        if (delivered !== "cancelled") showDeliveryTips();
+        if (delivered !== "cancelled" && saved) showDeliveryTips();
       } catch (err) {
         console.error(err);
         notify(

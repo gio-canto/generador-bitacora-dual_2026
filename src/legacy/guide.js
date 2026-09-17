@@ -241,7 +241,7 @@ export function startGuide() {
     try {
       state = localStorage.getItem(KEY);
     } catch {}
-    if (!state) requestAnimationFrame(startTour);
+    if (!state) requestAnimationFrame(() => welcome.showModal());
     else {
       try {
         const savedStep = Math.max(

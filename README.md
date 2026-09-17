@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.49.0--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.49.0--beta.2-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,7 +13,7 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.49.0-beta.1 · Anti-fool upgrate · Parte 2
+## Beta 0.49.0-beta.2 · Anti-fool upgrate · Parte 2
 
 Corrección del rediseño: vuelve la interfaz original de Beta 0.47, con su navegación, tutorial, ayuda y funciones. React se conserva como punto de entrada con una capa de compatibilidad para el controlador original. La FAQ vuelve a su implementación estática original.
 
@@ -32,9 +32,9 @@ Corrección del rediseño: vuelve la interfaz original de Beta 0.47, con su nave
 
 Sileo confirma acciones como guardar o importar y muestra avisos breves del sistema. El autoguardado no genera notificaciones. Las confirmaciones, avisos de jornadas y recomendaciones de entrega conservan sus ventanas.
 
-La semana pide el martes de inicio, entrada y salida. Markdown sigue activo en Más opciones. Historial y respaldos están plegados. La portada recuerda el nombre con un Blobatar local; puedes cambiarlo u olvidarlo. COCYTIEG activa el instructor por defecto. Los nombres cortos para firmas se configuran en los JSON.
+La semana pide el martes de inicio, entrada y salida. Markdown sigue activo en Más opciones. Historial y respaldos están plegados. La barra superior recuerda el nombre con un Blobatar local; puedes cambiarlo u olvidarlo. COCYTIEG activa el instructor por defecto. Los nombres cortos para firmas se configuran en los JSON.
 
-No hay cuentas ni servidor de bitácoras. Los datos permanecen en el navegador. Para respaldar una semana, guárdala y usa Exportar respaldo en el último paso.
+No hay cuentas ni servidor de bitácoras. Los datos permanecen en el navegador. Descargar PDF guarda también la semana en el historial. Para llevarte una copia del historial, usa Exportar respaldo en el último paso.
 
 ## Uso rápido
 
