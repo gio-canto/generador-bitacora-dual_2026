@@ -1,0 +1,157 @@
+[
+  {
+    "keywords": "modalidad dual educacion escuela empresa aprendizaje",
+    "title": "¿Qué es la modalidad dual?",
+    "html": "<p>La <strong>Educación Dual</strong> combina la formación escolar con aprendizaje práctico dentro de una empresa u organismo. Parte de lo que aprendes se desarrolla en el plantel y otra parte directamente en un entorno de trabajo real, donde realizas actividades relacionadas con tu formación y recibes seguimiento.</p><p>No es solamente “ir a trabajar”: debes aprender, aplicar conocimientos, desarrollar competencias y dejar evidencia de tus actividades.</p>"
+  },
+  {
+    "keywords": "bitacora semanal evidencia actividades horarios empresa firmas",
+    "title": "¿Qué es una bitácora de la modalidad dual?",
+    "html": "<p>Es el documento semanal donde registras <strong>qué días asististe, tus horarios, el área donde estuviste y las actividades que realizaste</strong>. También incluye los espacios de responsables y firmas que permiten validar la información.</p>"
+  },
+  {
+    "keywords": "porque entregar obligatoria evidencia seguimiento escuela vinculacion",
+    "title": "¿Por qué tengo que entregarla?",
+    "html": "<p>Porque permite al plantel llevar seguimiento de tu participación en Educación Dual y documentar las actividades desarrolladas en la empresa. Las firmas ayudan a comprobar que la información fue revisada por las personas responsables.</p><div class=\"important\"><strong>No la dejes para el final.</strong> Actualízala cada semana mientras todavía recuerdas con claridad lo que hiciste.</div>"
+  },
+  {
+    "keywords": "como entregar imprimir tres copias empresa alumno cbtis vinculacion directora firmas",
+    "title": "¿Cómo entrego mi bitácora?",
+    "html": "<p>Como recomendación práctica, imprime <strong>3 copias</strong> cuando tu proceso y tu empresa lo permitan:</p><ol><li>Una para la empresa u organismo.</li><li>Una para ti, como respaldo.</li><li>Una para el CBTis No. 134.</li></ol><p>Primero reúne las firmas que correspondan en la empresa. Después pasa con la <strong>Dirección o Departamento de Vinculación</strong> para la revisión, firma y recepción del ejemplar destinado al plantel. Posteriormente entrega la copia de la empresa y conserva la tuya.</p><div class=\"important\"><strong>Para el plantel, el ejemplar indispensable es el que se entrega al CBTis No. 134.</strong> Las otras dos copias son una recomendación. Consulta siempre con tu empresa por si maneja otro procedimiento.</div>"
+  },
+  {
+    "keywords": "empresa no aparece listado github colaborar pull request agregar",
+    "title": "¿Qué pasa si mi empresa no aparece en el listado?",
+    "html": "<p>No tengas miedo: el catálogo puede ampliarse. Si tu empresa u organismo no aparece, puedes colaborar agregándolo al proyecto y enviando un <strong>pull request</strong> en GitHub.</p><p>Revisa que el nombre oficial esté escrito correctamente y evita subir datos personales innecesarios.</p>"
+  },
+  {
+    "keywords": "una fecha de esa semana primer dia martes generar martes viernes manual",
+    "title": "“Una fecha de esa semana”, ¿qué significa?",
+    "html": "<p>Es una fecha que sirve para identificar la semana que vas a registrar. Si normalmente comienzas a laborar los martes, selecciona <strong>el martes correspondiente a esa semana</strong>.</p><p>Después pulsa <strong>“Generar martes a viernes”</strong> y el sistema creará automáticamente los cuatro días. Si tu horario es diferente, puedes hacerlo manualmente día por día.</p>"
+  },
+  {
+    "keywords": "markdown negritas cursivas listas formato actividad",
+    "title": "¿Qué es Markdown?",
+    "html": "<p>Markdown es una forma sencilla de dar formato al texto con símbolos. No necesitas saber programación.</p><ul><li><code>**texto**</code> = <strong>negritas</strong>.</li><li><code>*texto*</code> = <em>cursivas</em>.</li><li>Una línea que comienza con <code>-</code> crea una viñeta.</li></ul><p>También puedes escribir normalmente o desactivar Markdown.</p>"
+  },
+  {
+    "keywords": "falte falta dia inhabil calendario oficial suspension",
+    "title": "¿Qué pasa si falto?",
+    "html": "<p>Si no hubo actividades porque fue un <strong>día inhábil del calendario oficial</strong>, selecciona <strong>“Día inhábil”</strong>. Si tú no asististe por una situación personal, utiliza <strong>“Falta”</strong> y escribe la justificación correspondiente.</p>"
+  },
+  {
+    "keywords": "enferme accidente no pude trabajar falta autorizacion avisar directora vinculacion empresa jefe inmediato justificar",
+    "title": "Me enfermé o me pasó algo y no pude trabajar, ¿qué hago?",
+    "html": "<p>Antes que nada, <strong>avisa y solicita la autorización correspondiente</strong>. Comunícate con Vinculación, con tu empresa y con tu jefe inmediato. No esperes hasta entregar la bitácora.</p><p>En el generador selecciona <strong>“Falta”</strong> y escribe de forma breve por qué no asististe. Conserva los comprobantes que te soliciten.</p><div class=\"important\">La bitácora registra lo ocurrido; no sustituye el procedimiento de aviso, permiso o justificación.</div>"
+  },
+  {
+    "keywords": "empresa cerro faltaron no hubo labores supervisor ausente sin labores",
+    "title": "En mi empresa no hubo labores, ¿qué hago?",
+    "html": "<p>Si la empresa suspendió actividades, cerró ese día o por cualquier otro motivo <strong>no hubo labores para ti</strong>, selecciona <strong>“Sin labores”</strong>. Si solamente faltó una persona o tu supervisor, pero tú sí realizaste actividades, registra el día como <strong>“Con labores”</strong>.</p>"
+  },
+  {
+    "keywords": "autorizo quien autoriza jefe inmediato superior responsable empresa vinculacion consejo directora investigacion holiday inn recursos humanos",
+    "title": "“Autorizó”, ¿quién autoriza?",
+    "html": "<p>Por regla general, aquí va tu <strong>jefe inmediato o responsable principal dentro de la empresa</strong>: quien supervisa tu participación en Educación Dual y puede validar tus actividades.</p><p>La persona exacta depende de cada empresa. En COCYTIEG puede corresponder a la Dirección de Investigación y Proyectos Estratégicos; en el TecNM Campus Chilpancingo el generador muestra un catálogo de responsables para elegir a quien realmente corresponda a tu área.</p><p>Si tienes duda, pregunta a Vinculación o al responsable de Educación Dual en tu empresa.</p>"
+  },
+  {
+    "keywords": "cargo que es puesto persona directorio consejo cocytieg tecnm uagro virtual contrato pagina 8 karen jefe inmediato",
+    "title": "“Cargo”, ¿qué es eso?",
+    "html": "<p>El <strong>cargo</strong> es el puesto o función oficial que tiene una persona dentro de la institución o empresa. Por ejemplo: puedes saber que la persona se llama <strong>M.C. Karen Paulina Solís Catalán</strong>, pero todavía necesitar saber cuál es su cargo oficial para escribirlo correctamente en la bitácora.</p><p>La opción más segura es <strong>preguntárselo directamente a la persona</strong> o consultar el directorio oficial de su institución:</p><div class=\"directory-links\"><a href=\"https://cocytieg.gob.mx/directorio\" target=\"_blank\" rel=\"noopener noreferrer\">COCYTIEG · Directorio</a><a href=\"https://chilpancingo.tecnm.mx/pages/directorio.php\" target=\"_blank\" rel=\"noopener noreferrer\">TecNM Campus Chilpancingo · Directorio</a><a href=\"https://virtual.uagro.mx/directorio.php\" target=\"_blank\" rel=\"noopener noreferrer\">UAGro Virtual · Directorio</a></div><p>Otra opción es revisar tu <strong>contrato o documentación de Educación Dual</strong>. En el modelo usado como referencia, la información del responsable suele aparecer alrededor de la <strong>página 8</strong>, aunque la ubicación puede variar según la versión del documento.</p><div class=\"tip\"><strong>¿No sabes el cargo exacto?</strong> Si después de revisarlo todavía no lo conoces, puedes colocar <strong>“Jefe inmediato”</strong> como función de la persona. Si sí conoces el cargo oficial, escribe ese cargo y, si corresponde a tu caso, también puedes agregar <strong>“Jefe inmediato”</strong> en una segunda línea. Ejemplo: <strong>Directora de Investigación y Proyectos Estratégicos · Jefa inmediata</strong>.</div><p>En el catálogo precargado del <strong>TecNM Campus Chilpancingo</strong>, el sistema conserva el cargo oficial seleccionado y agrega al final una segunda línea con <strong>“Jefe inmediato”</strong>, porque esa es la función que la persona desempeña dentro de la bitácora del alumno.</p><div class=\"example-gallery\"><figure class=\"example-media\"><img loading=\"lazy\" src=\"../Assets/Ej1.png\" alt=\"Ejemplo 1 de dónde localizar nombre y cargo en el contrato\"><figcaption class=\"example-caption\">Ejemplo 1 · Busca el nombre de la persona y el puesto que aparece asociado.</figcaption></figure><figure class=\"example-media\"><img loading=\"lazy\" src=\"../Assets/Ej2.png\" alt=\"Ejemplo 2 de dónde localizar nombre y cargo en el contrato\"><figcaption class=\"example-caption\">Ejemplo 2 · Verifica el cargo oficial antes de copiarlo a la bitácora.</figcaption></figure></div><div class=\"important\">Si puedes confirmar el cargo oficial, es preferible usarlo. No inventes un puesto específico: si no lo sabes, <strong>“Jefe inmediato”</strong> es una descripción funcional más segura hasta que puedas confirmarlo con la persona, la empresa o Vinculación.</div>"
+  },
+  {
+    "keywords": "instructor formador que es cuando usar segundo responsable encargado area consejo informatica firma",
+    "title": "¿Qué es “Instructor formador” y en qué casos se usa?",
+    "html": "<p>Es un espacio para casos donde, además del responsable que autoriza, existe otra persona que <strong>trabaja directamente contigo, supervisa tus tareas o puede certificar que las actividades sí se realizaron</strong>.</p><p>Por ejemplo, en el Consejo tu jefe inmediato puede ser la Directora de Investigación y Proyectos Estratégicos, pero puedes estar asignado al Área de Informática con su encargado. En ese caso, la firma del encargado permite acreditar el trabajo realizado antes de la autorización correspondiente.</p><p><strong>No siempre se utiliza.</strong> Si tu empresa no maneja una figura similar, deja desactivada esta opción y confirma con la empresa o con Vinculación.</p>"
+  },
+  {
+    "keywords": "instructor ya no labora cambio responsable temporal empresa vinculacion",
+    "title": "¿Qué pasa si mi instructor ya no labora en la empresa?",
+    "html": "<p>No coloques automáticamente a otra persona. Primero <strong>consulta con la directora o el área de Vinculación</strong> para saber cómo se manejará tu caso.</p><p>Si la empresa asignó un encargado temporal o un nuevo responsable, pregunta directamente en la empresa quién debe firmar o aparecer en la bitácora y desde qué fecha aplica el cambio.</p><div class=\"important\">La persona que figure como responsable debe corresponder a la situación real. No mantengas el nombre de alguien que ya no labora ahí solo porque estaba precargado en el sistema.</div>"
+  },
+  {
+    "keywords": "telefono movil celular puedo usar limitaciones pdf pantalla compartir guardar",
+    "title": "Estoy en teléfono, ¿puedo usar el generador?",
+    "html": "<p><strong>Sí.</strong> El generador está diseñado para funcionar también en teléfono. Puedes llenar la información, guardar registros y generar el PDF desde un navegador móvil compatible.</p><p>En teléfonos compatibles, al generar el PDF el sistema intenta utilizar primero el <strong>menú nativo de compartir o guardar</strong>. Si ese método no está disponible, utiliza una alternativa para abrir el PDF.</p><div class=\"tip\">Si trabajas desde el teléfono, revisa especialmente la vista previa antes de guardar el archivo y conserva un respaldo JSON de tus registros.</div>"
+  },
+  {
+    "keywords": "ejemplo ver bitacora guia ej3 modelo como hacer actividades",
+    "title": "¿Me puedo guiar por un ejemplo? ¿Puedo ver uno?",
+    "html": "<p>Sí. Usa los ejemplos como <strong>referencia de estructura</strong>, no para copiar actividades que no realizaste. Cada bitácora debe describir lo que realmente ocurrió en tu empresa.</p><div class=\"example-gallery single\"><figure class=\"example-media\"><img loading=\"lazy\" src=\"../Assets/Ej3.png\" alt=\"Ejemplo de una bitácora correctamente elaborada\"><figcaption class=\"example-caption\">Ejemplo 3 · Referencia visual de una bitácora terminada.</figcaption></figure></div><div class=\"model-entry\"><strong>Ejemplo sencillo de una jornada bien redactada</strong><ul><li><strong>Fecha:</strong> 08/09/2026</li><li><strong>Horario:</strong> 10:00 a.m. – 2:00 p.m.</li><li><strong>Área:</strong> Área de Informática</li><li><strong>Actividad 1:</strong> Revisión de requerimientos del sistema asignado y organización de tareas.</li><li><strong>Actividad 2:</strong> Diseño preliminar de la base de datos y definición de entidades principales.</li><li><strong>Actividad 3:</strong> Actualización del proyecto en GitHub para control de versiones.</li></ul></div><p>Una buena actividad responde, de manera breve, a <strong>qué hiciste, sobre qué trabajaste y qué avance obtuviste</strong>. Evita frases vagas como “hice cosas de informática” o “trabajé normal”.</p>"
+  },
+  {
+    "keywords": "formato desuso viejo cambio actualizar proyecto pull request gio canto instagram html informatica",
+    "title": "El formato quedó en desuso o cambió, ¿qué hago?",
+    "html": "<p>Si el CBTis, Vinculación o las empresas cambian el formato, <strong>actualiza o propón actualizar el proyecto</strong>. Puedes enviar un pull request para que el generador siga siendo útil.</p><p>Si no sabes hacerlo, no manejas HTML o tienes una duda técnica, puedes contactar directamente a <strong>Gio Canto</strong>, creador del proyecto.</p><p><a href=\"https://www.instagram.com/gio_canto_g/\" target=\"_blank\" rel=\"noopener noreferrer\">Instagram de Gio Canto · @gio_canto_g</a></p>"
+  },
+  {
+    "keywords": "como hacer pull request github fork rama editar commit contribuir version beta",
+    "title": "¿Cómo hago un pull request?",
+    "html": "<ol><li>Abre el repositorio del generador y crea un fork si no tienes permisos de escritura.</li><li>Crea una rama para tu cambio.</li><li>Edita los catálogos en src/data/ o el componente React correspondiente.</li><li>Ejecuta npm ci y npm run check.</li><li>Envía un pull request explicando qué cambiaste y cómo lo probaste.</li></ol><p>Consulta CONTRIBUTING.md. No publiques bitácoras reales ni respaldos personales.</p>"
+  },
+  {
+    "keywords": "que escribir actividades descripcion trabajo breve evidencia tareas",
+    "title": "¿Qué debo escribir en “Actividades”?",
+    "html": "<p>Escribe lo que realmente realizaste durante esa jornada, de forma concreta. Describe acciones y resultados, no frases genéricas.</p><div class=\"example\"><strong>Mejor:</strong> “Configuración de GitHub para control de versiones y revisión del diseño de la base de datos.”<br><strong>Evita:</strong> “Trabajé en informática.”</div>"
+  },
+  {
+    "keywords": "me equivoque editar corregir antes firmar pdf registro",
+    "title": "Me equivoqué al llenar la bitácora, ¿puedo corregirla?",
+    "html": "<p>Sí. Corrige la información y vuelve a guardar o descargar el PDF. Hazlo <strong>antes de recopilar firmas o entregar el documento</strong>. Si ya fue firmado o recibido, consulta con Vinculación antes de sustituirlo.</p>"
+  },
+  {
+    "keywords": "pdf excede una pagina espacio fijo reducir texto cabe una pagina",
+    "title": "¿Qué hago si el PDF dice que excede una página?",
+    "html": "<p>Resume el texto de las actividades sin eliminar información importante. Usa frases claras y elimina repeticiones. El generador mantiene el formato de una sola página y evita exportarlo cuando el contenido ya no cabe correctamente.</p>"
+  },
+  {
+    "keywords": "respaldo json guardar registros otro navegador computadora exportar importar",
+    "title": "¿Cómo evito perder mis bitácoras guardadas?",
+    "html": "<p>En el Historial utiliza <strong>“Exportar respaldo”</strong>. Se descargará un archivo JSON con tus registros. Si cambias de navegador o computadora, usa <strong>“Importar respaldo”</strong>.</p><div class=\"important\">Si borras los datos del sitio sin respaldo, puedes perder los registros almacenados localmente.</div>"
+  },
+  {
+    "keywords": "privacidad datos servidor nombres actividades local navegador cookies",
+    "title": "¿Mis datos se envían a un servidor?",
+    "html": "<p>No. El generador funciona del lado del navegador: los registros se almacenan localmente, el respaldo se genera en tu dispositivo y el PDF se crea directamente ahí.</p><p>No publiques en GitHub respaldos, bitácoras reales o archivos con datos personales.</p>"
+  },
+  {
+    "keywords": "caso diferente duda no aparece opcion vinculacion empresa preguntar",
+    "title": "Mi caso no aparece aquí, ¿qué hago?",
+    "html": "<p>Si la duda afecta firmas, faltas, horarios, entrega o responsables, confirma primero con <strong>Vinculación y con tu empresa</strong>. Si es sobre el generador, puedes abrir un issue en GitHub o proponer una mejora mediante pull request.</p>"
+  },
+  {
+    "keywords": "horarios predeterminados empresa turno entrada salida area informatica cocytieg tecnm hotel nissan museo natural",
+    "title": "¿Por qué cambia el horario predeterminado cuando selecciono una empresa?",
+    "html": "<p>Desde la <strong>Beta 0.35</strong>, el generador ajusta automáticamente la entrada, la salida y, cuando corresponde, el área predeterminada según la empresa seleccionada.</p><ul><li><strong>COCYTIEG:</strong> 10:00–14:00.</li><li><strong>TecNM Campus Chilpancingo:</strong> 08:00–15:00.</li><li><strong>UAGro Virtual:</strong> 09:00–14:00.</li><li><strong>100% Natural:</strong> 10:00–15:00.</li><li><strong>Holiday Inn:</strong> 09:00–14:00.</li><li><strong>Nissan / Automóviles de Iguala:</strong> 08:00–15:00 y Área de Informática.</li><li><strong>Chevrolet Chilpancingo:</strong> 09:00–14:00.</li><li><strong>La Avispa, Museo Interactivo:</strong> 10:00–15:00.</li></ul><p>Son valores iniciales para agilizar el llenado. <strong>Puedes modificarlos manualmente</strong> si tu horario real es distinto. Cambiar de empresa tampoco altera las jornadas que ya capturaste.</p><div class=\"important\">Si tu empresa o Vinculación te indican otro horario, utiliza siempre el horario real y la instrucción oficial.</div>"
+  },
+  {
+    "keywords": "falta sin labores dia inhabil aviso directora vinculacion jefe inmediato justificar calendario dgeti dual cbtis sep",
+    "title": "¿Qué pasa cuando selecciono Falta, Sin labores o Día inhábil?",
+    "html": "<p><strong>Cada vez</strong> que selecciones cualquiera de estos tres estados, el generador mostrará una ventana de recordatorio.</p><ul><li><strong>Falta:</strong> recuerda avisar a la directora de Vinculación y a tu jefe inmediato, además de escribir la justificación.</li><li><strong>Sin labores:</strong> recuerda avisar a la directora de Vinculación que <strong>en tu empresa no laborarán</strong> y escribe la justificación correspondiente.</li><li><strong>Día inhábil:</strong> esta opción es <strong>exclusiva</strong> para fechas contempladas como inhábiles o feriados en los calendarios oficiales vigentes de <strong>DGETI, CBTis, SEP</strong> y en el calendario interno propio aplicable a Educación Dual. El generador coloca automáticamente la leyenda <code>Falta de acuerdo con el calendario escolar vigente</code>. Si tienes duda, la ventana te ofrece acceso al <a href=\"https://modelo.formaciondual.sems.gob.mx/\" target=\"_blank\" rel=\"noopener noreferrer\">Modelo de Formación Dual</a> y a <a href=\"https://dgeti.sep.gob.mx/index.php/tramites-y-servicios\" target=\"_blank\" rel=\"noopener noreferrer\">DGETI · Trámites y servicios</a>.</li></ul><div class=\"important\">Selecciona el estado que realmente corresponda. Si Vinculación o tu empresa te dan una indicación específica, esa instrucción tiene prioridad.</div>"
+  },
+  {
+    "keywords": "cuatro dias exactos 4 actividades minimo palabras lineas limite hoja pdf",
+    "title": "¿Por qué el sistema exige exactamente 4 días y limita las líneas?",
+    "html": "<p>El formato utiliza cuatro jornadas de martes a viernes. El espacio del PDF es compartido: si escribes más en un día, queda menos en los demás. El programa conserva tu texto, pero no permite descargar una hoja que rebase el espacio. Resume lo necesario antes de exportar.</p>"
+  },
+  {
+    "keywords": "autoguardado borrador cerrar recargar recuperar progreso dispositivo cache almacenamiento local respaldo",
+    "title": "¿Se guarda mi progreso si cierro el navegador?",
+    "html": "<p>Sí. El borrador actual se guarda automáticamente en el almacenamiento local del navegador y se recupera cuando vuelves a abrir el generador en <strong>ese mismo navegador y dispositivo</strong>.</p><div class=\"important\">El almacenamiento local no puede recuperar información si pierdes o cambias de dispositivo. Para eso, exporta periódicamente el respaldo JSON y consérvalo fuera del equipo.</div>"
+  },
+  {
+    "keywords": "nombre tres palabras apellidos apellido materno aviso responsable alumno",
+    "title": "¿Por qué aparece un aviso cuando un nombre tiene menos de 3 palabras?",
+    "html": "<p>Es una comprobación preventiva para detectar nombres posiblemente incompletos. <strong>No es restrictiva</strong>: si la persona no utiliza apellido materno o su nombre legal tiene menos de tres palabras, selecciona que el nombre está correcto y continúa.</p>"
+  },
+  {
+    "keywords": "escuela empresa representante catalogo agregar editar",
+    "title": "¿Cómo agrego una escuela, empresa o representante?",
+    "html": "<p>Abre <strong>Catálogos</strong>, selecciona Escuelas o Empresas y pulsa Agregar. Completa los datos y guarda. Los horarios, representantes e instructores se editan en el mismo lugar. Tus cambios son locales; exporta un respaldo para compartirlos.</p>"
+  },
+  {
+    "keywords": "cache actualizar sin conexion datos borrar",
+    "title": "¿Qué ocurre al actualizar la aplicación?",
+    "html": "<p>La nueva versión avisa cuando está lista. Al elegir Actualizar ahora se guarda el borrador y se recarga. La limpieza de caché afecta únicamente archivos de esta aplicación; no borra el historial ni los catálogos. Exporta un respaldo antes de borrar datos del navegador.</p>"
+  }
+]
