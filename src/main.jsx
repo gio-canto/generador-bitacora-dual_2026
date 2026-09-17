@@ -26,7 +26,9 @@ createRoot(document.getElementById("root")).render(
     <App />
   </ErrorBoundary>,
 );
+let pendingWorker;
 window.addEventListener("bitacora-update", (event) => {
+  pendingWorker = event.detail;
   if (document.getElementById("updateNotice")) return;
   const banner = document.createElement("div");
   banner.id = "updateNotice";
@@ -37,7 +39,14 @@ window.addEventListener("bitacora-update", (event) => {
   button.textContent = "Actualizar";
   button.onclick = () => {
     window.dispatchEvent(new Event("pagehide"));
-    event.detail.postMessage({ type: "SKIP_WAITING" });
+    button.disabled = true;
+    button.textContent = "Actualizando…";
+    const worker = pendingWorker;
+    worker.addEventListener('statechange', () => {
+      if (worker.state === 'activated') location.reload();
+    });
+    if (worker.state === 'activated') location.reload();
+    else worker.postMessage({ type: "SKIP_WAITING" });
   };
   banner.append(button);
   document.querySelector(".topbar")?.after(banner);

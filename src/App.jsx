@@ -15,6 +15,11 @@ export default function App() {
     if (initialized.current) return;
     initialized.current = true;
     recoverPreviousVersion();
+    document.querySelectorAll('.field').forEach(field => {
+      const label = field.querySelector('label');
+      const input = field.querySelector('input, select, textarea');
+      if (label && input?.id && !label.htmlFor) label.htmlFor = input.id;
+    });
     startEditor();
     startGuide();
     startPeople();
