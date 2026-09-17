@@ -22,7 +22,7 @@
   {
     "keywords": "empresa no aparece listado github colaborar pull request agregar",
     "title": "¿Qué pasa si mi empresa no aparece en el listado?",
-    "html": "<p>No tengas miedo: el catálogo puede ampliarse. Si tu empresa u organismo no aparece, puedes colaborar agregándolo al proyecto y enviando un <strong>pull request</strong> en GitHub.</p><p>Revisa que el nombre oficial esté escrito correctamente y evita subir datos personales innecesarios.</p>"
+    "html": "<p>Abre <strong>Catálogos → Empresas → Agregar empresa</strong>. Escribe su nombre oficial, horario, área y responsables, y guarda. La empresa quedará disponible en este navegador.</p><p>Para incorporarla al catálogo predeterminado de todas las personas, modifica <code>src/data/companies.json</code> y envía un pull request. No publiques datos personales innecesarios.</p>"
   },
   {
     "keywords": "una fecha de esa semana primer dia martes generar martes viernes manual",
@@ -82,7 +82,7 @@
   {
     "keywords": "formato desuso viejo cambio actualizar proyecto pull request gio canto instagram html informatica",
     "title": "El formato quedó en desuso o cambió, ¿qué hago?",
-    "html": "<p>Si el CBTis, Vinculación o las empresas cambian el formato, <strong>actualiza o propón actualizar el proyecto</strong>. Puedes enviar un pull request para que el generador siga siendo útil.</p><p>Si no sabes hacerlo, no manejas HTML o tienes una duda técnica, puedes contactar directamente a <strong>Gio Canto</strong>, creador del proyecto.</p><p><a href=\"https://www.instagram.com/gio_canto_g/\" target=\"_blank\" rel=\"noopener noreferrer\">Instagram de Gio Canto · @gio_canto_g</a></p>"
+    "html": "<p>Si el CBTis, Vinculación o las empresas cambian el formato, <strong>actualiza o propón actualizar el proyecto</strong>. Puedes enviar un pull request para que el generador siga siendo útil.</p><p>Si no sabes hacerlo, no manejas React o tienes una duda técnica, puedes contactar directamente a <strong>Gio Canto</strong>, creador del proyecto.</p><p><a href=\"https://www.instagram.com/gio_canto_g/\" target=\"_blank\" rel=\"noopener noreferrer\">Instagram de Gio Canto · @gio_canto_g</a></p>"
   },
   {
     "keywords": "como hacer pull request github fork rama editar commit contribuir version beta",
@@ -127,7 +127,7 @@
   {
     "keywords": "falta sin labores dia inhabil aviso directora vinculacion jefe inmediato justificar calendario dgeti dual cbtis sep",
     "title": "¿Qué pasa cuando selecciono Falta, Sin labores o Día inhábil?",
-    "html": "<p><strong>Cada vez</strong> que selecciones cualquiera de estos tres estados, el generador mostrará una ventana de recordatorio.</p><ul><li><strong>Falta:</strong> recuerda avisar a la directora de Vinculación y a tu jefe inmediato, además de escribir la justificación.</li><li><strong>Sin labores:</strong> recuerda avisar a la directora de Vinculación que <strong>en tu empresa no laborarán</strong> y escribe la justificación correspondiente.</li><li><strong>Día inhábil:</strong> esta opción es <strong>exclusiva</strong> para fechas contempladas como inhábiles o feriados en los calendarios oficiales vigentes de <strong>DGETI, CBTis, SEP</strong> y en el calendario interno propio aplicable a Educación Dual. El generador coloca automáticamente la leyenda <code>Falta de acuerdo con el calendario escolar vigente</code>. Si tienes duda, la ventana te ofrece acceso al <a href=\"https://modelo.formaciondual.sems.gob.mx/\" target=\"_blank\" rel=\"noopener noreferrer\">Modelo de Formación Dual</a> y a <a href=\"https://dgeti.sep.gob.mx/index.php/tramites-y-servicios\" target=\"_blank\" rel=\"noopener noreferrer\">DGETI · Trámites y servicios</a>.</li></ul><div class=\"important\">Selecciona el estado que realmente corresponda. Si Vinculación o tu empresa te dan una indicación específica, esa instrucción tiene prioridad.</div>"
+    "html": "<p>Al seleccionar uno de estos estados aparece una indicación junto a la jornada.</p><ul><li><strong>Falta:</strong> recuerda avisar a la directora de Vinculación y a tu jefe inmediato, además de escribir la justificación.</li><li><strong>Sin labores:</strong> recuerda avisar a la directora de Vinculación que <strong>en tu empresa no laborarán</strong> y escribe la justificación correspondiente.</li><li><strong>Día inhábil:</strong> esta opción es <strong>exclusiva</strong> para fechas contempladas como inhábiles o feriados en los calendarios oficiales vigentes de <strong>DGETI, CBTis, SEP</strong> y en el calendario interno propio aplicable a Educación Dual. El generador coloca automáticamente la leyenda <code>Falta de acuerdo con el calendario escolar vigente</code>. Si tienes duda, consulta el <a href=\"https://modelo.formaciondual.sems.gob.mx/\" target=\"_blank\" rel=\"noopener noreferrer\">Modelo de Formación Dual</a> y a <a href=\"https://dgeti.sep.gob.mx/index.php/tramites-y-servicios\" target=\"_blank\" rel=\"noopener noreferrer\">DGETI · Trámites y servicios</a>.</li></ul><div class=\"important\">Selecciona el estado que realmente corresponda. Si Vinculación o tu empresa te dan una indicación específica, esa instrucción tiene prioridad.</div>"
   },
   {
     "keywords": "cuatro dias exactos 4 actividades minimo palabras lineas limite hoja pdf",
@@ -142,7 +142,7 @@
   {
     "keywords": "nombre tres palabras apellidos apellido materno aviso responsable alumno",
     "title": "¿Por qué aparece un aviso cuando un nombre tiene menos de 3 palabras?",
-    "html": "<p>Es una comprobación preventiva para detectar nombres posiblemente incompletos. <strong>No es restrictiva</strong>: si la persona no utiliza apellido materno o su nombre legal tiene menos de tres palabras, selecciona que el nombre está correcto y continúa.</p>"
+    "html": "<p>Es una comprobación preventiva para detectar nombres posiblemente incompletos. <strong>No es restrictiva</strong>: si la persona no utiliza apellido materno o su nombre legal tiene menos de tres palabras, puedes continuar sin cambiarlo. La sugerencia aparece junto al nombre del alumno.</p>"
   },
   {
     "keywords": "escuela empresa representante catalogo agregar editar",
