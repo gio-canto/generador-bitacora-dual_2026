@@ -612,7 +612,7 @@ export function startEditor() {
         currentId = d.currentId || null;
         entries = deepCopy(d.entries).slice(0, MAX_DAYS);
         fillIdentity(d.identity);
-        $("#weekDate").value = d.weekDate || "";
+        $("#weekDate").value = weekDates(d.weekDate || entries[0]?.date)[0] || "";
         $("#defaultStart").value =
           d.defaultStart || companyDefaults($("#company").value).start;
         $("#defaultEnd").value =
@@ -918,6 +918,7 @@ export function startEditor() {
     function loadRecord(r) {
       currentId = r.id;
       entries = deepCopy(r.entries || []).slice(0, MAX_DAYS);
+      $("#weekDate").value=weekDates(entries[0]?.date)[0]||"";
       $("#markdown").checked = r.markdown !== false;
       fillIdentity(r);
       renderDays();
