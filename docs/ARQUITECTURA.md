@@ -13,9 +13,13 @@ Sitio estático compilado con Vite. La corrección beta.2 restaura el HTML, CSS 
 | `src/legacy/easter-egg.js` | Interacción Virtual Insanity |
 | `src/data/*.json` | Catálogos editados en el repositorio |
 | `src/services/recover-original.js` | Recuperación de datos de beta.1 |
-| `src/services/rare-notification.jsx` | Carga diferida de Sileo tras importar un respaldo |
+| `src/services/rare-notification.jsx` | Carga diferida de Sileo para acciones explícitas y avisos breves |
 | `faq/index.html` | FAQ original con buscador, ejemplos y versiones |
 
 La vista previa espera 120 ms desde la última modificación y solo dibuja si su panel es visible. La exportación mantiene la resolución original de 11.81 píxeles/mm. Los ajustes del logotipo y etiquetas de firma se aplican dentro del motor, sin modificar prototipos globales de Canvas.
 
 La prioridad de esta corrección es recuperar comportamiento e identidad visual. La extracción futura de componentes React debe hacerse por partes, con pruebas de equivalencia antes de sustituir los controladores originales.
+
+## Parte 2
+
+`src/components/Profile.jsx` monta un componente React independiente en la portada. Usa `blobatar/react` y `src/services/profile.js`; no envía el nombre a un servicio externo. El controlador original sigue a cargo del formulario. `src/domain/presentation.js` concentra las reglas del martes, nombres de firma y disparadores secretos. La hoja de estilos aplica animaciones cortas con alternativas de movimiento reducido.

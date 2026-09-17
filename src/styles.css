@@ -20,3 +20,34 @@ body.virtual-insanity-running{overflow-x:hidden}.virtual-easter{position:fixed;i
 @media(pointer:coarse){input,select,textarea{font-size:16px}button,.btn{min-height:44px}}
 :focus-visible{outline:3px solid #0071e3;outline-offset:3px}
 .update-notice{margin:12px 0;padding:12px 16px;border-radius:16px;background:#fff;border:1px solid var(--line)}
+
+/* Part 2: restrained motion and secondary controls; original layout retained. */
+.field-error{color:#a32920;font-size:14px;line-height:1.45;margin:12px 0}
+[aria-invalid="true"]{outline:2px solid #b3261e;outline-offset:2px}
+.quiet-options{font-size:13px;color:var(--muted)}
+.quiet-options summary,.management-card summary{cursor:pointer;min-height:44px;align-content:center;font-weight:650;color:var(--ink)}
+.options-content{display:grid;gap:12px;padding:12px 0}
+.management-card>summary{font-size:14px;list-style-position:inside}
+.management-card:not([open]){padding-top:8px;padding-bottom:8px}
+.management-card[open]>summary{margin-bottom:12px}
+.profile-menu{position:relative;max-width:360px;margin-top:22px}
+.profile-menu summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;width:fit-content;max-width:100%;border:1px solid rgba(0,0,0,.06);padding:7px 13px 7px 7px;border-radius:22px;background:rgba(255,255,255,.8)}
+.profile-menu summary::-webkit-details-marker{display:none}
+.profile-menu img{border-radius:50%;flex:none}
+.profile-menu span{min-width:0}.profile-menu small{display:block;font-size:11px;color:var(--muted);line-height:1.4}
+.profile-menu strong{display:block;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.profile-actions{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:8px;box-shadow:0 8px 28px #0000000c}
+.profile-actions p{font-size:13px;margin:0 0 12px;color:var(--muted)}.profile-actions .btn{margin:3px}
+.virtual-stop{position:fixed;bottom:max(20px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:10000;box-shadow:0 6px 28px #0002;white-space:nowrap}
+.virtual-stop[hidden]{display:none}.virtual-stop:active{transform:translateX(-50%) scale(.98)}
+dialog{max-height:calc(100dvh - 32px);overflow:auto;border:1px solid rgba(255,255,255,.8);box-shadow:0 28px 90px #10213a33}
+dialog[open]{animation:dialog-in 220ms cubic-bezier(.2,.8,.2,1)}
+dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
+@keyframes dialog-in{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes content-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.step-panel.active,.management-card[open]>.records,.profile-actions{animation:content-in 180ms ease-out}
+.credits-avatar{box-shadow:0 6px 20px #0002;border:3px solid #fff}.credits-quote{line-height:1.6}
+.status-mark,.guard-mark,.welcome-mark,.delivery-mark{border-radius:20px;box-shadow:inset 0 0 0 1px #00000006}
+.notice-fallback{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10000;background:#fff;padding:15px 20px;border:1px solid var(--line);border-radius:20px;box-shadow:0 8px 36px #0002;max-width:calc(100vw - 32px)}
+@media(prefers-reduced-motion:reduce){dialog[open],.step-panel.active,.management-card[open]>.records,.profile-actions{animation:none}.virtual-easter,.virtual-easter-card{transition:none!important;animation:none!important}}
+@media(prefers-reduced-transparency:reduce){dialog::backdrop{backdrop-filter:none;background:#0006}.profile-menu summary{background:#fff}}

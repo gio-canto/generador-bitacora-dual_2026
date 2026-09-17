@@ -37,6 +37,10 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect($("tecnmAutorizoPreset").options.length).toBeGreaterThan(20);
   fireEvent.change($("weekDate"), { target: { value: "2026-09-17" } });
   fireEvent.click($("weekBtn"));
+  expect($("weekError").textContent).toContain("El primer día debe ser martes");
+  expect(document.querySelectorAll("#days .day-card")).toHaveLength(0);
+  fireEvent.change($("weekDate"), { target: { value: "2026-09-15" } });
+  fireEvent.click($("weekBtn"));
   expect(document.querySelectorAll("#days .day-card").length).toBe(4);
   fireEvent.click($("addDayBtn"));
   expect($("guardTitle").textContent).toBe("Máximo de 4 días");
@@ -51,4 +55,25 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   ]);
   expect(draft.identity.student).toBe("Alumno de Prueba");
   expect(draft.entries[0].start).toBe("08:00");
+  expect($("markdown").checked).toBe(true);
+  expect($("markdown").closest("details").open).toBe(false);
+  expect($("historyDisclosure").open).toBe(false);
+  expect($("backupDisclosure").open).toBe(false);
+  fireEvent.change($("company"), {
+    target: {
+      value:
+        "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)",
+    },
+  });
+  expect($("instructorEnabled").checked).toBe(true);
+  fireEvent.click($("instructorEnabled"));
+  window.dispatchEvent(new Event("pagehide"));
+  expect(
+    JSON.parse(localStorage.getItem("bitacora_dual_draft_v1")).identity
+      .instructor.enabled,
+  ).toBe(false);
+  fireEvent.input($("student"), { target: { value: "uwu" } });
+  expect($("creditsDialog").open).toBe(true);
+  fireEvent.click($("creditsClose"));
+  expect($("creditsDialog").open).toBe(false);
 });

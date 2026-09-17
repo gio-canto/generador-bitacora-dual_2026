@@ -9,6 +9,8 @@ Las bitácoras permanecen en el navegador. No hay cuentas ni sincronización ent
 - Exportar respaldo descarga el historial en el formato JSON original. Guarda primero la bitácora para incluirla.
 - Importar acepta el formato original y los respaldos de beta.1; valida estructura y tamaño máximo de 5 MB, pide confirmación y agrega registros. Las coincidencias de identificador reciben un identificador nuevo para evitar sobrescribir registros existentes.
 
-El service worker guarda una versión identificada por el contenido del generador, FAQ y recursos compilados. La caché almacena el HTML exacto de cada compilación para no mezclarlo con archivos de otra versión. Conserva las cachés anteriores durante esta corrección para no romper pestañas abiertas. Las actualizaciones se aplican al pulsar Actualizar y se solicita guardar el borrador antes de recargar. Sileo, audio y ejemplos no se precargan. Sileo requiere conexión la primera vez que se importa un respaldo; si no carga, aparece una confirmación nativa.
+El service worker guarda una versión identificada por el contenido del generador, FAQ y recursos compilados. La caché almacena el HTML exacto de cada compilación para no mezclarlo con archivos de otra versión. Conserva las cachés anteriores durante esta corrección para no romper pestañas abiertas. Las actualizaciones se aplican al pulsar Actualizar y se solicita guardar el borrador antes de recargar. Sileo, audio y ejemplos no se precargan. Sileo requiere conexión para su primera carga; si no carga, aparece un aviso local accesible.
 
 Limpiar los datos del sitio elimina el historial local. La caché de archivos no es un respaldo de las bitácoras.
+
+El perfil usa `bitacora_profile_v1`, separado de la caché de archivos. Recuerda el nombre al escribirlo y al guardar; las palabras secretas no lo sustituyen. Olvidar el nombre no elimina borrador ni historial. El avatar se genera localmente a partir del nombre; no hay cuentas.

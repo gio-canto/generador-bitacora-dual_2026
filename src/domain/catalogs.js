@@ -31,8 +31,20 @@ export function validateCatalogs(c) {
         );
       ids.add(row.id);
       names.add(row.name.trim().toLowerCase());
+      if (
+        row.shortName !== undefined &&
+        (typeof row.shortName !== "string" || row.shortName.length > 180)
+      )
+        throw new Error(
+          "El nombre corto debe ser texto de hasta 180 caracteres.",
+        );
+      if (
+        row.instructorEnabledByDefault !== undefined &&
+        typeof row.instructorEnabledByDefault !== "boolean"
+      )
+        throw new Error("La opción de instructor debe ser true o false.");
       if (type === "schools") {
-        for (const key of ["shortName", "voboName", "voboRole"])
+        for (const key of ["voboName", "voboRole"])
           if (
             typeof row[key] !== "string" ||
             !row[key].trim() ||

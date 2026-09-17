@@ -1,46 +1,9 @@
-# Editar catálogos en el código
+# Configurar escuelas y empresas
 
-No existe una pantalla de administración de catálogos para el usuario. Los campos del formulario siguen permitiendo ajustar la bitácora individual.
+Consulta [Contribuir](../CONTRIBUTING.md): incluye botones para editar cada JSON, instrucciones de GitHub, ejemplos y una tabla de todos sus campos.
 
-## Configuración compartida
+Los catálogos publicados son compartidos. El usuario puede ajustar su bitácora, pero no editar el catálogo desde la aplicación.
 
-Edita `src/data/schools.json` o `src/data/companies.json`. No hace falta modificar componentes React. Conserva los `id` existentes: identifican cada elemento. Usa un identificador nuevo para cada alta.
+`shortName` es opcional en escuelas y empresas. Solo abrevia las firmas; sin él se usa el nombre completo. `instructorEnabledByDefault` controla el estado inicial del instructor al elegir una empresa, sin cambiar las preferencias guardadas de bitácoras existentes.
 
-Ejemplo de empresa (datos ficticios; no pegar como información real):
-
-```json
-{
-  "id": "empresa-ejemplo",
-  "name": "Empresa de ejemplo",
-  "start": "09:00",
-  "end": "14:00",
-  "area": "Área de Informática",
-  "representatives": [
-    { "name": "Persona de ejemplo", "role": "Jefatura de área\nJefe inmediato" }
-  ],
-  "instructors": [
-    { "name": "Instructor de ejemplo", "roleMain": "Encargado de Informática" }
-  ]
-}
-```
-
-Ejemplo de escuela:
-
-```json
-{
-  "id": "plantel-ejemplo",
-  "name": "NOMBRE COMPLETO DEL PLANTEL",
-  "shortName": "Plantel de ejemplo",
-  "voboName": "Responsable de ejemplo",
-  "voboRole": "Responsable de Vinculación\nPlantel de ejemplo",
-  "specialties": ["Programación"],
-  "semesters": ["4", "5", "6"],
-  "groups": ["A", "B", "C", "D"]
-}
-```
-
-Los horarios usan `HH:mm`, con salida posterior a entrada. Cada lista necesita al menos un elemento. Evita nombres repetidos. Los cargos admiten saltos de línea; el PDF reserva hasta cuatro líneas, incluida la empresa cuando corresponda. No inventes nombres, cargos ni relaciones de supervisión.
-
-Después ejecuta `npm run check`. La configuración publicada se aplica a todos. Los registros existentes conservan sus propios datos. El selector de instructores precargados de la interfaz original corresponde a COCYTIEG; para otras empresas el instructor se captura manualmente.
-
-El logotipo compartido vive en `public/Assets/Edu.png`. Confirma que el formato corresponda a cada nuevo plantel antes de distribuirlo.
+El logotipo está en `public/Assets/Edu.png`. Revisa el formato antes de agregar un plantel diferente.

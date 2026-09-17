@@ -1,3 +1,5 @@
+import { notify } from "../services/rare-notification.jsx";
+import { CREDIT_NAMES } from "../domain/presentation.js";
 export function startGuide() {
   (() => {
     "use strict";
@@ -15,23 +17,7 @@ export function startGuide() {
         [],
       ];
     function announce(msg) {
-      let t = document.getElementById("wizardToast");
-      if (!t) {
-        t = document.createElement("div");
-        t.id = "wizardToast";
-        t.setAttribute("role", "status");
-        t.style.cssText =
-          "position:fixed;left:50%;bottom:22px;z-index:100;transform:translate(-50%,18px);opacity:0;padding:12px 16px;border-radius:15px;color:#fff;background:rgba(16,33,58,.92);font:700 12px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:.2s;pointer-events:none";
-        document.body.appendChild(t);
-      }
-      t.textContent = msg;
-      t.style.opacity = "1";
-      t.style.transform = "translate(-50%,0)";
-      clearTimeout(announce.timer);
-      announce.timer = setTimeout(() => {
-        t.style.opacity = "0";
-        t.style.transform = "translate(-50%,18px)";
-      }, 2300);
+      notify("warning", "Revisa este campo", msg);
     }
     function valid(i) {
       for (const id of req[i]) {
@@ -112,6 +98,11 @@ export function startGuide() {
       highestStep = 0;
       showStep(0, true);
     });
+    window.addEventListener("bitacora-edit-name", () => {
+      showStep(1, true);
+      document.getElementById("student").focus();
+      document.getElementById("student").select();
+    });
     const welcome = document.getElementById("welcomeDialog"),
       layer = document.getElementById("tourLayer"),
       focus = document.getElementById("tourFocus"),
@@ -135,7 +126,7 @@ export function startGuide() {
           section: 2,
           selector: '.step-panel[data-step="2"] .fields.three',
           title: "3. Genera la semana",
-          text: "Elige una fecha de referencia y genera automáticamente de martes a viernes.",
+          text: "Elige el martes de inicio, revisa la entrada y salida y pulsa Generar martes a viernes.",
         },
         {
           section: 2,
@@ -264,21 +255,7 @@ export function startGuide() {
       } catch {}
     }
     const credits = document.getElementById("creditsDialog");
-    const EASTER_EGG_NAMES = new Set([
-      "uwu",
-      "legoshi",
-      "jack",
-      "haru",
-      "louis",
-      "furry",
-      "xd",
-      "lol",
-      "anton",
-      "mark scout",
-      "helly riggs",
-      "dylan george",
-      "hatsune miku",
-    ]);
+    const EASTER_EGG_NAMES = new Set(CREDIT_NAMES);
     const normalizeEasterEggName = (value) =>
       String(value || "")
         .trim()

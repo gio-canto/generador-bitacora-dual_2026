@@ -1,7 +1,18 @@
+import { validDate, validTime, weekDates } from "../domain/records.js";
+import {
+  weekSetup,
+  signatureName,
+  schoolSignatureRole,
+} from "../domain/presentation.js";
+import {
+  readProfile,
+  rememberName,
+  initializeProfile,
+} from "../services/profile.js";
 import companies from "../data/companies.json";
 import schools from "../data/schools.json";
 import { parseBackup } from "../services/storage.js";
-import { notifyImported } from "../services/rare-notification.jsx";
+import { notify, notifyImported } from "../services/rare-notification.jsx";
 export function startEditor() {
   "use strict";
   (() => {
@@ -106,11 +117,21 @@ export function startEditor() {
         note: "Instructor Formador",
       },
     };
-    const COUNCIL_AUTHORITY = {
-      name: "Mtra. Karen Paulina Solís Catalán",
-      role: "Directora de Investigación y Proyectos Estratégicos\nJefa inmediata\nCOCyTEG",
-    };
-    const INSTRUCTORS = companies[0].instructors;
+    Object.assign(DEFAULTS, {
+      school: schools[0].name,
+      specialty: schools[0].specialties[0],
+      semester: schools[0].semesters[0],
+      group: schools[0].groups.includes("B") ? "B" : schools[0].groups[0],
+    });
+    Object.assign(DEFAULTS.authorities, {
+      elaboroRole: "Alumno de Educación Dual\n" + signatureName(schools[0]),
+      voboName: schools[0].voboName,
+      voboRole: schools[0].voboRole,
+    });
+    const COUNCIL_AUTHORITY = companies.find((c) => c.name === COUNCIL)
+      ?.representatives[0] || { name: "", role: "" };
+    const instructors = () =>
+      companies.find((c) => c.name === $("#company").value)?.instructors || [];
     const SEED = {
       id: "week1-2026-09-01",
       title: "Semana 1 · 1 al 4 de septiembre de 2026",
@@ -261,7 +282,7 @@ export function startEditor() {
       const s = $("#instructorPreset");
       s.innerHTML =
         '<option value="__custom__">Personalizar / otra persona…</option>';
-      INSTRUCTORS.forEach((p) => {
+      instructors().forEach((p) => {
         const o = document.createElement("option");
         o.value = p.name;
         o.textContent = p.name + " · " + p.roleMain;
@@ -270,7 +291,7 @@ export function startEditor() {
     }
     function setInstructorEnabledUI() {
       const on = $("#instructorEnabled").checked,
-        isCouncil = $("#company").value === COUNCIL;
+        isCouncil = instructors().length > 0;
       $("#instructorBox").classList.toggle("disabled", !on);
       [
         "instructorPreset",
@@ -284,7 +305,7 @@ export function startEditor() {
       );
     }
     function applyInstructorPreset() {
-      const p = INSTRUCTORS.find(
+      const p = instructors().find(
         (x) => x.name === $("#instructorPreset").value,
       );
       if (!p) return;
@@ -467,8 +488,33 @@ export function startEditor() {
           title: "Hay fechas repetidas",
           message: "Las 4 jornadas deben corresponder a fechas distintas.",
         };
+      if (entries.some((e) => !validDate(e.date)))
+        return {
+          ok: false,
+          title: "Revisa las fechas",
+          message: "Hay una fecha que no existe. Corrígela antes de continuar.",
+        };
+      const actual = entries.map((e) => e.date).sort(),
+        expected = weekDates(actual[0]);
+      if (actual.some((date, i) => date !== expected[i]))
+        return {
+          ok: false,
+          title: "Revisa la semana",
+          message:
+            "Las cuatro fechas deben ser de martes a viernes de la misma semana.",
+        };
       for (let i = 0; i < entries.length; i++) {
         const e = entries[i];
+        if (
+          e.status === "laboral" &&
+          (!validTime(e.start) || !validTime(e.end) || e.end <= e.start)
+        )
+          return {
+            ok: false,
+            title: `Revisa el horario del día ${i + 1}`,
+            message:
+              "Completa entrada y salida. La salida debe ser después de la entrada.",
+          };
         if (e.status === "inhabil") continue;
         const check = validateActivityText(e.activity);
         if (!check.ok)
@@ -690,6 +736,22 @@ export function startEditor() {
       refreshLineLimits();
     }
     async function generateWeek() {
+      const setup = weekSetup(
+        $("#weekDate").value,
+        $("#defaultStart").value,
+        $("#defaultEnd").value,
+      );
+      const error = $("#weekError");
+      error.hidden = !setup.error;
+      error.textContent = setup.error || "";
+      ["weekDate", "defaultStart", "defaultEnd"].forEach((id) =>
+        $("#" + id).removeAttribute("aria-invalid"),
+      );
+      if (setup.error) {
+        $("#" + setup.field).setAttribute("aria-invalid", "true");
+        $("#" + setup.field).focus();
+        return;
+      }
       if (
         entries.some((e) => e.activity?.trim()) &&
         !(await openGuardDialog(
@@ -699,33 +761,9 @@ export function startEditor() {
         ))
       )
         return;
-      const value = $("#weekDate").value;
-      if (!value) {
-        showGuardAlert(
-          "Selecciona una fecha",
-          "Elige una fecha de referencia de la semana antes de generar las cuatro jornadas.",
-        );
-        return;
-      }
-      const [y, m, d] = value.split("-").map(Number),
-        anchor = new Date(y, m - 1, d),
-        offset = (anchor.getDay() + 6) % 7,
-        monday = new Date(anchor);
-      monday.setDate(anchor.getDate() - offset);
-      entries = [];
-      for (let i = 1; i <= 4; i++) {
-        const x = new Date(monday);
-        x.setDate(monday.getDate() + i);
-        entries.push(
-          blankEntry(
-            [
-              x.getFullYear(),
-              String(x.getMonth() + 1).padStart(2, "0"),
-              String(x.getDate()).padStart(2, "0"),
-            ].join("-"),
-          ),
-        );
-      }
+      entries = setup.dates.map((date) => blankEntry(date));
+      $("#weekHint").textContent =
+        `Del ${setup.dates[0].split("-").reverse().join("/")} al ${setup.dates[3].split("-").reverse().join("/")}. Ajusta abajo solo lo que cambie.`;
       renderDays();
       markDirty();
       updatePreview();
@@ -755,21 +793,33 @@ export function startEditor() {
         },
       };
     }
-    function syncCompanyContext() {
+    function syncCompanyContext(changed = false) {
+      const config = companies.find((c) => c.name === $("#company").value);
+      populateInstructorSelect();
+      if (changed)
+        $("#instructorEnabled").checked = !!config?.instructorEnabledByDefault;
       const council = $("#company").value === COUNCIL;
-      $("#instructorPresetField").hidden = !council;
+      $("#instructorPresetField").hidden = !instructors().length;
       $("#instructorContext").textContent = council
         ? "Selecciona un instructor precargado del Consejo"
         : "Captura manual para esta empresa";
-      if (council) {
+      if (changed && council) {
         $("#autorizoName").value = COUNCIL_AUTHORITY.name;
         $("#autorizoRole").value = COUNCIL_AUTHORITY.role;
-      } else if ($("#autorizoName").value.trim() === COUNCIL_AUTHORITY.name) {
+      } else if (
+        changed &&
+        $("#autorizoName").value.trim() === COUNCIL_AUTHORITY.name
+      ) {
         $("#autorizoName").value = "";
         $("#autorizoRole").value = "";
       }
+      $("#instructorPreset").value = instructors().some(
+        (p) => p.name === $("#instructorName").value,
+      )
+        ? $("#instructorName").value
+        : "__custom__";
       setInstructorEnabledUI();
-      applyCompanyDefaults();
+      if (changed) applyCompanyDefaults();
     }
     function savedOption(id, value) {
       const select = $("#" + id);
@@ -808,8 +858,11 @@ export function startEditor() {
       $("#autorizoName").value = a.autorizoName || "";
       $("#autorizoRole").value = a.autorizoRole || "";
       const ins = { ...DEFAULTS.instructor, ...(r.instructor || {}) };
-      $("#instructorEnabled").checked = !!ins.enabled;
-      $("#instructorPreset").value = INSTRUCTORS.some(
+      $("#instructorEnabled").checked =
+        r.instructor?.enabled ??
+        !!companies.find((c) => c.name === $("#company").value)
+          ?.instructorEnabledByDefault;
+      $("#instructorPreset").value = instructors().some(
         (p) => p.name === ins.preset,
       )
         ? ins.preset
@@ -856,7 +909,7 @@ export function startEditor() {
       entries = [];
       $("#weekDate").value = "";
       $("#markdown").checked = true;
-      fillIdentity(DEFAULTS);
+      fillIdentity({ ...DEFAULTS, student: readProfile() });
       renderDays();
       dirty = false;
       setSaveState("Nueva");
@@ -880,7 +933,31 @@ export function startEditor() {
           !String(e.activity || "").trim(),
       );
     }
+    function checkIdentity() {
+      const required = [
+        "student",
+        "company",
+        "school",
+        "specialty",
+        "semester",
+        "group",
+        "voboName",
+        "voboRole",
+        "autorizoName",
+        "autorizoRole",
+      ];
+      if ($("#instructorEnabled").checked)
+        required.push("instructorName", "instructorRoleMain");
+      const missing = required.find((id) => !$("#" + id).value.trim());
+      if (!missing) return true;
+      showGuardAlert(
+        "Falta un dato",
+        "Completa los datos del alumno, la empresa y quienes firman antes de guardar o descargar.",
+      );
+      return false;
+    }
     async function saveRecord() {
+      if (!checkIdentity()) return;
       const check = validateWeekEntries();
       if (!check.ok) {
         showGuardAlert(check.title, check.message);
@@ -898,6 +975,14 @@ export function startEditor() {
       setSaveState("Guardado");
       renderRecords();
       saveDraftNow();
+      rememberName(r.student);
+      $("#historyDisclosure").open = false;
+      $("#backupDisclosure").open = false;
+      notify(
+        "success",
+        "Bitácora guardada",
+        "La encontrarás en Registros guardados.",
+      );
     }
     function renderRecords() {
       const h = $("#records"),
@@ -1112,9 +1197,9 @@ export function startEditor() {
       return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "p.m." : "a.m."}`;
     }
     function companySignatureName(company) {
-      const value = String(company || "").trim(),
-        m = value.match(/\(([^()]+)\)\s*$/);
-      return (m?.[1] || value).trim();
+      return signatureName(
+        companies.find((c) => c.name === company) || { name: company },
+      );
     }
     function authoritySignatureRoles(role, company) {
       let lines = String(role || "")
@@ -1484,13 +1569,19 @@ export function startEditor() {
           {
             h: "Elaboró",
             n: id.authorities.elaboroName,
-            r: id.authorities.elaboroRole.split("\n").filter(Boolean),
+            r: schoolSignatureRole(
+              id.authorities.elaboroRole,
+              schools.find((s) => s.name === id.school) || { name: id.school },
+            ),
             on: true,
           },
           {
             h: "Vo.Bo",
             n: id.authorities.voboName,
-            r: id.authorities.voboRole.split("\n").filter(Boolean),
+            r: schoolSignatureRole(
+              id.authorities.voboRole,
+              schools.find((s) => s.name === id.school) || { name: id.school },
+            ),
             on: true,
           },
           {
@@ -1527,7 +1618,7 @@ export function startEditor() {
             c,
             [
               "FIRMA DEL ALUMNO:",
-              "FIRMA DE VINCULACIÓN CBTIS 134:",
+              "FIRMA DE VINCULACIÓN:",
               "FIRMA DEL ASESOR DE LA EMPRESA:",
             ][i],
             cx,
@@ -1756,6 +1847,7 @@ export function startEditor() {
       });
     }
     async function downloadPdf() {
+      if (!checkIdentity()) return;
       const check = validateWeekEntries();
       if (!check.ok) {
         showGuardAlert(check.title, check.message);
@@ -1788,7 +1880,11 @@ export function startEditor() {
         if (delivered !== "cancelled") showDeliveryTips();
       } catch (err) {
         console.error(err);
-        alert("No se pudo generar el PDF. Intenta nuevamente.");
+        notify(
+          "error",
+          "No se pudo generar el PDF",
+          "Vuelve a intentarlo. Tu bitácora sigue aquí.",
+        );
       } finally {
         b.textContent = old;
         mb.textContent = oldm;
@@ -1882,11 +1978,14 @@ export function startEditor() {
           updatePreview();
         });
       });
+      let profileTimer;
       $("#student").addEventListener("input", () => {
+        clearTimeout(profileTimer);
+        profileTimer = setTimeout(() => rememberName($("#student").value), 400);
         $("#elaboroName").value = $("#student").value.trim();
       });
       $("#company").addEventListener("change", () => {
-        syncCompanyContext();
+        syncCompanyContext(true);
         const company = companies.find((c) => c.name === $("#company").value);
         if (company?.representatives?.length === 1) {
           $("#autorizoName").value = company.representatives[0].name;
@@ -1936,7 +2035,7 @@ export function startEditor() {
         $("#voboName").value = school.voboName;
         $("#voboRole").value = school.voboRole;
         $("#elaboroRole").value =
-          "Alumno de Educación Dual\n" + school.shortName;
+          "Alumno de Educación Dual\n" + signatureName(school);
       }
     }
     function configureCatalogs() {
@@ -1963,6 +2062,7 @@ export function startEditor() {
       logoImage.onload = updatePreview;
       logoImage.src = "Assets/Edu.png";
       if (!restoreDraft()) newBlank(false);
+      initializeProfile($("#student").value);
     }
     init();
   })();

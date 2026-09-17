@@ -1,3 +1,4 @@
+import { isVirtualName } from "../domain/presentation.js";
 export function startEasterEgg() {
   (() => {
     "use strict";
@@ -71,6 +72,7 @@ export function startEasterEgg() {
       } else finishEverything();
     }
     function restoreVisualAndContinue() {
+      document.getElementById("virtualStop").hidden = true;
       overlay.classList.remove("show");
       setTimeout(() => {
         overlay.hidden = true;
@@ -125,6 +127,7 @@ export function startEasterEgg() {
     function trigger() {
       if (active) return;
       active = true;
+      document.getElementById("virtualStop").hidden = false;
       finishing = false;
       clearTimeout(finaleTimer);
       const focus = document.activeElement,
@@ -154,13 +157,17 @@ export function startEasterEgg() {
       audio = new Audio(AUDIO_SRC);
       audio.preload = "auto";
       audio.volume = 0.88;
+      const playingAudio = audio;
       audio.addEventListener(
         "loadedmetadata",
         () => {
-          if (Number.isFinite(audio.duration) && audio.duration > 0) {
+          if (
+            Number.isFinite(playingAudio.duration) &&
+            playingAudio.duration > 0
+          ) {
             motionDuration = Math.max(
               8000,
-              Math.min(18000, audio.duration * 900),
+              Math.min(18000, playingAudio.duration * 900),
             );
           }
         },
@@ -171,7 +178,7 @@ export function startEasterEgg() {
       safetyTimer = setTimeout(finale, 22000);
     }
     student.addEventListener("input", () => {
-      const hit = normalize(student.value) === "jamiroquai";
+      const hit = isVirtualName(student.value);
       if (hit && studentArmed) trigger();
       studentArmed = !hit;
     });
@@ -184,6 +191,7 @@ export function startEasterEgg() {
       if (hit && weekArmed) trigger();
       weekArmed = !hit;
     });
+    document.getElementById("virtualStop").addEventListener("click", finale);
     document.addEventListener("keydown", (event) => {
       if (active && event.key === "Escape") finale();
     });

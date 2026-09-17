@@ -1,5 +1,19 @@
 # Notas de versión
 
+## 0.49.0-beta.1 · Anti-fool upgrate · Parte 2
+
+- Registra la semana pide martes, entrada y salida; valida fecha y horario antes de generar o reemplazar jornadas.
+- Markdown sigue encendido y puede desactivarse en Más opciones. La edición manual se conserva.
+- Registros guardados y Respaldo de información son desplegables; guardar confirma con Sileo y los deja plegados.
+- Sileo también cubre avisos breves del sistema. Las confirmaciones y recomendaciones extensas mantienen sus ventanas.
+- Ventanas, créditos, cambios de paso y desplegables tienen transiciones breves, con respeto a movimiento reducido.
+- Virtual Insanity conserva el audio, movimiento y créditos: se activa con jamiroquai, Virtual Insanity en el nombre o la frase en una actividad. Incluye botón para terminar; se conservan todos los disparadores de créditos.
+- Perfil local con Blobatar: recuerda el nombre para nuevas bitácoras, permite cambiarlo u olvidarlo y no recuerda palabras de easter eggs como nombres.
+- `shortName` opcional en escuelas y empresas para firmas, con nombre completo como respaldo.
+- `instructorEnabledByDefault` por empresa, activo en COCYTIEG; abrir registros respeta la opción guardada.
+- FAQ con lenguaje más directo y CONTRIBUTING con botones de edición, campos y ejemplos de cada JSON.
+
+
 ## 0.48.0-beta.2 · Anti-fool upgrate — corrección del rediseño
 
 - Se recuperan el diseño de Beta 0.47, la FAQ, el tutorial guiado, los avisos, créditos e interacción Virtual Insanity.

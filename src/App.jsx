@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
+import { startProfile } from "./components/Profile.jsx";
 import shell from "./legacy/shell.html?raw";
 import { startEditor } from "./legacy/editor.js";
 import { startGuide } from "./legacy/guide.js";
@@ -15,9 +16,9 @@ export default function App() {
     if (initialized.current) return;
     initialized.current = true;
     recoverPreviousVersion();
-    document.querySelectorAll('.field').forEach(field => {
-      const label = field.querySelector('label');
-      const input = field.querySelector('input, select, textarea');
+    document.querySelectorAll(".field").forEach((field) => {
+      const label = field.querySelector("label");
+      const input = field.querySelector("input, select, textarea");
       if (label && input?.id && !label.htmlFor) label.htmlFor = input.id;
     });
     startEditor();
@@ -25,6 +26,7 @@ export default function App() {
     startPeople();
     startSignatureFixes();
     startEasterEgg();
+    startProfile();
   }, []);
   return <div dangerouslySetInnerHTML={{ __html: shell }} />;
 }
