@@ -40,7 +40,9 @@ export async function deliver(file) {
   const a = document.createElement("a");
   a.href = url;
   a.download = file.name;
+  document.body.appendChild(a);
   a.click();
+  a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
   return true;
 }

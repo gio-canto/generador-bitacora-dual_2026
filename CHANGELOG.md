@@ -16,6 +16,7 @@ Continúa en beta. El nombre de esta actualización se conserva tal como fue sol
 - Recuperación de almacenamiento incompatible sin sobrescribirlo automáticamente.
 - Service worker con caché por compilación, aviso de actualización y limpieza limitada a los recursos de la aplicación.
 - Pruebas automatizadas y verificación en pull requests antes del despliegue.
+- Ruta de mantenimiento `qa/responsive.html` para revisar la aplicación real a 390, 768 y 1024 px.
 - Documentación de arquitectura, datos, catálogos, validación y contribuciones.
 
 ### Mejorado

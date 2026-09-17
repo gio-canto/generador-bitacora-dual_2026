@@ -37,3 +37,15 @@ El menú nativo de compartir depende de la compatibilidad y permisos del navegad
 ## Revisión adaptable sin herramientas externas
 
 La ruta de mantenimiento `qa/responsive.html` carga la aplicación real en un marco de 390, 768 o 1024 px. Sirve para comprobar los puntos de adaptación del CSS y el FAQ. Comparte el almacenamiento de la aplicación; utiliza datos ficticios. No aparece en la navegación del alumno ni simula el motor de Safari.
+
+## Resultado de la revisión de esta beta
+
+- 22 pruebas automatizadas aprobadas localmente y en GitHub Actions.
+- Compilación y despliegue en Pages completados.
+- Revisión visual del sitio servido en escritorio y en marcos de 390 y 768 px. Sin desbordamiento horizontal del formulario: ancho útil/scroll 375/375 y 753/753 px (el marco reserva espacio para la barra de desplazamiento).
+- Navegación, selección de empresa, historial anterior, importación aditiva y apertura de respaldo comprobados en el sitio publicado.
+- Exportación ejecutada hasta el aviso de PDF listo. El navegador remoto no entregó el evento de descarga; la estructura de una página A4 y el renderizado del motor se verificaron por separado.
+- Sin errores de aplicación en la consola durante estos recorridos. El entorno de revisión informó errores propios de su extensión.
+- Safari y el menú de compartir de iOS siguen pendientes de prueba en un dispositivo físico.
+
+Capturas de la aplicación real: [teléfono](revision-movil.jpg) y [tableta](revision-tableta.jpg).

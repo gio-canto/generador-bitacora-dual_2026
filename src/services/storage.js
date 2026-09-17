@@ -97,7 +97,9 @@ export function downloadJson(value, name) {
   const a = document.createElement("a");
   a.href = url;
   a.download = name;
+  document.body.appendChild(a);
   a.click();
+  a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 export function mergeRecords(current, incoming) {
