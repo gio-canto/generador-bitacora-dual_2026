@@ -57,7 +57,7 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
 .switch input:focus-visible + .switch-track{outline:3px solid var(--blue);outline-offset:3px}
 
 /* Give navigation its own width while keeping the original content column. */
-.topbar{width:min(1280px,calc(100vw - 32px));left:50%;transform:translateX(-50%)}
+.topbar{--navigation-width:min(1280px,calc(100vw - 32px));width:var(--navigation-width);margin-inline:calc((100% - var(--navigation-width))/2)}
 .topbar .actions{align-items:center;flex-wrap:nowrap}
 .topbar .actions>.btn{white-space:nowrap}
 #profileSlot:empty{display:none}
@@ -73,7 +73,7 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
   .topbar .actions{width:100%;justify-content:flex-end}
 }
 @media(max-width:900px){
-  .topbar{width:100%;left:auto;transform:none;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px 8px;align-items:center}
+  .topbar{width:100%;margin-inline:0;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px 8px;align-items:center}
   .topbar .brand{grid-column:1;grid-row:1;min-width:0}
   .topbar .brand-logo{width:145px;max-width:100%}
   .topbar .actions{display:contents}
