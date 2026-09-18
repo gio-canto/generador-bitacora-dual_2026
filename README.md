@@ -81,3 +81,11 @@ Sileo ya está declarado y fijado en `package-lock.json`; se incorporó con `npm
 ## Contribuir
 
 Conserva la interfaz original y verifica las funciones existentes antes de cambiar un flujo. Describe el problema, el cambio y las comprobaciones en cada propuesta. Continúa en beta.
+
+### Corrector ortográfico
+
+En cada actividad o justificación, pulsa **Revisar ortografía**. Elige una sugerencia u **Omitir palabra**; **Cerrar** te devuelve al texto. Los cambios se guardan con el borrador y respetan el espacio del PDF. No cambia nombres, firmas ni empresas automáticamente y no bloquea la descarga.
+
+Usa [nspell](https://github.com/wooorm/nspell) (MIT) y [dictionary-es](https://github.com/wooorm/dictionaries/tree/main/dictionaries/es) 4.0.0 (diccionario es_ES; pueden faltar regionalismos mexicanos). Revisa palabras, no gramática ni contexto. El procesamiento es local en un Web Worker: no envía los textos a un servicio externo. El recurso de unos 884 kB sin comprimir se descarga al abrir el corrector, no al iniciar la aplicación, y el service worker lo guarda para siguientes usos sin conexión.
+
+Licencias y atribuciones: [nspell](public/licenses/nspell.txt), [diccionario español](public/licenses/dictionary-es.txt). Los archivos originales del diccionario se distribuyen sin modificar mediante la dependencia fijada en package-lock.json.

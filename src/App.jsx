@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 import { startProfile } from "./components/Profile.jsx";
+import { startSpelling } from "./services/spelling.js";
 import shell from "./legacy/shell.html?raw";
 import { startEditor } from "./legacy/editor.js";
 import { startGuide } from "./legacy/guide.js";
@@ -27,6 +28,7 @@ export default function App() {
     startSignatureFixes();
     startEasterEgg();
     startProfile();
+    startSpelling();
   }, []);
   return <div dangerouslySetInnerHTML={{ __html: shell }} />;
 }

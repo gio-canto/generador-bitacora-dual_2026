@@ -7,7 +7,7 @@ const core = [
   "./Assets/Edu.png",
   "./faq/",
   "./faq/index.html",
-  ...files.filter(f => !f.startsWith("sileo-host-")).map((f) => "./assets/" + f),
+  ...files.filter(f => !f.startsWith("sileo-host-") && !f.startsWith("spell-worker-")).map((f) => "./assets/" + f),
 ];
 const hash = createHash("sha256");
 for (const f of ["dist/index.html", "dist/faq/index.html", ...files.map((f) => "dist/assets/" + f)])
@@ -26,7 +26,8 @@ self.addEventListener('message',e=>{if(e.data?.type==='SKIP_WAITING')self.skipWa
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{const url=new URL(e.request.url);if(e.request.method!=='GET'||url.origin!==self.location.origin||!url.href.startsWith(self.registration.scope))return;
 const relative='./'+url.pathname.slice(new URL(self.registration.scope).pathname.length);
-if(!CORE.includes(relative))return;
+const optional=relative.startsWith('./assets/spell-worker-');
+if(!CORE.includes(relative)&&!optional)return;
 e.respondWith(caches.open(CACHE).then(async cache=>{const cached=await cache.match(e.request,{ignoreSearch:true});if(cached)return cached;const response=await fetch(e.request);if(response.ok)await cache.put(e.request,response.clone());return response;}));});
 `,
 );

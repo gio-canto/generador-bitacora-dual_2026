@@ -2,6 +2,8 @@
 
 ## 0.49.0-beta.2 · Anti-fool upgrate · Parte 2
 
+- Corrector de español en actividades y justificaciones: sugerencias opcionales, una palabra a la vez, sin cambiar el texto automáticamente. Usa nspell en un trabajador separado; el diccionario se carga al pedir la revisión y queda disponible sin conexión tras su descarga.
+
 - Nombre y Blobatar después de Descargar PDF, en una barra más ancha en escritorio. En móvil, logo y ayuda arriba; descarga y perfil juntos debajo, sin estirar la barra por nombres largos.
 - Descargar PDF guarda automáticamente la bitácora validada en el historial; repetir la descarga actualiza el mismo registro.
 - Bienvenida de primera visita con lenguaje juvenil y botones Ver tutorial / Saltar tutorial. La decisión se recuerda al completar o saltar el recorrido.
