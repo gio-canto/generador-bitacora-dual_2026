@@ -98,8 +98,4 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
 .spelling-choices .btn,.spelling-close{min-height:44px}
 
 /* Project/legal footer */
-.site-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:28px 0 0;padding:22px 8px 6px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;line-height:1.5}
-.site-footer nav{display:flex;align-items:center;justify-content:flex-end;gap:8px 14px;flex-wrap:wrap}
-.site-footer a{color:#424245;text-decoration:none;font-weight:650}
-.site-footer a:hover{text-decoration:underline;text-underline-offset:3px}
-@media(max-width:620px){.site-footer{align-items:flex-start;flex-direction:column;padding-inline:4px}.site-footer nav{justify-content:flex-start}}
+.site-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:28px 0 0;padding:22px 8px 6px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;line-height:1.5}.site-footer nav{display:flex;align-items:center;justify-content:flex-end;gap:8px 14px;flex-wrap:wrap}.site-footer a{color:#424245;text-decoration:none;font-weight:650}.site-footer a:hover{text-decoration:underline;text-underline-offset:3px}@media(max-width:620px){.site-footer{align-items:flex-start;flex-direction:column;padding-inline:4px}.site-footer nav{justify-content:flex-start}}
