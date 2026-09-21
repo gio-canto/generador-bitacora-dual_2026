@@ -55,3 +55,14 @@ it("ajusta palabras largas al ancho de la celda", () => {
   r.entries[0].activity = "Supercalifragilistico".repeat(20);
   expect(buildPageModel(r).rows[0].activityLines.length).toBeGreaterThan(1);
 });
+
+it("cambia el render del PDF cuando se activa la firma genérica del alumno", () => {
+  const unsigned = sample();
+  const signed = sample();
+  signed.studentGenericSignature = true;
+  const a = createCanvas(1, 1);
+  const b = createCanvas(1, 1);
+  drawPdfPage(a, 4, unsigned, null);
+  drawPdfPage(b, 4, signed, null);
+  expect(Buffer.compare(a.toBuffer("image/png"), b.toBuffer("image/png"))).not.toBe(0);
+});
