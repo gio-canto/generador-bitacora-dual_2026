@@ -100,6 +100,7 @@ export function startEditor() {
       specialty: "Programación",
       semester: "4",
       group: "B",
+      studentGenericSignature: false,
       authorities: {
         elaboroName: "",
         elaboroRole: "Alumno de Educación Dual\nCBTis No. 134",
@@ -140,6 +141,7 @@ export function startEditor() {
       specialty: "Programación",
       semester: "4",
       group: "B",
+      studentGenericSignature: false,
       markdown: true,
       authorities: {
         elaboroName: "Gio Antonio Canto Gómez",
@@ -769,6 +771,14 @@ export function startEditor() {
       markDirty();
       updatePreview();
     }
+    function updateStudentSignaturePreview() {
+      const sample = $("#studentSignatureSample"),
+        preview = $("#studentSignaturePreview"),
+        toggle = $("#studentGenericSignature");
+      if (!sample || !preview) return;
+      sample.textContent = $("#student")?.value.trim() || "Nombre del alumno";
+      preview.classList.toggle("enabled", toggle?.checked === true);
+    }
     function getIdentity() {
       return {
         student: $("#student").value.trim(),
@@ -777,6 +787,7 @@ export function startEditor() {
         specialty: $("#specialty").value,
         semester: $("#semester").value,
         group: $("#group").value,
+        studentGenericSignature: $("#studentGenericSignature")?.checked === true,
         authorities: {
           elaboroName: $("#elaboroName").value.trim(),
           elaboroRole: $("#elaboroRole").value.trim(),
@@ -847,6 +858,9 @@ export function startEditor() {
         .trim()
         .toUpperCase();
       $("#group").value = restoredGroup;
+      const signatureToggle = $("#studentGenericSignature");
+      if (signatureToggle) signatureToggle.checked = r.studentGenericSignature === true;
+      updateStudentSignaturePreview();
       const a = { ...DEFAULTS.authorities, ...(r.authorities || {}) };
       $("#elaboroName").value = $("#student").value.trim();
       $("#elaboroRole").value =
@@ -1310,6 +1324,23 @@ export function startEditor() {
       c.textBaseline = "alphabetic";
       c.fillText(t, mm(x, p), mm(y, p));
     }
+    function drawGenericStudentSignature(c, text, cx, y, maxWidth, p) {
+      const value = String(text || "").trim();
+      if (!value) return;
+      c.save();
+      const px = ptToMm(15) * p;
+      c.font = `italic 500 ${px}px "Segoe Script", "Snell Roundhand", "Brush Script MT", cursive`;
+      const measured = Math.max(c.measureText(value).width, 1),
+        scaleX = Math.min(1, mm(maxWidth, p) / measured);
+      c.translate(mm(cx, p), mm(y, p));
+      c.rotate(-0.035);
+      c.scale(scaleX, 1);
+      c.fillStyle = "#1646a8";
+      c.textAlign = "center";
+      c.textBaseline = "alphabetic";
+      c.fillText(value, 0, 0);
+      c.restore();
+    }
     function line(c, x1, y1, x2, y2, w, col, p) {
       c.beginPath();
       c.moveTo(mm(x1, p), mm(y1, p));
@@ -1635,6 +1666,15 @@ export function startEditor() {
             "#555",
             p,
           );
+        if (i === 0 && id.studentGenericSignature)
+          drawGenericStudentSignature(
+            c,
+            id.student,
+            cx,
+            s.lineY - 1.3,
+            sw[i] * 0.7,
+            p,
+          );
         line(
           c,
           cx - sw[i] * 0.39,
@@ -1829,7 +1869,7 @@ export function startEditor() {
           });
       } else {
         alert(
-          "PDF listo. Recomendación: imprime 3 copias, reúne las firmas y utiliza preferentemente tinta azul. No se permiten firmas digitales: las firmas deben ser autógrafas. Si aún no tienes una firma definida, puedes escribir tu nombre completo.",
+          "PDF listo. Recomendación: imprime 3 copias y reúne las firmas. Si activaste la firma genérica del alumno, confirma que tu plantel o empresa la acepte; las firmas de terceros deben recabarse conforme al procedimiento oficial.",
         );
       }
     }
@@ -1951,6 +1991,11 @@ export function startEditor() {
         markDirty();
         updatePreview();
       };
+      $("#studentGenericSignature")?.addEventListener("change", () => {
+        updateStudentSignaturePreview();
+        markDirty();
+        updatePreview();
+      });
       $("#instructorPreset").onchange = applyInstructorPreset;
       $("#instructorEnabled").onchange = () => {
         setInstructorEnabledUI();
@@ -1990,6 +2035,7 @@ export function startEditor() {
         clearTimeout(profileTimer);
         profileTimer = setTimeout(() => rememberName($("#student").value), 400);
         $("#elaboroName").value = $("#student").value.trim();
+        updateStudentSignaturePreview();
       });
       $("#company").addEventListener("change", () => {
         syncCompanyContext(true);
