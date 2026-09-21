@@ -34,6 +34,8 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     "importFile",
     "restoreBtn",
     "tecnmAutorizoPreset",
+    "studentGenericSignature",
+    "studentSignatureSample",
   ])
     expect($(id), id).toBeTruthy();
   fireEvent.input($("student"), { target: { value: "Alumno de Prueba" } });
@@ -61,6 +63,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     "2026-09-18",
   ]);
   expect(draft.identity.student).toBe("Alumno de Prueba");
+  expect(draft.identity.studentGenericSignature).toBe(true);
   expect(draft.entries[0].start).toBe("08:00");
   expect($("markdown").checked).toBe(true);
   expect($("markdown").closest("details").open).toBe(false);
