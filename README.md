@@ -13,6 +13,10 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
+## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
+
+La revisión final incorpora una firma genérica opcional para el alumno. Si se activa, el PDF coloca únicamente el nombre del estudiante con apariencia de tinta azul en su espacio de firma; no genera ni modifica firmas de Vinculación, empresa o instructor. La preferencia se guarda con la bitácora y el sistema recuerda verificar si la institución acepta este recurso.
+
 ## Beta 0.49.0-beta.2 · Anti-fool upgrate · Parte 2
 
 Corrección del rediseño: vuelve la interfaz original de Beta 0.47, con su navegación, tutorial, ayuda y funciones. React se conserva como punto de entrada con una capa de compatibilidad para el controlador original. La FAQ vuelve a su implementación estática original.
