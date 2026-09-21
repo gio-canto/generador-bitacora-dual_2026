@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.49.0-beta.2";
-export const RELEASE = "Anti-fool upgrate · Parte 2";
+export const VERSION = "0.49.0-beta.3";
+export const RELEASE = "Anti-fool upgrade · Parte 3";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
@@ -60,6 +60,7 @@ export function normalizeRecord(raw) {
         ? "El Buen Tzin S.A. de C.V. (100% Natural)"
         : raw.company || "",
     id: typeof raw.id === "string" ? raw.id : base.id,
+    studentGenericSignature: raw.studentGenericSignature === true,
     authorities: {
       ...base.authorities,
       ...raw.authorities,
@@ -170,6 +171,7 @@ export function recordShape(r) {
     typeof r === "object" &&
     string(r.student, 100) &&
     string(r.company) &&
+    (r.studentGenericSignature === undefined || typeof r.studentGenericSignature === "boolean") &&
     Array.isArray(r.entries) &&
     r.entries.length <= 4 &&
     ["school", "specialty", "semester", "group"].every(

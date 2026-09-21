@@ -99,3 +99,16 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
 
 /* Project/legal footer */
 .site-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:28px 0 0;padding:22px 8px 6px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;line-height:1.5}.site-footer nav{display:flex;align-items:center;justify-content:flex-end;gap:8px 14px;flex-wrap:wrap}.site-footer a{color:#424245;text-decoration:none;font-weight:650}.site-footer a:hover{text-decoration:underline;text-underline-offset:3px}@media(max-width:620px){.site-footer{align-items:flex-start;flex-direction:column;padding-inline:4px}.site-footer nav{justify-content:flex-start}}
+
+
+/* Anti-fool upgrade · Parte 3: firma genérica del alumno */
+.student-signature-card{display:grid;gap:12px}
+.signature-option-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.signature-option-head h3{margin:0 0 5px}
+.signature-option-head p{margin:0;max-width:680px}
+.signature-switch{flex:0 0 auto}
+.student-signature-preview{min-height:74px;border:1px dashed var(--line,#cfd5df);border-radius:14px;background:rgba(255,255,255,.58);display:flex;align-items:center;justify-content:center;padding:14px;overflow:hidden}
+.student-signature-preview span{max-width:100%;font-family:"Segoe Script","Snell Roundhand","Brush Script MT",cursive;font-size:clamp(26px,5vw,42px);font-style:italic;color:#1646a8;line-height:1.05;transform:rotate(-2deg);opacity:.42;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.student-signature-preview.enabled span{opacity:1}
+.signature-note{margin:0}
+@media(max-width:720px){.signature-option-head{flex-direction:column}.signature-switch{width:100%;justify-content:space-between}.student-signature-preview{min-height:68px}}

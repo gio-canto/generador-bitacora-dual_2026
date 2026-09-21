@@ -6,6 +6,7 @@ export const DEFAULTS = {
   specialty: "Programación",
   semester: "4",
   group: "B",
+  studentGenericSignature: false,
   authorities: {
     elaboroName: "",
     elaboroRole: "Alumno de Educación Dual\nCBTis No. 134",

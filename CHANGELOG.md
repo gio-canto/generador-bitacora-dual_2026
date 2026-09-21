@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
+
+- Nueva opción en **Revisión y PDF** para agregar una firma genérica del alumno cuando todavía no tenga una firma definida.
+- La firma usa únicamente el nombre del estudiante y se renderiza en azul tipo tinta; no genera firmas para Vinculación, asesor, empresa ni instructor.
+- La preferencia se guarda con el borrador y con cada registro, y aparece tanto en la vista previa como en el PDF.
+- Avisos de entrega actualizados para recordar que la firma genérica debe ser aceptada por el plantel o la empresa cuando exista un requisito de firma autógrafa.
+- Pruebas automatizadas para la interfaz, persistencia y cambio de render del PDF.
+
 ## 0.49.0-beta.2 · Anti-fool upgrate · Parte 2
 
 - Corrector de español en actividades y justificaciones: sugerencias opcionales, una palabra a la vez, sin cambiar el texto automáticamente. Usa nspell en un trabajador separado; el diccionario se carga al pedir la revisión y queda disponible sin conexión tras su descarga.
