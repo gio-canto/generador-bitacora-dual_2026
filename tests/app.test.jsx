@@ -39,6 +39,9 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   ])
     expect($(id), id).toBeTruthy();
   fireEvent.input($("student"), { target: { value: "Alumno de Prueba" } });
+  expect($("studentSignatureSample").textContent).toBe("Alumno de Prueba");
+  fireEvent.click($("studentGenericSignature"));
+  expect($("studentGenericSignature").checked).toBe(true);
   fireEvent.change($("company"), {
     target: { value: "Instituto Tecnológico de Chilpancingo (ITCH)" },
   });
