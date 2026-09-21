@@ -1,19 +1,41 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 const files = await readdir("dist/assets");
+const staticPages = ["faq", "privacy", "terms", "accessibility", "acknowledgements"];
+const pagePaths = staticPages.flatMap((page) => [
+  `./${page}/`,
+  `./${page}/index.html`,
+]);
 const core = [
   "./",
   "./index.html",
   "./Assets/Edu.png",
-  "./faq/",
-  "./faq/index.html",
-  ...files.filter(f => !f.startsWith("sileo-host-") && !f.startsWith("spell-worker-")).map((f) => "./assets/" + f),
+  "./licenses/nspell.txt",
+  "./licenses/dictionary-es.txt",
+  ...pagePaths,
+  ...files
+    .filter((f) => !f.startsWith("sileo-host-") && !f.startsWith("spell-worker-"))
+    .map((f) => "./assets/" + f),
 ];
 const hash = createHash("sha256");
-for (const f of ["dist/index.html", "dist/faq/index.html", ...files.map((f) => "dist/assets/" + f)])
+for (const f of [
+  "dist/index.html",
+  ...staticPages.map((page) => `dist/${page}/index.html`),
+  "dist/licenses/nspell.txt",
+  "dist/licenses/dictionary-es.txt",
+  ...files.map((f) => "dist/assets/" + f),
+])
   hash.update(await readFile(f));
-hash.update("atomic-html-v2");
-const pages={"./":await readFile("dist/index.html","utf8"),"./index.html":await readFile("dist/index.html","utf8"),"./faq/":await readFile("dist/faq/index.html","utf8"),"./faq/index.html":await readFile("dist/faq/index.html","utf8")};
+hash.update("atomic-html-v3");
+const pages = {
+  "./": await readFile("dist/index.html", "utf8"),
+  "./index.html": await readFile("dist/index.html", "utf8"),
+};
+for (const page of staticPages) {
+  const html = await readFile(`dist/${page}/index.html`, "utf8");
+  pages[`./${page}/`] = html;
+  pages[`./${page}/index.html`] = html;
+}
 const cache = "bitacora-dual-" + hash.digest("hex").slice(0, 12);
 await writeFile(
   "dist/sw.js",
