@@ -277,6 +277,23 @@ function drawText(c, t, x, y, s, st, a, col, p, maxWidth) {
   c.textBaseline = "alphabetic";
   c.fillText(t, mm(x, p), mm(y, p));
 }
+function drawGenericStudentSignature(c, text, cx, y, maxWidth, p) {
+  const value = String(text || "").trim();
+  if (!value) return;
+  c.save();
+  const px = ptToMm(15) * p;
+  c.font = `italic 500 ${px}px "Segoe Script", "Snell Roundhand", "Brush Script MT", cursive`;
+  const measured = Math.max(c.measureText(value).width, 1),
+    scaleX = Math.min(1, mm(maxWidth, p) / measured);
+  c.translate(mm(cx, p), mm(y, p));
+  c.rotate(-0.035);
+  c.scale(scaleX, 1);
+  c.fillStyle = "#1646a8";
+  c.textAlign = "center";
+  c.textBaseline = "alphabetic";
+  c.fillText(value, 0, 0);
+  c.restore();
+}
 function line(c, x1, y1, x2, y2, w, col, p) {
   c.beginPath();
   c.moveTo(mm(x1, p), mm(y1, p));
@@ -559,6 +576,15 @@ export function drawPdfPage(canvas, p, record, logoImage) {
         "normal",
         "center",
         "#555",
+        p,
+      );
+    if (i === 0 && id.studentGenericSignature)
+      drawGenericStudentSignature(
+        c,
+        id.student,
+        cx,
+        s.lineY - 1.3,
+        sw[i] * 0.7,
         p,
       );
     line(
