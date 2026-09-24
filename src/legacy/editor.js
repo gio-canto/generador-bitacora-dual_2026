@@ -790,10 +790,25 @@ export function startEditor() {
     function updateStudentSignaturePreview() {
       const sample = $("#studentSignatureSample"),
         preview = $("#studentSignaturePreview"),
-        toggle = $("#studentGenericSignature");
+        toggle = $("#studentGenericSignature"),
+        state = $("#studentSignatureSummaryState");
       if (!sample || !preview) return;
       sample.textContent = $("#student")?.value.trim() || "Nombre del alumno";
       preview.classList.toggle("enabled", toggle?.checked === true);
+      if (state) {
+        const introduced = readProfileData().studentSignatureIntroduced === true;
+        state.textContent = toggle?.checked
+          ? "Firma genérica activada"
+          : introduced
+            ? "Firma genérica desactivada"
+            : "Revísala antes de guardar tu primera bitácora.";
+      }
+    }
+    function syncStudentSignatureDisclosure(profile = readProfileData()) {
+      const disclosure = $("#studentSignatureDisclosure");
+      if (!disclosure) return;
+      disclosure.open = profile.studentSignatureIntroduced !== true;
+      updateStudentSignaturePreview();
     }
     function getIdentity() {
       return {
@@ -987,6 +1002,7 @@ export function startEditor() {
         },
       });
       applyCompanyDefaults();
+      syncStudentSignatureDisclosure(profile);
       renderDays();
       dirty = false;
       setSaveState("Nueva");
@@ -1065,6 +1081,7 @@ export function startEditor() {
       ];
       rememberProfile({
         ...collectProfileDefaults(),
+        studentSignatureIntroduced: true,
         ...(profileAreas.length === 1 ? { area: profileAreas[0] } : {}),
       });
       $("#historyDisclosure").open = false;
@@ -2294,6 +2311,7 @@ export function startEditor() {
       logoImage.src = "Assets/Edu.png";
       if (!restoreDraft()) newBlank(false);
       initializeProfile($("#student").value);
+      syncStudentSignatureDisclosure(readProfileData());
     }
     init();
   })();
