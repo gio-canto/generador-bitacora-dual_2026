@@ -83,6 +83,7 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
     area: "Laboratorio de desarrollo",
     markdown: false,
     studentGenericSignature: true,
+    studentSignatureIntroduced: false,
     authorities: {
       voboName: "Vo Bo",
       voboRole: "Vinculación",
@@ -107,10 +108,20 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
     company: "Empresa de Prueba",
     markdown: false,
     studentGenericSignature: true,
+    studentSignatureIntroduced: false,
     instructor: { enabled: true, name: "Instructor" },
   });
   expect(rememberName("Virtual Insanity")).toBe(false);
   expect(readProfile()).toBe("Alumno Actualizado");
+
+  rememberProfile({
+    studentGenericSignature: false,
+    studentSignatureIntroduced: true,
+  });
+  expect(readProfileData()).toMatchObject({
+    studentGenericSignature: false,
+    studentSignatureIntroduced: true,
+  });
 
   forgetProfile();
   expect(readProfileData()).toMatchObject({
@@ -120,6 +131,7 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
     area: "",
     markdown: true,
     studentGenericSignature: false,
+    studentSignatureIntroduced: false,
     authorities: {
       voboName: "",
       autorizoName: "",
