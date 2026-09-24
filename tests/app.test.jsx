@@ -47,6 +47,27 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   });
   expect($("defaultStart").value).toBe("08:00");
   expect($("tecnmAutorizoPreset").options.length).toBeGreaterThan(20);
+  await waitFor(() =>
+    expect(document.querySelector(".profile-menu")).toBeTruthy(),
+  );
+  fireEvent.click(document.querySelector(".profile-actions .btn.primary"));
+  expect($("profileSchool")).toBeTruthy();
+  fireEvent.change($("profileDefaultStart"), {
+    target: { value: "07:30" },
+  });
+  fireEvent.change($("profileDefaultEnd"), {
+    target: { value: "13:30" },
+  });
+  fireEvent.input($("profileArea"), {
+    target: { value: "Laboratorio de programación" },
+  });
+  fireEvent.click($("profileSave"));
+  const profile = JSON.parse(localStorage.getItem("bitacora_profile_v1"));
+  expect(profile.defaultStart).toBe("07:30");
+  expect(profile.defaultEnd).toBe("13:30");
+  expect(profile.area).toBe("Laboratorio de programación");
+  expect($("defaultStart").value).toBe("07:30");
+  expect($("defaultEnd").value).toBe("13:30");
   fireEvent.change($("weekDate"), { target: { value: "2026-09-17" } });
   fireEvent.click($("weekBtn"));
   expect($("weekError").textContent).toContain("El primer día debe ser martes");
@@ -67,7 +88,8 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   ]);
   expect(draft.identity.student).toBe("Alumno de Prueba");
   expect(draft.identity.studentGenericSignature).toBe(true);
-  expect(draft.entries[0].start).toBe("08:00");
+  expect(draft.entries[0].start).toBe("07:30");
+  expect(draft.entries[0].area).toBe("Laboratorio de programación");
   expect($("markdown").checked).toBe(true);
   expect($("markdown").closest("details").open).toBe(false);
   expect($("historyDisclosure").open).toBe(false);
