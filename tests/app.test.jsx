@@ -36,8 +36,11 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     "tecnmAutorizoPreset",
     "studentGenericSignature",
     "studentSignatureSample",
+    "studentSignatureDisclosure",
   ])
     expect($(id), id).toBeTruthy();
+  expect($("studentSignatureDisclosure").open).toBe(true);
+  expect($("studentSignatureSummaryState").textContent).toContain("primera");
   fireEvent.input($("student"), { target: { value: "Alumno de Prueba" } });
   expect($("studentSignatureSample").textContent).toBe("Alumno de Prueba");
   fireEvent.click($("studentGenericSignature"));
@@ -147,4 +150,31 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   await waitFor(()=>expect($("pdfBtn").disabled).toBe(false));
   expect(JSON.parse(localStorage.getItem("bitacora_dual_clean_v3"))).toHaveLength(before+1);
   expect($("saveState").textContent).toBe("Guardado");
+  expect(
+    JSON.parse(localStorage.getItem("bitacora_profile_v1"))
+      .studentSignatureIntroduced,
+  ).toBe(true);
+  fireEvent.click($("newBtn"));
+  expect($("studentSignatureDisclosure").open).toBe(false);
+  expect($("studentGenericSignature").checked).toBe(true);
+});
+
+it("mantiene plegada y apagada la firma si ya se presentó y no se activó", async () => {
+  localStorage.clear();
+  localStorage.setItem(
+    "bitacora_profile_v1",
+    JSON.stringify({
+      name: "Alumno sin firma",
+      studentGenericSignature: false,
+      studentSignatureIntroduced: true,
+    }),
+  );
+  render(<App />);
+  const $ = (id) => document.getElementById(id);
+  await waitFor(() => expect($("studentSignatureDisclosure")).toBeTruthy());
+  expect($("studentSignatureDisclosure").open).toBe(false);
+  expect($("studentGenericSignature").checked).toBe(false);
+  expect($("studentSignatureSummaryState").textContent).toContain(
+    "desactivada",
+  );
 });
