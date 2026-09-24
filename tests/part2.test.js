@@ -39,7 +39,7 @@ it("usa el nombre corto de las firmas o el nombre completo si falta", () => {
   ).toEqual(["Alumno", "Corto"]);
 });
 
-it("recuerda plantel, semestre, grupo, horario y área sin romper el nombre guardado", () => {
+it("recuerda todos los predeterminados sin guardar contenido de jornadas", () => {
   localStorage.clear();
   expect(
     rememberProfile({
@@ -48,41 +48,86 @@ it("recuerda plantel, semestre, grupo, horario y área sin romper el nombre guar
       specialty: "Programación",
       semester: "5",
       group: "c",
+      company: "Empresa de Prueba",
       defaultStart: "08:00",
       defaultEnd: "14:30",
       area: "Laboratorio de desarrollo",
+      markdown: false,
+      studentGenericSignature: true,
+      authorities: {
+        voboName: "Vo Bo",
+        voboRole: "Vinculación",
+        autorizoName: "Responsable",
+        autorizoRole: "Jefatura",
+      },
+      instructor: {
+        enabled: true,
+        preset: "Instructor",
+        name: "Instructor",
+        roleMain: "Área técnica",
+        note: "Instructor Formador",
+      },
+      entries: [{ activity: "Esto no debe quedar en el perfil" }],
     }),
   ).toBe(true);
+
   expect(readProfileData()).toEqual({
     name: "Alumno de Prueba",
     school: "Plantel de Prueba",
     specialty: "Programación",
     semester: "5",
     group: "C",
+    company: "Empresa de Prueba",
     defaultStart: "08:00",
     defaultEnd: "14:30",
     area: "Laboratorio de desarrollo",
+    markdown: false,
+    studentGenericSignature: true,
+    authorities: {
+      voboName: "Vo Bo",
+      voboRole: "Vinculación",
+      autorizoName: "Responsable",
+      autorizoRole: "Jefatura",
+    },
+    instructor: {
+      enabled: true,
+      preset: "Instructor",
+      name: "Instructor",
+      roleMain: "Área técnica",
+      note: "Instructor Formador",
+    },
   });
+  expect(
+    JSON.parse(localStorage.getItem("bitacora_profile_v1")).entries,
+  ).toBeUndefined();
+
   rememberName("Alumno Actualizado");
   expect(readProfileData()).toMatchObject({
     name: "Alumno Actualizado",
-    school: "Plantel de Prueba",
-    semester: "5",
-    group: "C",
-    area: "Laboratorio de desarrollo",
+    company: "Empresa de Prueba",
+    markdown: false,
+    studentGenericSignature: true,
+    instructor: { enabled: true, name: "Instructor" },
   });
   expect(rememberName("Virtual Insanity")).toBe(false);
   expect(readProfile()).toBe("Alumno Actualizado");
+
   forgetProfile();
-  expect(readProfileData()).toEqual({
+  expect(readProfileData()).toMatchObject({
     name: "",
     school: "",
-    specialty: "",
-    semester: "",
-    group: "",
-    defaultStart: "",
-    defaultEnd: "",
+    company: "",
     area: "",
+    markdown: true,
+    studentGenericSignature: false,
+    authorities: {
+      voboName: "",
+      autorizoName: "",
+    },
+    instructor: {
+      enabled: null,
+      name: "",
+    },
   });
 });
 

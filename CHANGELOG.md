@@ -2,6 +2,8 @@
 
 ## 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
+- El perfil del avatar también recuerda empresa, responsable que autoriza, instructor formador y preferencias recurrentes; el contenido de las jornadas queda fuera del perfil.
+- El menú del perfil se simplificó en secciones de Escuela, Dual y Preferencias, con un editor compacto integrado al diseño existente.
 - El perfil local del avatar ahora también guarda y permite editar plantel, especialidad, semestre o grado, grupo, horario y área común como información predeterminada.
 - Los valores personales de horario y área tienen prioridad al crear nuevas jornadas; cuando no existen, se conservan los presets de cada empresa.
 - La ampliación mantiene `bitacora_profile_v1`, conserva perfiles anteriores que sólo tenían nombre y no modifica los registros guardados.
