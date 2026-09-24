@@ -6,7 +6,9 @@ import {
 } from "../domain/presentation.js";
 import {
   readProfile,
+  readProfileData,
   rememberName,
+  rememberProfile,
   initializeProfile,
 } from "../services/profile.js";
 import companies from "../data/companies.json";
@@ -88,8 +90,9 @@ export function startEditor() {
     }
     function applyCompanyDefaults() {
       const preset = companyDefaults($("#company").value);
-      $("#defaultStart").value = preset.start;
-      $("#defaultEnd").value = preset.end;
+      const profile = readProfileData();
+      $("#defaultStart").value = profile.defaultStart || preset.start;
+      $("#defaultEnd").value = profile.defaultEnd || preset.end;
     }
 
     const DEFAULTS = {
@@ -324,7 +327,7 @@ export function startEditor() {
         status: "laboral",
         start: $("#defaultStart").value || preset.start,
         end: $("#defaultEnd").value || preset.end,
-        area: preset.area,
+        area: readProfileData().area || preset.area,
         activity: "",
       };
     }
@@ -719,6 +722,18 @@ export function startEditor() {
             const c = host.querySelector(`[data-count="${i}"]`);
             if (c) c.textContent = input.value.length;
           }
+          if (k === "area") {
+            const commonAreas = [
+              ...new Set(
+                entries
+                  .filter((entry) => entry.status === "laboral")
+                  .map((entry) => String(entry.area || "").trim())
+                  .filter(Boolean),
+              ),
+            ];
+            if (commonAreas.length === 1)
+              rememberProfile({ area: commonAreas[0] });
+          }
           markDirty();
           updatePreview();
           refreshLineLimits();
@@ -924,7 +939,16 @@ export function startEditor() {
       entries = [];
       $("#weekDate").value = "";
       $("#markdown").checked = true;
-      fillIdentity({ ...DEFAULTS, student: readProfile() });
+      const profile = readProfileData();
+      fillIdentity({
+        ...DEFAULTS,
+        student: profile.name || readProfile(),
+        school: profile.school || DEFAULTS.school,
+        specialty: profile.specialty || DEFAULTS.specialty,
+        semester: profile.semester || DEFAULTS.semester,
+        group: profile.group || DEFAULTS.group,
+      });
+      applyCompanyDefaults();
       renderDays();
       dirty = false;
       setSaveState("Nueva");
@@ -993,7 +1017,24 @@ export function startEditor() {
       setSaveState("Guardado");
       renderRecords();
       saveDraftNow();
-      rememberName(r.student);
+      const profileAreas = [
+        ...new Set(
+          (r.entries || [])
+            .filter((entry) => entry.status === "laboral")
+            .map((entry) => String(entry.area || "").trim())
+            .filter(Boolean),
+        ),
+      ];
+      rememberProfile({
+        name: r.student,
+        school: r.school,
+        specialty: r.specialty,
+        semester: r.semester,
+        group: r.group,
+        defaultStart: $("#defaultStart").value,
+        defaultEnd: $("#defaultEnd").value,
+        ...(profileAreas.length === 1 ? { area: profileAreas[0] } : {}),
+      });
       $("#historyDisclosure").open = false;
       $("#backupDisclosure").open = false;
       if (!quiet)
@@ -2030,12 +2071,70 @@ export function startEditor() {
           updatePreview();
         });
       });
-      let profileTimer;
+      let profileNameTimer;
+      let profileDefaultsTimer;
       $("#student").addEventListener("input", () => {
-        clearTimeout(profileTimer);
-        profileTimer = setTimeout(() => rememberName($("#student").value), 400);
+        clearTimeout(profileNameTimer);
+        profileNameTimer = setTimeout(
+          () => rememberName($("#student").value),
+          400,
+        );
         $("#elaboroName").value = $("#student").value.trim();
         updateStudentSignaturePreview();
+      });
+      const queueAcademicProfile = () => {
+        clearTimeout(profileDefaultsTimer);
+        profileDefaultsTimer = setTimeout(
+          () =>
+            rememberProfile({
+              school: $("#school").value,
+              specialty: $("#specialty").value,
+              semester: $("#semester").value,
+              group: $("#group").value,
+            }),
+          300,
+        );
+      };
+      ["school", "specialty", "semester", "group"].forEach((id) =>
+        $("#" + id).addEventListener("change", queueAcademicProfile),
+      );
+      const queueScheduleProfile = () => {
+        clearTimeout(profileDefaultsTimer);
+        profileDefaultsTimer = setTimeout(
+          () =>
+            rememberProfile({
+              defaultStart: $("#defaultStart").value,
+              defaultEnd: $("#defaultEnd").value,
+            }),
+          300,
+        );
+      };
+      ["defaultStart", "defaultEnd"].forEach((id) => {
+        $("#" + id).addEventListener("input", queueScheduleProfile);
+        $("#" + id).addEventListener("change", queueScheduleProfile);
+      });
+      window.addEventListener("bitacora-apply-profile", (event) => {
+        const profile = event.detail || readProfileData();
+        if (profile.name) {
+          $("#student").value = profile.name;
+          $("#elaboroName").value = profile.name;
+        }
+        if (profile.school) {
+          savedOption("school", profile.school);
+          $("#school").value = profile.school;
+          configureSchool(true);
+        }
+        for (const id of ["specialty", "semester", "group"]) {
+          if (!profile[id]) continue;
+          savedOption(id, profile[id]);
+          $("#" + id).value = profile[id];
+        }
+        if (profile.defaultStart)
+          $("#defaultStart").value = profile.defaultStart;
+        if (profile.defaultEnd) $("#defaultEnd").value = profile.defaultEnd;
+        updateStudentSignaturePreview();
+        markDirty();
+        updatePreview();
       });
       $("#company").addEventListener("change", () => {
         syncCompanyContext(true);
