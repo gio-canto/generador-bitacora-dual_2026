@@ -2,6 +2,7 @@
 
 ## 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
+- La sección de firma del alumno se despliega automáticamente sólo la primera vez; después del primer guardado queda plegada y conserva en caché si la firma genérica quedó activada o desactivada.
 - El perfil del avatar también recuerda empresa, responsable que autoriza, instructor formador y preferencias recurrentes; el contenido de las jornadas queda fuera del perfil.
 - El menú del perfil se simplificó en secciones de Escuela, Dual y Preferencias, con un editor compacto integrado al diseño existente.
 - El perfil local del avatar ahora también guarda y permite editar plantel, especialidad, semestre o grado, grupo, horario y área común como información predeterminada.

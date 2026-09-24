@@ -13,6 +13,7 @@ const EMPTY_PROFILE = Object.freeze({
   area: "",
   markdown: true,
   studentGenericSignature: false,
+  studentSignatureIntroduced: false,
   authorities: Object.freeze({
     voboName: "",
     voboRole: "",
@@ -87,6 +88,7 @@ export function readProfileData(storage = localStorage) {
       area: cleanText(raw.area, 150),
       markdown: raw.markdown !== false,
       studentGenericSignature: raw.studentGenericSignature === true,
+      studentSignatureIntroduced: raw.studentSignatureIntroduced === true,
       authorities: {
         voboName: cleanText(authorities.voboName, 160),
         voboRole: cleanMultiline(authorities.voboRole, 300),
@@ -166,6 +168,9 @@ export function rememberProfile(value, storage = localStorage) {
     studentGenericSignature: has(patch, "studentGenericSignature")
       ? patch.studentGenericSignature === true
       : current.studentGenericSignature,
+    studentSignatureIntroduced: has(patch, "studentSignatureIntroduced")
+      ? patch.studentSignatureIntroduced === true
+      : current.studentSignatureIntroduced,
     authorities: {
       voboName: has(authorityPatch, "voboName")
         ? cleanText(authorityPatch.voboName, 160)
