@@ -8,7 +8,9 @@ import {
 } from "../src/domain/presentation.js";
 import {
   rememberName,
+  rememberProfile,
   readProfile,
+  readProfileData,
   forgetProfile,
   initializeProfile,
 } from "../src/services/profile.js";
@@ -36,6 +38,54 @@ it("usa el nombre corto de las firmas o el nombre completo si falta", () => {
     }),
   ).toEqual(["Alumno", "Corto"]);
 });
+
+it("recuerda plantel, semestre, grupo, horario y área sin romper el nombre guardado", () => {
+  localStorage.clear();
+  expect(
+    rememberProfile({
+      name: "Alumno de Prueba",
+      school: "Plantel de Prueba",
+      specialty: "Programación",
+      semester: "5",
+      group: "c",
+      defaultStart: "08:00",
+      defaultEnd: "14:30",
+      area: "Laboratorio de desarrollo",
+    }),
+  ).toBe(true);
+  expect(readProfileData()).toEqual({
+    name: "Alumno de Prueba",
+    school: "Plantel de Prueba",
+    specialty: "Programación",
+    semester: "5",
+    group: "C",
+    defaultStart: "08:00",
+    defaultEnd: "14:30",
+    area: "Laboratorio de desarrollo",
+  });
+  rememberName("Alumno Actualizado");
+  expect(readProfileData()).toMatchObject({
+    name: "Alumno Actualizado",
+    school: "Plantel de Prueba",
+    semester: "5",
+    group: "C",
+    area: "Laboratorio de desarrollo",
+  });
+  expect(rememberName("Virtual Insanity")).toBe(false);
+  expect(readProfile()).toBe("Alumno Actualizado");
+  forgetProfile();
+  expect(readProfileData()).toEqual({
+    name: "",
+    school: "",
+    specialty: "",
+    semester: "",
+    group: "",
+    defaultStart: "",
+    defaultEnd: "",
+    area: "",
+  });
+});
+
 it("recuerda el nombre sin confundir los disparadores secretos con el perfil", () => {
   localStorage.clear();
   rememberName("Alumno de Prueba");
