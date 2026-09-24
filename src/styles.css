@@ -102,16 +102,23 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
 
 
 /* Anti-fool upgrade · Parte 3: firma genérica del alumno */
-.student-signature-card{display:grid;gap:12px}
-.signature-option-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
-.signature-option-head h3{margin:0 0 5px}
+.student-signature-card{display:block;padding:0;overflow:hidden}
+.student-signature-summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px}
+.student-signature-summary::-webkit-details-marker{display:none}
+.student-signature-summary>div{min-width:0}
+.student-signature-summary h3{margin:0 0 4px;font-size:15px}
+.student-signature-summary p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}
+.signature-chevron{flex:none;color:var(--muted);font-size:18px;line-height:1;transition:transform .18s ease}
+.student-signature-card[open] .signature-chevron{transform:rotate(180deg)}
+.student-signature-content{display:grid;gap:12px;padding:0 18px 18px;border-top:1px solid var(--line)}
+.signature-option-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding-top:14px}
 .signature-option-head p{margin:0;max-width:680px}
 .signature-switch{flex:0 0 auto}
 .student-signature-preview{min-height:74px;border:1px dashed var(--line,#cfd5df);border-radius:14px;background:rgba(255,255,255,.58);display:flex;align-items:center;justify-content:center;padding:14px;overflow:hidden}
 .student-signature-preview span{max-width:100%;font-family:"Segoe Script","Snell Roundhand","Brush Script MT",cursive;font-size:clamp(26px,5vw,42px);font-style:italic;color:#1646a8;line-height:1.05;transform:rotate(-2deg);opacity:.42;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
 .student-signature-preview.enabled span{opacity:1}
 .signature-note{margin:0}
-@media(max-width:720px){.signature-option-head{flex-direction:column}.signature-switch{width:100%;justify-content:space-between}.student-signature-preview{min-height:68px}}
+@media(max-width:720px){.signature-option-head{flex-direction:column}.signature-switch{width:100%;justify-content:space-between}.student-signature-preview{min-height:68px}.student-signature-summary{padding:15px 16px}.student-signature-content{padding:0 16px 16px}}
 
 
 /* Perfil local: popover sencillo, alineado con el resto del generador. */
