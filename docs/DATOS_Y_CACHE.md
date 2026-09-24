@@ -13,4 +13,4 @@ El service worker guarda una versión identificada por el contenido del generado
 
 Limpiar los datos del sitio elimina el historial local. La caché de archivos no es un respaldo de las bitácoras.
 
-El perfil usa `bitacora_profile_v1`, separado de la caché de archivos. Recuerda el nombre al escribirlo y al guardar; las palabras secretas no lo sustituyen. Olvidar el nombre no elimina borrador ni historial. El avatar se genera localmente a partir del nombre; no hay cuentas.
+El perfil usa `bitacora_profile_v1`, separado de la caché de archivos. Puede recordar localmente el nombre, plantel, especialidad, semestre o grado, grupo, horario y área común para completar nuevas bitácoras. El nombre también se actualiza al escribirlo y las palabras secretas no lo sustituyen. Desde el avatar se puede editar u olvidar esta información predeterminada sin eliminar el borrador ni el historial. El avatar se genera localmente a partir del nombre; no hay cuentas.

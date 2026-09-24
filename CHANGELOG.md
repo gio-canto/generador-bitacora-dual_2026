@@ -2,6 +2,9 @@
 
 ## 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
+- El perfil local del avatar ahora también guarda y permite editar plantel, especialidad, semestre o grado, grupo, horario y área común como información predeterminada.
+- Los valores personales de horario y área tienen prioridad al crear nuevas jornadas; cuando no existen, se conservan los presets de cada empresa.
+- La ampliación mantiene `bitacora_profile_v1`, conserva perfiles anteriores que sólo tenían nombre y no modifica los registros guardados.
 - Nueva opción en **Revisión y PDF** para agregar una firma genérica del alumno cuando todavía no tenga una firma definida.
 - La firma usa únicamente el nombre del estudiante y se renderiza en azul tipo tinta; no genera firmas para Vinculación, asesor, empresa ni instructor.
 - La preferencia se guarda con el borrador y con cada registro, y aparece tanto en la vista previa como en el PDF.
