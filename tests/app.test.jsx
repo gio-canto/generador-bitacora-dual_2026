@@ -50,8 +50,19 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   await waitFor(() =>
     expect(document.querySelector(".profile-menu")).toBeTruthy(),
   );
-  fireEvent.click(document.querySelector(".profile-actions .btn.primary"));
+  fireEvent.click(document.querySelector(".profile-text-button"));
   expect($("profileSchool")).toBeTruthy();
+  fireEvent.change($("profileCompany"), {
+    target: {
+      value:
+        "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)",
+    },
+  });
+  expect($("profileInstructorEnabled").checked).toBe(true);
+  fireEvent.change($("profileInstructorPreset"), {
+    target: { value: "Ing. Emmanuel Sandoval Mejía" },
+  });
+  fireEvent.click($("profileMarkdown"));
   fireEvent.change($("profileDefaultStart"), {
     target: { value: "07:30" },
   });
@@ -63,11 +74,22 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   });
   fireEvent.click($("profileSave"));
   const profile = JSON.parse(localStorage.getItem("bitacora_profile_v1"));
+  expect(profile.company).toContain("COCYTIEG");
   expect(profile.defaultStart).toBe("07:30");
   expect(profile.defaultEnd).toBe("13:30");
   expect(profile.area).toBe("Laboratorio de programación");
+  expect(profile.markdown).toBe(false);
+  expect(profile.studentGenericSignature).toBe(true);
+  expect(profile.instructor.enabled).toBe(true);
+  expect(profile.instructor.name).toBe("Ing. Emmanuel Sandoval Mejía");
+  expect(profile.authorities.autorizoName).toContain("Karen Paulina");
+  expect($("company").value).toContain("COCYTIEG");
   expect($("defaultStart").value).toBe("07:30");
   expect($("defaultEnd").value).toBe("13:30");
+  expect($("markdown").checked).toBe(false);
+  expect($("studentGenericSignature").checked).toBe(true);
+  expect($("instructorEnabled").checked).toBe(true);
+  expect($("instructorName").value).toBe("Ing. Emmanuel Sandoval Mejía");
   fireEvent.change($("weekDate"), { target: { value: "2026-09-17" } });
   fireEvent.click($("weekBtn"));
   expect($("weekError").textContent).toContain("El primer día debe ser martes");
@@ -90,7 +112,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect(draft.identity.studentGenericSignature).toBe(true);
   expect(draft.entries[0].start).toBe("07:30");
   expect(draft.entries[0].area).toBe("Laboratorio de programación");
-  expect($("markdown").checked).toBe(true);
+  expect($("markdown").checked).toBe(false);
   expect($("markdown").closest("details").open).toBe(false);
   expect($("historyDisclosure").open).toBe(false);
   expect($("backupDisclosure").open).toBe(false);
