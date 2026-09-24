@@ -317,6 +317,7 @@ export function startEditor() {
       $("#instructorName").value = p.name;
       $("#instructorRoleMain").value = p.roleMain;
       $("#instructorNote").value = "Instructor Formador";
+      rememberProfile({ instructor: getIdentity().instructor });
       markDirty();
       updatePreview();
     }
@@ -923,6 +924,28 @@ export function startEditor() {
         }).format(f(dates.at(-1)));
       return `Semana · ${a} al ${b}`;
     }
+    function collectProfileDefaults() {
+      const identity = getIdentity();
+      return {
+        name: identity.student,
+        school: identity.school,
+        specialty: identity.specialty,
+        semester: identity.semester,
+        group: identity.group,
+        company: identity.company,
+        defaultStart: $("#defaultStart").value,
+        defaultEnd: $("#defaultEnd").value,
+        markdown: $("#markdown").checked,
+        studentGenericSignature: identity.studentGenericSignature,
+        authorities: {
+          voboName: identity.authorities.voboName,
+          voboRole: identity.authorities.voboRole,
+          autorizoName: identity.authorities.autorizoName,
+          autorizoRole: identity.authorities.autorizoRole,
+        },
+        instructor: identity.instructor,
+      };
+    }
     function collectRecord() {
       return {
         id: currentId || createId(),
@@ -938,15 +961,30 @@ export function startEditor() {
       currentId = null;
       entries = [];
       $("#weekDate").value = "";
-      $("#markdown").checked = true;
       const profile = readProfileData();
+      const savedAuthorities = Object.fromEntries(
+        Object.entries(profile.authorities || {}).filter(
+          ([, value]) => String(value || "").trim(),
+        ),
+      );
+      $("#markdown").checked = profile.markdown !== false;
       fillIdentity({
         ...DEFAULTS,
         student: profile.name || readProfile(),
+        company: profile.company || DEFAULTS.company,
         school: profile.school || DEFAULTS.school,
         specialty: profile.specialty || DEFAULTS.specialty,
         semester: profile.semester || DEFAULTS.semester,
         group: profile.group || DEFAULTS.group,
+        studentGenericSignature: profile.studentGenericSignature === true,
+        authorities: {
+          ...DEFAULTS.authorities,
+          ...savedAuthorities,
+        },
+        instructor: {
+          ...DEFAULTS.instructor,
+          ...(profile.instructor || {}),
+        },
       });
       applyCompanyDefaults();
       renderDays();
@@ -1026,13 +1064,7 @@ export function startEditor() {
         ),
       ];
       rememberProfile({
-        name: r.student,
-        school: r.school,
-        specialty: r.specialty,
-        semester: r.semester,
-        group: r.group,
-        defaultStart: $("#defaultStart").value,
-        defaultEnd: $("#defaultEnd").value,
+        ...collectProfileDefaults(),
         ...(profileAreas.length === 1 ? { area: profileAreas[0] } : {}),
       });
       $("#historyDisclosure").open = false;
@@ -2029,10 +2061,14 @@ export function startEditor() {
         updatePreview();
       };
       $("#markdown").onchange = () => {
+        rememberProfile({ markdown: $("#markdown").checked });
         markDirty();
         updatePreview();
       };
       $("#studentGenericSignature")?.addEventListener("change", () => {
+        rememberProfile({
+          studentGenericSignature: $("#studentGenericSignature").checked,
+        });
         updateStudentSignaturePreview();
         markDirty();
         updatePreview();
@@ -2040,6 +2076,7 @@ export function startEditor() {
       $("#instructorPreset").onchange = applyInstructorPreset;
       $("#instructorEnabled").onchange = () => {
         setInstructorEnabledUI();
+        rememberProfile({ instructor: getIdentity().instructor });
         markDirty();
         updatePreview();
       };
@@ -2082,36 +2119,31 @@ export function startEditor() {
         $("#elaboroName").value = $("#student").value.trim();
         updateStudentSignaturePreview();
       });
-      const queueAcademicProfile = () => {
+      const queueProfileDefaults = () => {
         clearTimeout(profileDefaultsTimer);
         profileDefaultsTimer = setTimeout(
-          () =>
-            rememberProfile({
-              school: $("#school").value,
-              specialty: $("#specialty").value,
-              semester: $("#semester").value,
-              group: $("#group").value,
-            }),
+          () => rememberProfile(collectProfileDefaults()),
           300,
         );
       };
       ["school", "specialty", "semester", "group"].forEach((id) =>
-        $("#" + id).addEventListener("change", queueAcademicProfile),
+        $("#" + id).addEventListener("change", queueProfileDefaults),
       );
-      const queueScheduleProfile = () => {
-        clearTimeout(profileDefaultsTimer);
-        profileDefaultsTimer = setTimeout(
-          () =>
-            rememberProfile({
-              defaultStart: $("#defaultStart").value,
-              defaultEnd: $("#defaultEnd").value,
-            }),
-          300,
-        );
-      };
       ["defaultStart", "defaultEnd"].forEach((id) => {
-        $("#" + id).addEventListener("input", queueScheduleProfile);
-        $("#" + id).addEventListener("change", queueScheduleProfile);
+        $("#" + id).addEventListener("input", queueProfileDefaults);
+        $("#" + id).addEventListener("change", queueProfileDefaults);
+      });
+      [
+        "voboName",
+        "voboRole",
+        "autorizoName",
+        "autorizoRole",
+        "instructorName",
+        "instructorRoleMain",
+        "instructorNote",
+      ].forEach((id) => {
+        $("#" + id).addEventListener("input", queueProfileDefaults);
+        $("#" + id).addEventListener("change", queueProfileDefaults);
       });
       window.addEventListener("bitacora-apply-profile", (event) => {
         const profile = event.detail || readProfileData();
@@ -2129,9 +2161,55 @@ export function startEditor() {
           savedOption(id, profile[id]);
           $("#" + id).value = profile[id];
         }
+        if (profile.company) {
+          savedOption("company", profile.company);
+          $("#company").value = profile.company;
+          syncCompanyContext(false);
+        }
         if (profile.defaultStart)
           $("#defaultStart").value = profile.defaultStart;
         if (profile.defaultEnd) $("#defaultEnd").value = profile.defaultEnd;
+
+        const authorities = profile.authorities || {};
+        if (authorities.voboName) $("#voboName").value = authorities.voboName;
+        if (authorities.voboRole) $("#voboRole").value = authorities.voboRole;
+        $("#autorizoName").value = authorities.autorizoName || "";
+        $("#autorizoRole").value = authorities.autorizoRole || "";
+
+        const instructor = profile.instructor || {};
+        if (typeof instructor.enabled === "boolean")
+          $("#instructorEnabled").checked = instructor.enabled;
+        populateInstructorSelect();
+        $("#instructorPreset").value = instructors().some(
+          (person) => person.name === instructor.name,
+        )
+          ? instructor.name
+          : "__custom__";
+        $("#instructorName").value = instructor.name || "";
+        $("#instructorRoleMain").value = instructor.roleMain || "";
+        $("#instructorNote").value =
+          instructor.note || "Instructor Formador";
+        setInstructorEnabledUI();
+
+        $("#markdown").checked = profile.markdown !== false;
+        const signatureToggle = $("#studentGenericSignature");
+        if (signatureToggle)
+          signatureToggle.checked = profile.studentGenericSignature === true;
+
+        const tecnmPreset = $("#tecnmAutorizoPreset");
+        if (tecnmPreset) {
+          const isTec =
+            $("#company").value ===
+            "Instituto Tecnológico de Chilpancingo (ITCH)";
+          const field = tecnmPreset.closest(".field");
+          if (field) field.hidden = !isTec;
+          tecnmPreset.value = Array.from(tecnmPreset.options).some(
+            (option) => option.value === authorities.autorizoName,
+          )
+            ? authorities.autorizoName
+            : "__custom__";
+        }
+
         updateStudentSignaturePreview();
         markDirty();
         updatePreview();
@@ -2143,6 +2221,7 @@ export function startEditor() {
           $("#autorizoName").value = company.representatives[0].name;
           $("#autorizoRole").value = company.representatives[0].role;
         }
+        rememberProfile(collectProfileDefaults());
         markDirty();
         updatePreview();
       });
