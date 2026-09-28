@@ -1,22 +1,67 @@
-# Registro de entrega · en desarrollo
+# Notas de versión
 
-- Los avisos del subsistema usan ahora el sistema de notificaciones existente con **Sileo** para confirmaciones breves y tarjetas contextuales para errores o datos faltantes.
-- Se mejoró el aviso de **Nueva versión disponible** con jerarquía visual, descripción y botón de actualización.
-- El lector muestra estados industriales diferenciados para lectura correcta, repetida o no coincidente, sin llenar la pantalla de avisos.
-- El tutorial del registro puede abrirse en cualquier momento sin perder la pantalla actual; durante el tutorial el lector ignora nuevas detecciones.
-- El aviso **Hay una nueva versión disponible** funciona también dentro de `/registro-entrega/`.
-- El Data Matrix identifica ahora la combinación **nombre + especialidad + empresa**; los códigos anteriores con sólo nombre siguen siendo compatibles cuando no existe ambigüedad.
-- README incorpora acceso directo al registro de entrega y la FAQ explica el Data Matrix y el flujo de recepción.
+## 0.50.0-beta.5 · Registro de entrega · Parte 5 · 2026-09-28
+
+Commit guía: `5f38e399`.
+
+- El Subsistema de registro de entrega adopta **Sileo** para confirmaciones breves y conserva avisos dentro de la pantalla cuando requieren una acción del usuario.
+- Los mensajes de archivo cargado, alumnos importados, altas, ediciones, eliminaciones, semanas, registros manuales y cierre de escaneo tienen jerarquía y redacción consistentes.
+- El lector muestra estados visibles **LECTOR ACTIVO**, **REGISTRADO**, **REPETIDO** y **NO COINCIDE**, con iconos y estados visuales distintos.
+- Los errores de cámara se muestran como avisos persistentes y dejan claro que el registro manual continúa disponible.
+- El aviso **Nueva versión disponible** se rediseñó con título, texto secundario y el botón **Actualizar ahora**, también dentro de `/registro-entrega/`.
+- Se conserva el diseño adaptable y el comportamiento con movimiento reducido.
+
+## 0.50.0-beta.4 · Registro de entrega · Parte 4 · 2026-09-28
+
+Commit guía: `b4900250`.
+
+- El tutorial puede consultarse en cualquier momento como una ventana superpuesta, sin abandonar la semana, configuración o sesión actual.
+- Durante el tutorial, el escáner ignora nuevas lecturas y reanuda el flujo al cerrarlo.
+- El aviso de actualización del service worker funciona también desde la página independiente del registro.
+- README incorpora acceso directo al Subsistema de registro de entrega.
+- La FAQ explica qué es el Data Matrix, qué datos contiene, cómo funciona el registro, qué ocurre si cambian especialidad o empresa y por qué no debe taparse.
+- El Data Matrix deja de identificar sólo por nombre: ahora codifica **nombre + especialidad + empresa** mediante un formato versionado.
+- Los códigos anteriores que sólo contenían nombre siguen siendo compatibles cuando ese nombre no es ambiguo.
+- Se aumentó la resolución de generación del Data Matrix y se mantuvo su renderizado sin suavizado para mejorar la lectura.
+
+## 0.50.0-beta.3 · Registro de entrega · Parte 3 · 2026-09-28
+
+Commit guía: `1617a67f`.
+
 - La configuración general del registro se reduce al **plantel**.
-- Especialidad y empresa pasan a ser datos de cada alumno.
-- El alta manual de alumnos solicita únicamente nombre, especialidad y empresa.
+- Especialidad y empresa pasan a ser datos individuales de cada alumno.
+- El alta manual solicita nombre, especialidad y empresa.
 - La importación Excel/CSV reconoce nombre, especialidad y empresa.
 - Se elimina **Traer del generador** del alta inicial.
-- Se simplifican la bienvenida, el tutorial y los textos del flujo.
+- Se simplifican bienvenida, tutorial y textos para reducir ruido visual.
 - Los archivos del esquema anterior se migran conservando escuela, especialidad y empresa.
-- El CSV semanal incluye especialidad y empresa por alumno.
+- La exportación CSV semanal incluye especialidad y empresa por alumno.
 
-# Notas de versión
+## 0.50.0-beta.2 · Registro de entrega · Parte 2 · 2026-09-28
+
+Commit guía: `d9d03505`.
+
+- `registro-entrega` pasa a ser una página independiente y deja de formar parte del menú principal del generador.
+- Si todavía no existe una base o semana, la entrada muestra dos tarjetas: **Tutorial** e **Ingresar**.
+- Se añade un tutorial interactivo por tarjetas y un flujo de configuración simplificado.
+- Se corrige el Data Matrix en el renderizador que realmente genera el PDF del sistema heredado.
+- La descarga del PDF se bloquea con un aviso si el identificador no pudo generarse.
+- El cuadro industrial del lector compensa el recorte de la cámara para seguir mejor la posición real del Data Matrix.
+- Se añaden resumen semanal, porcentaje de avance, filtros por estado, cierre/reapertura y exportación CSV.
+
+## 0.50.0-beta.1 · Registro de entrega · Parte 1 · 2026-09-28
+
+Commit guía: `13e3b214`.
+
+- Se incorpora el primer **Subsistema de registro de entrega**.
+- Base local de alumnos con Blobatar, alta manual e importación de XLSX/XLS/CSV.
+- Semanas con fecha límite y estados automáticos **Entregado**, **Entregado a destiempo** y **No entregado**.
+- Registro de fecha, hora y origen de cada entrega.
+- Archivo portátil JSON y copia en almacenamiento local del navegador.
+- Escaneo Data Matrix continuo para registrar varias bitácoras sin cerrar la cámara entre lecturas.
+- Sonido de lectura, cuadro de detección y tratamiento de códigos desconocidos o repetidos.
+- Cola de lecturas que se confirma al terminar la sesión.
+- Primera integración del Data Matrix en la bitácora generada y pruebas automatizadas del registro.
 
 ## 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 

@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.49.0--beta.2-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.5-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -12,6 +12,14 @@ Una semana de actividades, un PDF listo para firmar.
 [Abrir aplicación](https://gio-canto.github.io/generador-bitacora-dual_2026/) · [Registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/) · [Preguntas frecuentes](https://gio-canto.github.io/generador-bitacora-dual_2026/faq/) · [Notas de versión](CHANGELOG.md) · [Reportar un problema](https://github.com/gio-canto/generador-bitacora-dual_2026/issues)
 
 </div>
+
+## Beta 0.50.0-beta.5 · Registro de entrega · Parte 5
+
+La serie 0.50 incorpora el **Subsistema de registro de entrega** como página independiente. El plantel mantiene una base común; cada alumno conserva nombre, especialidad y empresa. Las bitácoras generan un Data Matrix con esos tres datos para registrar entregas por cámara, en serie y con fecha, hora y estado.
+
+La versión actual añade avisos coherentes con Sileo, estados visuales del escáner, tutorial consultable en cualquier momento, actualización del service worker también dentro del registro, exportación CSV semanal y documentación específica en la FAQ.
+
+La numeración de esta serie sigue los cambios funcionales publicados en `main`: 0.50.0-beta.1 (subsistema inicial), beta.2 (página independiente y corrección del Data Matrix), beta.3 (registro a nivel plantel), beta.4 (identidad completa y tutorial/actualización) y beta.5 (avisos y estados visuales).
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
@@ -78,7 +86,7 @@ npm run preview
 | `npm run preview` | Sirve `dist/` para revisión |
 | `npm run format` | Formatea el código con Prettier |
 
-Sileo ya está declarado y fijado en `package-lock.json`; se incorporó con `npm i sileo`. No se descargan librerías desde CDN durante el uso.
+Sileo está declarado y fijado en `package-lock.json`. El generador principal usa sus dependencias npm compiladas con Vite. El Subsistema de registro de entrega carga además **bwip-js**, **SheetJS (XLSX)** y **ZXing Browser** desde los scripts declarados en su página para generar/leer Data Matrix e importar hojas de cálculo.
 
 ## Documentación
 
