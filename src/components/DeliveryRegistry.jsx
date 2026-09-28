@@ -249,6 +249,22 @@ export default function DeliveryRegistry({ onClose }) {
     () => state.weeks.find((week) => week.id === activeWeekId) || null,
     [state.weeks, activeWeekId],
   );
+  const activeSummary = useMemo(
+    () => (activeWeek ? weekSummary(activeWeek, state.students) : null),
+    [activeWeek, state.students],
+  );
+  const started =
+    contextIsComplete(state.context) ||
+    state.students.length > 0 ||
+    state.weeks.length > 0;
+  const selectedSchool =
+    schools.find((school) => school.name === contextForm.school) ||
+    schools[0] ||
+    {};
+  const generatorCandidates = useMemo(
+    () => studentsFromGenerator(generatorSnapshot, contextForm),
+    [generatorSnapshot, contextForm],
+  );
 
   const commit = (producer) => {
     const next =
