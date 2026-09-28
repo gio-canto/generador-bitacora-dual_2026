@@ -4,10 +4,12 @@ import schools from "../data/schools.json";
 import companies from "../data/companies.json";
 import {
   ArrowLeft,
+  ArrowRight,
   Camera,
   CheckCircle,
   Clock,
   DownloadSimple,
+  Database,
   FileArrowUp,
   FileXls,
   Plus,
