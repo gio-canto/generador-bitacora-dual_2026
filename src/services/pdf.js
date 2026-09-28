@@ -1,4 +1,5 @@
 import { validDate } from "../domain/records.js";
+import { createMatrixPayload } from "./delivery-registry.js";
 const COUNCIL =
   "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)";
 const PAGE = { w: 297, h: 210 };
@@ -313,42 +314,29 @@ function rect(c, x, y, w, h, fill, stroke, lw, p) {
     c.strokeRect(mm(x, p), mm(y, p), mm(w, p), mm(h, p));
   }
 }
-function drawStudentDataMatrix(c, student, p) {
-  const value = String(student || "").replace(/\s+/g, " ").trim();
-  if (!value || !globalThis.bwipjs?.toCanvas) return;
+function drawStudentDataMatrix(c, identity, p) {
+  const value = createMatrixPayload(identity);
+  if (!value || !globalThis.bwipjs?.toCanvas) return false;
   const code = document.createElement("canvas");
-  const render = (text) =>
+  try {
     globalThis.bwipjs.toCanvas(code, {
       bcid: "datamatrix",
-      text,
-      scale: 3,
+      text: value,
+      scale: 8,
       padding: 0,
       includetext: false,
     });
-  try {
-    render(value);
   } catch {
-    try {
-      render(
-        value
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, ""),
-      );
-    } catch {
-      return;
-    }
+    return false;
   }
-  const size = 11.8;
+  const size = 15.5;
+  const quiet = 1.4;
+  rect(c, 2.4 - quiet, 2.4 - quiet, size + quiet * 2, size + quiet * 2, "#fff", null, 0, p);
   c.save();
   c.imageSmoothingEnabled = false;
-  c.drawImage(
-    code,
-    mm(2.4, p),
-    mm(2.4, p),
-    mm(size, p),
-    mm(size, p),
-  );
+  c.drawImage(code, mm(2.4, p), mm(2.4, p), mm(size, p), mm(size, p));
   c.restore();
+  return true;
 }
 function styled(c, lines, x, y, s, lh, p) {
   lines.forEach((ln, ri) => {
@@ -377,7 +365,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
   const c = canvas.getContext("2d");
   c.fillStyle = "#fff";
   c.fillRect(0, 0, canvas.width, canvas.height);
-  drawStudentDataMatrix(c, id.student, p);
+  drawStudentDataMatrix(c, id, p);
   if (logoImage?.naturalWidth) {
     const w = layout.logo.w * 0.9625,
       h = w / (logoImage.naturalWidth / logoImage.naturalHeight);
