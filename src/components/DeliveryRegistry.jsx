@@ -282,7 +282,7 @@ export default function DeliveryRegistry({ onClose }) {
   }, [state.weeks, activeWeekId]);
 
   useEffect(() => {
-    if (view !== "scanner") return;
+    if (view !== "scanner" || activeWeek?.closedAt) return;
     let disposed = false;
     let nativeStream = null;
     let nativeFrame = 0;
@@ -416,7 +416,7 @@ export default function DeliveryRegistry({ onClose }) {
       nativeStream?.getTracks?.().forEach((track) => track.stop());
       clearTimeout(scanBoxTimer.current);
     };
-  }, [view, activeWeekId]);
+  }, [view, activeWeekId, activeWeek?.closedAt]);
 
   const startSetup = () => {
     setContextForm(
