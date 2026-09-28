@@ -718,13 +718,28 @@ export default function DeliveryRegistry({ onClose }) {
       <ScanSound tone={scanTone} />
       <header className="delivery-topbar">
         <button className="delivery-brand" type="button" onClick={onClose}>
-          <img src="Assets/Edu.png" alt="Educación Dual" />
+          <img
+            src={
+              location.pathname.includes("/registro-entrega/")
+                ? "../Assets/Edu.png"
+                : "Assets/Edu.png"
+            }
+            alt="Educación Dual"
+          />
         </button>
         <div className="delivery-top-actions">
-          <button className="btn" type="button" onClick={onClose}>
-            <ArrowLeft size={18} />
-            Generador
-          </button>
+          {view !== "welcome" && (
+            <button
+              className="btn"
+              type="button"
+              onClick={() => {
+                setTutorialStep(0);
+                setView("tutorial");
+              }}
+            >
+              Tutorial
+            </button>
+          )}
           <label className="btn delivery-file-button">
             <UploadSimple size={18} />
             Abrir archivo
@@ -738,102 +753,646 @@ export default function DeliveryRegistry({ onClose }) {
               }}
             />
           </label>
-          <button className="btn primary" type="button" onClick={() => exportDeliveryState(state)}>
-            <DownloadSimple size={18} />
-            Descargar archivo
-          </button>
+          {started && (
+            <button
+              className="btn primary"
+              type="button"
+              onClick={() => exportDeliveryState(state)}
+            >
+              <DownloadSimple size={18} />
+              Guardar archivo
+            </button>
+          )}
         </div>
       </header>
 
       <main className="delivery-shell">
-        {view !== "scanner" && (
-          <section className="delivery-hero">
-            <span>Educación Dual · control local</span>
-            <h1>Subsistema de registro de entrega</h1>
-            <p>
-              Administra la base de alumnos, crea semanas y registra bitácoras por cámara
-              o de forma manual. Los datos se conservan en este navegador y en el archivo
-              portátil que descargues.
-            </p>
+        {view === "welcome" && (
+          <section className="delivery-welcome">
+            <div className="delivery-welcome-copy">
+              <span className="delivery-kicker">Registro de bitácoras</span>
+              <h1>Subsistema de registro de entrega</h1>
+              <p>
+                Controla por semana quién entregó, quién llegó a destiempo y
+                quién sigue pendiente, sin cuentas ni servidor.
+              </p>
+            </div>
+            <div className="delivery-welcome-cards">
+              <button
+                className="delivery-entry-card"
+                type="button"
+                onClick={() => {
+                  setTutorialStep(0);
+                  setView("tutorial");
+                }}
+              >
+                <div className="delivery-entry-icon">
+                  <FileArrowUp size={42} />
+                </div>
+                <strong>Soy nuevo y quiero saber</strong>
+                <span>Aprende el sistema tarjeta por tarjeta.</span>
+                <b>Tutorial</b>
+              </button>
+              <button
+                className="delivery-entry-card primary"
+                type="button"
+                onClick={startSetup}
+              >
+                <div className="delivery-entry-icon">
+                  <Scan size={42} />
+                </div>
+                <strong>Iniciar registro</strong>
+                <span>Crea la base y la primera semana.</span>
+                <b>Ingresar</b>
+              </button>
+            </div>
           </section>
         )}
 
-        {notice && view !== "scanner" && (
+        {notice && view !== "scanner" && view !== "welcome" && (
           <div className="delivery-notice" role="status">
             {notice}
-            <button type="button" onClick={() => setNotice("")}>Cerrar</button>
+            <button type="button" onClick={() => setNotice("")}>
+              Cerrar
+            </button>
           </div>
+        )}
+
+        {view === "tutorial" && (
+          <section className="delivery-tutorial-stage">
+            <article className="delivery-tutorial-card">
+              <div className="delivery-tutorial-top">
+                <span>
+                  Tutorial · {tutorialStep + 1} de {tutorialSteps.length}
+                </span>
+                <div className="delivery-tutorial-dots">
+                  {tutorialSteps.map((_, index) => (
+                    <i
+                      key={index}
+                      className={index <= tutorialStep ? "active" : ""}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div
+                className={
+                  "delivery-tutorial-demo " +
+                  tutorialSteps[tutorialStep].visual
+                }
+              >
+                {tutorialSteps[tutorialStep].visual === "base" && (
+                  <>
+                    <Users size={38} />
+                    <div>
+                      <strong>CBTis No. 134</strong>
+                      <span>Programación · 4° B</span>
+                    </div>
+                  </>
+                )}
+                {tutorialSteps[tutorialStep].visual === "sync" && (
+                  <>
+                    <Database size={38} />
+                    <ArrowRight size={26} />
+                    <Users size={38} />
+                  </>
+                )}
+                {tutorialSteps[tutorialStep].visual === "week" && (
+                  <>
+                    <Clock size={38} />
+                    <div>
+                      <strong>Semana 4</strong>
+                      <span>Entrega límite · viernes 14:00</span>
+                    </div>
+                  </>
+                )}
+                {tutorialSteps[tutorialStep].visual === "scan" && (
+                  <>
+                    <Scan size={42} />
+                    <div className="delivery-tutorial-scanbox">DATA MATRIX</div>
+                    <strong>LECTURA OK</strong>
+                  </>
+                )}
+                {tutorialSteps[tutorialStep].visual === "finish" && (
+                  <div className="delivery-tutorial-mini-status">
+                    <span>12 Entregados</span>
+                    <span>2 A destiempo</span>
+                    <span>4 Pendientes</span>
+                  </div>
+                )}
+              </div>
+
+              <h2>{tutorialSteps[tutorialStep].title}</h2>
+              <p>{tutorialSteps[tutorialStep].text}</p>
+
+              <div className="delivery-tutorial-actions">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => {
+                    if (tutorialStep === 0)
+                      setView(started ? "home" : "welcome");
+                    else setTutorialStep((step) => step - 1);
+                  }}
+                >
+                  <ArrowLeft size={17} />
+                  {tutorialStep === 0 ? "Salir" : "Atrás"}
+                </button>
+                <button
+                  className="btn primary"
+                  type="button"
+                  onClick={() => {
+                    if (tutorialStep < tutorialSteps.length - 1) {
+                      setTutorialStep((step) => step + 1);
+                      return;
+                    }
+                    commit({
+                      ...state,
+                      settings: { ...state.settings, tutorialDone: true },
+                    });
+                    if (started) setView("home");
+                    else startSetup();
+                  }}
+                >
+                  {tutorialStep === tutorialSteps.length - 1
+                    ? started
+                      ? "Terminar"
+                      : "Crear registro"
+                    : "Siguiente"}
+                  <ArrowRight size={17} />
+                </button>
+              </div>
+            </article>
+          </section>
+        )}
+
+        {view === "setup" && (
+          <section className="delivery-setup">
+            <div className="delivery-setup-head">
+              <div>
+                <span className="delivery-kicker">
+                  Configuración · {setupStep + 1} de 3
+                </span>
+                <h1>
+                  {setupStep === 0
+                    ? "¿Qué grupo vas a administrar?"
+                    : setupStep === 1
+                      ? "Carga a tus alumnos"
+                      : "Crea la primera semana"}
+                </h1>
+              </div>
+              <div className="delivery-setup-progress">
+                <i className="active" />
+                <i className={setupStep >= 1 ? "active" : ""} />
+                <i className={setupStep >= 2 ? "active" : ""} />
+              </div>
+            </div>
+
+            {setupStep === 0 && (
+              <div className="delivery-setup-card">
+                <p className="delivery-setup-note">
+                  Estos datos salen de los mismos catálogos del generador de
+                  bitácoras y se aplican a toda la base, no alumno por alumno.
+                </p>
+                <div className="delivery-form">
+                  <label className="delivery-field delivery-field-wide">
+                    <span>Plantel</span>
+                    <select
+                      value={contextForm.school}
+                      onChange={(event) => {
+                        const school =
+                          schools.find(
+                            (item) => item.name === event.target.value,
+                          ) ||
+                          schools[0] ||
+                          {};
+                        setContextForm(
+                          createRegistryContext({
+                            ...contextForm,
+                            school: school.name || "",
+                            specialty: school.specialties?.[0] || "",
+                            semester: school.semesters?.[0] || "",
+                            group: school.groups?.[0] || "",
+                          }),
+                        );
+                      }}
+                    >
+                      <option value="">Selecciona un plantel</option>
+                      {schools.map((school) => (
+                        <option key={school.id} value={school.name}>
+                          {school.shortName || school.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="delivery-field">
+                    <span>Especialidad</span>
+                    <select
+                      value={contextForm.specialty}
+                      onChange={(event) =>
+                        setContextForm({
+                          ...contextForm,
+                          specialty: event.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Selecciona</option>
+                      {(selectedSchool.specialties || []).map((value) => (
+                        <option key={value}>{value}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="delivery-field">
+                    <span>Semestre</span>
+                    <select
+                      value={contextForm.semester}
+                      onChange={(event) =>
+                        setContextForm({
+                          ...contextForm,
+                          semester: event.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Selecciona</option>
+                      {(selectedSchool.semesters || []).map((value) => (
+                        <option key={value} value={value}>
+                          {value}°
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="delivery-field">
+                    <span>Grupo</span>
+                    <select
+                      value={contextForm.group}
+                      onChange={(event) =>
+                        setContextForm({
+                          ...contextForm,
+                          group: event.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Selecciona</option>
+                      {(selectedSchool.groups || []).map((value) => (
+                        <option key={value}>{value}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="delivery-field delivery-field-wide">
+                    <span>Empresa u organismo de referencia</span>
+                    <select
+                      value={contextForm.company}
+                      onChange={(event) =>
+                        setContextForm({
+                          ...contextForm,
+                          company: event.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Sin una empresa única</option>
+                      {companies.map((company) => (
+                        <option key={company.id} value={company.name}>
+                          {company.shortName || company.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                {contextIsComplete(generatorSnapshot.context) && (
+                  <div className="delivery-cross-hint">
+                    <Database size={21} />
+                    <div>
+                      <strong>Encontré datos del generador</strong>
+                      <span>
+                        {shortSchool(generatorSnapshot.context.school)} ·{" "}
+                        {generatorSnapshot.context.specialty} ·{" "}
+                        {generatorSnapshot.context.semester}°{" "}
+                        {generatorSnapshot.context.group}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="delivery-setup-actions">
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => setView(started ? "home" : "welcome")}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="btn primary"
+                    type="button"
+                    onClick={() => {
+                      if (saveContext()) setSetupStep(1);
+                    }}
+                  >
+                    Continuar
+                    <ArrowRight size={17} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {setupStep === 1 && (
+              <div className="delivery-setup-card">
+                <div className="delivery-context-banner">
+                  <div>
+                    <strong>{shortSchool(state.context.school)}</strong>
+                    <span>
+                      {state.context.specialty} · {state.context.semester}°{" "}
+                      {state.context.group}
+                    </span>
+                  </div>
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => setSetupStep(0)}
+                  >
+                    Cambiar
+                  </button>
+                </div>
+
+                <div className="delivery-import-grid">
+                  <button
+                    className="delivery-action-tile"
+                    type="button"
+                    onClick={syncGeneratorStudents}
+                  >
+                    <Database size={38} />
+                    <strong>Traer del generador</strong>
+                    <span>
+                      {generatorCandidates.length
+                        ? generatorCandidates.length +
+                          " encontrados para este grupo"
+                        : "Cruzar con bitácoras guardadas"}
+                    </span>
+                  </button>
+                  <label className="delivery-action-tile">
+                    <FileXls size={38} />
+                    <strong>Cargar Excel o CSV</strong>
+                    <span>Busca una columna de nombre o alumno</span>
+                    <input
+                      hidden
+                      type="file"
+                      accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                      onChange={(event) => {
+                        importSpreadsheet(event.target.files?.[0]);
+                        event.target.value = "";
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <form className="delivery-inline-add" onSubmit={addStudent}>
+                  <label>
+                    <span>Agregar manualmente</span>
+                    <input
+                      value={studentForm.name}
+                      onChange={(event) =>
+                        setStudentForm({ name: event.target.value })
+                      }
+                      placeholder="Nombre completo del alumno"
+                    />
+                  </label>
+                  <button className="btn primary" type="submit">
+                    {editingStudentId ? (
+                      <PencilSimple size={17} />
+                    ) : (
+                      <Plus size={17} />
+                    )}
+                    {editingStudentId ? "Actualizar" : "Agregar"}
+                  </button>
+                  {editingStudentId && (
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => {
+                        setEditingStudentId("");
+                        setStudentForm({ name: "" });
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                </form>
+
+                <div className="delivery-roster-head">
+                  <strong>{state.students.length} alumnos en la base</strong>
+                  <span>El contexto escolar se aplica a todos.</span>
+                </div>
+                <div className="delivery-student-list compact">
+                  {state.students.map((student) => (
+                    <div className="delivery-base-row" key={student.id}>
+                      <Blobatar name={student.name} size={44} />
+                      <div>
+                        <strong>{student.name}</strong>
+                        <span>
+                          {state.context.specialty} · {state.context.semester}°{" "}
+                          {state.context.group}
+                        </span>
+                      </div>
+                      <div className="delivery-base-actions">
+                        <button
+                          className="btn"
+                          type="button"
+                          aria-label={"Editar " + student.name}
+                          onClick={() => editStudent(student)}
+                        >
+                          <PencilSimple size={18} />
+                        </button>
+                        <button
+                          className="btn delivery-danger"
+                          type="button"
+                          aria-label={"Eliminar " + student.name}
+                          onClick={() => deleteStudent(student.id)}
+                        >
+                          <Trash size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="delivery-setup-actions">
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => setSetupStep(0)}
+                  >
+                    Atrás
+                  </button>
+                  <button
+                    className="btn primary"
+                    type="button"
+                    disabled={!state.students.length}
+                    onClick={() => setSetupStep(2)}
+                  >
+                    Continuar
+                    <ArrowRight size={17} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {setupStep === 2 && (
+              <div className="delivery-setup-card">
+                <p className="delivery-setup-note">
+                  La hora límite controla automáticamente el estado de cada
+                  entrega.
+                </p>
+                <form
+                  className="delivery-form delivery-week-form"
+                  onSubmit={(event) => addWeek(event, true)}
+                >
+                  <label className="delivery-field delivery-field-wide">
+                    <span>Nombre de la semana</span>
+                    <input
+                      value={weekForm.label}
+                      onChange={(event) =>
+                        setWeekForm({ ...weekForm, label: event.target.value })
+                      }
+                      placeholder={"Semana " + (state.weeks.length + 1)}
+                    />
+                  </label>
+                  <label className="delivery-field">
+                    <span>Fecha inicial</span>
+                    <input
+                      type="date"
+                      value={weekForm.startDate}
+                      onChange={(event) =>
+                        setWeekForm({
+                          ...weekForm,
+                          startDate: event.target.value,
+                        })
+                      }
+                    />
+                  </label>
+                  <label className="delivery-field">
+                    <span>Fecha y hora límite</span>
+                    <input
+                      required
+                      type="datetime-local"
+                      value={weekForm.dueAt}
+                      onChange={(event) =>
+                        setWeekForm({ ...weekForm, dueAt: event.target.value })
+                      }
+                    />
+                  </label>
+                  <button
+                    className="btn primary delivery-form-submit"
+                    type="submit"
+                  >
+                    Crear y entrar
+                  </button>
+                </form>
+                <div className="delivery-setup-actions">
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => setSetupStep(1)}
+                  >
+                    Atrás
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
         )}
 
         {view === "home" && (
           <>
+            <section className="delivery-hero compact">
+              <span className="delivery-kicker">Registro de entrega</span>
+              <h1>{shortSchool(state.context.school) || "Tu registro"}</h1>
+              <p>
+                {[
+                  state.context.specialty,
+                  state.context.semester &&
+                    state.context.semester + "°",
+                  state.context.group,
+                  shortCompany(state.context.company),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            </section>
+
             <section className="delivery-summary-grid">
               <article className="delivery-summary-card">
                 <Users size={28} />
-                <span>Base de alumnos</span>
+                <span>Alumnos</span>
                 <strong>{state.students.length}</strong>
-                <button className="btn" type="button" onClick={() => setView("students")}>
-                  Administrar
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => {
+                    setContextForm(state.context);
+                    setSetupStep(1);
+                    setView("setup");
+                  }}
+                >
+                  Administrar base
                 </button>
               </article>
               <article className="delivery-summary-card">
                 <FileArrowUp size={28} />
-                <span>Semanas registradas</span>
+                <span>Semanas</span>
                 <strong>{state.weeks.length}</strong>
-                <button className="btn" type="button" onClick={() => setView("new-week")}>
-                  Crear nueva semana
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => setView("new-week")}
+                >
+                  Nueva semana
                 </button>
               </article>
               <article className="delivery-summary-card">
                 <Scan size={28} />
                 <span>Registro rápido</span>
-                <strong>{activeWeek ? activeWeek.label : "Sin semana"}</strong>
+                <strong className="delivery-summary-text">
+                  {state.weeks.at(-1)?.label || "Sin semana"}
+                </strong>
                 <button
                   className="btn primary"
                   type="button"
-                  disabled={!activeWeek || !state.students.length}
-                  onClick={() => setView("scanner")}
+                  disabled={!state.weeks.length || !state.students.length}
+                  onClick={() => {
+                    const week = state.weeks.at(-1);
+                    setActiveWeekId(week.id);
+                    setView(week.closedAt ? "week" : "scanner");
+                  }}
                 >
-                  Escanear bitácoras
+                  {state.weeks.at(-1)?.closedAt ? "Ver cierre" : "Escanear"}
                 </button>
               </article>
             </section>
 
-            {!state.students.length && (
-              <section className="delivery-empty-start">
+            <section className="delivery-panel">
+              <div className="delivery-panel-head">
                 <div>
-                  <span className="delivery-kicker">Primer uso</span>
-                  <h2>Carga tu base de alumnos</h2>
-                  <p>
-                    Puedes capturar nombres manualmente o importar la primera hoja de un
-                    archivo Excel/CSV. El nombre completo es el dato que se compara contra
-                    el Data Matrix de cada bitácora.
-                  </p>
+                  <span className="delivery-kicker">Historial</span>
+                  <h2>Semanas</h2>
                 </div>
-                <button className="btn primary" type="button" onClick={() => setView("students")}>
-                  <UserPlus size={18} />
-                  Crear base
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => setView("new-week")}
+                >
+                  <Plus size={18} />
+                  Nueva semana
                 </button>
-              </section>
-            )}
-
-            {!!state.weeks.length && (
-              <section className="delivery-panel">
-                <div className="delivery-panel-head">
-                  <div>
-                    <span className="delivery-kicker">Historial</span>
-                    <h2>Semanas</h2>
-                  </div>
-                  <button className="btn" type="button" onClick={() => setView("new-week")}>
-                    <Plus size={18} />
-                    Nueva semana
-                  </button>
-                </div>
+              </div>
+              {state.weeks.length ? (
                 <div className="delivery-week-list">
                   {[...state.weeks].reverse().map((week) => {
-                    const delivered = state.students.filter(
-                      (student) => deliveryStatus(week, student.id) !== "no_entregado",
-                    ).length;
+                    const summary = weekSummary(week, state.students);
                     return (
                       <button
                         className="delivery-week-row"
@@ -841,6 +1400,7 @@ export default function DeliveryRegistry({ onClose }) {
                         type="button"
                         onClick={() => {
                           setActiveWeekId(week.id);
+                          setStatusFilter("all");
                           setView("week");
                         }}
                       >
@@ -848,185 +1408,40 @@ export default function DeliveryRegistry({ onClose }) {
                           <strong>{week.label}</strong>
                           <span>
                             Límite: {formatDateTime(week.dueAt)}
+                            {week.closedAt ? " · Cerrada" : ""}
                           </span>
+                          <div className="delivery-week-progress">
+                            <i style={{ width: summary.percent + "%" }} />
+                          </div>
                         </div>
-                        <b>{delivered}/{state.students.length}</b>
+                        <b>
+                          {summary.registered}/{summary.total}
+                        </b>
                       </button>
                     );
                   })}
                 </div>
-              </section>
-            )}
+              ) : (
+                <div className="delivery-empty-week">
+                  <strong>Aún no hay semanas.</strong>
+                  <span>Crea la primera para comenzar a registrar.</span>
+                </div>
+              )}
+            </section>
 
             <section className="delivery-help-strip">
               <div>
-                <span className="delivery-kicker">¿Es tu primera vez?</span>
-                <h2>Ve el flujo completo antes de registrar.</h2>
+                <span className="delivery-kicker">Base compartida</span>
+                <h2>
+                  Escuela, especialidad, semestre y grupo se guardan una sola
+                  vez.
+                </h2>
               </div>
-              <button className="btn" type="button" onClick={() => setView("tutorial")}>
-                Ver tutorial
+              <button className="btn" type="button" onClick={startSetup}>
+                Revisar configuración
               </button>
             </section>
           </>
-        )}
-
-        {view === "tutorial" && (
-          <section className="delivery-panel">
-            <div className="delivery-panel-head">
-              <div>
-                <span className="delivery-kicker">Tutorial</span>
-                <h2>Registro de entrega en tres pasos</h2>
-              </div>
-              <button className="btn" type="button" onClick={() => setView("home")}>
-                Volver
-              </button>
-            </div>
-            <div className="delivery-tutorial-grid">
-              <article><b>1</b><h3>Carga la base</h3><p>Agrega alumnos manualmente o importa Excel/CSV. Los nombres deben coincidir con los impresos en sus bitácoras.</p></article>
-              <article><b>2</b><h3>Crea la semana</h3><p>Define la fecha y hora límite. Antes del límite será Entregado; después, Entregado a destiempo.</p></article>
-              <article><b>3</b><h3>Escanea en serie</h3><p>Mantén la cámara abierta y pasa cada hoja. Cada lectura emite un sonido y marca visualmente el código detectado. Termina la sesión para guardar y descargar el archivo actualizado.</p></article>
-            </div>
-          </section>
-        )}
-
-        {view === "students" && (
-          <section className="delivery-panel">
-            <div className="delivery-panel-head">
-              <div>
-                <span className="delivery-kicker">Base local</span>
-                <h2>Alumnos</h2>
-              </div>
-              <button className="btn" type="button" onClick={() => setView("home")}>
-                Volver
-              </button>
-            </div>
-
-            <div className="delivery-import-grid">
-              <label className="delivery-action-tile">
-                <FileXls size={42} />
-                <strong>Carga masiva</strong>
-                <span>Excel, XLSX, XLS o CSV</span>
-                <input
-                  hidden
-                  type="file"
-                  accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
-                  onChange={(event) => {
-                    importSpreadsheet(event.target.files?.[0]);
-                    event.target.value = "";
-                  }}
-                />
-              </label>
-              <div className="delivery-action-tile">
-                <UserPlus size={42} />
-                <strong>Carga manual</strong>
-                <span>Agrega o actualiza un alumno abajo</span>
-              </div>
-            </div>
-
-            <form className="delivery-form" onSubmit={addStudent}>
-              <label className="delivery-field delivery-field-wide">
-                <span>Nombre completo</span>
-                <input
-                  required
-                  value={studentForm.name}
-                  onChange={(event) => setStudentForm({ ...studentForm, name: event.target.value })}
-                  placeholder="Nombre y apellidos"
-                />
-              </label>
-              <label className="delivery-field delivery-field-wide">
-                <span>Plantel</span>
-                <input
-                  value={studentForm.school}
-                  onChange={(event) => setStudentForm({ ...studentForm, school: event.target.value })}
-                  placeholder="Opcional"
-                />
-              </label>
-              <label className="delivery-field">
-                <span>Especialidad</span>
-                <input
-                  value={studentForm.specialty}
-                  onChange={(event) => setStudentForm({ ...studentForm, specialty: event.target.value })}
-                  placeholder="Opcional"
-                />
-              </label>
-              <label className="delivery-field">
-                <span>Semestre</span>
-                <input
-                  value={studentForm.semester}
-                  onChange={(event) => setStudentForm({ ...studentForm, semester: event.target.value })}
-                  placeholder="Ej. 4"
-                />
-              </label>
-              <label className="delivery-field">
-                <span>Grupo</span>
-                <input
-                  value={studentForm.group}
-                  onChange={(event) => setStudentForm({ ...studentForm, group: event.target.value })}
-                  placeholder="Ej. B"
-                />
-              </label>
-              <button className="btn primary delivery-form-submit" type="submit">
-                {editingStudentId ? <PencilSimple size={18} /> : <Plus size={18} />}
-                {editingStudentId ? "Actualizar alumno" : "Guardar alumno"}
-              </button>
-              {editingStudentId && (
-                <button
-                  className="btn delivery-form-submit"
-                  type="button"
-                  onClick={() => {
-                    setEditingStudentId("");
-                    setStudentForm({ name: "", school: "", specialty: "", semester: "", group: "" });
-                    setNotice("");
-                  }}
-                >
-                  Cancelar edición
-                </button>
-              )}
-            </form>
-
-            <div className="delivery-list-toolbar">
-              <strong>{state.students.length} alumnos</strong>
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar alumno"
-              />
-            </div>
-            <div className="delivery-student-list compact">
-              {filteredStudents.map((student) => (
-                <div className="delivery-base-row" key={student.id}>
-                  <Blobatar name={student.name || "Alumno"} size={44} />
-                  <div>
-                    <strong>{student.name}</strong>
-                    <span>
-                      {[student.specialty, student.semester && `${student.semester}°`, student.group]
-                        .filter(Boolean)
-                        .join(" · ") || student.school || "Sin datos adicionales"}
-                    </span>
-                  </div>
-                  <div className="delivery-base-actions">
-                    <button
-                      className="btn"
-                      type="button"
-                      aria-label={`Editar ${student.name}`}
-                      onClick={() => editStudent(student)}
-                    >
-                      <PencilSimple size={18} />
-                    </button>
-                    <button
-                      className="btn delivery-danger"
-                      type="button"
-                      aria-label={`Eliminar ${student.name}`}
-                      onClick={() => deleteStudent(student.id)}
-                    >
-                      <Trash size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
         )}
 
         {view === "new-week" && (
@@ -1036,17 +1451,26 @@ export default function DeliveryRegistry({ onClose }) {
                 <span className="delivery-kicker">Nueva semana</span>
                 <h2>Configura el periodo de entrega</h2>
               </div>
-              <button className="btn" type="button" onClick={() => setView("home")}>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setView("home")}
+              >
                 Volver
               </button>
             </div>
-            <form className="delivery-form delivery-week-form" onSubmit={addWeek}>
+            <form
+              className="delivery-form delivery-week-form"
+              onSubmit={(event) => addWeek(event, false)}
+            >
               <label className="delivery-field delivery-field-wide">
                 <span>Nombre de la semana</span>
                 <input
                   value={weekForm.label}
-                  onChange={(event) => setWeekForm({ ...weekForm, label: event.target.value })}
-                  placeholder={`Semana ${state.weeks.length + 1}`}
+                  onChange={(event) =>
+                    setWeekForm({ ...weekForm, label: event.target.value })
+                  }
+                  placeholder={"Semana " + (state.weeks.length + 1)}
                 />
               </label>
               <label className="delivery-field">
@@ -1054,7 +1478,9 @@ export default function DeliveryRegistry({ onClose }) {
                 <input
                   type="date"
                   value={weekForm.startDate}
-                  onChange={(event) => setWeekForm({ ...weekForm, startDate: event.target.value })}
+                  onChange={(event) =>
+                    setWeekForm({ ...weekForm, startDate: event.target.value })
+                  }
                 />
               </label>
               <label className="delivery-field">
@@ -1063,57 +1489,122 @@ export default function DeliveryRegistry({ onClose }) {
                   required
                   type="datetime-local"
                   value={weekForm.dueAt}
-                  onChange={(event) => setWeekForm({ ...weekForm, dueAt: event.target.value })}
+                  onChange={(event) =>
+                    setWeekForm({ ...weekForm, dueAt: event.target.value })
+                  }
                 />
               </label>
-              <button className="btn primary delivery-form-submit" type="submit">
+              <button
+                className="btn primary delivery-form-submit"
+                type="submit"
+              >
                 Crear semana
               </button>
             </form>
           </section>
         )}
 
-        {view === "week" && activeWeek && (
+        {view === "week" && activeWeek && activeSummary && (
           <>
             <section className="delivery-week-head">
-              <button className="btn" type="button" onClick={() => setView("home")}>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setView("home")}
+              >
                 <ArrowLeft size={18} />
                 Semanas
               </button>
               <div>
-                <span className="delivery-kicker">Registro activo</span>
+                <span className="delivery-kicker">
+                  {activeWeek.closedAt ? "Semana cerrada" : "Registro activo"}
+                </span>
                 <h2>{activeWeek.label}</h2>
                 <p>Fecha límite: {formatDateTime(activeWeek.dueAt)}</p>
               </div>
-              <button
-                className="btn primary"
-                type="button"
-                disabled={!state.students.length}
-                onClick={() => setView("scanner")}
-              >
-                <Camera size={18} />
-                Escanear con cámara
-              </button>
+              <div className="delivery-week-head-actions">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => exportWeekCsv(state, activeWeek.id)}
+                >
+                  <DownloadSimple size={18} />
+                  CSV
+                </button>
+                <button className="btn" type="button" onClick={toggleWeekClosed}>
+                  {activeWeek.closedAt ? "Reabrir" : "Cerrar semana"}
+                </button>
+                <button
+                  className="btn primary"
+                  type="button"
+                  disabled={
+                    !state.students.length || Boolean(activeWeek.closedAt)
+                  }
+                  onClick={() => setView("scanner")}
+                >
+                  <Camera size={18} />
+                  Escanear
+                </button>
+              </div>
             </section>
 
             <section className="delivery-stat-row">
-              {["entregado", "entregado_tarde", "no_entregado"].map((status) => {
-                const meta = statusMeta[status];
-                const count = state.students.filter(
-                  (student) => deliveryStatus(activeWeek, student.id) === status,
-                ).length;
-                return (
-                  <article key={status}>
-                    <span>{meta.label}</span>
-                    <strong>{count}</strong>
-                  </article>
-                );
-              })}
+              {["entregado", "entregado_tarde", "no_entregado"].map(
+                (status) => {
+                  const meta = statusMeta[status];
+                  return (
+                    <button
+                      type="button"
+                      className={
+                        statusFilter === status
+                          ? "delivery-stat-card active"
+                          : "delivery-stat-card"
+                      }
+                      key={status}
+                      onClick={() =>
+                        setStatusFilter((current) =>
+                          current === status ? "all" : status,
+                        )
+                      }
+                    >
+                      <span>{meta.label}</span>
+                      <strong>{activeSummary[status]}</strong>
+                    </button>
+                  );
+                },
+              )}
+            </section>
+
+            <section className="delivery-completion">
+              <div>
+                <strong>{activeSummary.percent}% registrado</strong>
+                <span>
+                  {activeSummary.registered} de {activeSummary.total} alumnos
+                </span>
+              </div>
+              <div>
+                <i style={{ width: activeSummary.percent + "%" }} />
+              </div>
             </section>
 
             <section className="delivery-panel">
               <div className="delivery-list-toolbar">
-                <strong>Alumnos</strong>
+                <div>
+                  <strong>
+                    {statusFilter === "all"
+                      ? "Todos los alumnos"
+                      : statusMeta[statusFilter].label}
+                  </strong>
+                  {statusFilter !== "all" && (
+                    <button
+                      className="delivery-clear-filter"
+                      type="button"
+                      onClick={() => setStatusFilter("all")}
+                    >
+                      Mostrar todos
+                    </button>
+                  )}
+                </div>
                 <input
                   type="search"
                   value={search}
@@ -1122,7 +1613,15 @@ export default function DeliveryRegistry({ onClose }) {
                 />
               </div>
               <div className="delivery-student-list">
-                {filteredStudents.map((student) => renderStatus(activeWeek, student))}
+                {filteredStudents.length ? (
+                  filteredStudents.map((student) =>
+                    renderStatus(activeWeek, student),
+                  )
+                ) : (
+                  <div className="delivery-empty-week">
+                    No hay alumnos con este filtro.
+                  </div>
+                )}
               </div>
             </section>
           </>
@@ -1134,7 +1633,10 @@ export default function DeliveryRegistry({ onClose }) {
               <div>
                 <span className="delivery-kicker">Escaneo continuo</span>
                 <h2>{activeWeek.label}</h2>
-                <p>No cierres la cámara entre alumnos. Pasa una bitácora tras otra.</p>
+                <p>
+                  Mantén la cámara abierta y pasa una bitácora tras otra. No
+                  tienes que tocar nada entre alumnos.
+                </p>
               </div>
               <div className="delivery-scan-counter">
                 <strong>{scanQueue.length}</strong>
@@ -1153,12 +1655,14 @@ export default function DeliveryRegistry({ onClose }) {
               </div>
               {scanBox && (
                 <div
-                  className={`delivery-detection-box ${scanBox.tone || "ok"}`}
+                  className={
+                    "delivery-detection-box " + (scanBox.tone || "ok")
+                  }
                   style={{
-                    left: `${scanBox.left}%`,
-                    top: `${scanBox.top}%`,
-                    width: `${scanBox.width}%`,
-                    height: `${scanBox.height}%`,
+                    left: scanBox.left + "%",
+                    top: scanBox.top + "%",
+                    width: scanBox.width + "%",
+                    height: scanBox.height + "%",
                   }}
                 >
                   <span>DATA MATRIX</span>
@@ -1174,25 +1678,44 @@ export default function DeliveryRegistry({ onClose }) {
               <div className="delivery-scanner-error">
                 <strong>No se pudo iniciar el lector.</strong>
                 <p>{scannerError}</p>
-                <p>Puedes volver a la semana y registrar entregas manualmente.</p>
+                <p>
+                  Puedes volver a la semana y registrar entregas manualmente.
+                </p>
               </div>
             )}
 
             <div className="delivery-scan-results">
-              {scanQueue.slice(-5).reverse().map((item) => (
-                <div key={item.studentId}>
-                  <Blobatar name={item.name} size={38} />
-                  <span>{item.name}</span>
-                  <strong>{new Date(item.at).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</strong>
-                </div>
-              ))}
+              {scanQueue
+                .slice(-6)
+                .reverse()
+                .map((item) => (
+                  <div key={item.studentId}>
+                    <Blobatar name={item.name} size={38} />
+                    <span>{item.name}</span>
+                    <strong>
+                      {new Date(item.at).toLocaleTimeString("es-MX", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })}
+                    </strong>
+                  </div>
+                ))}
             </div>
 
             <div className="delivery-scanner-actions">
-              <button className="btn" type="button" onClick={() => setView("week")}>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => setView("week")}
+              >
                 Cancelar
               </button>
-              <button className="btn primary" type="button" onClick={finishScan}>
+              <button
+                className="btn primary"
+                type="button"
+                onClick={finishScan}
+              >
                 Terminar registro
               </button>
             </div>
