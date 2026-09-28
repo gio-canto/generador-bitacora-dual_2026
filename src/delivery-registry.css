@@ -501,6 +501,9 @@ label.delivery-action-tile:hover{background:#f0f0f3;transform:translateY(-1px)}
 }
 .delivery-camera-live{
   flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
   padding:5px 7px;
   border-radius:7px;
   background:#1a6f35;
@@ -508,6 +511,21 @@ label.delivery-action-tile:hover{background:#f0f0f3;transform:translateY(-1px)}
   font:700 10px ui-monospace,SFMono-Regular,Menlo,monospace;
   letter-spacing:.08em;
 }
+.delivery-camera-hud.ok .delivery-camera-live{
+  background:#1a6f35;
+  color:#d9ffe4;
+}
+.delivery-camera-hud.seen .delivery-camera-live{
+  background:#705408;
+  color:#fff2bf;
+}
+.delivery-camera-hud.error .delivery-camera-live{
+  background:#8f251f;
+  color:#ffe2df;
+}
+.delivery-camera-hud.ok{border-color:rgba(125,255,155,.34)}
+.delivery-camera-hud.seen{border-color:rgba(255,208,91,.32)}
+.delivery-camera-hud.error{border-color:rgba(255,98,88,.34)}
 .delivery-camera-hud strong{
   min-width:0;
   font:650 13px ui-monospace,SFMono-Regular,Menlo,monospace;
