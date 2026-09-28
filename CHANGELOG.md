@@ -1,3 +1,14 @@
+# Registro de entrega · en desarrollo
+
+- Nuevo **Subsistema de registro de entrega** para escuelas y responsables, integrado como una página independiente dentro del generador.
+- Base local de alumnos con captura manual e importación masiva desde Excel/CSV.
+- Archivo portátil JSON para mover alumnos, semanas y entregas entre dispositivos; el estado también se conserva en el navegador.
+- Creación de semanas con fecha/hora límite y estados automáticos: **Entregado**, **Entregado a destiempo** y **No entregado**.
+- Registro manual y escaneo continuo por cámara de códigos **Data Matrix**, con sonido de confirmación, marco industrial de detección y cola de lecturas sin cerrar la cámara entre alumnos.
+- Cada PDF de bitácora incorpora un Data Matrix con el nombre completo del alumno.
+- La vista de cada semana muestra Blobatar, hora de registro, origen de la captura y controles para corregir un registro.
+- Al terminar una sesión de cámara se guarda la información y se descarga una copia actualizada del archivo portátil.
+
 # Notas de versión
 
 ## 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
