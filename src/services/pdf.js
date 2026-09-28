@@ -314,7 +314,7 @@ function rect(c, x, y, w, h, fill, stroke, lw, p) {
   }
 }
 function drawStudentDataMatrix(c, student, p) {
-  const value = String(student || "").replace(/\\s+/g, " ").trim();
+  const value = String(student || "").replace(/\s+/g, " ").trim();
   if (!value || !globalThis.bwipjs?.toCanvas) return;
   const code = document.createElement("canvas");
   const render = (text) =>
@@ -332,7 +332,7 @@ function drawStudentDataMatrix(c, student, p) {
       render(
         value
           .normalize("NFD")
-          .replace(/[\\u0300-\\u036f]/g, ""),
+          .replace(/[\u0300-\u036f]/g, ""),
       );
     } catch {
       return;
