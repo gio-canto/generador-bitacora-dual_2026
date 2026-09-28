@@ -416,17 +416,50 @@ export default function DeliveryRegistry({ onClose }) {
     };
   }, [view, activeWeekId]);
 
+  const startSetup = () => {
+    setContextForm(
+      createRegistryContext(
+        contextIsComplete(state.context)
+          ? state.context
+          : generatorSnapshot.context,
+      ),
+    );
+    setSetupStep(0);
+    setView("setup");
+  };
+
+  const saveContext = () => {
+    const context = createRegistryContext(contextForm);
+    if (!contextIsComplete(context)) {
+      setNotice("Completa plantel, especialidad, semestre y grupo.");
+      return false;
+    }
+    commit({ ...state, context });
+    setContextForm(context);
+    setNotice("");
+    return true;
+  };
+
   const importPortable = async (file) => {
     if (!file) return;
     try {
       const imported = parsePortableDeliveryFile(await file.text());
       const saved = writeDeliveryState(imported);
       setState(saved);
+      setContextForm(saved.context);
       setActiveWeekId(saved.weeks.at(-1)?.id || "");
       setNotice(
-        `Archivo cargado: ${saved.students.length} alumnos y ${saved.weeks.length} semanas.`,
+        "Archivo cargado: " +
+          saved.students.length +
+          " alumnos y " +
+          saved.weeks.length +
+          " semanas.",
       );
-      setView("home");
+      setView(
+        saved.weeks.length || saved.students.length || contextIsComplete(saved.context)
+          ? "home"
+          : "welcome",
+      );
     } catch (error) {
       setNotice(error?.message || "No se pudo cargar el archivo.");
     }
@@ -445,48 +478,75 @@ export default function DeliveryRegistry({ onClose }) {
       const merged = mergeStudents(state.students, incoming);
       commit({ ...state, students: merged.students });
       setNotice(
-        `Base actualizada: ${merged.added} nuevos, ${merged.updated} actualizados${merged.skipped ? `, ${merged.skipped} omitidos` : ""}.`,
+        "Base actualizada: " +
+          merged.added +
+          " nuevos y " +
+          merged.updated +
+          " ya existentes.",
       );
     } catch (error) {
       setNotice(error?.message || "No se pudo leer el archivo de alumnos.");
     }
   };
 
+  const syncGeneratorStudents = () => {
+    const incoming = studentsFromGenerator(generatorSnapshot, contextForm);
+    if (!incoming.length) {
+      setNotice(
+        "No encontré bitácoras guardadas de este mismo plantel, especialidad, semestre y grupo.",
+      );
+      return;
+    }
+    const merged = mergeStudents(state.students, incoming);
+    commit({ ...state, students: merged.students });
+    setNotice(
+      "Se cruzó la base con el generador: " +
+        merged.added +
+        " alumnos agregados y " +
+        merged.updated +
+        " ya existentes.",
+    );
+  };
+
   const addStudent = (event) => {
     event.preventDefault();
-    if (!studentForm.name.trim()) return;
+    const name = String(studentForm.name || "").replace(/\s+/g, " ").trim();
+    if (!name) return;
+
     if (editingStudentId) {
-      const students = state.students.map((student) =>
-        student.id === editingStudentId
-          ? {
-              ...student,
-              ...studentForm,
-              name: studentForm.name.replace(/\s+/g, " ").trim(),
-            }
-          : student,
+      const duplicate = state.students.some(
+        (student) =>
+          student.id !== editingStudentId &&
+          student.name.localeCompare(name, "es", { sensitivity: "base" }) === 0,
       );
-      commit({ ...state, students });
+      if (duplicate) {
+        setNotice("Ya existe otro alumno con ese nombre.");
+        return;
+      }
+      commit({
+        ...state,
+        students: state.students.map((student) =>
+          student.id === editingStudentId ? { ...student, name } : student,
+        ),
+      });
       setEditingStudentId("");
-      setStudentForm({ name: "", school: "", specialty: "", semester: "", group: "" });
+      setStudentForm({ name: "" });
       setNotice("Alumno actualizado.");
       return;
     }
-    const merged = mergeStudents(state.students, [studentForm]);
+
+    const merged = mergeStudents(state.students, [{ name }]);
     commit({ ...state, students: merged.students });
-    setStudentForm({ name: "", school: "", specialty: "", semester: "", group: "" });
-    setNotice(merged.added ? "Alumno agregado." : "Alumno actualizado.");
+    setStudentForm({ name: "" });
+    setNotice(
+      merged.added ? "Alumno agregado." : "Ese alumno ya estaba en la base.",
+    );
   };
 
   const editStudent = (student) => {
     setEditingStudentId(student.id);
-    setStudentForm({
-      name: student.name || "",
-      school: student.school || "",
-      specialty: student.specialty || "",
-      semester: student.semester || "",
-      group: student.group || "",
-    });
-    setNotice(`Editando a ${student.name}. Guarda los cambios para aplicarlos.`);
+    setStudentForm({ name: student.name || "" });
+    setNotice("Editando a " + student.name + ".");
   };
 
   const deleteStudent = (studentId) => {
@@ -502,14 +562,20 @@ export default function DeliveryRegistry({ onClose }) {
     commit(next);
   };
 
-  const addWeek = (event) => {
-    event.preventDefault();
+  const addWeek = (event, downloadAfter = false) => {
+    event?.preventDefault?.();
     if (!weekForm.dueAt) {
-      setNotice("Define la fecha y hora límite para poder detectar entregas a destiempo.");
+      setNotice(
+        "Define la fecha y hora límite para distinguir entregas a tiempo y a destiempo.",
+      );
+      return;
+    }
+    if (!state.students.length) {
+      setNotice("Agrega al menos un alumno antes de crear la semana.");
       return;
     }
     const week = createWeek({
-      label: weekForm.label || `Semana ${state.weeks.length + 1}`,
+      label: weekForm.label || "Semana " + (state.weeks.length + 1),
       startDate: weekForm.startDate,
       dueAt: new Date(weekForm.dueAt).toISOString(),
     });
@@ -517,12 +583,12 @@ export default function DeliveryRegistry({ onClose }) {
     setActiveWeekId(week.id);
     setWeekForm({ label: "", startDate: "", dueAt: "" });
     setNotice("");
+    if (downloadAfter) exportDeliveryState(saved);
     setView("week");
-    return saved;
   };
 
   const registerManual = (studentId) => {
-    if (!activeWeek) return;
+    if (!activeWeek || activeWeek.closedAt) return;
     const weeks = state.weeks.map((week) =>
       week.id === activeWeek.id
         ? registerDelivery(week, studentId, new Date().toISOString(), "manual")
@@ -532,7 +598,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const undoDelivery = (studentId) => {
-    if (!activeWeek) return;
+    if (!activeWeek || activeWeek.closedAt) return;
     commit({
       ...state,
       weeks: state.weeks.map((week) =>
@@ -541,8 +607,19 @@ export default function DeliveryRegistry({ onClose }) {
     });
   };
 
-  const finishScan = () => {
+  const toggleWeekClosed = () => {
     if (!activeWeek) return;
+    const closedAt = activeWeek.closedAt ? "" : new Date().toISOString();
+    commit({
+      ...state,
+      weeks: state.weeks.map((week) =>
+        week.id === activeWeek.id ? { ...week, closedAt } : week,
+      ),
+    });
+  };
+
+  const finishScan = () => {
+    if (!activeWeek || activeWeek.closedAt) return;
     let updatedWeek = activeWeek;
     for (const item of scanQueue)
       updatedWeek = registerDelivery(
@@ -563,14 +640,24 @@ export default function DeliveryRegistry({ onClose }) {
 
   const filteredStudents = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("es-MX");
-    if (!term) return state.students;
-    return state.students.filter((student) =>
-      [student.name, student.school, student.specialty, student.group]
-        .join(" ")
-        .toLocaleLowerCase("es-MX")
-        .includes(term),
+    let list = state.students.filter((student) =>
+      student.name.toLocaleLowerCase("es-MX").includes(term),
     );
-  }, [state.students, search]);
+    if (activeWeek && statusFilter !== "all")
+      list = list.filter(
+        (student) => deliveryStatus(activeWeek, student.id) === statusFilter,
+      );
+    if (activeWeek) {
+      const order = { no_entregado: 0, entregado_tarde: 1, entregado: 2 };
+      list = [...list].sort((a, b) => {
+        const difference =
+          order[deliveryStatus(activeWeek, a.id)] -
+          order[deliveryStatus(activeWeek, b.id)];
+        return difference || a.name.localeCompare(b.name, "es");
+      });
+    }
+    return list;
+  }, [state.students, search, activeWeek, statusFilter]);
 
   const renderStatus = (week, student) => {
     const status = deliveryStatus(week, student.id);
