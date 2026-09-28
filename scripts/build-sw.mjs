@@ -1,7 +1,7 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 const files = await readdir("dist/assets");
-const staticPages = ["faq", "privacy", "terms", "accessibility", "acknowledgements"];
+const staticPages = ["faq", "privacy", "terms", "accessibility", "acknowledgements", "registro-entrega"];
 const pagePaths = staticPages.flatMap((page) => [
   `./${page}/`,
   `./${page}/index.html`,
