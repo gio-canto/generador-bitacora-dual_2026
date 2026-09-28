@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.5-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.6-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,13 +13,15 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.5 · Registro de entrega · Parte 5
+## Beta 0.50.0-beta.6 · Registro de entrega · Parte 6
 
-La serie 0.50 incorpora el **Subsistema de registro de entrega** como página independiente. El plantel mantiene una base común; cada alumno conserva nombre, especialidad y empresa. Las bitácoras generan un Data Matrix con esos tres datos para registrar entregas por cámara, en serie y con fecha, hora y estado.
+La serie 0.50 incorpora el **Subsistema de registro de entrega** como página independiente. El plantel mantiene una base común; cada alumno conserva nombre, especialidad y empresa.
 
-La versión actual añade avisos coherentes con Sileo, estados visuales del escáner, tutorial consultable en cualquier momento, actualización del service worker también dentro del registro, exportación CSV semanal y documentación específica en la FAQ.
+La versión actual corrige la lectura del Data Matrix y añade el **periodo de la bitácora** al identificador. El código contiene nombre, especialidad, empresa, fecha inicial y fecha final. El escáner puede recibir bitácoras de distintas semanas en una misma sesión, ubicarlas automáticamente en su semana y marcar como **Entregado a destiempo** aquellas recibidas después de su fecha y hora límite.
 
-La numeración de esta serie sigue los cambios funcionales publicados en `main`: 0.50.0-beta.1 (subsistema inicial), beta.2 (página independiente y corrección del Data Matrix), beta.3 (registro a nivel plantel), beta.4 (identidad completa y tutorial/actualización) y beta.5 (avisos y estados visuales).
+También se aumentó el tamaño físico del Data Matrix, se compactó su contenido, se fijó explícitamente el bundle UMD de ZXing Browser y se añadió **Leer imagen** como método alterno de prueba.
+
+La numeración de esta serie sigue los cambios funcionales publicados en `main`: beta.1 (subsistema inicial), beta.2 (página independiente y corrección del Data Matrix), beta.3 (registro a nivel plantel), beta.4 (identidad completa y tutorial/actualización), beta.5 (avisos y estados visuales) y beta.6 (lectura corregida y clasificación automática por periodo).
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
@@ -52,7 +54,7 @@ No hay cuentas ni servidor de bitácoras. Los datos permanecen en el navegador. 
 
 Acceso directo: **[Abrir Subsistema de registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/)**.
 
-El plantel configura una sola base de alumnos. Cada alumno conserva nombre, especialidad y empresa. Las bitácoras incluyen un **Data Matrix** que permite registrar entregas por cámara en serie y guardar fecha, hora y estado de la entrega.
+El plantel configura una sola base de alumnos. Cada alumno conserva nombre, especialidad y empresa. Las bitácoras incluyen un **Data Matrix** con identidad y periodo (fecha inicial y fecha final). El escáner puede mezclar varias semanas en una misma sesión, ubicar cada bitácora en la semana correspondiente y calcular automáticamente si la entrega fue a tiempo o a destiempo.
 
 ## Uso rápido
 
