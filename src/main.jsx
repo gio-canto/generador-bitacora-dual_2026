@@ -33,22 +33,37 @@ window.addEventListener("bitacora-update", (event) => {
   const banner = document.createElement("div");
   banner.id = "updateNotice";
   banner.className = "update-notice";
-  banner.append("Hay una nueva versión disponible. ");
+  banner.setAttribute("role", "status");
+  banner.setAttribute("aria-live", "polite");
+
+  const mark = document.createElement("span");
+  mark.className = "update-notice-mark";
+  mark.setAttribute("aria-hidden", "true");
+  mark.textContent = "↑";
+
+  const copy = document.createElement("div");
+  copy.className = "update-notice-copy";
+  const title = document.createElement("strong");
+  title.textContent = "Nueva versión disponible";
+  const description = document.createElement("span");
+  description.textContent = "Actualiza para usar la versión más reciente.";
+  copy.append(title, description);
+
   const button = document.createElement("button");
-  button.className = "btn";
-  button.textContent = "Actualizar";
+  button.className = "btn primary";
+  button.textContent = "Actualizar ahora";
   button.onclick = () => {
     window.dispatchEvent(new Event("pagehide"));
     button.disabled = true;
     button.textContent = "Actualizando…";
     const worker = pendingWorker;
-    worker.addEventListener('statechange', () => {
-      if (worker.state === 'activated') location.reload();
+    worker.addEventListener("statechange", () => {
+      if (worker.state === "activated") location.reload();
     });
-    if (worker.state === 'activated') location.reload();
+    if (worker.state === "activated") location.reload();
     else worker.postMessage({ type: "SKIP_WAITING" });
   };
-  banner.append(button);
+  banner.append(mark, copy, button);
   const anchor = document.querySelector(".topbar, .delivery-topbar");
   if (anchor) anchor.after(banner);
   else document.body.prepend(banner);

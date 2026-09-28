@@ -1,5 +1,8 @@
 # Registro de entrega · en desarrollo
 
+- Los avisos del subsistema usan ahora el sistema de notificaciones existente con **Sileo** para confirmaciones breves y tarjetas contextuales para errores o datos faltantes.
+- Se mejoró el aviso de **Nueva versión disponible** con jerarquía visual, descripción y botón de actualización.
+- El lector muestra estados industriales diferenciados para lectura correcta, repetida o no coincidente, sin llenar la pantalla de avisos.
 - El tutorial del registro puede abrirse en cualquier momento sin perder la pantalla actual; durante el tutorial el lector ignora nuevas detecciones.
 - El aviso **Hay una nueva versión disponible** funciona también dentro de `/registro-entrega/`.
 - El Data Matrix identifica ahora la combinación **nombre + especialidad + empresa**; los códigos anteriores con sólo nombre siguen siendo compatibles cuando no existe ambigüedad.
