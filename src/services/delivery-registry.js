@@ -1,7 +1,12 @@
-export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v3";
-export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v2";
-export const LEGACY_DELIVERY_KEY = "bitacora_dual_delivery_registry_v1";
-export const DELIVERY_SCHEMA = 3;
+import companies from "../data/companies.json";
+
+export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v4";
+export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v3";
+export const LEGACY_DELIVERY_KEYS = [
+  "bitacora_dual_delivery_registry_v2",
+  "bitacora_dual_delivery_registry_v1",
+];
+export const DELIVERY_SCHEMA = 4;
 
 const uid = () =>
   globalThis.crypto?.randomUUID?.() ||
@@ -17,6 +22,14 @@ export function normalizeName(value) {
   return clean(value, 180)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es-MX");
+}
+
+function normalizeMatrixText(value, max = 180) {
+  return clean(value, max)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\|/g, "/")
     .toLocaleLowerCase("es-MX");
 }
 
@@ -41,50 +54,129 @@ function decodeMatrixField(value) {
   return clean(new TextDecoder().decode(bytes));
 }
 
+function validIsoDate(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""));
+}
+
+function datePlusDays(value, days) {
+  if (!validIsoDate(value)) return "";
+  const date = new Date(`${value}T12:00:00Z`);
+  if (!Number.isFinite(+date)) return "";
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function compactDate(value) {
+  return validIsoDate(value) ? value.replaceAll("-", "") : "";
+}
+
+function expandCompactDate(value) {
+  const raw = String(value || "");
+  if (!/^\d{8}$/.test(raw)) return "";
+  const iso = `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+  return validIsoDate(iso) ? iso : "";
+}
+
+export function companyMatrixValue(value) {
+  const name = clean(value, 220);
+  const preset = companies.find((company) => company.name === name);
+  return normalizeMatrixText(preset?.shortName || name, 80);
+}
+
+export function matrixPeriodFromData(data = {}) {
+  const dates = Array.isArray(data.entries)
+    ? data.entries
+        .map((entry) => clean(entry?.date, 10))
+        .filter(validIsoDate)
+        .sort()
+    : [];
+  const startDate =
+    clean(data.startDate, 10) ||
+    dates[0] ||
+    (validIsoDate(data.weekDate) ? clean(data.weekDate, 10) : "");
+  const endDate =
+    clean(data.endDate, 10) ||
+    dates.at(-1) ||
+    (startDate ? datePlusDays(startDate, 3) : "");
+  return {
+    startDate: validIsoDate(startDate) ? startDate : "",
+    endDate: validIsoDate(endDate) ? endDate : "",
+  };
+}
+
 export function createMatrixPayload(data = {}) {
-  const name = clean(data.name ?? data.student, 180);
+  const name = normalizeMatrixText(data.name ?? data.student, 180);
   if (!name) return "";
+  const { startDate, endDate } = matrixPeriodFromData(data);
   return [
     "BD26",
-    "3",
-    encodeMatrixField(name),
-    encodeMatrixField(data.specialty),
-    encodeMatrixField(data.company),
+    "4",
+    name,
+    normalizeMatrixText(data.specialty, 120),
+    companyMatrixValue(data.company),
+    compactDate(startDate),
+    compactDate(endDate),
   ].join("|");
 }
 
 export function parseMatrixPayload(rawValue) {
   const raw = clean(rawValue, 900);
-  if (!raw) return { version: 0, name: "", specialty: "", company: "" };
+  const empty = {
+    version: 0,
+    name: "",
+    specialty: "",
+    company: "",
+    startDate: "",
+    endDate: "",
+  };
+  if (!raw) return empty;
 
   const parts = raw.split("|");
-  if (parts[0]?.toUpperCase() === "BD26" && parts[1] === "3" && parts.length >= 5) {
+  if (
+    parts[0]?.toUpperCase() === "BD26" &&
+    parts[1] === "4" &&
+    parts.length >= 7
+  ) {
+    return {
+      version: 4,
+      name: clean(parts[2], 180),
+      specialty: clean(parts[3], 120),
+      company: clean(parts[4], 80),
+      startDate: expandCompactDate(parts[5]),
+      endDate: expandCompactDate(parts[6]),
+    };
+  }
+
+  if (
+    parts[0]?.toUpperCase() === "BD26" &&
+    parts[1] === "3" &&
+    parts.length >= 5
+  ) {
     try {
       return {
         version: 3,
         name: decodeMatrixField(parts[2]),
         specialty: decodeMatrixField(parts[3]),
         company: decodeMatrixField(parts.slice(4).join("|")),
+        startDate: "",
+        endDate: "",
       };
     } catch {
-      return { version: 0, name: "", specialty: "", company: "" };
+      return empty;
     }
   }
 
   if (/^BD26\|/i.test(raw)) {
     return {
+      ...empty,
       version: 1,
       name: clean(raw.slice(5), 180),
-      specialty: "",
-      company: "",
     };
   }
 
   return {
-    version: 0,
+    ...empty,
     name: clean(raw, 180),
-    specialty: "",
-    company: "",
   };
 }
 
@@ -125,10 +217,14 @@ export function createStudent(data = {}) {
 }
 
 export function createWeek(data = {}) {
+  const startDate = clean(data.startDate, 10);
+  const endDate =
+    clean(data.endDate, 10) || (startDate ? datePlusDays(startDate, 3) : "");
   return {
     id: typeof data.id === "string" && data.id ? data.id : uid(),
     label: clean(data.label, 100) || "Semana",
-    startDate: clean(data.startDate, 10),
+    startDate: validIsoDate(startDate) ? startDate : "",
+    endDate: validIsoDate(endDate) ? endDate : "",
     dueAt: clean(data.dueAt, 40),
     createdAt:
       typeof data.createdAt === "string"
@@ -235,7 +331,7 @@ export function readDeliveryState(storage = globalThis.localStorage) {
     for (const key of [
       DELIVERY_KEY,
       PREVIOUS_DELIVERY_KEY,
-      LEGACY_DELIVERY_KEY,
+      ...LEGACY_DELIVERY_KEYS,
     ]) {
       const raw = storage?.getItem(key);
       if (!raw) continue;
@@ -367,7 +463,19 @@ export function findStudentByMatrixValue(students, rawValue) {
     (student) => normalizeName(student.name) === nameKey,
   );
 
-  if (payload.version >= 3) {
+  if (payload.version >= 4) {
+    const specialtyKey = normalizeName(payload.specialty);
+    const companyKey = normalizeMatrixText(payload.company, 80);
+    return (
+      byName.find(
+        (student) =>
+          normalizeName(student.specialty) === specialtyKey &&
+          companyMatrixValue(student.company) === companyKey,
+      ) || null
+    );
+  }
+
+  if (payload.version === 3) {
     const specialtyKey = normalizeName(payload.specialty);
     const companyKey = normalizeName(payload.company);
     return (
@@ -382,6 +490,28 @@ export function findStudentByMatrixValue(students, rawValue) {
   // Los códigos anteriores sólo tenían el nombre. Se aceptan únicamente
   // cuando ese nombre identifica a una sola persona en la base.
   return byName.length === 1 ? byName[0] : null;
+}
+
+export function findWeekByMatrixValue(weeks, rawValue, fallbackWeekId = "") {
+  const payload = parseMatrixPayload(rawValue);
+  if (payload.startDate && payload.endDate) {
+    return (
+      weeks.find(
+        (week) =>
+          week.startDate === payload.startDate &&
+          week.endDate === payload.endDate,
+      ) || null
+    );
+  }
+  if (fallbackWeekId)
+    return weeks.find((week) => week.id === fallbackWeekId) || null;
+  return weeks.length === 1 ? weeks[0] : null;
+}
+
+export function matrixPeriodLabel(rawValue) {
+  const { startDate, endDate } = parseMatrixPayload(rawValue);
+  if (!startDate || !endDate) return "";
+  return `${startDate} → ${endDate}`;
 }
 
 export function weekSummary(week, students) {
