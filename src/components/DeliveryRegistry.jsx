@@ -205,18 +205,27 @@ function ScanSound({ tone }) {
 }
 
 export default function DeliveryRegistry({ onClose }) {
-  const [state, setState] = useState(() => readDeliveryState());
-  const [view, setView] = useState("home");
+  const initialState = useMemo(() => readDeliveryState(), []);
+  const generatorSnapshot = useMemo(() => readGeneratorSnapshot(), []);
+  const initiallyStarted =
+    contextIsComplete(initialState.context) ||
+    initialState.students.length > 0 ||
+    initialState.weeks.length > 0;
+  const [state, setState] = useState(initialState);
+  const [view, setView] = useState(initiallyStarted ? "home" : "welcome");
   const [activeWeekId, setActiveWeekId] = useState(
-    () => readDeliveryState().weeks.at(-1)?.id || "",
+    initialState.weeks.at(-1)?.id || "",
   );
-  const [studentForm, setStudentForm] = useState({
-    name: "",
-    school: "",
-    specialty: "",
-    semester: "",
-    group: "",
-  });
+  const [contextForm, setContextForm] = useState(() =>
+    createRegistryContext(
+      contextIsComplete(initialState.context)
+        ? initialState.context
+        : generatorSnapshot.context,
+    ),
+  );
+  const [setupStep, setSetupStep] = useState(0);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [studentForm, setStudentForm] = useState({ name: "" });
   const [weekForm, setWeekForm] = useState({
     label: "",
     startDate: "",
@@ -225,6 +234,7 @@ export default function DeliveryRegistry({ onClose }) {
   const [editingStudentId, setEditingStudentId] = useState("");
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [scanQueue, setScanQueue] = useState([]);
   const [scanMessage, setScanMessage] = useState("Apunta la cámara al Data Matrix.");
   const [scanTone, setScanTone] = useState("");
