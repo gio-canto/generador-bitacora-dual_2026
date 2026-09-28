@@ -10,23 +10,28 @@ import { startSignatureFixes } from "./legacy/signatures.js";
 import { startEasterEgg } from "./legacy/easter-egg.js";
 import { recoverPreviousVersion } from "./services/recover-original.js";
 
+const isDeliveryPage = () =>
+  /\/registro-entrega\/?$/i.test(location.pathname) ||
+  location.hash === "#registro-entrega";
+
 // React owns the stable boundary; the original controller owns its descendants.
 // Do not render React children inside it or remount this single-page controller.
 export default function App() {
   const initialized = useRef(false);
-  const [deliveryMode, setDeliveryMode] = useState(
-    () => location.hash === "#registro-entrega",
-  );
+  const [deliveryMode, setDeliveryMode] = useState(isDeliveryPage);
 
   useEffect(() => {
-    const onHashChange = () =>
-      setDeliveryMode(location.hash === "#registro-entrega");
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
+    const syncRoute = () => setDeliveryMode(isDeliveryPage());
+    window.addEventListener("hashchange", syncRoute);
+    window.addEventListener("popstate", syncRoute);
+    return () => {
+      window.removeEventListener("hashchange", syncRoute);
+      window.removeEventListener("popstate", syncRoute);
+    };
   }, []);
 
   useLayoutEffect(() => {
-    if (initialized.current) return;
+    if (initialized.current || deliveryMode) return;
     initialized.current = true;
     recoverPreviousVersion();
     document.querySelectorAll(".field").forEach((field) => {
@@ -41,19 +46,20 @@ export default function App() {
     startEasterEgg();
     startProfile();
     startSpelling();
-  }, []);
+  }, [deliveryMode]);
 
-  return (
-    <>
-      <div hidden={deliveryMode} dangerouslySetInnerHTML={{ __html: shell }} />
-      {deliveryMode && (
-        <DeliveryRegistry
-          onClose={() => {
-            location.hash = "inicio";
-          }}
-        />
-      )}
-    </>
-  );
+  if (deliveryMode) {
+    return (
+      <DeliveryRegistry
+        onClose={() => {
+          if (/\/registro-entrega\/?$/i.test(location.pathname))
+            location.href = "../";
+          else location.hash = "inicio";
+        }}
+      />
+    );
+  }
+
+  return <div dangerouslySetInnerHTML={{ __html: shell }} />;
 }
 if (import.meta.hot) import.meta.hot.accept(() => location.reload());

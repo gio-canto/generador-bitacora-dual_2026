@@ -1450,6 +1450,61 @@ export function startEditor() {
         c.strokeRect(mm(x, p), mm(y, p), mm(w, p), mm(h, p));
       }
     }
+    function drawStudentDataMatrix(c, student, p) {
+      const value = String(student || "").replace(/\s+/g, " ").trim();
+      if (!value || !globalThis.bwipjs?.toCanvas) return false;
+
+      const code = document.createElement("canvas");
+      const draw = (text) =>
+        globalThis.bwipjs.toCanvas(code, {
+          bcid: "datamatrix",
+          text,
+          scale: 5,
+          padding: 0,
+          includetext: false,
+        });
+
+      try {
+        draw(value);
+      } catch {
+        try {
+          draw(
+            value
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, ""),
+          );
+        } catch {
+          return false;
+        }
+      }
+
+      const size = 13.2,
+        quiet = 1.25,
+        x = 2.4,
+        y = 2.4;
+      rect(
+        c,
+        x - quiet,
+        y - quiet,
+        size + quiet * 2,
+        size + quiet * 2,
+        "#fff",
+        null,
+        0,
+        p,
+      );
+      c.save();
+      c.imageSmoothingEnabled = false;
+      c.drawImage(
+        code,
+        mm(x, p),
+        mm(y, p),
+        mm(size, p),
+        mm(size, p),
+      );
+      c.restore();
+      return true;
+    }
     function styled(c, lines, x, y, s, lh, p) {
       lines.forEach((ln, ri) => {
         let cx = x;
@@ -1487,6 +1542,7 @@ export function startEditor() {
       const c = canvas.getContext("2d");
       c.fillStyle = "#fff";
       c.fillRect(0, 0, canvas.width, canvas.height);
+      const matrixReady = drawStudentDataMatrix(c, id.student, p);
       if (logoImage && logoImage.complete && logoImage.naturalWidth)
         c.drawImage(
           logoImage,
@@ -1804,7 +1860,7 @@ export function startEditor() {
             ),
           );
       });
-      return model;
+      return { ...model, matrixReady };
     }
     let previewTimer;
     function updatePreview() {
@@ -2007,7 +2063,11 @@ export function startEditor() {
       b.textContent = mb.textContent = "Generando…";
       try {
         const canvas = document.createElement("canvas");
-        drawPdfPage(canvas, 11.81);
+        const rendered = drawPdfPage(canvas, 11.81);
+        if (!rendered.matrixReady)
+          throw new Error(
+            "No se pudo generar el Data Matrix de identificación. Recarga la página antes de descargar el PDF.",
+          );
         const jpeg = await canvasToJpegBytes(canvas, 0.96),
           bytes = createPdf(jpeg, canvas.width, canvas.height),
           blob = new Blob([bytes], { type: "application/pdf" });
@@ -2020,7 +2080,9 @@ export function startEditor() {
         notify(
           "error",
           "No se pudo generar el PDF",
-          "Vuelve a intentarlo. Tu bitácora sigue aquí.",
+          err?.message?.includes("Data Matrix")
+            ? err.message
+            : "Vuelve a intentarlo. Tu bitácora sigue aquí.",
         );
       } finally {
         b.textContent = old;

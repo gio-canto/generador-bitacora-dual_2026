@@ -1,12 +1,16 @@
 # Registro de entrega · en desarrollo
 
-- Nuevo **Subsistema de registro de entrega** para escuelas y responsables, integrado como una página independiente dentro del generador.
-- Base local de alumnos con captura manual e importación masiva desde Excel/CSV.
-- Archivo portátil JSON para mover alumnos, semanas y entregas entre dispositivos; el estado también se conserva en el navegador.
-- Creación de semanas con fecha/hora límite y estados automáticos: **Entregado**, **Entregado a destiempo** y **No entregado**.
-- Registro manual y escaneo continuo por cámara de códigos **Data Matrix**, con sonido de confirmación, marco industrial de detección y cola de lecturas sin cerrar la cámara entre alumnos.
-- Cada PDF de bitácora incorpora un Data Matrix con el nombre completo del alumno.
-- La vista de cada semana muestra Blobatar, hora de registro, origen de la captura y controles para corregir un registro.
+- El subsistema vive ahora en la página independiente `/registro-entrega/`; se retiró del menú principal del generador.
+- Primer uso simplificado a dos tarjetas: **Tutorial** e **Ingresar**. Si no existe configuración, base ni semanas, el usuario entra siempre por esta pantalla.
+- Tutorial interactivo tarjeta por tarjeta, con avance, regreso y ejemplos visuales del flujo completo.
+- Configuración anti-fool en tres pasos: grupo compartido, alumnos y primera semana.
+- Plantel, especialidad, semestre, grupo y empresa se reutilizan desde los mismos catálogos del generador; ya no se duplican alumno por alumno.
+- La base puede cruzarse con las bitácoras ya guardadas en el generador local para recuperar alumnos del mismo grupo.
+- Se mantiene carga manual y Excel/CSV, Blobatar por alumno y archivo portátil JSON con migración del esquema anterior.
+- Las semanas incorporan avance porcentual, filtros por estado, cierre/reapertura, corrección manual y exportación CSV.
+- El escáner Data Matrix conserva la cámara abierta para lectura en serie, sonido de confirmación y cuadro industrial ajustado al recorte real de la cámara.
+- Se corrigió el **Data Matrix del generador base** en el renderizador que realmente genera y descarga el PDF; el código lleva el nombre completo del alumno y la descarga se bloquea con aviso si no puede generarse.
+- Estados automáticos: **Entregado**, **Entregado a destiempo** y **No entregado**, con fecha, hora y origen de cada registro.
 - Al terminar una sesión de cámara se guarda la información y se descarga una copia actualizada del archivo portátil.
 
 # Notas de versión
