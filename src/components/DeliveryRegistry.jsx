@@ -302,7 +302,10 @@ export default function DeliveryRegistry({ onClose }) {
         tone: kind,
       });
       clearTimeout(scanBoxTimer.current);
-      scanBoxTimer.current = setTimeout(() => setScanBox(null), 720);
+      scanBoxTimer.current = setTimeout(() => {
+        setScanBox(null);
+        setScanTone("");
+      }, 900);
     };
 
     const processValue = (rawValue, points) => {
@@ -1516,11 +1519,34 @@ export default function DeliveryRegistry({ onClose }) {
                     height: scanBox.height + "%",
                   }}
                 >
-                  <span>DATA MATRIX</span>
+                  <span>
+                    {scanBox.tone === "ok"
+                      ? "OK"
+                      : scanBox.tone === "seen"
+                        ? "REPETIDO"
+                        : "NO COINCIDE"}
+                  </span>
                 </div>
               )}
-              <div className="delivery-camera-hud">
-                <span className="delivery-camera-live">LECTOR ACTIVO</span>
+              <div className={"delivery-camera-hud " + (scanTone || "")}>
+                <span className="delivery-camera-live">
+                  {scanTone === "ok" ? (
+                    <CheckCircle size={15} weight="fill" />
+                  ) : scanTone === "error" ? (
+                    <WarningCircle size={15} weight="fill" />
+                  ) : scanTone === "seen" ? (
+                    <Info size={15} weight="fill" />
+                  ) : (
+                    <Scan size={15} />
+                  )}
+                  {scanTone === "ok"
+                    ? "REGISTRADO"
+                    : scanTone === "error"
+                      ? "NO COINCIDE"
+                      : scanTone === "seen"
+                        ? "REPETIDO"
+                        : "LECTOR ACTIVO"}
+                </span>
                 <strong>{scanMessage}</strong>
               </div>
             </div>
