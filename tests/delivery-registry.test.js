@@ -8,10 +8,8 @@ import {
   findStudentByMatrixValue,
   mergeStudents,
   parsePortableDeliveryFile,
-  readGeneratorSnapshot,
   registerDelivery,
   statusFromTimestamp,
-  studentsFromGenerator,
   weekSummary,
 } from "../src/services/delivery-registry.js";
 
@@ -30,7 +28,11 @@ describe("subsistema de registro de entrega", () => {
   });
 
   it("registra la hora y conserva el origen de la entrega", () => {
-    const student = createStudent({ name: "Virtual Insanity" });
+    const student = createStudent({
+      name: "Virtual Insanity",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
     const week = createWeek({
       label: "Semana 1",
       dueAt: "2026-09-30T20:00:00.000Z",
@@ -58,73 +60,57 @@ describe("subsistema de registro de entrega", () => {
     ).toBe(student.id);
   });
 
-  it("mantiene el contexto escolar una sola vez para toda la base", () => {
+  it("usa únicamente la escuela como configuración general", () => {
     const context = createRegistryContext({
       school: "CBTis 134",
       specialty: "Programación",
       semester: "4",
-      group: "b",
+      group: "B",
       company: "COCYTIEG",
     });
+    expect(context).toEqual({ school: "CBTis 134" });
     expect(contextIsComplete(context)).toBe(true);
-    expect(context.group).toBe("B");
-
-    const student = createStudent({
-      name: "Ana López",
-      specialty: "No debe duplicarse",
-    });
-    expect(student).not.toHaveProperty("specialty");
   });
 
-  it("actualiza alumnos repetidos sin duplicarlos", () => {
-    const original = createStudent({ name: "Ana López" });
+  it("guarda especialidad y empresa por alumno", () => {
+    const student = createStudent({
+      name: "Ana López",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    expect(student).toMatchObject({
+      name: "Ana López",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+  });
+
+  it("actualiza los datos de un alumno repetido sin duplicarlo", () => {
+    const original = createStudent({
+      name: "Ana López",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
     const result = mergeStudents([original], [
-      { name: "Ana Lopez" },
-      { name: "Luis Pérez" },
+      {
+        name: "Ana Lopez",
+        specialty: "Contabilidad",
+        company: "ITCH",
+      },
+      {
+        name: "Luis Pérez",
+        specialty: "Programación",
+        company: "COCYTIEG",
+      },
     ]);
     expect(result.students).toHaveLength(2);
     expect(result.updated).toBe(1);
     expect(result.added).toBe(1);
-    expect(result.students.find((student) => student.id === original.id)?.name).toBe(
-      "Ana Lopez",
-    );
-  });
-
-  it("cruza las bitácoras guardadas del generador con el mismo grupo", () => {
-    const storage = {
-      getItem(key) {
-        if (key === "bitacora_dual_react_v1") return null;
-        if (key === "bitacora_dual_clean_v3")
-          return JSON.stringify([
-            {
-              student: "Ana López",
-              school: "CBTis 134",
-              specialty: "Programación",
-              semester: "4",
-              group: "B",
-            },
-            {
-              student: "Luis Pérez",
-              school: "CBTis 134",
-              specialty: "Contabilidad",
-              semester: "4",
-              group: "B",
-            },
-          ]);
-        return null;
-      },
-    };
-    const snapshot = readGeneratorSnapshot(storage);
-    const matches = studentsFromGenerator(
-      snapshot,
-      createRegistryContext({
-        school: "CBTis 134",
-        specialty: "Programación",
-        semester: "4",
-        group: "B",
-      }),
-    );
-    expect(matches).toEqual([{ name: "Ana López" }]);
+    expect(result.students.find((student) => student.id === original.id)).toMatchObject({
+      name: "Ana Lopez",
+      specialty: "Contabilidad",
+      company: "ITCH",
+    });
   });
 
   it("resume el avance de una semana", () => {
@@ -158,18 +144,21 @@ describe("subsistema de registro de entrega", () => {
     });
   });
 
-  it("migra un archivo portátil anterior al esquema compartido", () => {
+  it("migra el esquema anterior y pasa especialidad y empresa a los alumnos", () => {
     const parsed = parsePortableDeliveryFile(
       JSON.stringify({
-        schemaVersion: 1,
+        schemaVersion: 2,
+        context: {
+          school: "CBTis 134",
+          specialty: "Programación",
+          semester: "4",
+          group: "B",
+          company: "COCYTIEG",
+        },
         students: [
           {
             id: "student-1",
             name: "Alumno de prueba",
-            school: "CBTis 134",
-            specialty: "Programación",
-            semester: "4",
-            group: "B",
           },
         ],
         weeks: [
@@ -181,13 +170,35 @@ describe("subsistema de registro de entrega", () => {
         ],
       }),
     );
-    expect(parsed.schemaVersion).toBe(2);
-    expect(parsed.students[0].name).toBe("Alumno de prueba");
-    expect(parsed.context).toMatchObject({
-      school: "CBTis 134",
+    expect(parsed.schemaVersion).toBe(3);
+    expect(parsed.context).toEqual({ school: "CBTis 134" });
+    expect(parsed.students[0]).toMatchObject({
+      name: "Alumno de prueba",
       specialty: "Programación",
-      semester: "4",
-      group: "B",
+      company: "COCYTIEG",
+    });
+  });
+
+  it("conserva datos individuales de archivos antiguos", () => {
+    const parsed = parsePortableDeliveryFile(
+      JSON.stringify({
+        schemaVersion: 1,
+        students: [
+          {
+            id: "student-1",
+            name: "Alumno de prueba",
+            school: "CBTis 134",
+            specialty: "Contabilidad",
+            company: "ITCH",
+          },
+        ],
+        weeks: [],
+      }),
+    );
+    expect(parsed.context).toEqual({ school: "CBTis 134" });
+    expect(parsed.students[0]).toMatchObject({
+      specialty: "Contabilidad",
+      company: "ITCH",
     });
   });
 });
