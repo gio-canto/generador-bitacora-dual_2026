@@ -322,15 +322,15 @@ function drawStudentDataMatrix(c, identity, p) {
     globalThis.bwipjs.toCanvas(code, {
       bcid: "datamatrix",
       text: value,
-      scale: 8,
+      scale: 10,
       padding: 0,
       includetext: false,
     });
   } catch {
     return false;
   }
-  const size = 15.5;
-  const quiet = 1.4;
+  const size = 22;
+  const quiet = 1.8;
   rect(c, 2.4 - quiet, 2.4 - quiet, size + quiet * 2, size + quiet * 2, "#fff", null, 0, p);
   c.save();
   c.imageSmoothingEnabled = false;
