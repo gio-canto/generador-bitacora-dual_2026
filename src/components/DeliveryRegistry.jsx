@@ -56,6 +56,90 @@ function formatDateTime(value) {
   }).format(date);
 }
 
+const tutorialSteps = [
+  {
+    title: "Un registro para todo el grupo",
+    text: "Primero eliges plantel, especialidad, semestre y grupo. Esos datos se guardan una sola vez para la base; no tienes que repetirlos alumno por alumno.",
+    visual: "base",
+  },
+  {
+    title: "La base se cruza con el generador",
+    text: "El subsistema usa los mismos catálogos del generador y puede recuperar alumnos de las bitácoras que ya están guardadas en este navegador.",
+    visual: "sync",
+  },
+  {
+    title: "Cada semana tiene una hora límite",
+    text: "Creas la semana y defines la fecha y hora de entrega. El sistema decide automáticamente si una entrega llegó a tiempo o a destiempo.",
+    visual: "week",
+  },
+  {
+    title: "Escanea todas las hojas en serie",
+    text: "Abres la cámara una sola vez. Cada Data Matrix reconocido emite un sonido, se encuadra como lector industrial y agrega al alumno sin cerrar la cámara.",
+    visual: "scan",
+  },
+  {
+    title: "Revisa, corrige y conserva el archivo",
+    text: "Al final puedes ver quién entregó, quién llegó tarde y quién falta; corregir registros, exportar CSV y guardar el archivo portátil JSON.",
+    visual: "finish",
+  },
+];
+
+function shortSchool(name) {
+  return schools.find((item) => item.name === name)?.shortName || name || "";
+}
+
+function shortCompany(name) {
+  return companies.find((item) => item.name === name)?.shortName || name || "";
+}
+
+function resultBoxFromPoints(video, points) {
+  if (
+    !video ||
+    !points?.length ||
+    !video.videoWidth ||
+    !video.videoHeight ||
+    !video.clientWidth ||
+    !video.clientHeight
+  )
+    return null;
+  const xs = points
+    .map((point) => Number(point?.getX?.() ?? point?.x))
+    .filter(Number.isFinite);
+  const ys = points
+    .map((point) => Number(point?.getY?.() ?? point?.y))
+    .filter(Number.isFinite);
+  if (!xs.length || !ys.length) return null;
+
+  const scale = Math.max(
+    video.clientWidth / video.videoWidth,
+    video.clientHeight / video.videoHeight,
+  );
+  const shownW = video.videoWidth * scale;
+  const shownH = video.videoHeight * scale;
+  const offsetX = (video.clientWidth - shownW) / 2;
+  const offsetY = (video.clientHeight - shownH) / 2;
+  const minX = Math.min(...xs) * scale + offsetX;
+  const maxX = Math.max(...xs) * scale + offsetX;
+  const minY = Math.min(...ys) * scale + offsetY;
+  const maxY = Math.max(...ys) * scale + offsetY;
+  const pad = Math.max(
+    8,
+    Math.min(video.clientWidth, video.clientHeight) * 0.018,
+  );
+  return {
+    left: Math.max(0.5, ((minX - pad) / video.clientWidth) * 100),
+    top: Math.max(0.5, ((minY - pad) / video.clientHeight) * 100),
+    width: Math.min(
+      99,
+      Math.max(9, ((maxX - minX + pad * 2) / video.clientWidth) * 100),
+    ),
+    height: Math.min(
+      99,
+      Math.max(9, ((maxY - minY + pad * 2) / video.clientHeight) * 100),
+    ),
+  };
+}
+
 function normalizeHeader(value) {
   return String(value || "")
     .normalize("NFD")
