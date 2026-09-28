@@ -22,7 +22,6 @@ import {
 import {
   contextIsComplete,
   createRegistryContext,
-  createStudent,
   createWeek,
   deliveryStatus,
   exportDeliveryState,
