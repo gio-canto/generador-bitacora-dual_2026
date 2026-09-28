@@ -292,7 +292,10 @@ export default function DeliveryRegistry({ onClose }) {
     const showDetection = (kind, box) => {
       setScanTone("");
       requestAnimationFrame(() => setScanTone(kind));
-      setScanBox(box || { left: 31, top: 26, width: 38, height: 48, tone: kind });
+      setScanBox({
+        ...(box || { left: 31, top: 26, width: 38, height: 48 }),
+        tone: kind,
+      });
       clearTimeout(scanBoxTimer.current);
       scanBoxTimer.current = setTimeout(() => setScanBox(null), 720);
     };
@@ -320,29 +323,7 @@ export default function DeliveryRegistry({ onClose }) {
       setScanQueue((current) => [...current, { studentId: student.id, name: student.name, at }]);
       setScanMessage(`Detectado: ${student.name}`);
 
-      let box = null;
-      const video = videoRef.current;
-      if (video && points?.length && video.videoWidth && video.videoHeight) {
-        const xs = points
-          .map((point) => Number(point?.getX?.() ?? point?.x))
-          .filter(Number.isFinite);
-        const ys = points
-          .map((point) => Number(point?.getY?.() ?? point?.y))
-          .filter(Number.isFinite);
-        if (xs.length && ys.length) {
-          const minX = Math.min(...xs);
-          const maxX = Math.max(...xs);
-          const minY = Math.min(...ys);
-          const maxY = Math.max(...ys);
-          box = {
-            left: Math.max(1, (minX / video.videoWidth) * 100 - 3),
-            top: Math.max(1, (minY / video.videoHeight) * 100 - 3),
-            width: Math.min(98, Math.max(12, ((maxX - minX) / video.videoWidth) * 100 + 6)),
-            height: Math.min(98, Math.max(12, ((maxY - minY) / video.videoHeight) * 100 + 6)),
-            tone: "ok",
-          };
-        }
-      }
+      const box = resultBoxFromPoints(videoRef.current, points);
       showDetection("ok", box);
     };
 
