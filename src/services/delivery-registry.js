@@ -1,9 +1,7 @@
-import { KEY as GENERATOR_KEY } from "./storage.js";
-import { readProfileData } from "./profile.js";
-
-export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v2";
+export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v3";
+export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v2";
 export const LEGACY_DELIVERY_KEY = "bitacora_dual_delivery_registry_v1";
-export const DELIVERY_SCHEMA = 2;
+export const DELIVERY_SCHEMA = 3;
 
 const uid = () =>
   globalThis.crypto?.randomUUID?.() ||
@@ -25,17 +23,11 @@ export function normalizeName(value) {
 export function createRegistryContext(data = {}) {
   return {
     school: clean(data.school),
-    specialty: clean(data.specialty, 120),
-    semester: clean(data.semester, 12),
-    group: clean(data.group, 20).toUpperCase(),
-    company: clean(data.company),
   };
 }
 
 export function contextIsComplete(context) {
-  return ["school", "specialty", "semester", "group"].every((key) =>
-    clean(context?.[key]),
-  );
+  return Boolean(clean(context?.school));
 }
 
 export function createDeliveryState() {
@@ -55,6 +47,8 @@ export function createStudent(data = {}) {
   return {
     id: typeof data.id === "string" && data.id ? data.id : uid(),
     name: clean(data.name, 180),
+    specialty: clean(data.specialty, 120),
+    company: clean(data.company, 220),
     createdAt:
       typeof data.createdAt === "string"
         ? data.createdAt
@@ -72,8 +66,7 @@ export function createWeek(data = {}) {
       typeof data.createdAt === "string"
         ? data.createdAt
         : new Date().toISOString(),
-    closedAt:
-      typeof data.closedAt === "string" ? data.closedAt : "",
+    closedAt: typeof data.closedAt === "string" ? data.closedAt : "",
     deliveries:
       data.deliveries && typeof data.deliveries === "object"
         ? { ...data.deliveries }
@@ -81,11 +74,16 @@ export function createWeek(data = {}) {
   };
 }
 
-function normalizeStudent(value) {
+function normalizeStudent(value, fallback = {}) {
   if (!value || typeof value !== "object") return null;
   const name = clean(value.name, 180);
   if (!name) return null;
-  return createStudent({ ...value, name });
+  return createStudent({
+    ...value,
+    name,
+    specialty: value.specialty || fallback.specialty,
+    company: value.company || fallback.company,
+  });
 }
 
 function normalizeDelivery(value) {
@@ -118,17 +116,26 @@ function normalizeWeek(value) {
 
 function inferLegacyContext(raw) {
   const first =
-    (Array.isArray(raw?.students) && raw.students.find((student) => student?.school)) ||
+    (Array.isArray(raw?.students) &&
+      raw.students.find((student) => student?.school)) ||
     {};
-  return createRegistryContext(first);
+  return createRegistryContext({
+    school: raw?.context?.school || first.school,
+  });
 }
 
 export function sanitizeDeliveryState(raw) {
   const base = createDeliveryState();
   if (!raw || typeof raw !== "object") return base;
 
+  const legacyDefaults = {
+    specialty: clean(raw?.context?.specialty, 120),
+    company: clean(raw?.context?.company, 220),
+  };
   const students = Array.isArray(raw.students)
-    ? raw.students.map(normalizeStudent).filter(Boolean)
+    ? raw.students
+        .map((student) => normalizeStudent(student, legacyDefaults))
+        .filter(Boolean)
     : [];
   const weeks = Array.isArray(raw.weeks)
     ? raw.weeks.map(normalizeWeek).filter(Boolean)
@@ -157,13 +164,16 @@ export function sanitizeDeliveryState(raw) {
 
 export function readDeliveryState(storage = globalThis.localStorage) {
   try {
-    const current = storage?.getItem(DELIVERY_KEY);
-    if (current) return sanitizeDeliveryState(JSON.parse(current));
-
-    const legacy = storage?.getItem(LEGACY_DELIVERY_KEY);
-    if (legacy) {
-      const migrated = sanitizeDeliveryState(JSON.parse(legacy));
-      storage?.setItem(DELIVERY_KEY, JSON.stringify(migrated));
+    for (const key of [
+      DELIVERY_KEY,
+      PREVIOUS_DELIVERY_KEY,
+      LEGACY_DELIVERY_KEY,
+    ]) {
+      const raw = storage?.getItem(key);
+      if (!raw) continue;
+      const migrated = sanitizeDeliveryState(JSON.parse(raw));
+      if (key !== DELIVERY_KEY)
+        storage?.setItem(DELIVERY_KEY, JSON.stringify(migrated));
       return migrated;
     }
   } catch {
@@ -259,10 +269,16 @@ export function mergeStudents(current, incoming) {
       (student) => normalizeName(student.name) === key,
     );
     if (index >= 0) {
-      result[index] = { ...result[index], name };
+      result[index] = {
+        ...result[index],
+        name,
+        specialty:
+          clean(item?.specialty, 120) || result[index].specialty || "",
+        company: clean(item?.company, 220) || result[index].company || "",
+      };
       updated++;
     } else {
-      result.push(createStudent({ name }));
+      result.push(createStudent(item));
       added++;
     }
   }
@@ -283,95 +299,6 @@ export function findStudentByMatrixValue(students, rawValue) {
   return (
     students.find((student) => normalizeName(student.name) === key) || null
   );
-}
-
-function uniqueRecords(records) {
-  const seen = new Set();
-  return records.filter((record) => {
-    const name = normalizeName(record?.student);
-    if (!name || seen.has(name)) return false;
-    seen.add(name);
-    return true;
-  });
-}
-
-export function readGeneratorSnapshot(storage = globalThis.localStorage) {
-  let records = [];
-  let draft = null;
-  try {
-    const parsed = JSON.parse(storage?.getItem(GENERATOR_KEY) || "null");
-    if (parsed && typeof parsed === "object") {
-      if (Array.isArray(parsed.records)) records = parsed.records;
-      if (parsed.draft && typeof parsed.draft === "object") draft = parsed.draft;
-    }
-  } catch {}
-
-  // El controlador que hoy usa la interfaz principal todavía conserva sus
-  // registros históricos en estas claves. Se leen también para que ambos
-  // subsistemas compartan la misma información sin pedirla dos veces.
-  try {
-    if (!records.length) {
-      const legacyRecords = JSON.parse(
-        storage?.getItem("bitacora_dual_clean_v3") || "[]",
-      );
-      if (Array.isArray(legacyRecords)) records = legacyRecords;
-    }
-    if (!draft) {
-      const legacyDraft = JSON.parse(
-        storage?.getItem("bitacora_dual_draft_v1") || "null",
-      );
-      if (legacyDraft && typeof legacyDraft === "object") {
-        draft = legacyDraft.identity
-          ? {
-              ...legacyDraft.identity,
-              weekDate: legacyDraft.weekDate,
-              entries: legacyDraft.entries,
-            }
-          : legacyDraft;
-      }
-    }
-  } catch {}
-
-  let profile = {};
-  try {
-    profile = readProfileData(storage);
-  } catch {}
-
-  const latest = records.at(-1) || draft || {};
-  const context = createRegistryContext({
-    school: profile.school || latest.school,
-    specialty: profile.specialty || latest.specialty,
-    semester: profile.semester || latest.semester,
-    group: profile.group || latest.group,
-    company: profile.company || latest.company,
-  });
-
-  return {
-    context,
-    records: uniqueRecords(records),
-    draft,
-  };
-}
-
-export function recordsMatchingContext(snapshot, context) {
-  const expected = createRegistryContext(context);
-  return (snapshot?.records || []).filter((record) => {
-    for (const key of ["school", "specialty", "semester", "group"]) {
-      if (
-        expected[key] &&
-        clean(record?.[key]).toLocaleLowerCase("es-MX") !==
-          expected[key].toLocaleLowerCase("es-MX")
-      )
-        return false;
-    }
-    return clean(record?.student);
-  });
-}
-
-export function studentsFromGenerator(snapshot, context) {
-  return recordsMatchingContext(snapshot, context).map((record) => ({
-    name: record.student,
-  }));
 }
 
 export function weekSummary(week, students) {
@@ -405,12 +332,14 @@ export function exportWeekCsv(state, weekId) {
   if (!week) return;
   const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`;
   const rows = [
-    ["Alumno", "Estado", "Fecha y hora", "Origen"],
+    ["Alumno", "Especialidad", "Empresa", "Estado", "Fecha y hora", "Origen"],
     ...state.students.map((student) => {
       const delivery = week.deliveries?.[student.id];
       const status = deliveryStatus(week, student.id);
       return [
         student.name,
+        student.specialty,
+        student.company,
         status === "entregado_tarde"
           ? "Entregado a destiempo"
           : status === "entregado"
@@ -421,7 +350,8 @@ export function exportWeekCsv(state, weekId) {
       ];
     }),
   ];
-  const csv = "\ufeff" + rows.map((row) => row.map(escape).join(",")).join("\r\n");
+  const csv =
+    "\ufeff" + rows.map((row) => row.map(escape).join(",")).join("\r\n");
   downloadText(
     csv,
     `${week.label.replace(/[^a-z0-9áéíóúñü _-]/gi, "").replace(/\s+/g, "-") || "semana"}-entregas.csv`,
