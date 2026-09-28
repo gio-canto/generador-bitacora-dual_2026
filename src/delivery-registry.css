@@ -303,6 +303,8 @@ label.delivery-action-tile:hover{background:#f0f0f3;transform:translateY(-1px)}
 .delivery-base-row>div{display:grid;gap:3px;min-width:0}
 .delivery-base-row strong{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .delivery-base-row span{color:#6e6e73;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.delivery-base-actions{display:flex!important;align-items:center;gap:6px!important;min-width:auto!important}
+.delivery-base-actions .btn{min-width:42px;padding-inline:10px}
 .delivery-danger{color:#b42318!important}
 
 .delivery-stat-row{
