@@ -9,6 +9,7 @@ import {
   FileArrowUp,
   FileXls,
   Plus,
+  PencilSimple,
   Scan,
   Trash,
   UploadSimple,
@@ -135,6 +136,7 @@ export default function DeliveryRegistry({ onClose }) {
     startDate: "",
     dueAt: "",
   });
+  const [editingStudentId, setEditingStudentId] = useState("");
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
   const [scanQueue, setScanQueue] = useState([]);
@@ -360,10 +362,38 @@ export default function DeliveryRegistry({ onClose }) {
   const addStudent = (event) => {
     event.preventDefault();
     if (!studentForm.name.trim()) return;
+    if (editingStudentId) {
+      const students = state.students.map((student) =>
+        student.id === editingStudentId
+          ? {
+              ...student,
+              ...studentForm,
+              name: studentForm.name.replace(/\s+/g, " ").trim(),
+            }
+          : student,
+      );
+      commit({ ...state, students });
+      setEditingStudentId("");
+      setStudentForm({ name: "", school: "", specialty: "", semester: "", group: "" });
+      setNotice("Alumno actualizado.");
+      return;
+    }
     const merged = mergeStudents(state.students, [studentForm]);
     commit({ ...state, students: merged.students });
     setStudentForm({ name: "", school: "", specialty: "", semester: "", group: "" });
     setNotice(merged.added ? "Alumno agregado." : "Alumno actualizado.");
+  };
+
+  const editStudent = (student) => {
+    setEditingStudentId(student.id);
+    setStudentForm({
+      name: student.name || "",
+      school: student.school || "",
+      specialty: student.specialty || "",
+      semester: student.semester || "",
+      group: student.group || "",
+    });
+    setNotice(`Editando a ${student.name}. Guarda los cambios para aplicarlos.`);
   };
 
   const deleteStudent = (studentId) => {
@@ -746,9 +776,22 @@ export default function DeliveryRegistry({ onClose }) {
                 />
               </label>
               <button className="btn primary delivery-form-submit" type="submit">
-                <Plus size={18} />
-                Guardar alumno
+                {editingStudentId ? <PencilSimple size={18} /> : <Plus size={18} />}
+                {editingStudentId ? "Actualizar alumno" : "Guardar alumno"}
               </button>
+              {editingStudentId && (
+                <button
+                  className="btn delivery-form-submit"
+                  type="button"
+                  onClick={() => {
+                    setEditingStudentId("");
+                    setStudentForm({ name: "", school: "", specialty: "", semester: "", group: "" });
+                    setNotice("");
+                  }}
+                >
+                  Cancelar edición
+                </button>
+              )}
             </form>
 
             <div className="delivery-list-toolbar">
@@ -772,14 +815,24 @@ export default function DeliveryRegistry({ onClose }) {
                         .join(" · ") || student.school || "Sin datos adicionales"}
                     </span>
                   </div>
-                  <button
-                    className="btn delivery-danger"
-                    type="button"
-                    aria-label={`Eliminar ${student.name}`}
-                    onClick={() => deleteStudent(student.id)}
-                  >
-                    <Trash size={18} />
-                  </button>
+                  <div className="delivery-base-actions">
+                    <button
+                      className="btn"
+                      type="button"
+                      aria-label={`Editar ${student.name}`}
+                      onClick={() => editStudent(student)}
+                    >
+                      <PencilSimple size={18} />
+                    </button>
+                    <button
+                      className="btn delivery-danger"
+                      type="button"
+                      aria-label={`Eliminar ${student.name}`}
+                      onClick={() => deleteStudent(student.id)}
+                    >
+                      <Trash size={18} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
