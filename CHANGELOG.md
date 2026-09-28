@@ -1,5 +1,9 @@
 # Registro de entrega · en desarrollo
 
+- El tutorial del registro puede abrirse en cualquier momento sin perder la pantalla actual; durante el tutorial el lector ignora nuevas detecciones.
+- El aviso **Hay una nueva versión disponible** funciona también dentro de `/registro-entrega/`.
+- El Data Matrix identifica ahora la combinación **nombre + especialidad + empresa**; los códigos anteriores con sólo nombre siguen siendo compatibles cuando no existe ambigüedad.
+- README incorpora acceso directo al registro de entrega y la FAQ explica el Data Matrix y el flujo de recepción.
 - La configuración general del registro se reduce al **plantel**.
 - Especialidad y empresa pasan a ser datos de cada alumno.
 - El alta manual de alumnos solicita únicamente nombre, especialidad y empresa.
