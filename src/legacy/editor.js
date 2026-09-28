@@ -1460,7 +1460,7 @@ export function startEditor() {
         globalThis.bwipjs.toCanvas(code, {
           bcid: "datamatrix",
           text: value,
-          scale: 8,
+          scale: 10,
           padding: 0,
           includetext: false,
         });
@@ -1468,8 +1468,8 @@ export function startEditor() {
         return false;
       }
 
-      const size = 15.5,
-        quiet = 1.4,
+      const size = 22,
+        quiet = 1.8,
         x = 2.4,
         y = 2.4;
       rect(
@@ -1526,7 +1526,7 @@ export function startEditor() {
     }
     function drawPdfPage(canvas, p) {
       const model = buildPageModel(),
-        id = getIdentity();
+        id = { ...getIdentity(), entries: deepCopy(entries) };
       canvas.width = Math.round(PAGE.w * p);
       canvas.height = Math.round(PAGE.h * p);
       const c = canvas.getContext("2d");

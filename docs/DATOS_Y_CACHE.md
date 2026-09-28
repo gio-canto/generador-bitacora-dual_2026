@@ -22,11 +22,11 @@ El perfil usa `bitacora_profile_v1`, separado de la caché de archivos. Puede re
 
 El Subsistema de registro de entrega usa almacenamiento separado del historial del generador.
 
-- Estado actual: `bitacora_dual_delivery_registry_v3`.
-- Las claves `bitacora_dual_delivery_registry_v2` y `bitacora_dual_delivery_registry_v1` se leen para migración y no se usan como formato nuevo.
+- Estado actual: `bitacora_dual_delivery_registry_v4`.
+- Las claves `bitacora_dual_delivery_registry_v3`, `bitacora_dual_delivery_registry_v2` y `bitacora_dual_delivery_registry_v1` se leen para migración y no se usan como formato nuevo.
 - La configuración general guarda el plantel. Cada alumno conserva nombre, especialidad y empresa.
-- Cada semana guarda fecha límite, cierre y entregas por alumno con estado, fecha/hora y origen (`camera`, `manual` o `import`).
+- Cada semana guarda fecha inicial, fecha final, fecha límite, cierre y entregas por alumno con estado, fecha/hora y origen (`camera`, `manual` o `import`).
 - **Guardar archivo** descarga un JSON portátil del registro completo. Terminar una sesión de cámara con lecturas nuevas descarga también una copia actualizada.
 - El CSV semanal es una exportación de consulta; no sustituye al JSON portátil.
-- El Data Matrix de las bitácoras utiliza un formato versionado con nombre, especialidad y empresa. Los códigos antiguos con sólo nombre se aceptan únicamente cuando no existe ambigüedad en la base.
+- El Data Matrix actual utiliza un formato compacto versionado con nombre, especialidad, empresa y periodo (fecha inicial y final). Esto permite clasificar automáticamente varias semanas en una misma sesión. Los códigos anteriores sin periodo usan la semana seleccionada como respaldo.
 - El lector de cámara y la importación de hojas se procesan en el navegador. El subsistema carga bwip-js, SheetJS y ZXing Browser desde las URLs declaradas en el HTML; esas dependencias externas no forman parte del caché principal del service worker.

@@ -2,7 +2,7 @@
 
 Ejecuta `npm run check`.
 
-La suite incluye generación de fechas y validación de registros, importación, PDF, recuperación de beta.1 y una regresión de la interfaz restaurada: controles originales, responsables de TecNM, generación de martes a viernes, límite de cuatro días y persistencia del borrador. También cubre el esquema del registro de entrega, migraciones, estados por hora límite, resumen semanal y la identidad Data Matrix con nombre, especialidad y empresa.
+La suite incluye generación de fechas y validación de registros, importación, PDF, recuperación de beta.1 y una regresión de la interfaz restaurada: controles originales, responsables de TecNM, generación de martes a viernes, límite de cuatro días y persistencia del borrador. También cubre el esquema del registro de entrega, migraciones, estados por hora límite, resumen semanal y el Data Matrix con nombre, especialidad, empresa y periodo, incluida la selección automática de semana.
 
 La prueba del servicio PDF extraído cubre su formato; el generador restaurado conserva su motor original dentro de `src/legacy/editor.js`. Una prueba de ese servicio por sí sola no acredita toda la entrega del navegador.
 
@@ -15,7 +15,10 @@ La prueba del servicio PDF extraído cubre su formato; el generador restaurado c
 - Importar un respaldo: confirmar que conserva los registros actuales y muestra un único aviso Sileo.
 - Activar una actualización y comprobar que no pierde el borrador.
 - Abrir `/registro-entrega/`, crear plantel, alumnos y semana, cerrar/reabrir y exportar JSON/CSV.
-- Generar una bitácora y comprobar que el Data Matrix puede leerse y corresponde a nombre + especialidad + empresa.
+- Generar una bitácora y comprobar que el Data Matrix puede leerse y corresponde a nombre + especialidad + empresa + fecha inicial + fecha final.
+- Crear dos semanas y escanear bitácoras de ambas en la misma sesión: cada lectura debe aparecer con su semana correcta.
+- Escanear una bitácora después de la fecha/hora límite y comprobar que queda como Entregado a destiempo.
+- Probar una foto o captura con Leer imagen para separar problemas de enfoque de problemas de decodificación.
 - Abrir el tutorial durante una sesión de cámara y comprobar que no se agregan lecturas hasta cerrarlo.
 - Revisar los estados del HUD: LECTOR ACTIVO, REGISTRADO, REPETIDO y NO COINCIDE.
 
