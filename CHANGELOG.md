@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.50.0-beta.6 · Registro de entrega · Parte 6 · 2026-09-28
+
+- Se corrige la lectura real del Data Matrix: el lector carga explícitamente el bundle UMD de ZXing Browser, reduce el intervalo entre intentos y solicita enfoque continuo cuando la cámara lo permite.
+- El Data Matrix adopta un payload más corto para facilitar la lectura por cámara y aumenta su tamaño físico en el PDF.
+- El identificador incluye **nombre + especialidad + empresa + fecha inicial + fecha final** de la bitácora.
+- Cada semana del registro guarda ahora su fecha final; los registros anteriores se migran calculándola a partir de la fecha inicial.
+- El escáner puede recibir bitácoras de **varias semanas en una sola sesión** y las clasifica automáticamente por el periodo codificado.
+- La hora real del escaneo se compara con la fecha y hora límite de la semana identificada, por lo que una entrega antigua queda marcada automáticamente como **Entregado a destiempo**.
+- Se permite escanear entregas hacia semanas cerradas para conservar la recepción extemporánea; las correcciones manuales siguen bloqueadas mientras la semana permanezca cerrada.
+- Se añade **Leer imagen** como método alterno de prueba/lectura desde una foto o captura del Data Matrix.
+- Los Data Matrix de versiones anteriores siguen funcionando: si no incluyen periodo, se asignan a la semana seleccionada.
+
 ## 0.50.0-beta.5 · Registro de entrega · Parte 5 · 2026-09-28
 
 Commit guía: `5f38e399`.
