@@ -9,7 +9,6 @@ import {
   CheckCircle,
   Clock,
   DownloadSimple,
-  Database,
   FileArrowUp,
   FileXls,
   Plus,
@@ -17,7 +16,6 @@ import {
   Scan,
   Trash,
   UploadSimple,
-  UserPlus,
   Users,
   XCircle,
 } from "@phosphor-icons/react";
@@ -33,10 +31,8 @@ import {
   mergeStudents,
   parsePortableDeliveryFile,
   readDeliveryState,
-  readGeneratorSnapshot,
   registerDelivery,
   removeDelivery,
-  studentsFromGenerator,
   weekSummary,
   writeDeliveryState,
 } from "../services/delivery-registry.js";
@@ -60,29 +56,24 @@ function formatDateTime(value) {
 
 const tutorialSteps = [
   {
-    title: "Un registro para todo el grupo",
-    text: "Primero eliges plantel, especialidad, semestre y grupo. Esos datos se guardan una sola vez para la base; no tienes que repetirlos alumno por alumno.",
-    visual: "base",
+    title: "Escuela",
+    text: "Selecciona el plantel del registro.",
+    visual: "school",
   },
   {
-    title: "La base se cruza con el generador",
-    text: "El subsistema usa los mismos catálogos del generador y puede recuperar alumnos de las bitácoras que ya están guardadas en este navegador.",
-    visual: "sync",
+    title: "Alumnos",
+    text: "Agrega nombre, especialidad y empresa.",
+    visual: "students",
   },
   {
-    title: "Cada semana tiene una hora límite",
-    text: "Creas la semana y defines la fecha y hora de entrega. El sistema decide automáticamente si una entrega llegó a tiempo o a destiempo.",
+    title: "Semana",
+    text: "Define la fecha y hora límite.",
     visual: "week",
   },
   {
-    title: "Escanea todas las hojas en serie",
-    text: "Abres la cámara una sola vez. Cada Data Matrix reconocido emite un sonido, se encuadra como lector industrial y agrega al alumno sin cerrar la cámara.",
+    title: "Escaneo",
+    text: "Escanea el Data Matrix de cada bitácora. La entrega queda registrada con fecha y hora.",
     visual: "scan",
-  },
-  {
-    title: "Revisa, corrige y conserva el archivo",
-    text: "Al final puedes ver quién entregó, quién llegó tarde y quién falta; corregir registros, exportar CSV y guardar el archivo portátil JSON.",
-    visual: "finish",
   },
 ];
 
@@ -172,7 +163,11 @@ function spreadsheetRowsToStudents(rows) {
           "nombre del alumno",
         ]) ||
         String(values.find((value) => String(value || "").trim()) || "").trim();
-      return { name };
+      return {
+        name,
+        specialty: pickColumn(row, ["especialidad", "carrera"]),
+        company: pickColumn(row, ["empresa", "organismo", "empresa u organismo"]),
+      };
     })
     .filter((student) => student.name);
 }
@@ -208,7 +203,6 @@ function ScanSound({ tone }) {
 
 export default function DeliveryRegistry({ onClose }) {
   const initialState = useMemo(() => readDeliveryState(), []);
-  const generatorSnapshot = useMemo(() => readGeneratorSnapshot(), []);
   const initiallyStarted =
     contextIsComplete(initialState.context) ||
     initialState.students.length > 0 ||
@@ -219,15 +213,15 @@ export default function DeliveryRegistry({ onClose }) {
     initialState.weeks.at(-1)?.id || "",
   );
   const [contextForm, setContextForm] = useState(() =>
-    createRegistryContext(
-      contextIsComplete(initialState.context)
-        ? initialState.context
-        : generatorSnapshot.context,
-    ),
+    createRegistryContext(initialState.context),
   );
   const [setupStep, setSetupStep] = useState(0);
   const [tutorialStep, setTutorialStep] = useState(0);
-  const [studentForm, setStudentForm] = useState({ name: "" });
+  const [studentForm, setStudentForm] = useState({
+    name: "",
+    specialty: "",
+    company: "",
+  });
   const [weekForm, setWeekForm] = useState({
     label: "",
     startDate: "",
@@ -259,14 +253,10 @@ export default function DeliveryRegistry({ onClose }) {
     contextIsComplete(state.context) ||
     state.students.length > 0 ||
     state.weeks.length > 0;
-  const selectedSchool =
-    schools.find((school) => school.name === contextForm.school) ||
+  const registrySchool =
+    schools.find((school) => school.name === state.context.school) ||
     schools[0] ||
     {};
-  const generatorCandidates = useMemo(
-    () => studentsFromGenerator(generatorSnapshot, contextForm),
-    [generatorSnapshot, contextForm],
-  );
 
   const commit = (producer) => {
     const next =
@@ -419,13 +409,7 @@ export default function DeliveryRegistry({ onClose }) {
   }, [view, activeWeekId, activeWeek?.closedAt]);
 
   const startSetup = () => {
-    setContextForm(
-      createRegistryContext(
-        contextIsComplete(state.context)
-          ? state.context
-          : generatorSnapshot.context,
-      ),
-    );
+    setContextForm(createRegistryContext(state.context));
     setSetupStep(0);
     setView("setup");
   };
@@ -433,7 +417,7 @@ export default function DeliveryRegistry({ onClose }) {
   const saveContext = () => {
     const context = createRegistryContext(contextForm);
     if (!contextIsComplete(context)) {
-      setNotice("Completa plantel, especialidad, semestre y grupo.");
+      setNotice("Selecciona el plantel.");
       return false;
     }
     commit({ ...state, context });
@@ -491,35 +475,25 @@ export default function DeliveryRegistry({ onClose }) {
     }
   };
 
-  const syncGeneratorStudents = () => {
-    const incoming = studentsFromGenerator(generatorSnapshot, contextForm);
-    if (!incoming.length) {
-      setNotice(
-        "No encontré bitácoras guardadas de este mismo plantel, especialidad, semestre y grupo.",
-      );
-      return;
-    }
-    const merged = mergeStudents(state.students, incoming);
-    commit({ ...state, students: merged.students });
-    setNotice(
-      "Se cruzó la base con el generador: " +
-        merged.added +
-        " alumnos agregados y " +
-        merged.updated +
-        " ya existentes.",
-    );
-  };
-
   const addStudent = (event) => {
     event.preventDefault();
-    const name = String(studentForm.name || "").replace(/\s+/g, " ").trim();
-    if (!name) return;
+    const nextStudent = {
+      name: String(studentForm.name || "").replace(/\s+/g, " ").trim(),
+      specialty: String(studentForm.specialty || "").trim(),
+      company: String(studentForm.company || "").trim(),
+    };
+    if (!nextStudent.name || !nextStudent.specialty || !nextStudent.company) {
+      setNotice("Completa nombre, especialidad y empresa.");
+      return;
+    }
 
     if (editingStudentId) {
       const duplicate = state.students.some(
         (student) =>
           student.id !== editingStudentId &&
-          student.name.localeCompare(name, "es", { sensitivity: "base" }) === 0,
+          student.name.localeCompare(nextStudent.name, "es", {
+            sensitivity: "base",
+          }) === 0,
       );
       if (duplicate) {
         setNotice("Ya existe otro alumno con ese nombre.");
@@ -528,18 +502,20 @@ export default function DeliveryRegistry({ onClose }) {
       commit({
         ...state,
         students: state.students.map((student) =>
-          student.id === editingStudentId ? { ...student, name } : student,
+          student.id === editingStudentId
+            ? { ...student, ...nextStudent }
+            : student,
         ),
       });
       setEditingStudentId("");
-      setStudentForm({ name: "" });
+      setStudentForm({ name: "", specialty: "", company: "" });
       setNotice("Alumno actualizado.");
       return;
     }
 
-    const merged = mergeStudents(state.students, [{ name }]);
+    const merged = mergeStudents(state.students, [nextStudent]);
     commit({ ...state, students: merged.students });
-    setStudentForm({ name: "" });
+    setStudentForm({ name: "", specialty: "", company: "" });
     setNotice(
       merged.added ? "Alumno agregado." : "Ese alumno ya estaba en la base.",
     );
@@ -547,8 +523,12 @@ export default function DeliveryRegistry({ onClose }) {
 
   const editStudent = (student) => {
     setEditingStudentId(student.id);
-    setStudentForm({ name: student.name || "" });
-    setNotice("Editando a " + student.name + ".");
+    setStudentForm({
+      name: student.name || "",
+      specialty: student.specialty || "",
+      company: student.company || "",
+    });
+    setNotice("");
   };
 
   const deleteStudent = (studentId) => {
@@ -643,7 +623,10 @@ export default function DeliveryRegistry({ onClose }) {
   const filteredStudents = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("es-MX");
     let list = state.students.filter((student) =>
-      student.name.toLocaleLowerCase("es-MX").includes(term),
+      [student.name, student.specialty, student.company]
+        .join(" ")
+        .toLocaleLowerCase("es-MX")
+        .includes(term),
     );
     if (activeWeek && statusFilter !== "all")
       list = list.filter(
@@ -674,9 +657,9 @@ export default function DeliveryRegistry({ onClose }) {
         <div className="delivery-student-main">
           <strong>{student.name}</strong>
           <span>
-            {[state.context.specialty, state.context.semester && state.context.semester + "°", state.context.group]
+            {[student.specialty, shortCompany(student.company)]
               .filter(Boolean)
-              .join(" · ") || "Alumno"}
+              .join(" · ") || "Sin datos"}
           </span>
           <div className={`delivery-status delivery-status-${status}`}>
             <Icon size={17} weight="fill" />
@@ -772,12 +755,8 @@ export default function DeliveryRegistry({ onClose }) {
         {view === "welcome" && (
           <section className="delivery-welcome">
             <div className="delivery-welcome-copy">
-              <span className="delivery-kicker">Registro de bitácoras</span>
-              <h1>Subsistema de registro de entrega</h1>
-              <p>
-                Controla por semana quién entregó, quién llegó a destiempo y
-                quién sigue pendiente, sin cuentas ni servidor.
-              </p>
+              <h1>Registro de entrega</h1>
+              <p>Control semanal de bitácoras.</p>
             </div>
             <div className="delivery-welcome-cards">
               <button
@@ -791,9 +770,8 @@ export default function DeliveryRegistry({ onClose }) {
                 <div className="delivery-entry-icon">
                   <FileArrowUp size={42} />
                 </div>
-                <strong>Soy nuevo y quiero saber</strong>
-                <span>Aprende el sistema tarjeta por tarjeta.</span>
-                <b>Tutorial</b>
+                <strong>Tutorial</strong>
+                <span>Ver cómo funciona</span>
               </button>
               <button
                 className="delivery-entry-card primary"
@@ -803,9 +781,8 @@ export default function DeliveryRegistry({ onClose }) {
                 <div className="delivery-entry-icon">
                   <Scan size={42} />
                 </div>
-                <strong>Iniciar registro</strong>
-                <span>Crea la base y la primera semana.</span>
-                <b>Ingresar</b>
+                <strong>Ingresar</strong>
+                <span>Configurar registro</span>
               </button>
             </div>
           </section>
@@ -843,20 +820,21 @@ export default function DeliveryRegistry({ onClose }) {
                   tutorialSteps[tutorialStep].visual
                 }
               >
-                {tutorialSteps[tutorialStep].visual === "base" && (
+                {tutorialSteps[tutorialStep].visual === "school" && (
                   <>
                     <Users size={38} />
                     <div>
-                      <strong>CBTis No. 134</strong>
-                      <span>Programación · 4° B</span>
+                      <strong>Plantel</strong>
                     </div>
                   </>
                 )}
-                {tutorialSteps[tutorialStep].visual === "sync" && (
+                {tutorialSteps[tutorialStep].visual === "students" && (
                   <>
-                    <Database size={38} />
-                    <ArrowRight size={26} />
                     <Users size={38} />
+                    <div>
+                      <strong>Nombre</strong>
+                      <span>Especialidad · Empresa</span>
+                    </div>
                   </>
                 )}
                 {tutorialSteps[tutorialStep].visual === "week" && (
@@ -937,10 +915,10 @@ export default function DeliveryRegistry({ onClose }) {
                 </span>
                 <h1>
                   {setupStep === 0
-                    ? "¿Qué grupo vas a administrar?"
+                    ? "Escuela"
                     : setupStep === 1
-                      ? "Carga a tus alumnos"
-                      : "Crea la primera semana"}
+                      ? "Alumnos"
+                      : "Semana"}
                 </h1>
               </div>
               <div className="delivery-setup-progress">
@@ -952,32 +930,16 @@ export default function DeliveryRegistry({ onClose }) {
 
             {setupStep === 0 && (
               <div className="delivery-setup-card">
-                <p className="delivery-setup-note">
-                  Estos datos salen de los mismos catálogos del generador de
-                  bitácoras y se aplican a toda la base, no alumno por alumno.
-                </p>
-                <div className="delivery-form">
-                  <label className="delivery-field delivery-field-wide">
+                <div className="delivery-form delivery-school-form">
+                  <label className="delivery-field">
                     <span>Plantel</span>
                     <select
                       value={contextForm.school}
-                      onChange={(event) => {
-                        const school =
-                          schools.find(
-                            (item) => item.name === event.target.value,
-                          ) ||
-                          schools[0] ||
-                          {};
+                      onChange={(event) =>
                         setContextForm(
-                          createRegistryContext({
-                            ...contextForm,
-                            school: school.name || "",
-                            specialty: school.specialties?.[0] || "",
-                            semester: school.semesters?.[0] || "",
-                            group: school.groups?.[0] || "",
-                          }),
-                        );
-                      }}
+                          createRegistryContext({ school: event.target.value }),
+                        )
+                      }
                     >
                       <option value="">Selecciona un plantel</option>
                       {schools.map((school) => (
@@ -987,99 +949,7 @@ export default function DeliveryRegistry({ onClose }) {
                       ))}
                     </select>
                   </label>
-
-                  <label className="delivery-field">
-                    <span>Especialidad</span>
-                    <select
-                      value={contextForm.specialty}
-                      onChange={(event) =>
-                        setContextForm({
-                          ...contextForm,
-                          specialty: event.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Selecciona</option>
-                      {(selectedSchool.specialties || []).map((value) => (
-                        <option key={value}>{value}</option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="delivery-field">
-                    <span>Semestre</span>
-                    <select
-                      value={contextForm.semester}
-                      onChange={(event) =>
-                        setContextForm({
-                          ...contextForm,
-                          semester: event.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Selecciona</option>
-                      {(selectedSchool.semesters || []).map((value) => (
-                        <option key={value} value={value}>
-                          {value}°
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="delivery-field">
-                    <span>Grupo</span>
-                    <select
-                      value={contextForm.group}
-                      onChange={(event) =>
-                        setContextForm({
-                          ...contextForm,
-                          group: event.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Selecciona</option>
-                      {(selectedSchool.groups || []).map((value) => (
-                        <option key={value}>{value}</option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="delivery-field delivery-field-wide">
-                    <span>Empresa u organismo de referencia</span>
-                    <select
-                      value={contextForm.company}
-                      onChange={(event) =>
-                        setContextForm({
-                          ...contextForm,
-                          company: event.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Sin una empresa única</option>
-                      {companies.map((company) => (
-                        <option key={company.id} value={company.name}>
-                          {company.shortName || company.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
                 </div>
-
-                {contextIsComplete(generatorSnapshot.context) && (
-                  <div className="delivery-cross-hint">
-                    <Database size={21} />
-                    <div>
-                      <strong>Encontré datos del generador</strong>
-                      <span>
-                        {shortSchool(generatorSnapshot.context.school)} ·{" "}
-                        {generatorSnapshot.context.specialty} ·{" "}
-                        {generatorSnapshot.context.semester}°{" "}
-                        {generatorSnapshot.context.group}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
                 <div className="delivery-setup-actions">
                   <button
                     className="btn"
@@ -1105,13 +975,7 @@ export default function DeliveryRegistry({ onClose }) {
             {setupStep === 1 && (
               <div className="delivery-setup-card">
                 <div className="delivery-context-banner">
-                  <div>
-                    <strong>{shortSchool(state.context.school)}</strong>
-                    <span>
-                      {state.context.specialty} · {state.context.semester}°{" "}
-                      {state.context.group}
-                    </span>
-                  </div>
+                  <strong>{shortSchool(state.context.school)}</strong>
                   <button
                     className="btn"
                     type="button"
@@ -1121,49 +985,73 @@ export default function DeliveryRegistry({ onClose }) {
                   </button>
                 </div>
 
-                <div className="delivery-import-grid">
-                  <button
-                    className="delivery-action-tile"
-                    type="button"
-                    onClick={syncGeneratorStudents}
-                  >
-                    <Database size={38} />
-                    <strong>Traer del generador</strong>
-                    <span>
-                      {generatorCandidates.length
-                        ? generatorCandidates.length +
-                          " encontrados para este grupo"
-                        : "Cruzar con bitácoras guardadas"}
-                    </span>
-                  </button>
-                  <label className="delivery-action-tile">
-                    <FileXls size={38} />
-                    <strong>Cargar Excel o CSV</strong>
-                    <span>Busca una columna de nombre o alumno</span>
-                    <input
-                      hidden
-                      type="file"
-                      accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
-                      onChange={(event) => {
-                        importSpreadsheet(event.target.files?.[0]);
-                        event.target.value = "";
-                      }}
-                    />
-                  </label>
-                </div>
+                <label className="delivery-action-tile delivery-import-single">
+                  <FileXls size={34} />
+                  <strong>Importar Excel o CSV</strong>
+                  <input
+                    hidden
+                    type="file"
+                    accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                    onChange={(event) => {
+                      importSpreadsheet(event.target.files?.[0]);
+                      event.target.value = "";
+                    }}
+                  />
+                </label>
 
-                <form className="delivery-inline-add" onSubmit={addStudent}>
-                  <label>
-                    <span>Agregar manualmente</span>
+                <form
+                  className="delivery-form delivery-student-form"
+                  onSubmit={addStudent}
+                >
+                  <label className="delivery-field">
+                    <span>Nombre</span>
                     <input
                       value={studentForm.name}
                       onChange={(event) =>
-                        setStudentForm({ name: event.target.value })
+                        setStudentForm({
+                          ...studentForm,
+                          name: event.target.value,
+                        })
                       }
-                      placeholder="Nombre completo del alumno"
                     />
                   </label>
-                  <button className="btn primary" type="submit">
+                  <label className="delivery-field">
+                    <span>Especialidad</span>
+                    <select
+                      value={studentForm.specialty}
+                      onChange={(event) =>
+                        setStudentForm({
+                          ...studentForm,
+                          specialty: event.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Selecciona</option>
+                      {(registrySchool.specialties || []).map((value) => (
+                        <option key={value}>{value}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="delivery-field">
+                    <span>Empresa</span>
+                    <select
+                      value={studentForm.company}
+                      onChange={(event) =>
+                        setStudentForm({
+                          ...studentForm,
+                          company: event.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Selecciona</option>
+                      {companies.map((company) => (
+                        <option key={company.id} value={company.name}>
+                          {company.shortName || company.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button className="btn primary delivery-form-submit" type="submit">
                     {editingStudentId ? (
                       <PencilSimple size={17} />
                     ) : (
@@ -1173,11 +1061,15 @@ export default function DeliveryRegistry({ onClose }) {
                   </button>
                   {editingStudentId && (
                     <button
-                      className="btn"
+                      className="btn delivery-form-submit"
                       type="button"
                       onClick={() => {
                         setEditingStudentId("");
-                        setStudentForm({ name: "" });
+                        setStudentForm({
+                          name: "",
+                          specialty: "",
+                          company: "",
+                        });
                       }}
                     >
                       Cancelar
@@ -1186,8 +1078,7 @@ export default function DeliveryRegistry({ onClose }) {
                 </form>
 
                 <div className="delivery-roster-head">
-                  <strong>{state.students.length} alumnos en la base</strong>
-                  <span>El contexto escolar se aplica a todos.</span>
+                  <strong>{state.students.length} alumnos</strong>
                 </div>
                 <div className="delivery-student-list compact">
                   {state.students.map((student) => (
@@ -1196,8 +1087,9 @@ export default function DeliveryRegistry({ onClose }) {
                       <div>
                         <strong>{student.name}</strong>
                         <span>
-                          {state.context.specialty} · {state.context.semester}°{" "}
-                          {state.context.group}
+                          {[student.specialty, shortCompany(student.company)]
+                            .filter(Boolean)
+                            .join(" · ") || "Sin datos"}
                         </span>
                       </div>
                       <div className="delivery-base-actions">
@@ -1245,10 +1137,6 @@ export default function DeliveryRegistry({ onClose }) {
 
             {setupStep === 2 && (
               <div className="delivery-setup-card">
-                <p className="delivery-setup-note">
-                  La hora límite controla automáticamente el estado de cada
-                  entrega.
-                </p>
                 <form
                   className="delivery-form delivery-week-form"
                   onSubmit={(event) => addWeek(event, true)}
@@ -1313,17 +1201,6 @@ export default function DeliveryRegistry({ onClose }) {
             <section className="delivery-hero compact">
               <span className="delivery-kicker">Registro de entrega</span>
               <h1>{shortSchool(state.context.school) || "Tu registro"}</h1>
-              <p>
-                {[
-                  state.context.specialty,
-                  state.context.semester &&
-                    state.context.semester + "°",
-                  state.context.group,
-                  shortCompany(state.context.company),
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </p>
             </section>
 
             <section className="delivery-summary-grid">
@@ -1357,7 +1234,7 @@ export default function DeliveryRegistry({ onClose }) {
               </article>
               <article className="delivery-summary-card">
                 <Scan size={28} />
-                <span>Registro rápido</span>
+                <span>Escaneo</span>
                 <strong className="delivery-summary-text">
                   {state.weeks.at(-1)?.label || "Sin semana"}
                 </strong>
@@ -1431,18 +1308,7 @@ export default function DeliveryRegistry({ onClose }) {
               )}
             </section>
 
-            <section className="delivery-help-strip">
-              <div>
-                <span className="delivery-kicker">Base compartida</span>
-                <h2>
-                  Escuela, especialidad, semestre y grupo se guardan una sola
-                  vez.
-                </h2>
-              </div>
-              <button className="btn" type="button" onClick={startSetup}>
-                Revisar configuración
-              </button>
-            </section>
+
           </>
         )}
 
