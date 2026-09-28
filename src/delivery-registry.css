@@ -1045,3 +1045,24 @@ button.delivery-action-tile{cursor:pointer}
   .delivery-context-banner{align-items:flex-start;flex-direction:column}
   .delivery-context-banner .btn{width:100%}
 }
+
+
+/* Ajustes del registro por escuela */
+.delivery-school-form{
+  grid-template-columns:1fr;
+}
+.delivery-import-single{
+  min-height:92px;
+  margin:0 0 14px;
+  flex-direction:row;
+  justify-content:flex-start;
+  text-align:left;
+}
+.delivery-import-single svg{flex:0 0 auto}
+.delivery-student-form{
+  grid-template-columns:1.25fr 1fr 1fr;
+}
+@media(max-width:760px){
+  .delivery-student-form{grid-template-columns:1fr}
+  .delivery-import-single{min-height:76px}
+}
