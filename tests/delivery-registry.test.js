@@ -7,6 +7,7 @@ import {
   createWeek,
   deliveryStatus,
   findStudentByMatrixValue,
+  findWeekByMatrixValue,
   mergeStudents,
   parseMatrixPayload,
   parsePortableDeliveryFile,
@@ -62,17 +63,25 @@ describe("subsistema de registro de entrega", () => {
     ).toBe(student.id);
   });
 
-  it("codifica nombre, especialidad y empresa en el Data Matrix actual", () => {
+  it("codifica identidad y periodo en el Data Matrix actual", () => {
     const payload = createMatrixPayload({
       student: "José Ángel Núñez",
       specialty: "Programación",
       company: "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)",
+      entries: [
+        { date: "2026-09-01" },
+        { date: "2026-09-02" },
+        { date: "2026-09-03" },
+        { date: "2026-09-04" },
+      ],
     });
     expect(parseMatrixPayload(payload)).toEqual({
-      version: 3,
-      name: "José Ángel Núñez",
-      specialty: "Programación",
-      company: "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)",
+      version: 4,
+      name: "jose angel nunez",
+      specialty: "programacion",
+      company: "cocytieg",
+      startDate: "2026-09-01",
+      endDate: "2026-09-04",
     });
   });
 
@@ -94,6 +103,54 @@ describe("subsistema de registro de entrega", () => {
     });
     expect(findStudentByMatrixValue([a, b], payload)?.id).toBe(b.id);
     expect(findStudentByMatrixValue([a, b], "Alex García")).toBeNull();
+  });
+
+  it("envía cada Data Matrix a la semana de su propio periodo", () => {
+    const week1 = createWeek({
+      id: "week-1",
+      label: "Semana 1",
+      startDate: "2026-09-01",
+      dueAt: "2026-09-05T18:00:00.000Z",
+    });
+    const week2 = createWeek({
+      id: "week-2",
+      label: "Semana 2",
+      startDate: "2026-09-08",
+      dueAt: "2026-09-12T18:00:00.000Z",
+    });
+    const payload = createMatrixPayload({
+      student: "Ana López",
+      specialty: "Programación",
+      company: "COCYTIEG",
+      entries: [
+        { date: "2026-09-08" },
+        { date: "2026-09-09" },
+        { date: "2026-09-10" },
+        { date: "2026-09-11" },
+      ],
+    });
+    expect(findWeekByMatrixValue([week1, week2], payload)?.id).toBe("week-2");
+  });
+
+  it("calcula entrega a destiempo después del límite de la semana identificada", () => {
+    const week = createWeek({
+      startDate: "2026-09-01",
+      dueAt: "2026-09-05T18:00:00.000Z",
+    });
+    expect(statusFromTimestamp(week, "2026-09-06T12:00:00.000Z")).toBe(
+      "entregado_tarde",
+    );
+  });
+
+  it("mantiene compatibilidad con Data Matrix v3 usando la semana seleccionada", () => {
+    const week = createWeek({
+      id: "week-old",
+      startDate: "2026-09-01",
+    });
+    const legacy = "BD26|3|Sm9zw6kgw4FuZ2VsIE7DumHDsWV6|UHJvZ3JhbWFjacOzbg|Q09DWVRJRUc";
+    expect(findWeekByMatrixValue([week], legacy, "week-old")?.id).toBe(
+      "week-old",
+    );
   });
 
   it("usa únicamente la escuela como configuración general", () => {
@@ -206,7 +263,7 @@ describe("subsistema de registro de entrega", () => {
         ],
       }),
     );
-    expect(parsed.schemaVersion).toBe(3);
+    expect(parsed.schemaVersion).toBe(4);
     expect(parsed.context).toEqual({ school: "CBTis 134" });
     expect(parsed.students[0]).toMatchObject({
       name: "Alumno de prueba",
