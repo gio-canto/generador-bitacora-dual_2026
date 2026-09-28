@@ -240,6 +240,7 @@ export default function DeliveryRegistry({ onClose }) {
   const scanControls = useRef(null);
   const pendingIds = useRef(new Set());
   const scanBoxTimer = useRef(null);
+  const tutorialOpenRef = useRef(false);
 
   const activeWeek = useMemo(
     () => state.weeks.find((week) => week.id === activeWeekId) || null,
@@ -272,6 +273,10 @@ export default function DeliveryRegistry({ onClose }) {
   }, [state.weeks, activeWeekId]);
 
   useEffect(() => {
+    tutorialOpenRef.current = tutorialOpen;
+  }, [tutorialOpen]);
+
+  useEffect(() => {
     if (view !== "scanner" || activeWeek?.closedAt) return;
     let disposed = false;
     let nativeStream = null;
@@ -293,6 +298,7 @@ export default function DeliveryRegistry({ onClose }) {
     };
 
     const processValue = (rawValue, points) => {
+      if (tutorialOpenRef.current) return;
       const student = findStudentByMatrixValue(state.students, rawValue);
       if (!student) {
         setScanMessage("Código detectado, pero no pertenece a la base cargada.");
