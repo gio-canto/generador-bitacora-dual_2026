@@ -17,6 +17,8 @@ import {
   Trash,
   UploadSimple,
   Users,
+  Info,
+  WarningCircle,
   XCircle,
 } from "@phosphor-icons/react";
 import {
@@ -35,6 +37,7 @@ import {
   weekSummary,
   writeDeliveryState,
 } from "../services/delivery-registry.js";
+import { notify } from "../services/rare-notification.jsx";
 import "../delivery-registry.css";
 
 const statusMeta = {
@@ -228,7 +231,7 @@ export default function DeliveryRegistry({ onClose }) {
     dueAt: "",
   });
   const [editingStudentId, setEditingStudentId] = useState("");
-  const [notice, setNotice] = useState("");
+  const [notice, setNotice] = useState(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [scanQueue, setScanQueue] = useState([]);
@@ -266,6 +269,11 @@ export default function DeliveryRegistry({ onClose }) {
     setState(saved);
     return saved;
   };
+
+  const showNotice = (kind, title, description = "") =>
+    setNotice({ kind, title, description });
+
+  const clearNotice = () => setNotice(null);
 
   useEffect(() => {
     if (activeWeekId && !state.weeks.some((week) => week.id === activeWeekId))
@@ -423,12 +431,12 @@ export default function DeliveryRegistry({ onClose }) {
   const saveContext = () => {
     const context = createRegistryContext(contextForm);
     if (!contextIsComplete(context)) {
-      setNotice("Selecciona el plantel.");
+      showNotice("warning", "Falta seleccionar el plantel");
       return false;
     }
     commit({ ...state, context });
     setContextForm(context);
-    setNotice("");
+    clearNotice();
     return true;
   };
 
@@ -440,12 +448,14 @@ export default function DeliveryRegistry({ onClose }) {
       setState(saved);
       setContextForm(saved.context);
       setActiveWeekId(saved.weeks.at(-1)?.id || "");
-      setNotice(
-        "Archivo cargado: " +
-          saved.students.length +
-          " alumnos y " +
+      clearNotice();
+      notify(
+        "success",
+        "Registro cargado",
+        saved.students.length +
+          " alumnos · " +
           saved.weeks.length +
-          " semanas.",
+          " semanas",
       );
       setView(
         saved.weeks.length || saved.students.length || contextIsComplete(saved.context)
@@ -453,7 +463,11 @@ export default function DeliveryRegistry({ onClose }) {
           : "welcome",
       );
     } catch (error) {
-      setNotice(error?.message || "No se pudo cargar el archivo.");
+      showNotice(
+        "error",
+        "No se pudo abrir el registro",
+        error?.message || "Revisa que sea un archivo compatible.",
+      );
     }
   };
 
@@ -469,15 +483,21 @@ export default function DeliveryRegistry({ onClose }) {
         throw new Error("No se encontraron nombres de alumnos en la primera hoja.");
       const merged = mergeStudents(state.students, incoming);
       commit({ ...state, students: merged.students });
-      setNotice(
-        "Base actualizada: " +
-          merged.added +
-          " nuevos y " +
+      clearNotice();
+      notify(
+        "success",
+        "Alumnos importados",
+        merged.added +
+          " nuevos · " +
           merged.updated +
-          " ya existentes.",
+          " actualizados",
       );
     } catch (error) {
-      setNotice(error?.message || "No se pudo leer el archivo de alumnos.");
+      showNotice(
+        "error",
+        "No se pudo importar la lista",
+        error?.message || "Revisa el archivo e inténtalo otra vez.",
+      );
     }
   };
 
@@ -489,7 +509,11 @@ export default function DeliveryRegistry({ onClose }) {
       company: String(studentForm.company || "").trim(),
     };
     if (!nextStudent.name || !nextStudent.specialty || !nextStudent.company) {
-      setNotice("Completa nombre, especialidad y empresa.");
+      showNotice(
+        "warning",
+        "Faltan datos del alumno",
+        "Completa nombre, especialidad y empresa.",
+      );
       return;
     }
 
@@ -502,7 +526,11 @@ export default function DeliveryRegistry({ onClose }) {
           }) === 0,
       );
       if (duplicate) {
-        setNotice("Ya existe otro alumno con ese nombre.");
+        showNotice(
+          "warning",
+          "Nombre ya registrado",
+          "Revisa si se trata del mismo alumno antes de continuar.",
+        );
         return;
       }
       commit({
@@ -515,16 +543,23 @@ export default function DeliveryRegistry({ onClose }) {
       });
       setEditingStudentId("");
       setStudentForm({ name: "", specialty: "", company: "" });
-      setNotice("Alumno actualizado.");
+      clearNotice();
+      notify("success", "Alumno actualizado", nextStudent.name);
       return;
     }
 
     const merged = mergeStudents(state.students, [nextStudent]);
     commit({ ...state, students: merged.students });
     setStudentForm({ name: "", specialty: "", company: "" });
-    setNotice(
-      merged.added ? "Alumno agregado." : "Ese alumno ya estaba en la base.",
-    );
+    clearNotice();
+    if (merged.added)
+      notify("success", "Alumno agregado", nextStudent.name);
+    else
+      showNotice(
+        "info",
+        "El alumno ya existe",
+        "No se agregó un registro duplicado.",
+      );
   };
 
   const editStudent = (student) => {
@@ -534,10 +569,13 @@ export default function DeliveryRegistry({ onClose }) {
       specialty: student.specialty || "",
       company: student.company || "",
     });
-    setNotice("");
+    clearNotice();
   };
 
   const deleteStudent = (studentId) => {
+    const studentName =
+      state.students.find((student) => student.id === studentId)?.name ||
+      "Alumno";
     const next = {
       ...state,
       students: state.students.filter((student) => student.id !== studentId),
@@ -548,18 +586,26 @@ export default function DeliveryRegistry({ onClose }) {
       }),
     };
     commit(next);
+    clearNotice();
+    notify("info", "Alumno eliminado", studentName);
   };
 
   const addWeek = (event, downloadAfter = false) => {
     event?.preventDefault?.();
     if (!weekForm.dueAt) {
-      setNotice(
-        "Define la fecha y hora límite para distinguir entregas a tiempo y a destiempo.",
+      showNotice(
+        "warning",
+        "Falta la fecha límite",
+        "Define la fecha y hora de entrega.",
       );
       return;
     }
     if (!state.students.length) {
-      setNotice("Agrega al menos un alumno antes de crear la semana.");
+      showNotice(
+        "warning",
+        "No hay alumnos",
+        "Agrega al menos un alumno antes de crear la semana.",
+      );
       return;
     }
     const week = createWeek({
@@ -570,40 +616,55 @@ export default function DeliveryRegistry({ onClose }) {
     const saved = commit({ ...state, weeks: [...state.weeks, week] });
     setActiveWeekId(week.id);
     setWeekForm({ label: "", startDate: "", dueAt: "" });
-    setNotice("");
+    clearNotice();
     if (downloadAfter) exportDeliveryState(saved);
+    notify(
+      "success",
+      "Semana creada",
+      week.label + (downloadAfter ? " · Archivo guardado" : ""),
+    );
     setView("week");
   };
 
   const registerManual = (studentId) => {
     if (!activeWeek || activeWeek.closedAt) return;
+    const student = state.students.find((item) => item.id === studentId);
     const weeks = state.weeks.map((week) =>
       week.id === activeWeek.id
         ? registerDelivery(week, studentId, new Date().toISOString(), "manual")
         : week,
     );
     commit({ ...state, weeks });
+    notify("success", "Entrega registrada", student?.name || "");
   };
 
   const undoDelivery = (studentId) => {
     if (!activeWeek || activeWeek.closedAt) return;
+    const student = state.students.find((item) => item.id === studentId);
     commit({
       ...state,
       weeks: state.weeks.map((week) =>
         week.id === activeWeek.id ? removeDelivery(week, studentId) : week,
       ),
     });
+    notify("info", "Registro retirado", student?.name || "");
   };
 
   const toggleWeekClosed = () => {
     if (!activeWeek) return;
-    const closedAt = activeWeek.closedAt ? "" : new Date().toISOString();
+    const reopening = Boolean(activeWeek.closedAt);
+    const closedAt = reopening ? "" : new Date().toISOString();
     commit({
       ...state,
       weeks: state.weeks.map((week) =>
         week.id === activeWeek.id ? { ...week, closedAt } : week,
       ),
     });
+    notify(
+      "info",
+      reopening ? "Semana reabierta" : "Semana cerrada",
+      activeWeek.label,
+    );
   };
 
   const finishScan = () => {
@@ -623,6 +684,13 @@ export default function DeliveryRegistry({ onClose }) {
       ),
     });
     if (scanQueue.length) exportDeliveryState(saved);
+    notify(
+      scanQueue.length ? "success" : "info",
+      scanQueue.length ? "Registro terminado" : "Sin nuevas lecturas",
+      scanQueue.length
+        ? scanQueue.length + " entregas registradas · Archivo guardado"
+        : "No se registraron entregas en esta sesión.",
+    );
     setView("week");
   };
 
@@ -746,7 +814,14 @@ export default function DeliveryRegistry({ onClose }) {
             <button
               className="btn primary"
               type="button"
-              onClick={() => exportDeliveryState(state)}
+              onClick={() => {
+                exportDeliveryState(state);
+                notify(
+                  "success",
+                  "Archivo guardado",
+                  "Registro de entrega actualizado.",
+                );
+              }}
             >
               <DownloadSimple size={18} />
               Guardar archivo
@@ -793,9 +868,22 @@ export default function DeliveryRegistry({ onClose }) {
         )}
 
         {notice && view !== "scanner" && view !== "welcome" && (
-          <div className="delivery-notice" role="status">
-            {notice}
-            <button type="button" onClick={() => setNotice("")}>
+          <div
+            className={"delivery-notice " + (notice.kind || "info")}
+            role={notice.kind === "error" ? "alert" : "status"}
+          >
+            <span className="delivery-notice-icon" aria-hidden="true">
+              {notice.kind === "error" || notice.kind === "warning" ? (
+                <WarningCircle size={20} weight="fill" />
+              ) : (
+                <Info size={20} weight="fill" />
+              )}
+            </span>
+            <div className="delivery-notice-copy">
+              <strong>{notice.title}</strong>
+              {notice.description && <span>{notice.description}</span>}
+            </div>
+            <button type="button" onClick={clearNotice} aria-label="Cerrar aviso">
               Cerrar
             </button>
           </div>
@@ -1438,12 +1526,13 @@ export default function DeliveryRegistry({ onClose }) {
             </div>
 
             {scannerError && (
-              <div className="delivery-scanner-error">
-                <strong>No se pudo iniciar el lector.</strong>
-                <p>{scannerError}</p>
-                <p>
-                  Puedes volver a la semana y registrar entregas manualmente.
-                </p>
+              <div className="delivery-scanner-error" role="alert">
+                <WarningCircle size={22} weight="fill" aria-hidden="true" />
+                <div>
+                  <strong>No se pudo iniciar el lector</strong>
+                  <p>{scannerError}</p>
+                  <span>El registro manual sigue disponible.</span>
+                </div>
               </div>
             )}
 
