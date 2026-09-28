@@ -170,13 +170,7 @@ function spreadsheetRowsToStudents(rows) {
           "nombre del alumno",
         ]) ||
         String(values.find((value) => String(value || "").trim()) || "").trim();
-      return {
-        name,
-        school: pickColumn(row, ["plantel", "escuela", "institucion", "institución"]),
-        specialty: pickColumn(row, ["especialidad", "carrera"]),
-        semester: pickColumn(row, ["semestre", "grado"]),
-        group: pickColumn(row, ["grupo"]),
-      };
+      return { name };
     })
     .filter((student) => student.name);
 }
