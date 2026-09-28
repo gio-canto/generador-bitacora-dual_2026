@@ -15,6 +15,7 @@ import companies from "../data/companies.json";
 import schools from "../data/schools.json";
 import { parseBackup } from "../services/storage.js";
 import { notify, notifyImported } from "../services/rare-notification.jsx";
+import { createMatrixPayload } from "../services/delivery-registry.js";
 export function startEditor() {
   "use strict";
   (() => {
@@ -1450,36 +1451,25 @@ export function startEditor() {
         c.strokeRect(mm(x, p), mm(y, p), mm(w, p), mm(h, p));
       }
     }
-    function drawStudentDataMatrix(c, student, p) {
-      const value = String(student || "").replace(/\s+/g, " ").trim();
+    function drawStudentDataMatrix(c, identity, p) {
+      const value = createMatrixPayload(identity);
       if (!value || !globalThis.bwipjs?.toCanvas) return false;
 
       const code = document.createElement("canvas");
-      const draw = (text) =>
+      try {
         globalThis.bwipjs.toCanvas(code, {
           bcid: "datamatrix",
-          text,
-          scale: 5,
+          text: value,
+          scale: 8,
           padding: 0,
           includetext: false,
         });
-
-      try {
-        draw(value);
       } catch {
-        try {
-          draw(
-            value
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, ""),
-          );
-        } catch {
-          return false;
-        }
+        return false;
       }
 
-      const size = 13.2,
-        quiet = 1.25,
+      const size = 15.5,
+        quiet = 1.4,
         x = 2.4,
         y = 2.4;
       rect(
@@ -1542,7 +1532,7 @@ export function startEditor() {
       const c = canvas.getContext("2d");
       c.fillStyle = "#fff";
       c.fillRect(0, 0, canvas.width, canvas.height);
-      const matrixReady = drawStudentDataMatrix(c, id.student, p);
+      const matrixReady = drawStudentDataMatrix(c, id, p);
       if (logoImage && logoImage.complete && logoImage.naturalWidth)
         c.drawImage(
           logoImage,

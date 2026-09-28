@@ -33,7 +33,7 @@ window.addEventListener("bitacora-update", (event) => {
   const banner = document.createElement("div");
   banner.id = "updateNotice";
   banner.className = "update-notice";
-  banner.append("Hay una actualización disponible. ");
+  banner.append("Hay una nueva versión disponible. ");
   const button = document.createElement("button");
   button.className = "btn";
   button.textContent = "Actualizar";
@@ -49,12 +49,17 @@ window.addEventListener("bitacora-update", (event) => {
     else worker.postMessage({ type: "SKIP_WAITING" });
   };
   banner.append(button);
-  document.querySelector(".topbar")?.after(banner);
+  const anchor = document.querySelector(".topbar, .delivery-topbar");
+  if (anchor) anchor.after(banner);
+  else document.body.prepend(banner);
 });
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
+    const serviceWorkerUrl = /\/registro-entrega\/?$/i.test(location.pathname)
+      ? "../sw.js"
+      : "./sw.js";
     navigator.serviceWorker
-      .register("./sw.js", { updateViaCache: "none" })
+      .register(serviceWorkerUrl, { updateViaCache: "none" })
       .then((reg) => {
         const announce = () => {
           if (reg.waiting)

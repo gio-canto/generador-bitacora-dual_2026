@@ -702,11 +702,21 @@ label.delivery-action-tile:hover{background:#f0f0f3;transform:translateY(-1px)}
 }
 .delivery-entry-card.primary>b{border-color:rgba(255,255,255,.18)}
 
+.delivery-tutorial-overlay{
+  position:fixed;
+  inset:0;
+  z-index:300;
+  padding:18px;
+  overflow:auto;
+  background:rgba(20,20,24,.36);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
 .delivery-tutorial-stage{
-  min-height:calc(100dvh - 180px);
+  min-height:100%;
   display:grid;
   place-items:center;
-  padding:20px 0 60px;
+  padding:20px 0;
 }
 .delivery-tutorial-card{
   width:min(700px,100%);
@@ -1065,4 +1075,11 @@ button.delivery-action-tile{cursor:pointer}
 @media(max-width:760px){
   .delivery-student-form{grid-template-columns:1fr}
   .delivery-import-single{min-height:76px}
+}
+
+
+.delivery-app>.update-notice{
+  width:min(1180px,calc(100% - 28px));
+  margin:12px auto 0;
+  box-shadow:0 8px 26px rgba(0,0,0,.05);
 }

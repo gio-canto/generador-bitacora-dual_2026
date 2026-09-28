@@ -20,6 +20,74 @@ export function normalizeName(value) {
     .toLocaleLowerCase("es-MX");
 }
 
+function encodeMatrixField(value) {
+  const bytes = new TextEncoder().encode(clean(value));
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return globalThis
+    .btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function decodeMatrixField(value) {
+  const base64 = String(value || "")
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+  const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+  const binary = globalThis.atob(padded);
+  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+  return clean(new TextDecoder().decode(bytes));
+}
+
+export function createMatrixPayload(data = {}) {
+  const name = clean(data.name ?? data.student, 180);
+  if (!name) return "";
+  return [
+    "BD26",
+    "3",
+    encodeMatrixField(name),
+    encodeMatrixField(data.specialty),
+    encodeMatrixField(data.company),
+  ].join("|");
+}
+
+export function parseMatrixPayload(rawValue) {
+  const raw = clean(rawValue, 900);
+  if (!raw) return { version: 0, name: "", specialty: "", company: "" };
+
+  const parts = raw.split("|");
+  if (parts[0]?.toUpperCase() === "BD26" && parts[1] === "3" && parts.length >= 5) {
+    try {
+      return {
+        version: 3,
+        name: decodeMatrixField(parts[2]),
+        specialty: decodeMatrixField(parts[3]),
+        company: decodeMatrixField(parts.slice(4).join("|")),
+      };
+    } catch {
+      return { version: 0, name: "", specialty: "", company: "" };
+    }
+  }
+
+  if (/^BD26\|/i.test(raw)) {
+    return {
+      version: 1,
+      name: clean(raw.slice(5), 180),
+      specialty: "",
+      company: "",
+    };
+  }
+
+  return {
+    version: 0,
+    name: clean(raw, 180),
+    specialty: "",
+    company: "",
+  };
+}
+
 export function createRegistryContext(data = {}) {
   return {
     school: clean(data.school),
@@ -287,18 +355,33 @@ export function mergeStudents(current, incoming) {
 }
 
 export function matrixValueToName(rawValue) {
-  const raw = clean(rawValue, 300);
-  if (!raw) return "";
-  if (/^BD26\|/i.test(raw)) return clean(raw.slice(5), 180);
-  return raw;
+  return parseMatrixPayload(rawValue).name;
 }
 
 export function findStudentByMatrixValue(students, rawValue) {
-  const key = normalizeName(matrixValueToName(rawValue));
-  if (!key) return null;
-  return (
-    students.find((student) => normalizeName(student.name) === key) || null
+  const payload = parseMatrixPayload(rawValue);
+  const nameKey = normalizeName(payload.name);
+  if (!nameKey) return null;
+
+  const byName = students.filter(
+    (student) => normalizeName(student.name) === nameKey,
   );
+
+  if (payload.version >= 3) {
+    const specialtyKey = normalizeName(payload.specialty);
+    const companyKey = normalizeName(payload.company);
+    return (
+      byName.find(
+        (student) =>
+          normalizeName(student.specialty) === specialtyKey &&
+          normalizeName(student.company) === companyKey,
+      ) || null
+    );
+  }
+
+  // Los códigos anteriores sólo tenían el nombre. Se aceptan únicamente
+  // cuando ese nombre identifica a una sola persona en la base.
+  return byName.length === 1 ? byName[0] : null;
 }
 
 export function weekSummary(week, students) {

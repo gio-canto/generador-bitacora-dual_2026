@@ -216,6 +216,7 @@ export default function DeliveryRegistry({ onClose }) {
   );
   const [setupStep, setSetupStep] = useState(0);
   const [tutorialStep, setTutorialStep] = useState(0);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const [studentForm, setStudentForm] = useState({
     name: "",
     specialty: "",
@@ -239,6 +240,7 @@ export default function DeliveryRegistry({ onClose }) {
   const scanControls = useRef(null);
   const pendingIds = useRef(new Set());
   const scanBoxTimer = useRef(null);
+  const tutorialOpenRef = useRef(false);
 
   const activeWeek = useMemo(
     () => state.weeks.find((week) => week.id === activeWeekId) || null,
@@ -271,6 +273,10 @@ export default function DeliveryRegistry({ onClose }) {
   }, [state.weeks, activeWeekId]);
 
   useEffect(() => {
+    tutorialOpenRef.current = tutorialOpen;
+  }, [tutorialOpen]);
+
+  useEffect(() => {
     if (view !== "scanner" || activeWeek?.closedAt) return;
     let disposed = false;
     let nativeStream = null;
@@ -292,6 +298,7 @@ export default function DeliveryRegistry({ onClose }) {
     };
 
     const processValue = (rawValue, points) => {
+      if (tutorialOpenRef.current) return;
       const student = findStudentByMatrixValue(state.students, rawValue);
       if (!student) {
         setScanMessage("Código detectado, pero no pertenece a la base cargada.");
@@ -712,18 +719,16 @@ export default function DeliveryRegistry({ onClose }) {
           />
         </button>
         <div className="delivery-top-actions">
-          {view !== "welcome" && (
-            <button
-              className="btn"
-              type="button"
-              onClick={() => {
-                setTutorialStep(0);
-                setView("tutorial");
-              }}
-            >
-              Tutorial
-            </button>
-          )}
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setTutorialStep(0);
+              setTutorialOpen(true);
+            }}
+          >
+            Tutorial
+          </button>
           <label className="btn delivery-file-button">
             <UploadSimple size={18} />
             Abrir archivo
@@ -763,7 +768,7 @@ export default function DeliveryRegistry({ onClose }) {
                 type="button"
                 onClick={() => {
                   setTutorialStep(0);
-                  setView("tutorial");
+                  setTutorialOpen(true);
                 }}
               >
                 <div className="delivery-entry-icon">
@@ -794,115 +799,6 @@ export default function DeliveryRegistry({ onClose }) {
               Cerrar
             </button>
           </div>
-        )}
-
-        {view === "tutorial" && (
-          <section className="delivery-tutorial-stage">
-            <article className="delivery-tutorial-card">
-              <div className="delivery-tutorial-top">
-                <span>
-                  Tutorial · {tutorialStep + 1} de {tutorialSteps.length}
-                </span>
-                <div className="delivery-tutorial-dots">
-                  {tutorialSteps.map((_, index) => (
-                    <i
-                      key={index}
-                      className={index <= tutorialStep ? "active" : ""}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div
-                className={
-                  "delivery-tutorial-demo " +
-                  tutorialSteps[tutorialStep].visual
-                }
-              >
-                {tutorialSteps[tutorialStep].visual === "school" && (
-                  <>
-                    <Users size={38} />
-                    <div>
-                      <strong>Plantel</strong>
-                    </div>
-                  </>
-                )}
-                {tutorialSteps[tutorialStep].visual === "students" && (
-                  <>
-                    <Users size={38} />
-                    <div>
-                      <strong>Nombre</strong>
-                      <span>Especialidad · Empresa</span>
-                    </div>
-                  </>
-                )}
-                {tutorialSteps[tutorialStep].visual === "week" && (
-                  <>
-                    <Clock size={38} />
-                    <div>
-                      <strong>Semana 4</strong>
-                      <span>Entrega límite · viernes 14:00</span>
-                    </div>
-                  </>
-                )}
-                {tutorialSteps[tutorialStep].visual === "scan" && (
-                  <>
-                    <Scan size={42} />
-                    <div className="delivery-tutorial-scanbox">DATA MATRIX</div>
-                    <strong>LECTURA OK</strong>
-                  </>
-                )}
-                {tutorialSteps[tutorialStep].visual === "finish" && (
-                  <div className="delivery-tutorial-mini-status">
-                    <span>12 Entregados</span>
-                    <span>2 A destiempo</span>
-                    <span>4 Pendientes</span>
-                  </div>
-                )}
-              </div>
-
-              <h2>{tutorialSteps[tutorialStep].title}</h2>
-              <p>{tutorialSteps[tutorialStep].text}</p>
-
-              <div className="delivery-tutorial-actions">
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={() => {
-                    if (tutorialStep === 0)
-                      setView(started ? "home" : "welcome");
-                    else setTutorialStep((step) => step - 1);
-                  }}
-                >
-                  <ArrowLeft size={17} />
-                  {tutorialStep === 0 ? "Salir" : "Atrás"}
-                </button>
-                <button
-                  className="btn primary"
-                  type="button"
-                  onClick={() => {
-                    if (tutorialStep < tutorialSteps.length - 1) {
-                      setTutorialStep((step) => step + 1);
-                      return;
-                    }
-                    commit({
-                      ...state,
-                      settings: { ...state.settings, tutorialDone: true },
-                    });
-                    if (started) setView("home");
-                    else startSetup();
-                  }}
-                >
-                  {tutorialStep === tutorialSteps.length - 1
-                    ? started
-                      ? "Terminar"
-                      : "Crear registro"
-                    : "Siguiente"}
-                  <ArrowRight size={17} />
-                </button>
-              </div>
-            </article>
-          </section>
         )}
 
         {view === "setup" && (
@@ -1589,6 +1485,112 @@ export default function DeliveryRegistry({ onClose }) {
           </section>
         )}
       </main>
+
+      {tutorialOpen && (
+        <div
+          className="delivery-tutorial-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Tutorial del registro de entrega"
+        >
+          <section className="delivery-tutorial-stage">
+            <article className="delivery-tutorial-card">
+              <div className="delivery-tutorial-top">
+                <span>
+                  Tutorial · {tutorialStep + 1} de {tutorialSteps.length}
+                </span>
+                <div className="delivery-tutorial-dots">
+                  {tutorialSteps.map((_, index) => (
+                    <i
+                      key={index}
+                      className={index <= tutorialStep ? "active" : ""}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div
+                className={
+                  "delivery-tutorial-demo " +
+                  tutorialSteps[tutorialStep].visual
+                }
+              >
+                {tutorialSteps[tutorialStep].visual === "school" && (
+                  <>
+                    <Users size={38} />
+                    <div><strong>Plantel</strong></div>
+                  </>
+                )}
+                {tutorialSteps[tutorialStep].visual === "students" && (
+                  <>
+                    <Users size={38} />
+                    <div>
+                      <strong>Nombre</strong>
+                      <span>Especialidad · Empresa</span>
+                    </div>
+                  </>
+                )}
+                {tutorialSteps[tutorialStep].visual === "week" && (
+                  <>
+                    <Clock size={38} />
+                    <div>
+                      <strong>Semana</strong>
+                      <span>Fecha y hora límite</span>
+                    </div>
+                  </>
+                )}
+                {tutorialSteps[tutorialStep].visual === "scan" && (
+                  <>
+                    <Scan size={42} />
+                    <div className="delivery-tutorial-scanbox">DATA MATRIX</div>
+                    <strong>LECTURA OK</strong>
+                  </>
+                )}
+              </div>
+
+              <h2>{tutorialSteps[tutorialStep].title}</h2>
+              <p>{tutorialSteps[tutorialStep].text}</p>
+
+              <div className="delivery-tutorial-actions">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => {
+                    if (tutorialStep === 0) setTutorialOpen(false);
+                    else setTutorialStep((step) => step - 1);
+                  }}
+                >
+                  <ArrowLeft size={17} />
+                  {tutorialStep === 0 ? "Cerrar" : "Atrás"}
+                </button>
+                <button
+                  className="btn primary"
+                  type="button"
+                  onClick={() => {
+                    if (tutorialStep < tutorialSteps.length - 1) {
+                      setTutorialStep((step) => step + 1);
+                      return;
+                    }
+                    commit({
+                      ...state,
+                      settings: { ...state.settings, tutorialDone: true },
+                    });
+                    setTutorialOpen(false);
+                    if (!started) startSetup();
+                  }}
+                >
+                  {tutorialStep === tutorialSteps.length - 1
+                    ? started
+                      ? "Cerrar"
+                      : "Ingresar"
+                    : "Siguiente"}
+                  <ArrowRight size={17} />
+                </button>
+              </div>
+            </article>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

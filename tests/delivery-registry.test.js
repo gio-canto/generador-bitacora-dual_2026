@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   contextIsComplete,
   createRegistryContext,
+  createMatrixPayload,
   createStudent,
   createWeek,
   deliveryStatus,
   findStudentByMatrixValue,
   mergeStudents,
+  parseMatrixPayload,
   parsePortableDeliveryFile,
   registerDelivery,
   statusFromTimestamp,
@@ -58,6 +60,40 @@ describe("subsistema de registro de entrega", () => {
     expect(
       findStudentByMatrixValue([student], "BD26|Jose Angel Nunez")?.id,
     ).toBe(student.id);
+  });
+
+  it("codifica nombre, especialidad y empresa en el Data Matrix actual", () => {
+    const payload = createMatrixPayload({
+      student: "José Ángel Núñez",
+      specialty: "Programación",
+      company: "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)",
+    });
+    expect(parseMatrixPayload(payload)).toEqual({
+      version: 3,
+      name: "José Ángel Núñez",
+      specialty: "Programación",
+      company: "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)",
+    });
+  });
+
+  it("usa especialidad y empresa para distinguir nombres repetidos", () => {
+    const a = createStudent({
+      name: "Alex García",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const b = createStudent({
+      name: "Alex García",
+      specialty: "Contabilidad",
+      company: "ITCH",
+    });
+    const payload = createMatrixPayload({
+      student: "Alex García",
+      specialty: "Contabilidad",
+      company: "ITCH",
+    });
+    expect(findStudentByMatrixValue([a, b], payload)?.id).toBe(b.id);
+    expect(findStudentByMatrixValue([a, b], "Alex García")).toBeNull();
   });
 
   it("usa únicamente la escuela como configuración general", () => {
