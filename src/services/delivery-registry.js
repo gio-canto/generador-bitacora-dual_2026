@@ -306,6 +306,32 @@ export function readGeneratorSnapshot(storage = globalThis.localStorage) {
     }
   } catch {}
 
+  // El controlador que hoy usa la interfaz principal todavía conserva sus
+  // registros históricos en estas claves. Se leen también para que ambos
+  // subsistemas compartan la misma información sin pedirla dos veces.
+  try {
+    if (!records.length) {
+      const legacyRecords = JSON.parse(
+        storage?.getItem("bitacora_dual_clean_v3") || "[]",
+      );
+      if (Array.isArray(legacyRecords)) records = legacyRecords;
+    }
+    if (!draft) {
+      const legacyDraft = JSON.parse(
+        storage?.getItem("bitacora_dual_draft_v1") || "null",
+      );
+      if (legacyDraft && typeof legacyDraft === "object") {
+        draft = legacyDraft.identity
+          ? {
+              ...legacyDraft.identity,
+              weekDate: legacyDraft.weekDate,
+              entries: legacyDraft.entries,
+            }
+          : legacyDraft;
+      }
+    }
+  } catch {}
+
   let profile = {};
   try {
     profile = readProfileData(storage);
