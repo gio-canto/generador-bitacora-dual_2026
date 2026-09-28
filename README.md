@@ -9,7 +9,7 @@ Una semana de actividades, un PDF listo para firmar.
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
 
-[Abrir aplicación](https://gio-canto.github.io/generador-bitacora-dual_2026/) · [Preguntas frecuentes](https://gio-canto.github.io/generador-bitacora-dual_2026/faq/) · [Notas de versión](CHANGELOG.md) · [Reportar un problema](https://github.com/gio-canto/generador-bitacora-dual_2026/issues)
+[Abrir aplicación](https://gio-canto.github.io/generador-bitacora-dual_2026/) · [Registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/) · [Preguntas frecuentes](https://gio-canto.github.io/generador-bitacora-dual_2026/faq/) · [Notas de versión](CHANGELOG.md) · [Reportar un problema](https://github.com/gio-canto/generador-bitacora-dual_2026/issues)
 
 </div>
 
@@ -39,6 +39,12 @@ Sileo confirma acciones como guardar o importar y muestra avisos breves del sist
 La semana pide el martes de inicio, entrada y salida. Markdown sigue activo en Más opciones. Historial y respaldos están plegados. La barra superior recuerda el nombre con un Blobatar local; puedes cambiarlo u olvidarlo. COCYTIEG activa el instructor por defecto. Los nombres cortos para firmas se configuran en los JSON.
 
 No hay cuentas ni servidor de bitácoras. Los datos permanecen en el navegador. Descargar PDF guarda también la semana en el historial. Para llevarte una copia del historial, usa Exportar respaldo en el último paso.
+
+## Registro de entrega
+
+Acceso directo: **[Abrir Subsistema de registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/)**.
+
+El plantel configura una sola base de alumnos. Cada alumno conserva nombre, especialidad y empresa. Las bitácoras incluyen un **Data Matrix** que permite registrar entregas por cámara en serie y guardar fecha, hora y estado de la entrega.
 
 ## Uso rápido
 
