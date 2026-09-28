@@ -313,6 +313,43 @@ function rect(c, x, y, w, h, fill, stroke, lw, p) {
     c.strokeRect(mm(x, p), mm(y, p), mm(w, p), mm(h, p));
   }
 }
+function drawStudentDataMatrix(c, student, p) {
+  const value = String(student || "").replace(/\s+/g, " ").trim();
+  if (!value || !globalThis.bwipjs?.toCanvas) return;
+  const code = document.createElement("canvas");
+  const render = (text) =>
+    globalThis.bwipjs.toCanvas(code, {
+      bcid: "datamatrix",
+      text,
+      scale: 3,
+      padding: 0,
+      includetext: false,
+    });
+  try {
+    render(value);
+  } catch {
+    try {
+      render(
+        value
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, ""),
+      );
+    } catch {
+      return;
+    }
+  }
+  const size = 11.8;
+  c.save();
+  c.imageSmoothingEnabled = false;
+  c.drawImage(
+    code,
+    mm(2.4, p),
+    mm(2.4, p),
+    mm(size, p),
+    mm(size, p),
+  );
+  c.restore();
+}
 function styled(c, lines, x, y, s, lh, p) {
   lines.forEach((ln, ri) => {
     let cx = x;
@@ -340,6 +377,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
   const c = canvas.getContext("2d");
   c.fillStyle = "#fff";
   c.fillRect(0, 0, canvas.width, canvas.height);
+  drawStudentDataMatrix(c, id.student, p);
   if (logoImage?.naturalWidth) {
     const w = layout.logo.w * 0.9625,
       h = w / (logoImage.naturalWidth / logoImage.naturalHeight);
