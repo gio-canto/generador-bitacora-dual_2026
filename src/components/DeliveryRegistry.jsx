@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Blobatar } from "blobatar/react";
+import schools from "../data/schools.json";
+import companies from "../data/companies.json";
 import {
   ArrowLeft,
   Camera,
@@ -18,16 +20,22 @@ import {
   XCircle,
 } from "@phosphor-icons/react";
 import {
+  contextIsComplete,
+  createRegistryContext,
   createStudent,
   createWeek,
   deliveryStatus,
   exportDeliveryState,
+  exportWeekCsv,
   findStudentByMatrixValue,
   mergeStudents,
   parsePortableDeliveryFile,
   readDeliveryState,
+  readGeneratorSnapshot,
   registerDelivery,
   removeDelivery,
+  studentsFromGenerator,
+  weekSummary,
   writeDeliveryState,
 } from "../services/delivery-registry.js";
 import "../delivery-registry.css";
