@@ -14,7 +14,11 @@ Sitio estático compilado con Vite. La corrección beta.2 restaura el HTML, CSS 
 | `src/data/*.json` | Catálogos editados en el repositorio |
 | `src/services/recover-original.js` | Recuperación de datos de beta.1 |
 | `src/services/rare-notification.jsx` | Carga diferida de Sileo para acciones explícitas y avisos breves |
-| `faq/index.html` | FAQ original con buscador, ejemplos y versiones |
+| `faq/index.html` | FAQ con buscador, ejemplos y notas de versión |
+| `registro-entrega/index.html` | Entrada independiente del Subsistema de registro de entrega |
+| `src/components/DeliveryRegistry.jsx` | Flujo React del registro: configuración, alumnos, semanas, tutorial y escáner |
+| `src/services/delivery-registry.js` | Esquema local, migraciones, Data Matrix, estados, JSON portátil y CSV |
+| `src/delivery-registry.css` | Diseño y estados visuales del subsistema |
 
 La vista previa espera 120 ms desde la última modificación y solo dibuja si su panel es visible. La exportación mantiene la resolución original de 11.81 píxeles/mm. Los ajustes del logotipo y etiquetas de firma se aplican dentro del motor, sin modificar prototipos globales de Canvas.
 
@@ -23,3 +27,12 @@ La prioridad de esta corrección es recuperar comportamiento e identidad visual.
 ## Parte 2
 
 `src/components/Profile.jsx` monta un componente React independiente en la barra superior. Usa `blobatar/react` y `src/services/profile.js`; no envía el nombre a un servicio externo. El controlador original sigue a cargo del formulario. `src/domain/presentation.js` concentra las reglas del martes, nombres de firma y disparadores secretos. La hoja de estilos aplica animaciones cortas con alternativas de movimiento reducido.
+
+
+## Serie 0.50 · Registro de entrega
+
+El registro de entrega es una segunda entrada de la aplicación, compilada por Vite como `registro-entrega/index.html`. No aparece en la navegación principal del generador. `App.jsx` detecta esa ruta y monta `DeliveryRegistry`; el generador normal conserva la frontera heredada.
+
+El subsistema mantiene una base por plantel y alumnos con nombre, especialidad y empresa. El Data Matrix se genera también en el motor heredado de PDF (`src/legacy/editor.js`) porque ese sigue siendo el camino real de descarga del generador principal. `src/services/pdf.js` conserva la misma codificación para mantener equivalencia.
+
+El escáner intenta ZXing Browser y conserva `BarcodeDetector` como alternativa cuando el navegador ofrece Data Matrix. El cuadro de detección compensa `object-fit: cover` para alinear las coordenadas de la lectura con el video visible. Las confirmaciones breves usan Sileo; los errores o datos faltantes que requieren corrección permanecen dentro de la pantalla.
