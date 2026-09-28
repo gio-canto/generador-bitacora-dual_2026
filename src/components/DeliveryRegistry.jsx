@@ -672,7 +672,7 @@ export default function DeliveryRegistry({ onClose }) {
         <div className="delivery-student-main">
           <strong>{student.name}</strong>
           <span>
-            {[student.specialty, student.semester && `${student.semester}°`, student.group]
+            {[state.context.specialty, state.context.semester && state.context.semester + "°", state.context.group]
               .filter(Boolean)
               .join(" · ") || "Alumno"}
           </span>
@@ -690,12 +690,22 @@ export default function DeliveryRegistry({ onClose }) {
         </div>
         <div className="delivery-row-actions">
           {status === "no_entregado" ? (
-            <button className="btn" type="button" onClick={() => registerManual(student.id)}>
-              Registrar entrega
+            <button
+              className="btn"
+              type="button"
+              disabled={Boolean(week.closedAt)}
+              onClick={() => registerManual(student.id)}
+            >
+              Registrar
             </button>
           ) : (
-            <button className="btn" type="button" onClick={() => undoDelivery(student.id)}>
-              Quitar registro
+            <button
+              className="btn"
+              type="button"
+              disabled={Boolean(week.closedAt)}
+              onClick={() => undoDelivery(student.id)}
+            >
+              Corregir
             </button>
           )}
         </div>
