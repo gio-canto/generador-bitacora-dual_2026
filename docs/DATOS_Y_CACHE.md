@@ -2,6 +2,8 @@
 
 Las bitácoras permanecen en el navegador. No hay cuentas ni sincronización entre dispositivos.
 
+## Generador de bitácoras
+
 - Historial: `bitacora_dual_clean_v3`.
 - Borrador: `bitacora_dual_draft_v1`.
 - La primera apertura tras beta.1 recupera su historial y borrador. Conserva intacto `bitacora_dual_react_v1` como copia de recuperación; una marca evita repetir la migración.
@@ -14,3 +16,17 @@ El service worker guarda una versión identificada por el contenido del generado
 Limpiar los datos del sitio elimina el historial local. La caché de archivos no es un respaldo de las bitácoras.
 
 El perfil usa `bitacora_profile_v1`, separado de la caché de archivos. Puede recordar localmente el nombre, plantel, especialidad, semestre o grado, grupo, empresa, horario, área común, responsable que autoriza, instructor formador y preferencias recurrentes como Markdown o firma genérica del alumno. También guarda si la sección de firma del alumno ya fue presentada: se abre automáticamente sólo antes del primer guardado y después queda plegada, conservando activada o desactivada la elección realizada. Estos datos sirven únicamente para completar nuevas bitácoras; no se guardan en el perfil fechas, estados de jornada, actividades ni justificaciones. El nombre también se actualiza al escribirlo y las palabras secretas no lo sustituyen. Desde el avatar se puede editar u olvidar la información predeterminada sin eliminar el borrador ni el historial. El avatar se genera localmente a partir del nombre; no hay cuentas.
+
+
+## Registro de entrega · Beta 0.50
+
+El Subsistema de registro de entrega usa almacenamiento separado del historial del generador.
+
+- Estado actual: `bitacora_dual_delivery_registry_v3`.
+- Las claves `bitacora_dual_delivery_registry_v2` y `bitacora_dual_delivery_registry_v1` se leen para migración y no se usan como formato nuevo.
+- La configuración general guarda el plantel. Cada alumno conserva nombre, especialidad y empresa.
+- Cada semana guarda fecha límite, cierre y entregas por alumno con estado, fecha/hora y origen (`camera`, `manual` o `import`).
+- **Guardar archivo** descarga un JSON portátil del registro completo. Terminar una sesión de cámara con lecturas nuevas descarga también una copia actualizada.
+- El CSV semanal es una exportación de consulta; no sustituye al JSON portátil.
+- El Data Matrix de las bitácoras utiliza un formato versionado con nombre, especialidad y empresa. Los códigos antiguos con sólo nombre se aceptan únicamente cuando no existe ambigüedad en la base.
+- El lector de cámara y la importación de hojas se procesan en el navegador. El subsistema carga bwip-js, SheetJS y ZXing Browser desde las URLs declaradas en el HTML; esas dependencias externas no forman parte del caché principal del service worker.
