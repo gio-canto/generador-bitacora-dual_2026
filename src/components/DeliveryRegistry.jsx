@@ -29,11 +29,15 @@ import {
   exportDeliveryState,
   exportWeekCsv,
   findStudentByMatrixValue,
+  findWeekByMatrixValue,
+  matrixPeriodLabel,
   mergeStudents,
+  parseMatrixPayload,
   parsePortableDeliveryFile,
   readDeliveryState,
   registerDelivery,
   removeDelivery,
+  statusFromTimestamp,
   weekSummary,
   writeDeliveryState,
 } from "../services/delivery-registry.js";
@@ -56,6 +60,23 @@ function formatDateTime(value) {
   }).format(date);
 }
 
+function formatDate(value) {
+  if (!value) return "";
+  const date = new Date(value + "T12:00:00");
+  if (!Number.isFinite(+date)) return value;
+  return new Intl.DateTimeFormat("es-MX", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function formatPeriod(startDate, endDate) {
+  if (!startDate && !endDate) return "Sin periodo";
+  if (!endDate || startDate === endDate) return formatDate(startDate || endDate);
+  return formatDate(startDate) + " – " + formatDate(endDate);
+}
+
 const tutorialSteps = [
   {
     title: "Escuela",
@@ -74,7 +95,7 @@ const tutorialSteps = [
   },
   {
     title: "Escaneo",
-    text: "Escanea el Data Matrix de cada bitácora. La entrega queda registrada con fecha y hora.",
+    text: "Escanea las bitácoras en cualquier orden. El periodo del Data Matrix decide la semana y la hora decide si fue a tiempo o a destiempo.",
     visual: "scan",
   },
 ];
@@ -244,6 +265,7 @@ export default function DeliveryRegistry({ onClose }) {
   const pendingIds = useRef(new Set());
   const scanBoxTimer = useRef(null);
   const tutorialOpenRef = useRef(false);
+  const scanProcessorRef = useRef(null);
 
   const activeWeek = useMemo(
     () => state.weeks.find((week) => week.id === activeWeekId) || null,
@@ -285,7 +307,7 @@ export default function DeliveryRegistry({ onClose }) {
   }, [tutorialOpen]);
 
   useEffect(() => {
-    if (view !== "scanner" || activeWeek?.closedAt) return;
+    if (view !== "scanner" || !state.weeks.length) return;
     let disposed = false;
     let nativeStream = null;
     let nativeFrame = 0;
@@ -310,38 +332,100 @@ export default function DeliveryRegistry({ onClose }) {
 
     const processValue = (rawValue, points) => {
       if (tutorialOpenRef.current) return;
+      const payload = parseMatrixPayload(rawValue);
       const student = findStudentByMatrixValue(state.students, rawValue);
       if (!student) {
-        setScanMessage("Código detectado, pero no pertenece a la base cargada.");
+        setScanMessage("Código leído, pero el alumno no coincide con la base.");
         showDetection("error");
         return;
       }
-      if (activeWeek?.deliveries?.[student.id]) {
-        setScanMessage(`${student.name} ya estaba registrado en esta semana.`);
-        showDetection("seen");
+
+      const targetWeek = findWeekByMatrixValue(
+        state.weeks,
+        rawValue,
+        activeWeekId,
+      );
+      if (!targetWeek) {
+        const period = matrixPeriodLabel(rawValue);
+        setScanMessage(
+          period
+            ? "No existe una semana para " + period + "."
+            : "Este código antiguo necesita una semana seleccionada.",
+        );
+        showDetection("error");
         return;
       }
-      if (pendingIds.current.has(student.id)) {
-        setScanMessage(`${student.name} ya fue detectado en esta sesión.`);
+
+      if (targetWeek.deliveries?.[student.id]) {
+        setScanMessage(
+          student.name + " ya estaba registrado en " + targetWeek.label + ".",
+        );
         showDetection("seen");
         return;
       }
 
-      pendingIds.current.add(student.id);
+      const pendingKey = targetWeek.id + ":" + student.id;
+      if (pendingIds.current.has(pendingKey)) {
+        setScanMessage(
+          student.name + " ya fue detectado para " + targetWeek.label + ".",
+        );
+        showDetection("seen");
+        return;
+      }
+
+      pendingIds.current.add(pendingKey);
       const at = new Date().toISOString();
-      setScanQueue((current) => [...current, { studentId: student.id, name: student.name, at }]);
-      setScanMessage(`Detectado: ${student.name}`);
+      const status = statusFromTimestamp(targetWeek, at);
+      setScanQueue((current) => [
+        ...current,
+        {
+          studentId: student.id,
+          name: student.name,
+          at,
+          weekId: targetWeek.id,
+          weekLabel: targetWeek.label,
+          startDate: targetWeek.startDate,
+          endDate: targetWeek.endDate,
+          status,
+          matrixVersion: payload.version,
+        },
+      ]);
+      setScanMessage(
+        student.name +
+          " → " +
+          targetWeek.label +
+          (status === "entregado_tarde" ? " · A destiempo" : ""),
+      );
 
       const box = resultBoxFromPoints(videoRef.current, points);
       showDetection("ok", box);
     };
 
+    scanProcessorRef.current = processValue;
+
     async function start() {
       const video = videoRef.current;
       if (!video) return;
       try {
-        if (window.ZXingBrowser?.BrowserDatamatrixCodeReader) {
-          const reader = new window.ZXingBrowser.BrowserDatamatrixCodeReader();
+        const ZX = window.ZXingBrowser;
+        const Reader =
+          ZX?.BrowserDatamatrixCodeReader || ZX?.BrowserMultiFormatReader;
+
+        if (Reader) {
+          const options = {
+            delayBetweenScanAttempts: 120,
+            delayBetweenScanSuccess: 220,
+            tryPlayVideoTimeout: 8000,
+          };
+          const reader = ZX.BrowserDatamatrixCodeReader
+            ? new ZX.BrowserDatamatrixCodeReader(undefined, options)
+            : new ZX.BrowserMultiFormatReader(undefined, options);
+          if (
+            !ZX.BrowserDatamatrixCodeReader &&
+            ZX.BarcodeFormat?.DATA_MATRIX !== undefined
+          )
+            reader.possibleFormats = [ZX.BarcodeFormat.DATA_MATRIX];
+
           const controls = await reader.decodeFromConstraints(
             {
               audio: false,
@@ -352,14 +436,44 @@ export default function DeliveryRegistry({ onClose }) {
               },
             },
             video,
-            (result) => {
-              if (!result || disposed) return;
-              processValue(
-                result.getText?.() || result.text || "",
-                result.getResultPoints?.() || [],
-              );
+            (result, error) => {
+              if (disposed) return;
+              if (result) {
+                processValue(
+                  result.getText?.() || result.text || "",
+                  result.getResultPoints?.() || [],
+                );
+                return;
+              }
+              const errorName = String(error?.name || error?.constructor?.name || "");
+              if (
+                error &&
+                errorName &&
+                !/NotFound|Checksum|Format/i.test(errorName)
+              ) {
+                setScannerError(
+                  error?.message || "El lector se detuvo inesperadamente.",
+                );
+              }
             },
           );
+
+          const track = video.srcObject?.getVideoTracks?.()[0];
+          if (track?.getCapabilities && track?.applyConstraints) {
+            try {
+              const capabilities = track.getCapabilities();
+              if (Array.isArray(capabilities.focusMode) &&
+                  capabilities.focusMode.includes("continuous")) {
+                await track.applyConstraints({
+                  advanced: [{ focusMode: "continuous" }],
+                });
+              }
+            } catch {
+              // El enfoque automático es una mejora, no un requisito.
+            }
+          }
+
+          setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
           if (disposed) controls?.stop?.();
           else scanControls.current = controls;
           return;
@@ -379,7 +493,10 @@ export default function DeliveryRegistry({ onClose }) {
           const formats = await window.BarcodeDetector.getSupportedFormats?.();
           if (formats && !formats.includes("data_matrix"))
             throw new Error("Este navegador no admite Data Matrix con la cámara.");
-          const detector = new window.BarcodeDetector({ formats: ["data_matrix"] });
+          const detector = new window.BarcodeDetector({
+            formats: ["data_matrix"],
+          });
+          setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
           const loop = async () => {
             if (disposed) return;
             try {
@@ -405,7 +522,9 @@ export default function DeliveryRegistry({ onClose }) {
           return;
         }
 
-        throw new Error("El navegador no dispone de un lector Data Matrix compatible.");
+        throw new Error(
+          "No se cargó un lector Data Matrix compatible. Recarga la página e inténtalo de nuevo.",
+        );
       } catch (error) {
         setScannerError(
           error?.message ||
@@ -422,8 +541,9 @@ export default function DeliveryRegistry({ onClose }) {
       if (nativeFrame) cancelAnimationFrame(nativeFrame);
       nativeStream?.getTracks?.().forEach((track) => track.stop());
       clearTimeout(scanBoxTimer.current);
+      scanProcessorRef.current = null;
     };
-  }, [view, activeWeekId, activeWeek?.closedAt]);
+  }, [view, activeWeekId, state.students, state.weeks]);
 
   const startSetup = () => {
     setContextForm(createRegistryContext(state.context));
@@ -595,6 +715,14 @@ export default function DeliveryRegistry({ onClose }) {
 
   const addWeek = (event, downloadAfter = false) => {
     event?.preventDefault?.();
+    if (!weekForm.startDate) {
+      showNotice(
+        "warning",
+        "Falta el periodo",
+        "Selecciona la fecha inicial de la bitácora.",
+      );
+      return;
+    }
     if (!weekForm.dueAt) {
       showNotice(
         "warning",
@@ -616,6 +744,19 @@ export default function DeliveryRegistry({ onClose }) {
       startDate: weekForm.startDate,
       dueAt: new Date(weekForm.dueAt).toISOString(),
     });
+    if (
+      state.weeks.some(
+        (item) =>
+          item.startDate === week.startDate && item.endDate === week.endDate,
+      )
+    ) {
+      showNotice(
+        "warning",
+        "Ese periodo ya existe",
+        formatPeriod(week.startDate, week.endDate),
+      );
+      return;
+    }
     const saved = commit({ ...state, weeks: [...state.weeks, week] });
     setActiveWeekId(week.id);
     setWeekForm({ label: "", startDate: "", dueAt: "" });
@@ -671,30 +812,104 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const finishScan = () => {
-    if (!activeWeek || activeWeek.closedAt) return;
-    let updatedWeek = activeWeek;
-    for (const item of scanQueue)
-      updatedWeek = registerDelivery(
-        updatedWeek,
-        item.studentId,
-        item.at,
-        "camera",
-      );
-    const saved = commit({
-      ...state,
-      weeks: state.weeks.map((week) =>
-        week.id === activeWeek.id ? updatedWeek : week,
-      ),
-    });
+    let weeks = state.weeks;
+    if (scanQueue.length) {
+      const grouped = new Map();
+      for (const item of scanQueue) {
+        const items = grouped.get(item.weekId) || [];
+        items.push(item);
+        grouped.set(item.weekId, items);
+      }
+      weeks = state.weeks.map((week) => {
+        let updatedWeek = week;
+        for (const item of grouped.get(week.id) || [])
+          updatedWeek = registerDelivery(
+            updatedWeek,
+            item.studentId,
+            item.at,
+            "camera",
+          );
+        return updatedWeek;
+      });
+    }
+
+    const saved = commit({ ...state, weeks });
     if (scanQueue.length) exportDeliveryState(saved);
+
+    const lastWeekId = scanQueue.at(-1)?.weekId || activeWeekId;
+    if (lastWeekId) setActiveWeekId(lastWeekId);
+
+    const lateCount = scanQueue.filter(
+      (item) => item.status === "entregado_tarde",
+    ).length;
     notify(
       scanQueue.length ? "success" : "info",
       scanQueue.length ? "Registro terminado" : "Sin nuevas lecturas",
       scanQueue.length
-        ? scanQueue.length + " entregas registradas · Archivo guardado"
+        ? scanQueue.length +
+            " entregas registradas" +
+            (lateCount ? " · " + lateCount + " a destiempo" : "") +
+            " · Archivo guardado"
         : "No se registraron entregas en esta sesión.",
     );
-    setView("week");
+    setView(lastWeekId ? "week" : "home");
+  };
+
+  const scanImageFile = async (file) => {
+    if (!file) return;
+    try {
+      setScannerError("");
+      const ZX = window.ZXingBrowser;
+      if (ZX?.BrowserDatamatrixCodeReader || ZX?.BrowserMultiFormatReader) {
+        const Reader =
+          ZX.BrowserDatamatrixCodeReader || ZX.BrowserMultiFormatReader;
+        const reader = ZX.BrowserDatamatrixCodeReader
+          ? new Reader()
+          : new Reader();
+        if (
+          !ZX.BrowserDatamatrixCodeReader &&
+          ZX.BarcodeFormat?.DATA_MATRIX !== undefined
+        )
+          reader.possibleFormats = [ZX.BarcodeFormat.DATA_MATRIX];
+
+        const url = URL.createObjectURL(file);
+        try {
+          const result = await reader.decodeFromImageUrl(url);
+          scanProcessorRef.current?.(
+            result.getText?.() || result.text || "",
+            result.getResultPoints?.() || [],
+          );
+          return;
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      }
+
+      if ("BarcodeDetector" in window) {
+        const formats = await window.BarcodeDetector.getSupportedFormats?.();
+        if (formats && !formats.includes("data_matrix"))
+          throw new Error("Este navegador no admite Data Matrix en imágenes.");
+        const bitmap = await createImageBitmap(file);
+        try {
+          const detector = new window.BarcodeDetector({
+            formats: ["data_matrix"],
+          });
+          const results = await detector.detect(bitmap);
+          if (!results.length) throw new Error("No se encontró un Data Matrix.");
+          scanProcessorRef.current?.(results[0].rawValue, []);
+          return;
+        } finally {
+          bitmap.close?.();
+        }
+      }
+
+      throw new Error("No hay un lector Data Matrix disponible.");
+    } catch (error) {
+      setScannerError(
+        error?.message ||
+          "No se pudo leer el Data Matrix de la imagen seleccionada.",
+      );
+    }
   };
 
   const filteredStudents = useMemo(() => {
@@ -1140,6 +1355,7 @@ export default function DeliveryRegistry({ onClose }) {
                   <label className="delivery-field">
                     <span>Fecha inicial</span>
                     <input
+                      required
                       type="date"
                       value={weekForm.startDate}
                       onChange={(event) =>
@@ -1231,10 +1447,10 @@ export default function DeliveryRegistry({ onClose }) {
                   onClick={() => {
                     const week = state.weeks.at(-1);
                     setActiveWeekId(week.id);
-                    setView(week.closedAt ? "week" : "scanner");
+                    setView("scanner");
                   }}
                 >
-                  {state.weeks.at(-1)?.closedAt ? "Ver cierre" : "Escanear"}
+                  Escanear entregas
                 </button>
               </article>
             </section>
@@ -1272,7 +1488,8 @@ export default function DeliveryRegistry({ onClose }) {
                         <div>
                           <strong>{week.label}</strong>
                           <span>
-                            Límite: {formatDateTime(week.dueAt)}
+                            {formatPeriod(week.startDate, week.endDate)}
+                            {" · Límite: " + formatDateTime(week.dueAt)}
                             {week.closedAt ? " · Cerrada" : ""}
                           </span>
                           <div className="delivery-week-progress">
@@ -1330,6 +1547,7 @@ export default function DeliveryRegistry({ onClose }) {
               <label className="delivery-field">
                 <span>Fecha inicial</span>
                 <input
+                  required
                   type="date"
                   value={weekForm.startDate}
                   onChange={(event) =>
@@ -1374,7 +1592,10 @@ export default function DeliveryRegistry({ onClose }) {
                   {activeWeek.closedAt ? "Semana cerrada" : "Registro activo"}
                 </span>
                 <h2>{activeWeek.label}</h2>
-                <p>Fecha límite: {formatDateTime(activeWeek.dueAt)}</p>
+                <p>
+                  {formatPeriod(activeWeek.startDate, activeWeek.endDate)}
+                  {" · Límite: " + formatDateTime(activeWeek.dueAt)}
+                </p>
               </div>
               <div className="delivery-week-head-actions">
                 <button
@@ -1391,9 +1612,7 @@ export default function DeliveryRegistry({ onClose }) {
                 <button
                   className="btn primary"
                   type="button"
-                  disabled={
-                    !state.students.length || Boolean(activeWeek.closedAt)
-                  }
+                  disabled={!state.students.length}
                   onClick={() => setView("scanner")}
                 >
                   <Camera size={18} />
@@ -1481,15 +1700,15 @@ export default function DeliveryRegistry({ onClose }) {
           </>
         )}
 
-        {view === "scanner" && activeWeek && (
+        {view === "scanner" && state.weeks.length > 0 && (
           <section className="delivery-scanner-page">
             <div className="delivery-scanner-head">
               <div>
                 <span className="delivery-kicker">Escaneo continuo</span>
-                <h2>{activeWeek.label}</h2>
+                <h2>Clasificación automática por semana</h2>
                 <p>
-                  Mantén la cámara abierta y pasa una bitácora tras otra. No
-                  tienes que tocar nada entre alumnos.
+                  Puedes mezclar bitácoras de distintas semanas. El Data Matrix
+                  indica el periodo y el sistema registra cada entrega donde corresponde.
                 </p>
               </div>
               <div className="delivery-scan-counter">
@@ -1567,15 +1786,22 @@ export default function DeliveryRegistry({ onClose }) {
                 .slice(-6)
                 .reverse()
                 .map((item) => (
-                  <div key={item.studentId}>
+                  <div key={item.weekId + ":" + item.studentId}>
                     <Blobatar name={item.name} size={38} />
-                    <span>{item.name}</span>
+                    <span>
+                      {item.name}
+                      <small>
+                        {item.weekLabel} · {formatPeriod(item.startDate, item.endDate)}
+                      </small>
+                    </span>
                     <strong>
-                      {new Date(item.at).toLocaleTimeString("es-MX", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      })}
+                      {item.status === "entregado_tarde"
+                        ? "A destiempo"
+                        : new Date(item.at).toLocaleTimeString("es-MX", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          })}
                     </strong>
                   </div>
                 ))}
@@ -1585,10 +1811,23 @@ export default function DeliveryRegistry({ onClose }) {
               <button
                 className="btn"
                 type="button"
-                onClick={() => setView("week")}
+                onClick={() => setView(activeWeek ? "week" : "home")}
               >
                 Cancelar
               </button>
+              <label className="btn delivery-file-button">
+                <FileArrowUp size={18} />
+                Leer imagen
+                <input
+                  hidden
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    scanImageFile(event.target.files?.[0]);
+                    event.target.value = "";
+                  }}
+                />
+              </label>
               <button
                 className="btn primary"
                 type="button"
