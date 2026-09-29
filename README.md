@@ -4,7 +4,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.29-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.30-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -45,7 +45,7 @@ El proyecto funciona sin cuentas y sin una base de datos central propia. El gene
 - Acceso discreto a bitácoras anteriores desde la barra superior, con contador compacto, revisión de sólo lectura y retorno directo al paso 5 para volver a descargar el PDF.
 - Landing pública disponible en español, inglés y alemán; la versión alemana usa terminología contextual de la **duale Berufsausbildung** y **Ausbildungsnachweis (Berichtsheft)**. Las aplicaciones operativas permanecen en español.
 - Perfil con Blobatar y datos recurrentes.
-- Corrector ortográfico opcional procesado localmente.
+- Corrector ortográfico opcional procesado localmente, con diccionario adicional para catálogos institucionales y vocabulario técnico de programación, contabilidad, RH, IA, e-commerce, ciberseguridad, datos, diseño y gestión.
 - Firma genérica opcional del alumno.
 - Data Matrix versionado en las bitácoras.
 - Escaneo continuo de entregas desde cámara o imagen.
