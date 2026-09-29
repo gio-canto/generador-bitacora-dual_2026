@@ -21,6 +21,12 @@ describe("reportes de entrega", () => {
       specialty: "Contabilidad",
       company: "ITCH",
     });
+    const c = createStudent({
+      id: "c",
+      name: "María Torres",
+      specialty: "Programación",
+      company: "La Avispa",
+    });
     let week = createWeek({
       id: "week-1",
       label: "Semana 1",
@@ -40,6 +46,13 @@ describe("reportes de entrega", () => {
       "",
       "manual",
     );
+    week = setDeliveryStatus(
+      week,
+      c.id,
+      "no_aplica",
+      "2026-09-05T16:00:00.000Z",
+      "manual",
+    );
 
     const model = buildDeliveryReportModel(
       {
@@ -47,7 +60,7 @@ describe("reportes de entrega", () => {
           school: "CBTis 134",
           generation: "2025-2028",
         },
-        students: [a, b],
+        students: [a, b, c],
         weeks: [week],
       },
       {
@@ -64,10 +77,13 @@ describe("reportes de entrega", () => {
       entregado: 1,
       entregado_tarde: 0,
       no_entregado: 1,
-      total: 2,
+      no_aplica: 1,
+      applicable: 2,
+      total: 3,
     });
     expect(model.weeks[0].rows.map((row) => row.status)).toEqual([
       "entregado",
+      "no_aplica",
       "no_entregado",
     ]);
     expect(model.weeks[0].rows[0].source).toBe("Cámara");
@@ -117,8 +133,8 @@ describe("reportes de entrega", () => {
     week1 = setDeliveryStatus(
       week1,
       b.id,
-      "no_entregado",
-      "",
+      "no_aplica",
+      "2026-09-05T16:30:00.000Z",
       "manual",
     );
     week2 = setDeliveryStatus(
@@ -149,7 +165,7 @@ describe("reportes de entrega", () => {
       "entregado_tarde",
     ]);
     expect(model.globalRows[1].weeks.map((item) => item.status)).toEqual([
-      "no_entregado",
+      "no_aplica",
       "entregado",
     ]);
   });
