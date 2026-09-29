@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.19-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.20-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,13 +13,11 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.19 · Presentación del proyecto · Parte 5
+## Beta 0.50.0-beta.20 · Registro de entrega · coincidencias aproximadas y edición
 
-La landing corrige un problema real de visualización de iconos. Los iconos de **[/presentacion/](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/)** ahora se dibujan como SVG inline desde componentes React locales, por lo que no dependen de una carga visual externa y funcionan con los mismos colores, hovers y animaciones del diseño.
+El escáner conserva la coincidencia exacta como primera opción y, si el nombre difiere sólo un poco, puede proponer alumnos posibles. La entrega no se registra hasta que la persona confirme la sugerencia. En los Data Matrix actuales, especialidad y empresa deben seguir coincidiendo.
 
-También se mejora la actualización de la landing: si el navegador conserva un service worker anterior, la página activa la versión pendiente y recarga una sola vez para evitar quedarse mostrando una compilación vieja desde caché.
-
-React, parallax, progreso de lectura, relojes y microinteracciones se mantienen sin cambios de intención y continúan respetando `prefers-reduced-motion`.
+Los alumnos ya registrados pueden editarse desde **Administrar base** y ahora también directamente desde la lista de una semana mediante el botón de edición.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
@@ -52,7 +50,7 @@ No hay cuentas ni servidor de bitácoras. Los datos permanecen en el navegador. 
 
 Acceso directo: **[Abrir Subsistema de registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/)**.
 
-El plantel configura una sola base de alumnos y puede registrar la **generación dual**. Cada alumno conserva nombre, especialidad y empresa. Las bitácoras incluyen un **Data Matrix** con identidad y periodo (fecha inicial y fecha final). El escáner puede mezclar varias semanas en una misma sesión, ubicar cada bitácora en la semana correspondiente y calcular automáticamente si la entrega fue a tiempo o a destiempo. El subsistema también genera reportes PDF como listado simplificado, semana por semana o matriz global de todas las semanas.
+El plantel configura una sola base de alumnos y puede registrar la **generación dual**. Cada alumno conserva nombre, especialidad y empresa. Las bitácoras incluyen un **Data Matrix** con identidad y periodo (fecha inicial y fecha final). El escáner puede mezclar varias semanas en una misma sesión, ubicar cada bitácora en la semana correspondiente y calcular automáticamente si la entrega fue a tiempo o a destiempo. Si el nombre no coincide exactamente pero cambia sólo una o pocas letras, el sistema puede mostrar candidatos y pedir confirmación antes de registrar; en los códigos actuales especialidad y empresa deben coincidir. Los alumnos pueden editarse desde la base o desde la lista semanal. El subsistema también genera reportes PDF como listado simplificado, semana por semana o matriz global de todas las semanas.
 
 ## Uso rápido
 
