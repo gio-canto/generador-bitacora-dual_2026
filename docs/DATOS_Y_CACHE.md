@@ -28,6 +28,8 @@ Existen claves de versiones anteriores usadas únicamente para recuperación o m
 
 Guardar o descargar una bitácora puede incorporarla al historial local. El historial puede exportarse como respaldo.
 
+Desde **Registros guardados** una bitácora puede revisarse en modo de sólo lectura. Esa revisión no sustituye el borrador actual ni carga el registro en el formulario. La carga sólo ocurre al elegir explícitamente **Abrir para editar**.
+
 ### Borrador
 
 El borrador permite continuar una captura interrumpida. Una actualización de assets no debe borrarlo.
