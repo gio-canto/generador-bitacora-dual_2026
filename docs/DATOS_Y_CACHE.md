@@ -57,10 +57,10 @@ No sustituye al historial y no debe contener actividades semanales como fuente c
 Clave actual:
 
 ```text
-bitacora_dual_delivery_registry_v5
+bitacora_dual_delivery_registry_v6
 ```
 
-Las claves `v1` a `v4` pueden leerse para migración.
+Las claves `v1` a `v5` pueden leerse para migración.
 
 El estado contiene, entre otros:
 
@@ -74,7 +74,10 @@ El estado contiene, entre otros:
 - estado de cierre;
 - entregas por alumno;
 - fecha/hora;
-- origen de registro.
+- origen de registro;
+- estado de entrega: a tiempo, a destiempo, no entregado o **No aplica**.
+
+**No aplica** se conserva como un estado explícito por alumno y semana. Indica que esa persona no tenía obligación de entregar en ese periodo, por lo que se excluye del denominador utilizado para calcular el porcentaje de cumplimiento.
 
 ## Respaldo portátil
 
