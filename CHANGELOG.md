@@ -1,5 +1,21 @@
 # Notas de versión
 
+## 0.50.0-beta.17 · Presentación del proyecto · Parte 3 · 2026-09-28
+
+- Se elimina el monograma **B** de la navegación y se simplifica la identidad visual de la landing.
+- La acción principal pasa a ser **Colaborar**, tanto en la navegación como en los principales CTA del proyecto.
+- Se añade una sección de comparación temporal con relojes animados:
+  - Alumno sin el sistema: **10–20 min aprox.** por bitácora.
+  - Alumno con el sistema: **≈ 5 min** con datos precargados.
+  - Escuela con registro manual: **1–1.5 h aprox.** por jornada de recepción.
+  - Escuela con registro automatizado: **menos de 10 min aprox.** con base preparada y escaneo.
+- Los tiempos se presentan explícitamente como **aproximaciones orientativas**, no como benchmark formal ni garantía.
+- Se refuerza la autonomía del proyecto: estudiantes, docentes y planteles pueden proponer su escuela, empresa, catálogos o mejoras directamente mediante ramas y pull requests.
+- Se mantiene la posibilidad de solicitar apoyo al creador como ruta secundaria.
+- Se incorporan iconos lineales discretos en acciones y ventajas, conservando el diseño editorial sobrio.
+- El CTA de GitHub prioriza contribuir y deja **Dar estrella** como segunda acción de apoyo.
+- Los relojes respetan `prefers-reduced-motion` y quedan estáticos cuando el usuario reduce animaciones.
+
 ## 0.50.0-beta.16 · Presentación del proyecto · Parte 2 · 2026-09-28
 
 - La landing pasa a un diseño **image-first**: `asset_landing.png` ocupa el hero desde la primera pantalla y el mensaje aparece directamente sobre la imagen.
