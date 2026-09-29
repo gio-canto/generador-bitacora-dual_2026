@@ -8,7 +8,8 @@ describe("landing de presentación", () => {
 
     expect(html).toContain('id="presentation-root"');
     expect(html).toContain("../src/presentation.jsx");
-    expect(jsx).toContain('from "@phosphor-icons/react"');
+    expect(jsx).toContain("function SvgIcon");
+    expect(jsx).toContain('const GitPullRequest = iconComponent("gitPullRequest")');
     expect(jsx).toContain("createRoot(root).render(<Presentation />)");
 
     expect(jsx).toContain("Nunca fue tan fácil hacer una bitácora.");
@@ -35,6 +36,8 @@ describe("landing de presentación", () => {
     expect(jsx).toContain("<QrCode");
     expect(jsx).toContain("<ShieldCheck");
     expect(jsx).toContain("<DeviceMobile");
+    expect(jsx).toContain('registration.waiting?.postMessage({ type: "SKIP_WAITING" })');
+    expect(jsx).toContain('"controllerchange"');
     expect(jsx).toContain('"../registro-entrega/"');
   });
 
