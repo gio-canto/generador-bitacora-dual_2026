@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.11-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.12-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,13 +13,13 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.11 · Registro de entrega · Parte 11
+## Beta 0.50.0-beta.12 · Registro de entrega · Parte 12
 
-La beta.11 amplía el control manual del registro. Cada alumno puede cambiarse directamente entre **Entregado a tiempo**, **Entregado a destiempo** y **No entregado**. El escaneo por cámara sigue calculando automáticamente el estado según la hora límite; la selección manual permite corregir o capturar excepciones sin depender de ese cálculo.
+La beta.12 hace más directo el filtrado semanal. La barra de alumnos incorpora un selector de **Entrega** con **Todos**, **Entregados a tiempo**, **A destiempo** y **No entregados**. Se combina con especialidad, empresa, búsqueda y agrupación; las tarjetas-resumen superiores continúan funcionando como accesos rápidos al mismo filtro.
 
-La lista semanal incorpora filtros por **especialidad**, **empresa**, estado y búsqueda de texto. También puede agruparse por especialidad o empresa, mostrando cada grupo con su contador.
+El sonido de una lectura válida ahora utiliza **`public/Assets/asset_chime.mp3`** en lugar del tono sintetizado. Los sonidos de repetido y error se mantienen distintos para que una lectura aceptada sea reconocible inmediatamente. El chime se precarga y queda incluido en la caché del service worker.
 
-En teléfono se reforzó la navegación: los iconos permanecen visibles, las acciones de semana usan icono + etiqueta compacta y los selectores están preparados para Safari/iPhone sin zoom automático.
+En teléfono, los cuatro filtros se acomodan en 2 × 2 y pasan a una sola columna en pantallas estrechas para evitar controles comprimidos.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
