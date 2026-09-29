@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.50.0-beta.19 · Presentación del proyecto · Parte 5 · 2026-09-28
+
+- Se corrige la carga de iconos de la landing: ahora se renderizan como **SVG inline dentro de React**, sin depender del componente visual de una librería externa en tiempo de ejecución.
+- Se mantienen los iconos en botones, ventajas, sistemas, Data Matrix, flujo, privacidad, open source y colaboración.
+- El nuevo componente local de iconos hereda `currentColor`, por lo que conserva correctamente los estados claros/oscuros y las animaciones CSS.
+- La landing fuerza la activación del service worker pendiente cuando detecta una nueva versión, evitando quedarse atrapada mostrando una compilación anterior en caché.
+- Al cambiar el controlador del service worker, la landing hace una única recarga para tomar los assets de la versión nueva.
+- Se conservan React, parallax, progreso de scroll, relojes y microanimaciones con soporte para `prefers-reduced-motion`.
+
 ## 0.50.0-beta.18 · Presentación del proyecto · Parte 4 · 2026-09-28
 
 - La landing de `/presentacion/` ahora se renderiza con **React 19** en lugar de HTML estático.

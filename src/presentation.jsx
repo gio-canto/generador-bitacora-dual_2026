@@ -1,30 +1,221 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Buildings,
-  CheckCircle,
-  Clock,
-  Code,
-  Database,
-  Desktop,
-  DeviceMobile,
-  DeviceTablet,
-  FilePdf,
-  Folder,
-  GitBranch,
-  GithubLogo,
-  GitPullRequest,
-  Lock,
-  Plus,
-  QrCode,
-  Scan,
-  ShieldCheck,
-  Star,
-  Student,
-  Users,
-} from "@phosphor-icons/react";
+function SvgIcon({
+  name,
+  size = 20,
+  className = "",
+  weight = "regular",
+  ...props
+}) {
+  const common = {
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: weight === "bold" ? 2 : 1.7,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+  };
+
+  const paths = {
+    arrowRight: (
+      <>
+        <path d="M5 12h14" />
+        <path d="m14 7 5 5-5 5" />
+      </>
+    ),
+    arrowUpRight: (
+      <>
+        <path d="M7 17 17 7" />
+        <path d="M9 7h8v8" />
+      </>
+    ),
+    buildings: (
+      <>
+        <path d="M4 20V7l6-3v16" />
+        <path d="M10 9h10v11" />
+        <path d="M7 10h.01M7 14h.01M14 12h2M14 16h2" />
+      </>
+    ),
+    checkCircle: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="m8 12 2.5 2.5L16.5 8.5" />
+      </>
+    ),
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3.5 2" />
+      </>
+    ),
+    code: (
+      <>
+        <path d="m9 7-5 5 5 5" />
+        <path d="m15 7 5 5-5 5" />
+        <path d="m13 5-2 14" />
+      </>
+    ),
+    database: (
+      <>
+        <ellipse cx="12" cy="6" rx="7" ry="3" />
+        <path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6" />
+        <path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" />
+      </>
+    ),
+    desktop: (
+      <>
+        <rect x="3" y="4" width="18" height="12" rx="2" />
+        <path d="M8 20h8M12 16v4" />
+      </>
+    ),
+    deviceMobile: (
+      <>
+        <rect x="7" y="2.5" width="10" height="19" rx="2.2" />
+        <path d="M10.5 5h3M11 18.5h2" />
+      </>
+    ),
+    deviceTablet: (
+      <>
+        <rect x="5" y="2.5" width="14" height="19" rx="2.2" />
+        <path d="M11 18.5h2" />
+      </>
+    ),
+    filePdf: (
+      <>
+        <path d="M6 2.5h8l4 4V21H6z" />
+        <path d="M14 2.5v4h4M9 12h6M9 15h6" />
+      </>
+    ),
+    folder: (
+      <>
+        <path d="M3 7h7l2 2h9v9.5H3z" />
+        <path d="M3 7V5h6l2 2" />
+      </>
+    ),
+    gitBranch: (
+      <>
+        <circle cx="6" cy="5" r="2" />
+        <circle cx="6" cy="19" r="2" />
+        <circle cx="18" cy="9" r="2" />
+        <path d="M6 7v10M8 7c5 0 4 2 8 2" />
+      </>
+    ),
+    githubLogo: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M8 15c1.2 1 2.5 1.5 4 1.5s2.8-.5 4-1.5" />
+        <path d="M8.5 9.5 7 7.5M15.5 9.5 17 7.5" />
+        <path d="M9 12h.01M15 12h.01" />
+      </>
+    ),
+    gitPullRequest: (
+      <>
+        <circle cx="6" cy="5" r="2" />
+        <circle cx="6" cy="19" r="2" />
+        <circle cx="18" cy="19" r="2" />
+        <path d="M6 7v10M10 5h4a4 4 0 0 1 4 4v8" />
+        <path d="m12 3 2 2-2 2" />
+      </>
+    ),
+    lock: (
+      <>
+        <rect x="5" y="10" width="14" height="10" rx="2" />
+        <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+      </>
+    ),
+    plus: (
+      <>
+        <path d="M12 5v14M5 12h14" />
+      </>
+    ),
+    qrCode: (
+      <>
+        <rect x="4" y="4" width="6" height="6" />
+        <rect x="14" y="4" width="6" height="6" />
+        <rect x="4" y="14" width="6" height="6" />
+        <path d="M14 14h2v2h-2zM18 14h2v6h-2M14 18h2v2h-2" />
+      </>
+    ),
+    scan: (
+      <>
+        <path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" />
+        <path d="M7 12h10" />
+      </>
+    ),
+    shieldCheck: (
+      <>
+        <path d="M12 3 19 6v5c0 4.6-2.8 7.7-7 10-4.2-2.3-7-5.4-7-10V6z" />
+        <path d="m8.5 12 2.2 2.2 4.8-5" />
+      </>
+    ),
+    star: (
+      <path
+        d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"
+        fill={weight === "fill" ? "currentColor" : "none"}
+      />
+    ),
+    student: (
+      <>
+        <path d="m3 9 9-5 9 5-9 5z" />
+        <path d="M7 12v4c2.8 2 7.2 2 10 0v-4" />
+        <path d="M21 9v6" />
+      </>
+    ),
+    users: (
+      <>
+        <circle cx="9" cy="8" r="3" />
+        <circle cx="16.5" cy="9" r="2.2" />
+        <path d="M3.5 19c.5-4 2.8-6 5.5-6s5 2 5.5 6" />
+        <path d="M14 14c2.8.2 4.8 1.7 5.4 4" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      className={className}
+      aria-hidden={props["aria-hidden"] ?? true}
+      focusable="false"
+      {...common}
+      {...props}
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+
+function iconComponent(name) {
+  return function LocalIcon(props) {
+    return <SvgIcon name={name} {...props} />;
+  };
+}
+
+const ArrowRight = iconComponent("arrowRight");
+const ArrowUpRight = iconComponent("arrowUpRight");
+const Buildings = iconComponent("buildings");
+const CheckCircle = iconComponent("checkCircle");
+const Clock = iconComponent("clock");
+const Code = iconComponent("code");
+const Database = iconComponent("database");
+const Desktop = iconComponent("desktop");
+const DeviceMobile = iconComponent("deviceMobile");
+const DeviceTablet = iconComponent("deviceTablet");
+const FilePdf = iconComponent("filePdf");
+const Folder = iconComponent("folder");
+const GitBranch = iconComponent("gitBranch");
+const GithubLogo = iconComponent("githubLogo");
+const GitPullRequest = iconComponent("gitPullRequest");
+const Lock = iconComponent("lock");
+const Plus = iconComponent("plus");
+const QrCode = iconComponent("qrCode");
+const Scan = iconComponent("scan");
+const ShieldCheck = iconComponent("shieldCheck");
+const Star = iconComponent("star");
+const Student = iconComponent("student");
+const Users = iconComponent("users");
+
 import "./presentation.css";
 
 document.documentElement.classList.add("js", "presentation-react");
@@ -761,12 +952,54 @@ function Presentation() {
   useScrollMotion(reducedMotion);
 
   useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
+    if (!("serviceWorker" in navigator)) return undefined;
+
+    let reloaded = false;
+    const onControllerChange = () => {
+      if (reloaded) return;
+      reloaded = true;
+      window.location.reload();
+    };
+
+    navigator.serviceWorker.addEventListener(
+      "controllerchange",
+      onControllerChange,
+    );
+
     navigator.serviceWorker
       .register("../sw.js", { updateViaCache: "none" })
+      .then(async (registration) => {
+        await registration.update().catch(() => {});
+
+        const activateWaiting = () => {
+          registration.waiting?.postMessage({ type: "SKIP_WAITING" });
+        };
+
+        activateWaiting();
+
+        registration.addEventListener("updatefound", () => {
+          const worker = registration.installing;
+          if (!worker) return;
+          worker.addEventListener("statechange", () => {
+            if (
+              worker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
+              activateWaiting();
+            }
+          });
+        });
+      })
       .catch(() => {
         // La landing continúa funcionando aunque el service worker falle.
       });
+
+    return () => {
+      navigator.serviceWorker.removeEventListener(
+        "controllerchange",
+        onControllerChange,
+      );
+    };
   }, []);
 
   return (

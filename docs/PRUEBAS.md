@@ -146,3 +146,12 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Revisar hover de iconos, flechas y botones sin saltos de layout.
 - Activar `prefers-reduced-motion` y comprobar que parallax, reloj, flecha animada y transiciones queden desactivados.
 - Validar la landing en iPhone, iPad y escritorio sin pérdida de contenido o desbordamientos.
+
+
+## Corrección de iconos · Beta 0.50.0-beta.19
+
+- Abrir `/presentacion/` en Safari iOS, Chrome móvil y escritorio y comprobar que todos los iconos sean visibles.
+- Confirmar iconos en CTA, ventajas, escuelas, sistemas, Data Matrix, flujo, privacidad, open source y GitHub.
+- Verificar que los SVG hereden correctamente blanco, negro, azul y estados hover mediante `currentColor`.
+- Simular un service worker anterior y confirmar que la landing activa la versión pendiente y recarga una sola vez.
+- Activar `prefers-reduced-motion` y confirmar que la corrección de iconos no reactiva animaciones deshabilitadas.

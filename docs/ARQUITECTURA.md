@@ -134,3 +134,10 @@ La navegación y los CTA priorizan la guía de contribución. La ruta de contact
 La capa React gestiona IntersectionObserver para apariciones progresivas, detección de `prefers-reduced-motion`, progreso de scroll, parallax leve del hero y registro del service worker. No se añade una dependencia externa de animación.
 
 Las microinteracciones se resuelven principalmente con CSS y se desactivan cuando el usuario solicita movimiento reducido.
+
+
+## Iconos inline y actualización de la landing · Beta 0.50.0-beta.19
+
+La landing mantiene React, pero deja de depender de componentes de iconografía externos para el render visual. `src/presentation.jsx` define un componente `SvgIcon` y pequeñas fábricas de iconos que producen SVG inline con `currentColor`. Esto garantiza que el icono viaje dentro del mismo bundle de la landing y elimina una posible diferencia entre compilación y render en navegador.
+
+El registro del service worker en la landing también comprueba actualizaciones, activa un worker en espera con `SKIP_WAITING` y escucha `controllerchange` para recargar una sola vez. Este comportamiento se limita a la landing y evita que una caché anterior mantenga una presentación desactualizada.
