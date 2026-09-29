@@ -50,23 +50,21 @@ const EVENTS = Object.freeze({
     anniversaryFrom: 1810,
     description: () => "Una fecha nacional dentro de la bitácora dual.",
   },
-  "10-01": {
-    id: "mmfd-october-1",
-    kind: "dual",
-    eyebrow: "Modelo Mexicano de Formación Dual",
-    title: "1 de octubre de 2013",
-    anniversaryFrom: 2013,
+  "11-01": {
+    id: "day-of-the-dead-1",
+    kind: "day-of-the-dead",
+    eyebrow: "1 de noviembre",
+    title: "Día de Muertos",
     description: () =>
-      "Escuela y empresa, aprendiendo juntas a través del Modelo Mexicano de Formación Dual.",
+      "Una celebración mexicana para recordar a quienes ya no están.",
   },
-  "10-02": {
-    id: "mmfd-october-2",
-    kind: "dual",
-    eyebrow: "Modelo Mexicano de Formación Dual",
-    title: "2 de octubre de 2013",
-    anniversaryFrom: 2013,
+  "11-02": {
+    id: "day-of-the-dead-2",
+    kind: "day-of-the-dead",
+    eyebrow: "2 de noviembre",
+    title: "Día de Muertos",
     description: () =>
-      "La formación continúa dentro y fuera del aula.",
+      "La tradición continúa entre flores, luz y memoria.",
   },
   "10-31": {
     id: "halloween",
@@ -214,6 +212,8 @@ function visualMarkup(event, state) {
       return `<div class="calendar-visual calendar-visual--dual">${flagsMarkup(true)}<div class="dual-nodes" aria-hidden="true"><span>Escuela</span><i></i><span>Empresa</span></div></div>`;
     case "halloween":
       return '<div class="calendar-visual calendar-visual--halloween" aria-hidden="true"><div class="halloween-eyes"><i></i><i></i></div><strong>31 / 10</strong></div>';
+    case "day-of-the-dead":
+      return '<div class="calendar-visual calendar-visual--day-of-the-dead" aria-hidden="true"><div class="cempasuchil"><i></i><i></i><i></i><i></i><i></i></div><div class="memorial-candle"><span></span></div><strong>1 · 2 XI</strong></div>';
     case "revolution":
       return '<div class="calendar-visual calendar-visual--revolution" aria-hidden="true"><small>ARCHIVO</small><strong>20 · XI</strong><span>1910</span></div>';
     case "christmas-eve":
