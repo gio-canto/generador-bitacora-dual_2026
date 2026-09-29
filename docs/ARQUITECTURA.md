@@ -58,6 +58,8 @@ Aunque React monta la aplicación, esta zona no es una migración declarativa co
 - `Profile.jsx`: perfil local.
 - `DeliveryRegistry.jsx`: registro de entrega.
 
+El corrector ortográfico se ejecuta en un Web Worker y combina `dictionary-es` con `src/services/spelling-dictionary.js`. Este último incorpora vocabulario técnico y extrae automáticamente palabras de los catálogos de escuelas y empresas.
+
 La landing vive en `src/presentation.jsx`.
 
 ### Servicios
