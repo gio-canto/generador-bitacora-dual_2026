@@ -4,7 +4,7 @@ export function startSpelling() {
   const dialog = document.createElement('dialog');
   dialog.className = 'spelling-dialog';
   dialog.setAttribute('aria-labelledby', 'spellingTitle');
-  dialog.innerHTML = '<h2 id="spellingTitle">Revisar ortografía</h2><p>Revisión en español. Tú decides los cambios; los nombres y términos técnicos pueden ser correctos.</p><div class="spelling-result" aria-live="polite"></div><button type="button" class="btn spelling-close">Cerrar</button>';
+  dialog.innerHTML = '<h2 id="spellingTitle">Revisar ortografía</h2><p>Revisión en español. Incluye nombres institucionales y vocabulario técnico frecuente de programación, contabilidad, RH, IA y comercio electrónico. Tú decides cada cambio.</p><div class="spelling-result" aria-live="polite"></div><button type="button" class="btn spelling-close">Cerrar</button>';
   document.body.append(dialog);
   const result = dialog.querySelector('.spelling-result');
   let worker, timer, field, snapshot, ignored;
