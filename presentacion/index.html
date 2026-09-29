@@ -14,17 +14,17 @@
 <body>
   <header class="site-nav">
     <a class="brand" href="./" aria-label="Bitácora Dual 2026">
-      <span class="brand-mark" aria-hidden="true">B</span>
       <span>Bitácora Dual</span>
     </a>
     <nav class="desktop-nav" aria-label="Navegación">
       <a href="#alumnos">Alumnos</a>
       <a href="#escuelas">Escuelas</a>
+      <a href="#tiempos">Tiempos</a>
       <a href="#sistemas">Sistemas</a>
       <a href="#matrix">Data Matrix</a>
       <a href="#instituciones">Instituciones</a>
     </nav>
-    <a class="nav-cta" href="../">Crear bitácora</a>
+    <a class="nav-cta" href="https://github.com/gio-canto/generador-bitacora-dual_2026/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Colaborar</a>
   </header>
 
   <main>
@@ -39,8 +39,14 @@
           consistente y puede llevar un control más rápido de las entregas.
         </p>
         <div class="hero-actions">
-          <a class="button white" href="../">Crear una bitácora</a>
-          <a class="button glass" href="#alumnos">Ver cómo funciona</a>
+          <a class="button white" href="https://github.com/gio-canto/generador-bitacora-dual_2026/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12h8M12 8v8"/><circle cx="12" cy="12" r="9"/></svg>
+            Colaborar
+          </a>
+          <a class="button glass" href="../">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h10v15H7z"/><path d="M9.5 8h5M9.5 11.5h5M9.5 15h3"/></svg>
+            Probar el generador
+          </a>
         </div>
       </div>
     </section>
@@ -58,19 +64,31 @@
 
       <div class="advantage-list reveal">
         <article>
-          <strong>En cualquier dispositivo.</strong>
+          <div class="advantage-title">
+            <span class="line-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="11" height="8" rx="1.5"/><path d="M8 18h3M9.5 13v5"/><rect x="16.5" y="8" width="4" height="8" rx="1"/></svg></span>
+            <strong>En cualquier dispositivo.</strong>
+          </div>
           <p>Crea tu bitácora desde teléfono, PC o iPad, sin depender de un Excel raro o de un Word que cambia según el equipo.</p>
         </article>
         <article>
-          <strong>Tu historial se queda contigo.</strong>
+          <div class="advantage-title">
+            <span class="line-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.5h14v12H5z"/><path d="M8 10h8M8 13h6"/></svg></span>
+            <strong>Tu historial se queda contigo.</strong>
+          </div>
           <p>Guarda bitácoras y respaldos en tu propio dispositivo para volver a ellas cuando lo necesites.</p>
         </article>
         <article>
-          <strong>Más intuitivo, menos errores.</strong>
+          <div class="advantage-title">
+            <span class="line-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5 9.5 17 19 7.5"/></svg></span>
+            <strong>Más intuitivo, menos errores.</strong>
+          </div>
           <p>El sistema guía el llenado y mantiene el formato para reducir equivocaciones de captura o estructura.</p>
         </article>
         <article>
-          <strong>Sin repetir lo mismo cada semana.</strong>
+          <div class="advantage-title">
+            <span class="line-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 7h10v10H7z"/><path d="M4 11V4h7M20 13v7h-7"/></svg></span>
+            <strong>Sin repetir lo mismo cada semana.</strong>
+          </div>
           <p>Plantel, especialidad, empresa, horarios y otros datos pueden quedar precargados. Tú escribes lo que realizaste y continúas.</p>
         </article>
       </div>
@@ -109,6 +127,75 @@
             <p>Vinculación puede registrar, filtrar y reportar entregas sin volver a capturar cada dato.</p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="time-section" id="tiempos">
+      <div class="time-inner">
+        <div class="section-label reveal">Tiempo aproximado</div>
+        <div class="time-lead reveal">
+          <h2>Menos tiempo llenando y registrando. Más tiempo para lo importante.</h2>
+          <p>
+            Comparación orientativa basada en el flujo esperado del proyecto. No es un benchmark
+            formal: los tiempos reales cambian según la persona, el plantel y la cantidad de alumnos.
+          </p>
+        </div>
+
+        <div class="time-comparisons">
+          <article class="time-comparison reveal">
+            <div class="time-clock-wrap">
+              <div class="moving-clock" data-clock="student" aria-label="Reloj animado ilustrativo para alumno">
+                <span class="clock-dot c1"></span><span class="clock-dot c2"></span><span class="clock-dot c3"></span><span class="clock-dot c4"></span>
+                <span class="clock-hand hour"></span>
+                <span class="clock-hand minute"></span>
+                <span class="clock-center"></span>
+              </div>
+              <span class="clock-caption">Alumno</span>
+            </div>
+            <div class="time-data">
+              <div class="time-row old">
+                <span>Sin el sistema</span>
+                <strong>10–20 min</strong>
+                <small>aprox. por bitácora</small>
+              </div>
+              <div class="time-arrow" aria-hidden="true">→</div>
+              <div class="time-row new">
+                <span>Con el sistema</span>
+                <strong>≈ 5 min</strong>
+                <small>cuando sus datos ya están precargados</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="time-comparison reveal">
+            <div class="time-clock-wrap">
+              <div class="moving-clock school-clock" data-clock="school" aria-label="Reloj animado ilustrativo para escuela">
+                <span class="clock-dot c1"></span><span class="clock-dot c2"></span><span class="clock-dot c3"></span><span class="clock-dot c4"></span>
+                <span class="clock-hand hour"></span>
+                <span class="clock-hand minute"></span>
+                <span class="clock-center"></span>
+              </div>
+              <span class="clock-caption">Escuela</span>
+            </div>
+            <div class="time-data">
+              <div class="time-row old">
+                <span>Registro manual</span>
+                <strong>1–1.5 h</strong>
+                <small>aprox. para una jornada de recepción</small>
+              </div>
+              <div class="time-arrow" aria-hidden="true">→</div>
+              <div class="time-row new">
+                <span>Registro automatizado</span>
+                <strong>&lt; 10 min</strong>
+                <small>aprox. con escaneo y base preparada</small>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <p class="time-disclaimer reveal">
+          Tiempos aproximados de uso previstos para explicar la diferencia de flujo; no representan una medición científica ni garantizan un tiempo específico.
+        </p>
       </div>
     </section>
 
@@ -207,35 +294,39 @@
         <div class="institution-lead reveal">
           <h2>¿Quieres que tu institución pueda usar este sistema?</h2>
           <p>
-            Puedes incorporarlo de dos formas: adaptarlo directamente como proyecto
-            open source o pedir apoyo al creador para integrar el flujo de tu plantel.
+            La idea es que el proyecto pueda crecer de forma autónoma. Un alumno, docente
+            o plantel puede aportar directamente: agregar su escuela, empresa, responsable
+            o una mejora completa sin tener que esperar a que alguien lo haga por ellos.
           </p>
         </div>
 
         <div class="adoption-paths">
           <article class="adoption-path reveal">
             <p class="path-label">Ruta 1 · Colaborar</p>
-            <h3>Haz la adaptación con tu institución.</h3>
+            <h3>Tu escuela puede agregarse al proyecto.</h3>
             <p>
-              El proyecto es abierto. Puedes revisar el código, crear tu propia rama,
-              adaptar catálogos o comportamiento y enviar una <strong>pull request</strong>
-              para proponer mejoras que también puedan servir a otros planteles.
+              Estudiantes, docentes o personal de Vinculación pueden editar los catálogos,
+              agregar una escuela o empresa, corregir datos, crear una rama y enviar una
+              <strong>pull request</strong>. Las aportaciones útiles son bienvenidas.
             </p>
             <div class="path-actions">
-              <a class="button dark" href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">Ver código en GitHub</a>
+              <a class="button dark" href="https://github.com/gio-canto/generador-bitacora-dual_2026/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">
+                <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7.5h8M6 12h12M6 16.5h7"/><path d="m16 5 3 3-3 3"/></svg>
+                Colaborar en GitHub
+              </a>
             </div>
           </article>
 
           <article class="adoption-path reveal">
-            <p class="path-label">Ruta 2 · Solicitar integración</p>
-            <h3>Parte del proceso real de tu plantel.</h3>
+            <p class="path-label">Ruta 2 · Implementación acompañada</p>
+            <h3>Si necesitan ayuda, también pueden pedirla.</h3>
             <p>
-              Se puede revisar el formato, responsables, empresas, calendario, reglas de
-              entrega y reportes que ya utiliza tu institución para preparar una implementación
-              acorde a ese procedimiento.
+              Si el plantel no quiere tocar código, se puede revisar su formato, responsables,
+              empresas, calendario, reglas de entrega y reportes para plantear una integración
+              compatible con su procedimiento actual.
             </p>
-            <div class="path-actions">
-              <a class="button dark" href="https://www.instagram.com/gio_canto_g/" target="_blank" rel="noopener noreferrer">Contactar al creador</a>
+            <div class="path-actions secondary-action">
+              <a class="arrow-link" href="https://www.instagram.com/gio_canto_g/" target="_blank" rel="noopener noreferrer">Pedir apoyo al creador <span>↗</span></a>
             </div>
           </article>
         </div>
@@ -265,6 +356,8 @@
           <p>
             El código está disponible públicamente bajo la licencia del proyecto. Cualquier
             persona puede estudiarlo, proponer mejoras y colaborar mediante issues o pull requests.
+            Un estudiante puede incluso proponer su propio plantel o actualizar un catálogo sin
+            depender de una administración central.
           </p>
           <a class="arrow-link" href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">Colaborar en GitHub <span>↗</span></a>
         </article>
@@ -274,16 +367,23 @@
     <section class="github-callout">
       <div class="github-inner reveal">
         <div>
-          <p class="eyebrow light">Si te sirve el proyecto</p>
-          <h2>Dale una estrella en GitHub.</h2>
+          <p class="eyebrow light">Proyecto abierto</p>
+          <h2>Úsalo. Mejora lo que haga falta. Compártelo.</h2>
           <p>
-            Ayuda a que el proyecto sea más fácil de encontrar y deja una señal de que
-            vale la pena seguir mejorándolo.
+            La colaboración es la acción principal del proyecto. Si encuentras algo que
+            pueda mejorar, propón el cambio. Y si te sirve tal como está, una estrella en
+            GitHub ayuda a que más personas lo encuentren.
           </p>
         </div>
-        <a class="button white star-button" href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">
-          <span aria-hidden="true">★</span> Dar estrella
-        </a>
+        <div class="github-actions">
+          <a class="button white" href="https://github.com/gio-canto/generador-bitacora-dual_2026/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v12H5z"/><path d="M8 10h8M8 14h5"/></svg>
+            Colaborar
+          </a>
+          <a class="button outline-light star-button" href="https://github.com/gio-canto/generador-bitacora-dual_2026" target="_blank" rel="noopener noreferrer">
+            <span aria-hidden="true">★</span> Dar estrella
+          </a>
+        </div>
       </div>
     </section>
 
@@ -292,8 +392,8 @@
         <p class="eyebrow">Bitácora Dual 2026</p>
         <h2>Menos tiempo acomodando formatos. Más tiempo documentando lo que hiciste.</h2>
         <div class="closing-actions">
-          <a class="button primary" href="../">Crear una bitácora</a>
-          <a class="button secondary" href="../registro-entrega/">Registro de entregas</a>
+          <a class="button primary" href="https://github.com/gio-canto/generador-bitacora-dual_2026/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Colaborar con el proyecto</a>
+          <a class="button secondary" href="../">Crear una bitácora</a>
         </div>
       </div>
     </section>
