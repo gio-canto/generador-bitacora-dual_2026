@@ -25,6 +25,8 @@ const COLORS = {
   amberSoft: "#fbf2dc",
   red: "#a13a32",
   redSoft: "#f9e9e7",
+  gray: "#5f6368",
+  graySoft: "#eef0f2",
 };
 
 const STATUS_META = {
@@ -40,11 +42,17 @@ const STATUS_META = {
     background: COLORS.amberSoft,
     order: 1,
   },
+  no_aplica: {
+    label: "No aplica",
+    color: COLORS.gray,
+    background: COLORS.graySoft,
+    order: 2,
+  },
   no_entregado: {
     label: "No entregado",
     color: COLORS.red,
     background: COLORS.redSoft,
-    order: 2,
+    order: 3,
   },
 };
 
@@ -251,11 +259,12 @@ function drawLabelValue(ctx, label, value, x, y, width) {
 
 function drawSummary(ctx, summary, x, y, width) {
   const gap = 14;
-  const cardW = (width - gap * 2) / 3;
+  const cardW = (width - gap * 3) / 4;
   const entries = [
     ["A tiempo", summary.entregado, COLORS.green, COLORS.greenSoft],
     ["A destiempo", summary.entregado_tarde, COLORS.amber, COLORS.amberSoft],
     ["No entregado", summary.no_entregado, COLORS.red, COLORS.redSoft],
+    ["No aplica", summary.no_aplica, COLORS.gray, COLORS.graySoft],
   ];
   entries.forEach(([label, number, color, background], index) => {
     const cx = x + index * (cardW + gap);
@@ -348,8 +357,10 @@ async function drawStudentRow(ctx, row, x, y, width) {
   const receipt =
     row.status === "no_entregado"
       ? "Sin registro"
-      : formatDateTime(row.registeredAt) +
-        (row.source ? " · " + row.source : "");
+      : row.status === "no_aplica"
+        ? "Sin entrega requerida"
+        : formatDateTime(row.registeredAt) +
+          (row.source ? " · " + row.source : "");
   ctx.fillText(trimToWidth(ctx, receipt, statusW), badgeX, y + 59);
 }
 
@@ -513,6 +524,7 @@ async function renderReportPage(model, spec, pageNumber, pageCount) {
 function statusSymbol(status) {
   if (status === "entregado") return "✓";
   if (status === "entregado_tarde") return "!";
+  if (status === "no_aplica") return "—";
   return "×";
 }
 
@@ -658,6 +670,7 @@ async function renderGlobalReportPage(model, spec, pageNumber, pageCount) {
     ["✓", "A tiempo", COLORS.green, COLORS.greenSoft],
     ["!", "A destiempo", COLORS.amber, COLORS.amberSoft],
     ["×", "No entregado", COLORS.red, COLORS.redSoft],
+    ["—", "No aplica", COLORS.gray, COLORS.graySoft],
   ];
   let legendX = left;
   for (const [symbol, label, color, background] of legend) {
