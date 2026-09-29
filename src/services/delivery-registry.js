@@ -1,13 +1,14 @@
 import companies from "../data/companies.json";
 
-export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v5";
-export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v4";
+export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v6";
+export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v5";
 export const LEGACY_DELIVERY_KEYS = [
+  "bitacora_dual_delivery_registry_v4",
   "bitacora_dual_delivery_registry_v3",
   "bitacora_dual_delivery_registry_v2",
   "bitacora_dual_delivery_registry_v1",
 ];
-export const DELIVERY_SCHEMA = 5;
+export const DELIVERY_SCHEMA = 6;
 
 const uid = () =>
   globalThis.crypto?.randomUUID?.() ||
@@ -254,11 +255,15 @@ function normalizeStudent(value, fallback = {}) {
 
 function normalizeDelivery(value) {
   if (!value || typeof value !== "object") return null;
+  const status = ["entregado", "entregado_tarde", "no_aplica"].includes(
+    value.status,
+  )
+    ? value.status
+    : "entregado";
   const registeredAt = clean(value.registeredAt, 40);
-  if (!registeredAt) return null;
+  if (!registeredAt && status !== "no_aplica") return null;
   return {
-    status:
-      value.status === "entregado_tarde" ? "entregado_tarde" : "entregado",
+    status,
     registeredAt,
     source: ["camera", "manual", "import"].includes(value.source)
       ? value.source
@@ -383,6 +388,7 @@ export function portableDeliveryFile(state) {
 export function deliveryStatus(week, studentId) {
   const delivery = week?.deliveries?.[studentId];
   if (!delivery) return "no_entregado";
+  if (delivery.status === "no_aplica") return "no_aplica";
   return delivery.status === "entregado_tarde"
     ? "entregado_tarde"
     : "entregado";
@@ -420,7 +426,8 @@ export function setDeliveryStatus(
   source = "manual",
 ) {
   if (status === "no_entregado") return removeDelivery(week, studentId);
-  if (!["entregado", "entregado_tarde"].includes(status)) return week;
+  if (!["entregado", "entregado_tarde", "no_aplica"].includes(status))
+    return week;
 
   const previous = week?.deliveries?.[studentId];
   const registeredAt =
@@ -633,15 +640,19 @@ export function weekSummary(week, students) {
     entregado: 0,
     entregado_tarde: 0,
     no_entregado: 0,
+    no_aplica: 0,
     total: students.length,
   };
   students.forEach((student) => {
     summary[deliveryStatus(week, student.id)]++;
   });
   summary.registered = summary.entregado + summary.entregado_tarde;
-  summary.percent = summary.total
-    ? Math.round((summary.registered / summary.total) * 100)
-    : 0;
+  summary.applicable = summary.total - summary.no_aplica;
+  summary.percent = summary.applicable
+    ? Math.round((summary.registered / summary.applicable) * 100)
+    : summary.total
+      ? 100
+      : 0;
   return summary;
 }
 
@@ -671,7 +682,9 @@ export function exportWeekCsv(state, weekId) {
           ? "Entregado a destiempo"
           : status === "entregado"
             ? "Entregado"
-            : "No entregado",
+            : status === "no_aplica"
+              ? "No aplica"
+              : "No entregado",
         delivery?.registeredAt || "",
         delivery?.source || "",
       ];
