@@ -31,10 +31,14 @@ describe("landing de presentación", () => {
     expect(jsx).toContain("Lo que dicen quienes lo usan");
     expect(jsx).toContain("What users are saying");
     expect(jsx).toContain("Was Nutzer sagen");
+    expect(jsx).toContain("duale Berufsausbildung");
+    expect(jsx).toContain("Ausbildungsnachweis");
+    expect(jsx).toContain("Berichtsheft");
+    expect(jsx).toContain("Auszubildende");
     expect(jsx).toContain("Wuendy G.");
     expect(jsx).toContain("Alumna del Sistema Dual");
     expect(jsx).toContain("Dual Education student");
-    expect(jsx).toContain("Schülerin im dualen System");
+    expect(jsx).toContain("Teilnehmerin am dualen Bildungsmodell in Mexiko");
     expect(jsx).toContain("CBTis 134");
     expect(jsx).toContain("corregir mis faltas ortográficas");
     expect(jsx).toContain('import { Blobatar } from "blobatar/react"');
