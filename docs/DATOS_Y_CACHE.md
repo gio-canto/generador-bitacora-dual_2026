@@ -22,11 +22,22 @@ El perfil usa `bitacora_profile_v1`, separado de la caché de archivos. Puede re
 
 El Subsistema de registro de entrega usa almacenamiento separado del historial del generador.
 
-- Estado actual: `bitacora_dual_delivery_registry_v4`.
-- Las claves `bitacora_dual_delivery_registry_v3`, `bitacora_dual_delivery_registry_v2` y `bitacora_dual_delivery_registry_v1` se leen para migración y no se usan como formato nuevo.
-- La configuración general guarda el plantel. Cada alumno conserva nombre, especialidad y empresa.
+- Estado actual: `bitacora_dual_delivery_registry_v5`.
+- Las claves `bitacora_dual_delivery_registry_v4`, `bitacora_dual_delivery_registry_v3`, `bitacora_dual_delivery_registry_v2` y `bitacora_dual_delivery_registry_v1` se leen para migración y no se usan como formato nuevo.
+- La configuración general guarda el plantel y la **generación dual**. Cada alumno conserva nombre, especialidad y empresa.
 - Cada semana guarda fecha inicial, fecha final, fecha límite, cierre y entregas por alumno con estado, fecha/hora y origen (`camera`, `manual` o `import`).
 - **Guardar archivo** descarga un JSON portátil del registro completo. Terminar una sesión de cámara con lecturas nuevas descarga también una copia actualizada.
 - El CSV semanal es una exportación de consulta; no sustituye al JSON portátil.
 - El Data Matrix actual utiliza un formato compacto versionado con nombre, especialidad, empresa y periodo (fecha inicial y final). Esto permite clasificar automáticamente varias semanas en una misma sesión. Los códigos anteriores sin periodo usan la semana seleccionada como respaldo.
 - El lector de cámara y la importación de hojas se procesan en el navegador. El subsistema carga bwip-js, SheetJS y ZXing Browser desde las URLs declaradas en el HTML; esas dependencias externas no forman parte del caché principal del service worker.
+
+
+## Reportes PDF · Beta 0.50.0-beta.13
+
+Los reportes se construyen completamente en el navegador a partir del estado local. No crean un registro adicional ni modifican semanas o entregas.
+
+- **Listado simplificado:** usa una semana seleccionada.
+- **Semana por semana:** recorre el historial completo en orden de fecha inicial.
+- El PDF incluye plantel, generación dual, fecha de creación, versión, periodo, límite, resumen de estados y filas de alumnos.
+- Los Blobatars se generan localmente desde el nombre mediante la dependencia ya instalada.
+- El archivo PDF descargado queda bajo control de la persona que lo conserva; no se sincroniza ni se sube automáticamente.

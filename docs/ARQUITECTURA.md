@@ -81,3 +81,12 @@ La lista semanal aplica búsqueda, estado, especialidad y empresa antes de agrup
 La vista semanal reutiliza `statusFilter` tanto para las tarjetas-resumen como para el selector explícito de Entrega. De esta forma ambos controles permanecen sincronizados y el filtro puede combinarse con especialidad, empresa, texto y agrupación sin duplicar lógica.
 
 `ScanSound` reproduce `Assets/asset_chime.mp3` únicamente para una lectura aceptada (`tone === "ok"`). Repetidos y lecturas no coincidentes conservan tonos sintetizados distintos. El archivo de chime se incluye en el núcleo del service worker para disponibilidad posterior sin conexión.
+
+
+## Reportes de entrega PDF · Beta 0.50.0-beta.13
+
+`src/services/delivery-report.js` separa la construcción del modelo de reporte de su renderizado. `buildDeliveryReportModel()` produce un modelo estable para una semana o para todo el historial; `generateDeliveryReportPdf()` lo convierte en páginas A4.
+
+El renderizado se hace sobre canvas para mantener tipografía, Blobatars, tablas y estados consistentes en navegadores móviles. Cada página se rasteriza como JPEG y un escritor PDF mínimo empaqueta las imágenes en un PDF multipágina A4 sin depender de servicios externos ni de una librería PDF adicional.
+
+El diseño es deliberadamente institucional: fondo blanco, tipografía del sistema, líneas discretas, un único acento azul y colores de estado moderados. El servicio añade fecha de creación, versión, plantel, generación dual, periodo, límite, resumen y numeración de páginas.

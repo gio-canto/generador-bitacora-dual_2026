@@ -133,7 +133,7 @@
 .delivery-notice button:hover{background:rgba(255,255,255,.72)}
 .delivery-summary-grid{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:14px;
   margin-bottom:18px;
 }
@@ -1946,5 +1946,235 @@ button.delivery-action-tile{cursor:pointer}
   }
   .delivery-student-group-head{
     padding-inline:4px;
+  }
+}
+
+
+/* Beta 0.50.0-beta.13 · reportes PDF */
+.delivery-school-form{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.delivery-report-overlay{
+  position:fixed;
+  inset:0;
+  z-index:320;
+  padding:18px;
+  overflow:auto;
+  background:rgba(20,20,24,.38);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.delivery-report-stage{
+  min-height:100%;
+  display:grid;
+  place-items:center;
+  padding:20px 0;
+}
+.delivery-report-card{
+  width:min(760px,100%);
+  padding:clamp(22px,4vw,34px);
+  border:1px solid rgba(0,0,0,.07);
+  border-radius:26px;
+  background:#fff;
+  box-shadow:0 20px 60px rgba(0,0,0,.12);
+}
+.delivery-report-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:22px;
+  padding-bottom:18px;
+  border-bottom:1px solid rgba(0,0,0,.08);
+}
+.delivery-report-head>div{min-width:0}
+.delivery-report-head>svg{
+  flex:0 0 auto;
+  color:#1f5f91;
+}
+.delivery-report-head h2{
+  margin:5px 0 6px;
+  color:#16202a;
+  font-size:32px;
+  letter-spacing:-.035em;
+}
+.delivery-report-head p{
+  margin:0;
+  color:#66717d;
+  font-size:13px;
+  line-height:1.45;
+}
+.delivery-report-options{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:20px;
+}
+.delivery-report-option{
+  min-height:128px;
+  display:grid;
+  align-content:start;
+  gap:7px;
+  padding:17px;
+  border:1px solid rgba(0,0,0,.09);
+  border-radius:17px;
+  background:#f7f8fa;
+  color:#16202a;
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
+}
+.delivery-report-option:hover{
+  border-color:rgba(31,95,145,.24);
+  background:#f3f6f9;
+}
+.delivery-report-option.active{
+  border-color:rgba(31,95,145,.45);
+  background:#eaf1f7;
+  box-shadow:0 0 0 3px rgba(31,95,145,.07);
+}
+.delivery-report-option strong{font-size:14px}
+.delivery-report-option span{
+  color:#66717d;
+  font-size:12px;
+  line-height:1.5;
+}
+.delivery-report-week{
+  margin-top:16px;
+}
+.delivery-report-preview{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  margin-top:16px;
+  padding:15px 16px;
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:15px;
+  background:#f7f8fa;
+}
+.delivery-report-preview>div{
+  display:grid;
+  gap:3px;
+}
+.delivery-report-preview strong{font-size:12px}
+.delivery-report-preview span{
+  color:#66717d;
+  font-size:11.5px;
+  line-height:1.45;
+}
+.delivery-report-preview>span{
+  flex:0 0 auto;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#fff;
+  color:#1f5f91;
+  font-weight:750;
+}
+.delivery-report-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:9px;
+  margin-top:22px;
+}
+.delivery-report-actions .btn{gap:7px}
+
+@media(max-width:1100px){
+  .delivery-summary-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:760px){
+  .delivery-school-form{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:900px), (pointer:coarse){
+  .delivery-week-head-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+  .delivery-report-overlay{
+    padding:
+      max(10px,env(safe-area-inset-top))
+      max(10px,env(safe-area-inset-right))
+      max(10px,env(safe-area-inset-bottom))
+      max(10px,env(safe-area-inset-left));
+  }
+  .delivery-report-stage{
+    align-items:end;
+    padding:0;
+  }
+  .delivery-report-card{
+    width:100%;
+    max-height:calc(100dvh - env(safe-area-inset-top) - 10px);
+    overflow:auto;
+    border-radius:24px 24px 18px 18px;
+    padding:20px;
+  }
+  .delivery-report-options{
+    grid-template-columns:1fr 1fr;
+  }
+  .delivery-report-actions{
+    position:sticky;
+    bottom:-20px;
+    margin-inline:-20px;
+    padding:12px 20px calc(12px + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.92);
+    border-top:1px solid rgba(0,0,0,.07);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+  }
+}
+
+@media(max-width:520px){
+  .delivery-summary-grid{
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+  }
+  .delivery-summary-card{
+    min-height:170px;
+    padding:15px;
+    border-radius:19px;
+  }
+  .delivery-summary-card>strong{
+    min-height:48px;
+    font-size:30px;
+  }
+  .delivery-summary-card>.btn{
+    width:100%;
+    justify-content:center;
+    padding-inline:8px;
+    font-size:11px;
+  }
+  .delivery-week-head-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+  .delivery-week-head-actions .delivery-nav-button{
+    min-height:44px;
+    padding:5px 3px;
+    font-size:9.5px;
+  }
+  .delivery-report-head h2{
+    font-size:27px;
+  }
+  .delivery-report-options{
+    grid-template-columns:1fr;
+  }
+  .delivery-report-option{
+    min-height:0;
+  }
+  .delivery-report-preview{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .delivery-report-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .delivery-report-actions .btn{
+    width:100%;
+    justify-content:center;
   }
 }

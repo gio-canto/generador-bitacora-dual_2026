@@ -12,6 +12,7 @@ import {
   Clock,
   DownloadSimple,
   FileArrowUp,
+  FilePdf,
   FileXls,
   Plus,
   PencilSimple,
@@ -45,6 +46,7 @@ import {
   writeDeliveryState,
 } from "../services/delivery-registry.js";
 import { VERSION } from "../domain/records.js";
+import { generateDeliveryReportPdf } from "../services/delivery-report.js";
 import {
   createScannerIssue,
   formatScannerDiagnostic,
@@ -373,6 +375,12 @@ export default function DeliveryRegistry({ onClose }) {
   const [specialtyFilter, setSpecialtyFilter] = useState("all");
   const [companyFilter, setCompanyFilter] = useState("all");
   const [groupBy, setGroupBy] = useState("none");
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportMode, setReportMode] = useState("simple");
+  const [reportWeekId, setReportWeekId] = useState(
+    initialState.weeks.at(-1)?.id || "",
+  );
+  const [reportBusy, setReportBusy] = useState(false);
   const [scanQueue, setScanQueue] = useState([]);
   const [scanMessage, setScanMessage] = useState("Apunta la cámara al Data Matrix.");
   const [scanTone, setScanTone] = useState("");
@@ -1028,6 +1036,57 @@ export default function DeliveryRegistry({ onClose }) {
     };
   }, [view]);
 
+
+  const openReport = (weekId = "") => {
+    const selectedWeekId =
+      weekId || activeWeekId || state.weeks.at(-1)?.id || "";
+    setReportWeekId(selectedWeekId);
+    setReportMode(weekId ? "simple" : "weekly");
+    setReportOpen(true);
+  };
+
+  const downloadReport = async () => {
+    if (!state.weeks.length) {
+      showNotice(
+        "warning",
+        "No hay semanas para reportar",
+        "Crea al menos una semana antes de generar el PDF.",
+      );
+      setReportOpen(false);
+      return;
+    }
+    if (reportMode === "simple" && !reportWeekId) {
+      showNotice(
+        "warning",
+        "Selecciona una semana",
+        "El listado simplificado necesita una semana.",
+      );
+      return;
+    }
+
+    setReportBusy(true);
+    try {
+      const result = await generateDeliveryReportPdf(state, {
+        mode: reportMode,
+        weekId: reportWeekId,
+      });
+      notify(
+        "success",
+        "Reporte PDF generado",
+        result.pages + (result.pages === 1 ? " página" : " páginas"),
+      );
+      setReportOpen(false);
+    } catch (error) {
+      showNotice(
+        "error",
+        "No se pudo generar el reporte",
+        error?.message || "Inténtalo nuevamente.",
+      );
+      setReportOpen(false);
+    } finally {
+      setReportBusy(false);
+    }
+  };
 
   const startSetup = () => {
     setContextForm(createRegistryContext(state.context));
@@ -1708,7 +1767,10 @@ export default function DeliveryRegistry({ onClose }) {
                       value={contextForm.school}
                       onChange={(event) =>
                         setContextForm(
-                          createRegistryContext({ school: event.target.value }),
+                          createRegistryContext({
+                            ...contextForm,
+                            school: event.target.value,
+                          }),
                         )
                       }
                     >
@@ -1719,6 +1781,22 @@ export default function DeliveryRegistry({ onClose }) {
                         </option>
                       ))}
                     </select>
+                  </label>
+                  <label className="delivery-field">
+                    <span>Generación dual</span>
+                    <input
+                      value={contextForm.generation || ""}
+                      onChange={(event) =>
+                        setContextForm(
+                          createRegistryContext({
+                            ...contextForm,
+                            generation: event.target.value,
+                          }),
+                        )
+                      }
+                      placeholder="Ej. 2025-2028"
+                      maxLength={100}
+                    />
                   </label>
                 </div>
                 <div className="delivery-setup-actions">
@@ -1746,7 +1824,12 @@ export default function DeliveryRegistry({ onClose }) {
             {setupStep === 1 && (
               <div className="delivery-setup-card">
                 <div className="delivery-context-banner">
-                  <strong>{shortSchool(state.context.school)}</strong>
+                  <div>
+                    <strong>{shortSchool(state.context.school)}</strong>
+                    <span>
+                      Generación dual: {state.context.generation || "No especificada"}
+                    </span>
+                  </div>
                   <button
                     className="btn"
                     type="button"
@@ -1973,6 +2056,9 @@ export default function DeliveryRegistry({ onClose }) {
             <section className="delivery-hero compact">
               <span className="delivery-kicker">Registro de entrega</span>
               <h1>{shortSchool(state.context.school) || "Tu registro"}</h1>
+              <p>
+                Generación dual: {state.context.generation || "No especificada"}
+              </p>
             </section>
 
             <section className="delivery-summary-grid">
@@ -2021,6 +2107,19 @@ export default function DeliveryRegistry({ onClose }) {
                   }}
                 >
                   Escanear entregas
+                </button>
+              </article>
+              <article className="delivery-summary-card">
+                <FilePdf size={28} />
+                <span>Reporte</span>
+                <strong className="delivery-summary-text">PDF</strong>
+                <button
+                  className="btn"
+                  type="button"
+                  disabled={!state.weeks.length}
+                  onClick={() => openReport()}
+                >
+                  Crear reporte
                 </button>
               </article>
             </section>
@@ -2170,6 +2269,16 @@ export default function DeliveryRegistry({ onClose }) {
                 </p>
               </div>
               <div className="delivery-week-head-actions">
+                <button
+                  className="btn delivery-nav-button"
+                  type="button"
+                  aria-label="Descargar reporte PDF"
+                  title="Reporte PDF"
+                  onClick={() => openReport(activeWeek.id)}
+                >
+                  <FilePdf size={18} />
+                  <span>PDF</span>
+                </button>
                 <button
                   className="btn delivery-nav-button"
                   type="button"
@@ -2592,6 +2701,109 @@ export default function DeliveryRegistry({ onClose }) {
           </section>
         )}
       </main>
+
+      {reportOpen && (
+        <div
+          className="delivery-report-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Generar reporte de entregas"
+        >
+          <div className="delivery-report-stage">
+            <article className="delivery-report-card">
+              <div className="delivery-report-head">
+                <div>
+                  <span className="delivery-kicker">Documento institucional</span>
+                  <h2>Reporte de entregas</h2>
+                  <p>
+                    {shortSchool(state.context.school)} · Generación dual:{" "}
+                    {state.context.generation || "No especificada"}
+                  </p>
+                </div>
+                <FilePdf size={34} />
+              </div>
+
+              <div className="delivery-report-options">
+                <button
+                  className={
+                    reportMode === "simple"
+                      ? "delivery-report-option active"
+                      : "delivery-report-option"
+                  }
+                  type="button"
+                  onClick={() => setReportMode("simple")}
+                >
+                  <strong>Listado simplificado</strong>
+                  <span>
+                    Una semana, con alumnos, Blobatar, estado y fecha de registro.
+                  </span>
+                </button>
+                <button
+                  className={
+                    reportMode === "weekly"
+                      ? "delivery-report-option active"
+                      : "delivery-report-option"
+                  }
+                  type="button"
+                  onClick={() => setReportMode("weekly")}
+                >
+                  <strong>Semana por semana</strong>
+                  <span>
+                    Historial completo con resumen y listado de cada periodo.
+                  </span>
+                </button>
+              </div>
+
+              {reportMode === "simple" && (
+                <label className="delivery-field delivery-report-week">
+                  <span>Semana del reporte</span>
+                  <select
+                    value={reportWeekId}
+                    onChange={(event) => setReportWeekId(event.target.value)}
+                  >
+                    {[...state.weeks].reverse().map((week) => (
+                      <option key={week.id} value={week.id}>
+                        {week.label} · {formatPeriod(week.startDate, week.endDate)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              <div className="delivery-report-preview">
+                <div>
+                  <strong>Incluye</strong>
+                  <span>
+                    Plantel, generación, fecha de creación, periodo, límite,
+                    resumen de estados, alumnos y origen del registro.
+                  </span>
+                </div>
+                <span>{state.students.length} alumnos</span>
+              </div>
+
+              <div className="delivery-report-actions">
+                <button
+                  className="btn"
+                  type="button"
+                  disabled={reportBusy}
+                  onClick={() => setReportOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn primary"
+                  type="button"
+                  disabled={reportBusy || !state.weeks.length}
+                  onClick={downloadReport}
+                >
+                  <DownloadSimple size={18} />
+                  {reportBusy ? "Generando…" : "Descargar PDF"}
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+      )}
 
       {tutorialOpen && (
         <div

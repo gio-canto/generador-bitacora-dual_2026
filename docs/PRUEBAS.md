@@ -81,3 +81,14 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Escanear una entrega válida y comprobar que reproduce `asset_chime.mp3`.
 - Confirmar que repetido y no coincide no reproducen el chime de éxito.
 - Tras una primera carga, probar el registro con la caché del service worker y verificar que el chime sigue disponible.
+
+
+## Reportes PDF · Beta 0.50.0-beta.13
+
+- Configurar una generación dual y confirmar que persiste al recargar y al exportar/importar JSON.
+- Generar un **Listado simplificado** de una semana con estados a tiempo, a destiempo y no entregado.
+- Generar **Semana por semana** con al menos dos periodos y comprobar su orden cronológico.
+- Revisar que cada fila muestre Blobatar, alumno, especialidad, empresa, estado y fecha/origen cuando exista.
+- Confirmar que el PDF muestre plantel, generación, fecha de creación, versión, periodo, límite, resumen y numeración.
+- Abrir el PDF en Safari/iPhone, Vista Previa/macOS o un lector equivalente y verificar que no existan recortes ni páginas vacías.
+- Imprimir una página de prueba en A4 y comprobar legibilidad en escala 100%.
