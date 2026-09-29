@@ -7,6 +7,7 @@ import {
   createWeek,
   deliveryStatus,
   findStudentByMatrixValue,
+  findStudentSuggestionsByMatrixValue,
   findWeekByMatrixValue,
   mergeStudents,
   parseMatrixPayload,
@@ -62,6 +63,40 @@ describe("subsistema de registro de entrega", () => {
     expect(
       findStudentByMatrixValue([student], "BD26|Jose Angel Nunez")?.id,
     ).toBe(student.id);
+  });
+
+  it("sugiere una persona cuando el nombre cambia por una diferencia pequeña", () => {
+    const student = createStudent({
+      name: "Ocabet Hernández",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const payload = createMatrixPayload({
+      student: "Jocabet Hernández",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+
+    expect(findStudentByMatrixValue([student], payload)).toBeNull();
+    const suggestions = findStudentSuggestionsByMatrixValue([student], payload);
+    expect(suggestions).toHaveLength(1);
+    expect(suggestions[0].student.id).toBe(student.id);
+    expect(suggestions[0].distance).toBe(1);
+  });
+
+  it("no sugiere nombres parecidos si especialidad o empresa no coinciden", () => {
+    const student = createStudent({
+      name: "Ocabet Hernández",
+      specialty: "Contabilidad",
+      company: "ITCH",
+    });
+    const payload = createMatrixPayload({
+      student: "Jocabet Hernández",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+
+    expect(findStudentSuggestionsByMatrixValue([student], payload)).toEqual([]);
   });
 
   it("codifica identidad y periodo en el Data Matrix actual", () => {
