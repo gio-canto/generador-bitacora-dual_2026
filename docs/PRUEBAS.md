@@ -47,6 +47,8 @@ Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regl
 - responsables e instructor;
 - firma genérica;
 - guardar, recargar y reabrir;
+- revisar un registro guardado sin reemplazar el borrador actual;
+- desde la revisión, abrir explícitamente un registro para editar;
 - exportar/importar respaldo;
 - descargar PDF.
 
