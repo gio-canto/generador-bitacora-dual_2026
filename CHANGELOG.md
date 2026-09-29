@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.50.0-beta.34 · Día de Muertos · 2026-09-29
+
+- Se añaden easter eggs de **Día de Muertos** para el **1 y 2 de noviembre**.
+- Ambas fechas comparten una identidad visual propia con cempasúchil, vela y una composición cálida, separada de Halloween.
+- **Halloween** permanece exclusivamente el **31 de octubre**.
+- Día de Muertos no utiliza un contador de aniversario artificial.
+- Se añaden pruebas para verificar ambas fechas y confirmar que no se calcule aniversario.
+- El resto de efemérides, temporadas y aniversarios automáticos permanece sin cambios.
+
 ## 0.50.0-beta.33 · Efemérides de octubre corregidas · 2026-09-29
 
 - Se eliminan por completo las efemérides del **1 y 2 de octubre**.
