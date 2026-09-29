@@ -43,6 +43,11 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     "homeRecords",
   ])
     expect($(id), id).toBeTruthy();
+  expect($("homeHistoryDisclosure").open).toBe(false);
+  expect($("homeHistoryDisclosure").querySelector("summary").textContent).toContain(
+    "Bitácoras anteriores",
+  );
+  expect($("homeHistoryState").textContent).toBe("1");
   expect($("studentSignatureDisclosure").open).toBe(true);
   expect($("studentSignatureSummaryState").textContent).toContain("primera");
   fireEvent.input($("student"), { target: { value: "Alumno de Prueba" } });
