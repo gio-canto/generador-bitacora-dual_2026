@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.18-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.19-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,13 +13,13 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.18 · Presentación del proyecto · Parte 4
+## Beta 0.50.0-beta.19 · Presentación del proyecto · Parte 5
 
-La landing de **[/presentacion/](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/)** ahora está montada con **React 19** y reutiliza `@phosphor-icons/react` para mantener una iconografía coherente con el resto del proyecto.
+La landing corrige un problema real de visualización de iconos. Los iconos de **[/presentacion/](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/)** ahora se dibujan como SVG inline desde componentes React locales, por lo que no dependen de una carga visual externa y funcionan con los mismos colores, hovers y animaciones del diseño.
 
-Se añadieron iconos en ventajas para alumnos, beneficios para escuelas, sistemas, Data Matrix, flujo, privacidad, open source y colaboración. También se incorporaron microanimaciones sobrias: parallax suave del hero, progreso de lectura, flechas con movimiento mínimo, estados hover en iconos y una ligera profundidad en la imagen de ejemplo.
+También se mejora la actualización de la landing: si el navegador conserva un service worker anterior, la página activa la versión pendiente y recarga una sola vez para evitar quedarse mostrando una compilación vieja desde caché.
 
-Las animaciones siguen siendo progresivas y respetan `prefers-reduced-motion`, por lo que pueden desactivarse completamente desde el sistema operativo.
+React, parallax, progreso de lectura, relojes y microinteracciones se mantienen sin cambios de intención y continúan respetando `prefers-reduced-motion`.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
