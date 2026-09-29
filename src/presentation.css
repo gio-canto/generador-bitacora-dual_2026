@@ -649,11 +649,15 @@ footer nav{
 }
 
 .reveal{
+  opacity:1;
+  transform:none;
+}
+.js .reveal{
   opacity:0;
   transform:translateY(18px);
   transition:opacity .65s cubic-bezier(.22,.61,.36,1),transform .65s cubic-bezier(.22,.61,.36,1);
 }
-.reveal.is-visible{
+.js .reveal.is-visible{
   opacity:1;
   transform:none;
 }
@@ -805,7 +809,7 @@ footer nav{
 
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .reveal{
+  .js .reveal{
     opacity:1;
     transform:none;
     transition:none;
