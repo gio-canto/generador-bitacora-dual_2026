@@ -157,6 +157,20 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   fireEvent.click($("newBtn"));
   expect($("studentSignatureDisclosure").open).toBe(false);
   expect($("studentGenericSignature").checked).toBe(true);
+  expect(document.querySelectorAll("#days .day-card")).toHaveLength(0);
+
+  $("#historyDisclosure").open = true;
+  const reviewButton = document.querySelector("[data-review]");
+  expect(reviewButton).toBeTruthy();
+  fireEvent.click(reviewButton);
+  expect($("#recordReviewDialog").open).toBe(true);
+  expect($("#recordReviewContent").textContent).toContain("Alumno de Prueba");
+  expect($("#recordReviewContent").textContent).toContain(
+    "Revisé los datos del sistema y corregí errores.",
+  );
+  expect(document.querySelectorAll("#days .day-card")).toHaveLength(0);
+  fireEvent.click($("#recordReviewClose"));
+  expect($("#recordReviewDialog").open).toBe(false);
 });
 
 it("mantiene plegada y apagada la firma si ya se presentó y no se activó", async () => {
