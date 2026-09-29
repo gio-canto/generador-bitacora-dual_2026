@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.28 · Localización alemana contextual · 2026-09-29
+
+- La versión alemana de la landing deja de traducir literalmente **Educación Dual** y adopta terminología propia del sistema alemán de **duale Berufsausbildung**.
+- **Bitácora** se contextualiza como **Ausbildungsnachweis (Berichtsheft)**, término utilizado en la formación profesional dual alemana para documentar las actividades de aprendizaje y trabajo.
+- **Alumno** pasa a **Auszubildende** y se ajustan referencias a **Ausbildungsbetrieb**, **Berufsschule**, **Ausbilderinnen und Ausbilder** y **Ausbildungskoordination** según el contexto.
+- Se revisan hero, ventajas, tiempos, testimonios, sistemas, Data Matrix, flujo, instituciones, privacidad y CTA para evitar una traducción palabra por palabra del contexto mexicano.
+- La atribución de Wuendy G. aclara que participa en el modelo dual mexicano, para no presentarla erróneamente como aprendiz del sistema alemán.
+- El aviso de idioma alemán aclara que la landing usa terminología alemana contextual, mientras que las aplicaciones operativas siguen en español y responden al contexto de uso mexicano.
+- Las pruebas de la landing verifican ahora la presencia de **duale Berufsausbildung**, **Ausbildungsnachweis**, **Berichtsheft** y **Auszubildende**.
+
 ## 0.50.0-beta.27 · Landing multilingüe · 2026-09-29
 
 - La landing de `/presentacion/` incorpora versiones completas en **español, inglés y alemán** mediante un selector **ES / EN / DE**.
