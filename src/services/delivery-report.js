@@ -6,6 +6,10 @@ const PAGE_W = 1240;
 const PAGE_H = 1754;
 const PDF_W = 595.28;
 const PDF_H = 841.89;
+const LANDSCAPE_PAGE_W = 1754;
+const LANDSCAPE_PAGE_H = 1240;
+const LANDSCAPE_PDF_W = 841.89;
+const LANDSCAPE_PDF_H = 595.28;
 
 const COLORS = {
   ink: "#16202a",
@@ -102,18 +106,22 @@ export function buildDeliveryReportModel(
 ) {
   const students = Array.isArray(state?.students) ? state.students : [];
   const allWeeks = Array.isArray(state?.weeks) ? state.weeks : [];
+  const normalizedMode = ["simple", "weekly", "global"].includes(mode)
+    ? mode
+    : "simple";
+  const sortedWeeks = [...allWeeks].sort((a, b) =>
+    String(a.startDate || a.createdAt || "").localeCompare(
+      String(b.startDate || b.createdAt || ""),
+    ),
+  );
   const selected =
     allWeeks.find((week) => week.id === weekId) || allWeeks.at(-1) || null;
   const weeks =
-    mode === "weekly"
-      ? [...allWeeks].sort((a, b) =>
-          String(a.startDate || a.createdAt || "").localeCompare(
-            String(b.startDate || b.createdAt || ""),
-          ),
-        )
-      : selected
+    normalizedMode === "simple"
+      ? selected
         ? [selected]
-        : [];
+        : []
+      : sortedWeeks;
 
   const mappedWeeks = weeks.map((week) => {
     const rows = students
@@ -153,15 +161,40 @@ export function buildDeliveryReportModel(
     };
   });
 
+  const globalRows =
+    normalizedMode === "global"
+      ? [...students]
+          .sort((a, b) =>
+            clean(a.name).localeCompare(clean(b.name), "es", {
+              sensitivity: "base",
+            }),
+          )
+          .map((student) => ({
+            id: student.id,
+            name: clean(student.name, 180),
+            specialty: clean(student.specialty, 120),
+            company: clean(student.company, 220),
+            weeks: mappedWeeks.map((week) => {
+              const delivery = week.rows.find((row) => row.id === student.id);
+              return {
+                weekId: week.id,
+                status: delivery?.status || "no_entregado",
+                registeredAt: delivery?.registeredAt || "",
+              };
+            }),
+          }))
+      : [];
+
   return {
     kind: "delivery-report",
-    mode: mode === "weekly" ? "weekly" : "simple",
+    mode: normalizedMode,
     createdAt,
     school: clean(state?.context?.school, 220) || "Plantel no especificado",
     generation:
       clean(state?.context?.generation, 100) || "No especificada",
     students: students.length,
     weeks: mappedWeeks,
+    globalRows,
   };
 }
 
@@ -477,6 +510,307 @@ async function renderReportPage(model, spec, pageNumber, pageCount) {
   return canvas;
 }
 
+function statusSymbol(status) {
+  if (status === "entregado") return "✓";
+  if (status === "entregado_tarde") return "!";
+  return "×";
+}
+
+function buildGlobalPageSpecs(model) {
+  const weekChunkSize = 15;
+  const studentChunkSize = 14;
+  const specs = [];
+  const weekChunks = [];
+  const studentChunks = [];
+
+  for (let index = 0; index < model.weeks.length; index += weekChunkSize)
+    weekChunks.push({
+      start: index,
+      items: model.weeks.slice(index, index + weekChunkSize),
+    });
+  for (let index = 0; index < model.globalRows.length; index += studentChunkSize)
+    studentChunks.push({
+      start: index,
+      items: model.globalRows.slice(index, index + studentChunkSize),
+    });
+
+  if (!weekChunks.length) weekChunks.push({ start: 0, items: [] });
+  if (!studentChunks.length) studentChunks.push({ start: 0, items: [] });
+
+  for (const studentChunk of studentChunks) {
+    for (const weekChunk of weekChunks) {
+      specs.push({
+        type: "global",
+        students: studentChunk.items,
+        studentStart: studentChunk.start,
+        weeks: weekChunk.items,
+        weekStart: weekChunk.start,
+      });
+    }
+  }
+  return specs;
+}
+
+async function drawGlobalStudentCell(ctx, row, x, y, width, height) {
+  const avatar = await loadAvatar(row.name);
+  const avatarSize = 36;
+  const avatarX = x + 10;
+  const avatarY = y + (height - avatarSize) / 2;
+
+  if (avatar) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(
+      avatarX + avatarSize / 2,
+      avatarY + avatarSize / 2,
+      avatarSize / 2,
+      0,
+      Math.PI * 2,
+    );
+    ctx.clip();
+    ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = COLORS.blueSoft;
+    ctx.beginPath();
+    ctx.arc(
+      avatarX + avatarSize / 2,
+      avatarY + avatarSize / 2,
+      avatarSize / 2,
+      0,
+      Math.PI * 2,
+    );
+    ctx.fill();
+    ctx.fillStyle = COLORS.blue;
+    ctx.font = "800 12px Arial, Helvetica, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      initials(row.name),
+      avatarX + avatarSize / 2,
+      avatarY + 23,
+    );
+    ctx.textAlign = "left";
+  }
+
+  const textX = avatarX + avatarSize + 12;
+  const textW = width - (textX - x) - 10;
+  ctx.fillStyle = COLORS.ink;
+  ctx.font = "700 17px Arial, Helvetica, sans-serif";
+  ctx.fillText(trimToWidth(ctx, row.name, textW), textX, y + 26);
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = "500 12px Arial, Helvetica, sans-serif";
+  ctx.fillText(
+    trimToWidth(
+      ctx,
+      [row.specialty, row.company].filter(Boolean).join(" · ") || "Sin datos",
+      textW,
+    ),
+    textX,
+    y + 45,
+  );
+}
+
+async function renderGlobalReportPage(model, spec, pageNumber, pageCount) {
+  const canvas = document.createElement("canvas");
+  canvas.width = LANDSCAPE_PAGE_W;
+  canvas.height = LANDSCAPE_PAGE_H;
+  const ctx = canvas.getContext("2d", { alpha: false });
+
+  ctx.fillStyle = COLORS.paper;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const left = 58;
+  const right = canvas.width - 58;
+  const top = 48;
+  const width = right - left;
+
+  ctx.fillStyle = COLORS.blue;
+  ctx.fillRect(left, top, 8, 86);
+
+  ctx.fillStyle = COLORS.blue;
+  ctx.font = "800 18px Arial, Helvetica, sans-serif";
+  ctx.fillText("REPORTE GLOBAL DE ENTREGAS", left + 24, top + 20);
+
+  ctx.fillStyle = COLORS.ink;
+  ctx.font = "800 31px Arial, Helvetica, sans-serif";
+  ctx.fillText(trimToWidth(ctx, model.school, 780), left + 24, top + 58);
+
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = "600 16px Arial, Helvetica, sans-serif";
+  ctx.fillText(
+    "Generación dual: " + model.generation,
+    left + 24,
+    top + 84,
+  );
+
+  ctx.textAlign = "right";
+  ctx.fillStyle = COLORS.ink;
+  ctx.font = "700 17px Arial, Helvetica, sans-serif";
+  ctx.fillText("Bitácora Dual 2026", right, top + 20);
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = "500 14px Arial, Helvetica, sans-serif";
+  ctx.fillText("Creado: " + formatDateTime(model.createdAt), right, top + 47);
+  ctx.fillText("Versión " + VERSION, right, top + 71);
+  ctx.textAlign = "left";
+
+  const legendY = 160;
+  const legend = [
+    ["✓", "A tiempo", COLORS.green, COLORS.greenSoft],
+    ["!", "A destiempo", COLORS.amber, COLORS.amberSoft],
+    ["×", "No entregado", COLORS.red, COLORS.redSoft],
+  ];
+  let legendX = left;
+  for (const [symbol, label, color, background] of legend) {
+    roundedRect(ctx, legendX, legendY, 150, 34, 17, background);
+    ctx.fillStyle = color;
+    ctx.font = "800 16px Arial, Helvetica, sans-serif";
+    ctx.fillText(symbol, legendX + 12, legendY + 22);
+    ctx.font = "700 13px Arial, Helvetica, sans-serif";
+    ctx.fillText(label, legendX + 34, legendY + 22);
+    legendX += 162;
+  }
+
+  ctx.textAlign = "right";
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = "600 13px Arial, Helvetica, sans-serif";
+  const weekRange = spec.weeks.length
+    ? "Semanas " +
+      (spec.weekStart + 1) +
+      "–" +
+      (spec.weekStart + spec.weeks.length)
+    : "Sin semanas";
+  ctx.fillText(weekRange, right, legendY + 22);
+  ctx.textAlign = "left";
+
+  const tableX = left;
+  const tableY = 220;
+  const tableW = width;
+  const nameW = 430;
+  const weeksW = tableW - nameW;
+  const weekCellW = spec.weeks.length ? weeksW / spec.weeks.length : weeksW;
+  const headerH = 72;
+  const rowH = 58;
+
+  ctx.fillStyle = COLORS.soft;
+  ctx.fillRect(tableX, tableY, tableW, headerH);
+  ctx.strokeStyle = COLORS.line;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(tableX, tableY, tableW, headerH);
+
+  ctx.fillStyle = COLORS.ink;
+  ctx.font = "800 16px Arial, Helvetica, sans-serif";
+  ctx.fillText("ALUMNO", tableX + 14, tableY + 29);
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = "600 12px Arial, Helvetica, sans-serif";
+  ctx.fillText(
+    "Especialidad · Empresa",
+    tableX + 14,
+    tableY + 51,
+  );
+
+  spec.weeks.forEach((week, index) => {
+    const x = tableX + nameW + index * weekCellW;
+    ctx.strokeStyle = COLORS.line;
+    ctx.strokeRect(x, tableY, weekCellW, headerH);
+    ctx.textAlign = "center";
+    ctx.fillStyle = COLORS.ink;
+    ctx.font = "800 17px Arial, Helvetica, sans-serif";
+    ctx.fillText(String(spec.weekStart + index + 1), x + weekCellW / 2, tableY + 27);
+    ctx.fillStyle = COLORS.muted;
+    ctx.font = "600 10.5px Arial, Helvetica, sans-serif";
+    const dateLabel = week.startDate
+      ? formatDate(week.startDate).replace(/\s+de\s+/gi, " ")
+      : "Semana";
+    ctx.fillText(
+      trimToWidth(ctx, dateLabel, weekCellW - 8),
+      x + weekCellW / 2,
+      tableY + 49,
+    );
+    ctx.textAlign = "left";
+  });
+
+  let y = tableY + headerH;
+  for (const row of spec.students) {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(tableX, y, tableW, rowH);
+    ctx.strokeStyle = COLORS.line;
+    ctx.strokeRect(tableX, y, tableW, rowH);
+    await drawGlobalStudentCell(ctx, row, tableX, y, nameW, rowH);
+
+    spec.weeks.forEach((week, index) => {
+      const globalWeekIndex = spec.weekStart + index;
+      const delivery = row.weeks[globalWeekIndex] || {
+        status: "no_entregado",
+      };
+      const meta = STATUS_META[delivery.status] || STATUS_META.no_entregado;
+      const x = tableX + nameW + index * weekCellW;
+      ctx.strokeStyle = COLORS.line;
+      ctx.strokeRect(x, y, weekCellW, rowH);
+
+      const dotSize = Math.min(34, weekCellW - 16);
+      const dotX = x + (weekCellW - dotSize) / 2;
+      const dotY = y + (rowH - dotSize) / 2;
+      roundedRect(
+        ctx,
+        dotX,
+        dotY,
+        dotSize,
+        dotSize,
+        dotSize / 2,
+        meta.background,
+      );
+      ctx.fillStyle = meta.color;
+      ctx.font = "900 19px Arial, Helvetica, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        statusSymbol(delivery.status),
+        x + weekCellW / 2,
+        y + 36,
+      );
+      ctx.textAlign = "left";
+    });
+
+    y += rowH;
+  }
+
+  if (!spec.students.length) {
+    roundedRect(ctx, tableX, y + 18, tableW, 80, 12, COLORS.soft);
+    ctx.fillStyle = COLORS.muted;
+    ctx.font = "600 18px Arial, Helvetica, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("No hay alumnos en la base.", canvas.width / 2, y + 64);
+    ctx.textAlign = "left";
+  }
+
+  const footerY = canvas.height - 55;
+  ctx.strokeStyle = COLORS.line;
+  ctx.beginPath();
+  ctx.moveTo(left, footerY - 20);
+  ctx.lineTo(right, footerY - 20);
+  ctx.stroke();
+
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = "500 12px Arial, Helvetica, sans-serif";
+  ctx.fillText(
+    "Matriz global · " +
+      model.students +
+      " alumnos · " +
+      model.weeks.length +
+      " semanas",
+    left,
+    footerY,
+  );
+  ctx.textAlign = "right";
+  ctx.fillText(
+    "Página " + pageNumber + " de " + pageCount,
+    right,
+    footerY,
+  );
+  ctx.textAlign = "left";
+
+  return canvas;
+}
+
 function base64ToBytes(value) {
   const binary = atob(value);
   const bytes = new Uint8Array(binary.length);
@@ -485,11 +819,17 @@ function base64ToBytes(value) {
   return bytes;
 }
 
-function canvasToJpeg(canvas) {
+function canvasToJpeg(
+  canvas,
+  pdfWidth = PDF_W,
+  pdfHeight = PDF_H,
+) {
   const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
   return {
     width: canvas.width,
     height: canvas.height,
+    pdfWidth,
+    pdfHeight,
     bytes: base64ToBytes(dataUrl.split(",")[1]),
   };
 }
@@ -536,11 +876,13 @@ function createPdfFromJpegs(images) {
       ascii("\nendstream"),
     ];
 
+    const pageWidth = image.pdfWidth || PDF_W;
+    const pageHeight = image.pdfHeight || PDF_H;
     const stream =
       "q\n" +
-      PDF_W +
+      pageWidth +
       " 0 0 " +
-      PDF_H +
+      pageHeight +
       " 0 0 cm\n/Im0 Do\nQ\n";
     objects[contentId] = [
       ascii(
@@ -555,9 +897,9 @@ function createPdfFromJpegs(images) {
     objects[pageId] = [
       ascii(
         "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " +
-          PDF_W +
+          pageWidth +
           " " +
-          PDF_H +
+          pageHeight +
           "] /Resources << /XObject << /Im0 " +
           imageId +
           " 0 R >> >> /Contents " +
@@ -630,16 +972,30 @@ export async function generateDeliveryReportPdf(
   if (!model.weeks.length)
     throw new Error("No hay semanas disponibles para generar el reporte.");
 
-  const specs = buildPageSpecs(model);
+  const specs =
+    model.mode === "global" ? buildGlobalPageSpecs(model) : buildPageSpecs(model);
   const images = [];
+
   for (let index = 0; index < specs.length; index++) {
-    const canvas = await renderReportPage(
-      model,
-      specs[index],
-      index + 1,
-      specs.length,
-    );
-    images.push(canvasToJpeg(canvas));
+    if (model.mode === "global") {
+      const canvas = await renderGlobalReportPage(
+        model,
+        specs[index],
+        index + 1,
+        specs.length,
+      );
+      images.push(
+        canvasToJpeg(canvas, LANDSCAPE_PDF_W, LANDSCAPE_PDF_H),
+      );
+    } else {
+      const canvas = await renderReportPage(
+        model,
+        specs[index],
+        index + 1,
+        specs.length,
+      );
+      images.push(canvasToJpeg(canvas));
+    }
   }
 
   const pdf = createPdfFromJpegs(images);
@@ -647,7 +1003,9 @@ export async function generateDeliveryReportPdf(
   const scope =
     model.mode === "weekly"
       ? "semana-por-semana"
-      : slug(model.weeks[0]?.label || "semana");
+      : model.mode === "global"
+        ? "global"
+        : slug(model.weeks[0]?.label || "semana");
   const generation =
     model.generation === "No especificada"
       ? ""

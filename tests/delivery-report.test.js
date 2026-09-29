@@ -73,6 +73,87 @@ describe("reportes de entrega", () => {
     expect(model.weeks[0].rows[0].source).toBe("Cámara");
   });
 
+  it("construye una matriz global alumno por semana", () => {
+    const a = createStudent({
+      id: "a",
+      name: "Ana López",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const b = createStudent({
+      id: "b",
+      name: "Luis Pérez",
+      specialty: "Contabilidad",
+      company: "ITCH",
+    });
+
+    let week1 = createWeek({
+      id: "w1",
+      label: "Semana 1",
+      startDate: "2026-09-01",
+      dueAt: "2026-09-05T18:00:00.000Z",
+    });
+    let week2 = createWeek({
+      id: "w2",
+      label: "Semana 2",
+      startDate: "2026-09-08",
+      dueAt: "2026-09-12T18:00:00.000Z",
+    });
+
+    week1 = setDeliveryStatus(
+      week1,
+      a.id,
+      "entregado",
+      "2026-09-05T17:00:00.000Z",
+      "camera",
+    );
+    week2 = setDeliveryStatus(
+      week2,
+      a.id,
+      "entregado_tarde",
+      "2026-09-13T10:00:00.000Z",
+      "manual",
+    );
+    week1 = setDeliveryStatus(
+      week1,
+      b.id,
+      "no_entregado",
+      "",
+      "manual",
+    );
+    week2 = setDeliveryStatus(
+      week2,
+      b.id,
+      "entregado",
+      "2026-09-11T10:00:00.000Z",
+      "camera",
+    );
+
+    const model = buildDeliveryReportModel(
+      {
+        context: { school: "CBTis 134", generation: "2025-2028" },
+        students: [b, a],
+        weeks: [week2, week1],
+      },
+      { mode: "global", createdAt: "2026-09-28T21:30:00.000Z" },
+    );
+
+    expect(model.mode).toBe("global");
+    expect(model.weeks.map((week) => week.id)).toEqual(["w1", "w2"]);
+    expect(model.globalRows.map((row) => row.name)).toEqual([
+      "Ana López",
+      "Luis Pérez",
+    ]);
+    expect(model.globalRows[0].weeks.map((item) => item.status)).toEqual([
+      "entregado",
+      "entregado_tarde",
+    ]);
+    expect(model.globalRows[1].weeks.map((item) => item.status)).toEqual([
+      "no_entregado",
+      "entregado",
+    ]);
+  });
+
   it("ordena el reporte semana por semana por fecha inicial", () => {
     const student = createStudent({ id: "a", name: "Ana López" });
     const late = createWeek({

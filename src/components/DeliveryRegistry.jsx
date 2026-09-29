@@ -2752,6 +2752,20 @@ export default function DeliveryRegistry({ onClose }) {
                     Historial completo con resumen y listado de cada periodo.
                   </span>
                 </button>
+                <button
+                  className={
+                    reportMode === "global"
+                      ? "delivery-report-option active"
+                      : "delivery-report-option"
+                  }
+                  type="button"
+                  onClick={() => setReportMode("global")}
+                >
+                  <strong>Global de todas</strong>
+                  <span>
+                    Tabla general por alumno y semana, con mini Blobatar y estado de cada entrega.
+                  </span>
+                </button>
               </div>
 
               {reportMode === "simple" && (
@@ -2774,8 +2788,9 @@ export default function DeliveryRegistry({ onClose }) {
                 <div>
                   <strong>Incluye</strong>
                   <span>
-                    Plantel, generación, fecha de creación, periodo, límite,
-                    resumen de estados, alumnos y origen del registro.
+                    {reportMode === "global"
+                      ? "Plantel, generación, fecha de creación y una matriz alumno × semana con mini Blobatar y estado por cada periodo."
+                      : "Plantel, generación, fecha de creación, periodo, límite, resumen de estados, alumnos y origen del registro."}
                   </span>
                 </div>
                 <span>{state.students.length} alumnos</span>
