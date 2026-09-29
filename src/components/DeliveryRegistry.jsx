@@ -68,7 +68,11 @@ function loadExternalScript(src, timeout = 8000) {
       return;
     }
 
-    const script = existing || document.createElement("script");
+    // Los scripts del HTML son parser-blocking. Si llegamos aquí y el global
+    // no existe, ese elemento ya no va a volver a emitir "load"; se reemplaza
+    // para que el reintento tenga eventos observables y un código diagnóstico.
+    if (existing) existing.remove();
+    const script = document.createElement("script");
     const timer = setTimeout(() => {
       cleanup();
       reject(new Error("El lector tardó demasiado en cargar."));
@@ -86,28 +90,32 @@ function loadExternalScript(src, timeout = 8000) {
     };
     const onError = () => {
       cleanup();
-      if (!existing) script.remove();
+      script.remove();
       reject(new Error("No se pudo cargar el lector Data Matrix."));
     };
 
     script.addEventListener("load", onLoad, { once: true });
     script.addEventListener("error", onError, { once: true });
-    if (!existing) {
-      script.src = src;
-      script.async = true;
-      document.head.appendChild(script);
-    }
+    script.src = src;
+    script.async = true;
+    document.head.appendChild(script);
   });
 }
 
 async function ensureZxingBrowser() {
-  if (window.ZXingBrowser) return window.ZXingBrowser;
+  if (window.ZXingBrowser) {
+    window.__deliveryZxingSource ||= "preloaded";
+    return window.ZXingBrowser;
+  }
   if (!zxingLoadPromise) {
     zxingLoadPromise = (async () => {
       for (const src of ZXING_SOURCES) {
         try {
           await loadExternalScript(src);
-          if (window.ZXingBrowser) return window.ZXingBrowser;
+          if (window.ZXingBrowser) {
+            window.__deliveryZxingSource = src;
+            return window.ZXingBrowser;
+          }
         } catch {
           // Prueba el siguiente origen.
         }
