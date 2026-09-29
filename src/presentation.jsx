@@ -269,6 +269,16 @@ const schoolAdvantages = [
   },
 ];
 
+const testimonials = [
+  {
+    quote:
+      "Pues me ha ayudado a hacerlos de manera rápida y limpia; también me ha ayudado bastante a corregir mis faltas ortográficas.",
+    name: "Wuendy G.",
+    role: "Alumna del Sistema Dual",
+    institution: "CBTis 134",
+  },
+];
+
 const systems = [
   {
     icon: FilePdf,
@@ -438,6 +448,7 @@ function Header() {
         <a href="#alumnos">Alumnos</a>
         <a href="#escuelas">Escuelas</a>
         <a href="#tiempos">Tiempos</a>
+        <a href="#opiniones">Opiniones</a>
         <a href="#sistemas">Sistemas</a>
         <a href="#matrix">Data Matrix</a>
         <a href="#instituciones">Instituciones</a>
@@ -617,6 +628,42 @@ function TimeSection() {
           flujo; no representan una medición científica ni garantizan un tiempo
           específico.
         </p>
+      </div>
+    </section>
+  );
+}
+
+function TestimonialsSection() {
+  return (
+    <section className="testimonials" id="opiniones">
+      <div className="testimonials-inner">
+        <div className="section-label reveal">Lo que dicen quienes lo usan</div>
+        <div className="testimonials-lead reveal">
+          <h2>Hecho para resolver una tarea real, semana tras semana.</h2>
+          <p>
+            Opiniones de estudiantes que ya han usado el generador dentro de su
+            proceso de Educación Dual.
+          </p>
+        </div>
+
+        <div className="testimonial-list">
+          {testimonials.map(({ quote, name, role, institution }) => (
+            <figure className="testimonial reveal" key={name + institution}>
+              <blockquote>“{quote}”</blockquote>
+              <figcaption>
+                <span className="testimonial-avatar" aria-hidden="true">
+                  {name.charAt(0)}
+                </span>
+                <span>
+                  <strong>{name}</strong>
+                  <small>
+                    {role} · {institution}
+                  </small>
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -1010,6 +1057,7 @@ function Presentation() {
         <StudentSection />
         <SchoolSection />
         <TimeSection />
+        <TestimonialsSection />
         <SystemsSection />
         <MatrixSection />
         <WorkflowSection />
