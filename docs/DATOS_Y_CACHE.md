@@ -28,7 +28,7 @@ Existen claves de versiones anteriores usadas únicamente para recuperación o m
 
 Guardar o descargar una bitácora puede incorporarla al historial local. El historial puede exportarse como respaldo.
 
-Las bitácoras anteriores pueden consultarse directamente desde el bloque **Bitácoras anteriores** del inicio o desde **Registros guardados** en el paso 5. La revisión es de sólo lectura: no sustituye el borrador actual ni carga el registro en el formulario. La carga sólo ocurre al elegir explícitamente **Abrir para editar** desde la zona de administración.
+Las bitácoras anteriores pueden consultarse desde **Bitácoras anteriores** en la barra superior o desde **Registros guardados** en el paso 5. La revisión es de sólo lectura: no sustituye el borrador actual ni carga el registro en el formulario. Desde la revisión, **Volver a descargar PDF** carga explícitamente ese registro y lleva al paso 5. La zona de administración conserva además la apertura para edición, duplicado y eliminación.
 
 ### Borrador
 
