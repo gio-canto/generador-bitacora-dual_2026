@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.50.0-beta.32 · Aniversarios automáticos · 2026-09-29
+
+- Enero deja de depender de un año escrito manualmente: **“Nuevo año, nueva bitácora”** muestra siempre el año correspondiente al calendario actual.
+- Las efemérides con año histórico calculan automáticamente cuántos años han transcurrido y muestran una insignia como **“58.º aniversario”**.
+- El cálculo automático se aplica a las relaciones México-Alemania de **1879**, la **BBiG de 1969**, la Independencia de México de **1810**, las efemérides del Modelo Mexicano de Formación Dual de **2013** y la Revolución Mexicana de **1910**.
+- El número cambia por sí solo cada año sin requerir modificaciones en el código ni en los textos.
+- Se amplían las pruebas para comprobar el cambio automático entre años consecutivos y los números de aniversario.
+
 ## 0.50.0-beta.31 · Efemérides y temporadas · 2026-09-29
 
 - Se añade un motor independiente de efemérides, separado del easter egg **Virtual Insanity**, para mantener la lógica de fechas aislada del editor.
