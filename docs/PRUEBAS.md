@@ -19,6 +19,9 @@ La prueba del servicio PDF extraído cubre su formato; el generador restaurado c
 - Crear dos semanas y escanear bitácoras de ambas en la misma sesión: cada lectura debe aparecer con su semana correcta.
 - Escanear una bitácora después de la fecha/hora límite y comprobar que queda como Entregado a destiempo.
 - Probar una foto o captura con Leer imagen para separar problemas de enfoque de problemas de decodificación.
+- En iPhone/iPad, entrar al escáner y confirmar que la cámara **no** se abre sola; tocar Activar cámara y aceptar el permiso.
+- Bloquear el dispositivo o cambiar de app con la cámara activa; al volver, confirmar que el stream quedó detenido y que Reintentar/Activar cámara abre uno nuevo.
+- Probar Safari en vertical y horizontal, verificando safe areas, controles inferiores y que ningún input provoque zoom por tipografía menor de 16 px.
 - Abrir el tutorial durante una sesión de cámara y comprobar que no se agregan lecturas hasta cerrarlo.
 - Revisar los estados del HUD: LECTOR ACTIVO, REGISTRADO, REPETIDO y NO COINCIDE.
 
