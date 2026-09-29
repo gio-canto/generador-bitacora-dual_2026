@@ -1,143 +1,164 @@
 # Arquitectura
 
-Sitio estático compilado con Vite. La corrección beta.2 restaura el HTML, CSS y los controladores de Beta 0.47. React monta una frontera estable en `App.jsx`; el controlador original administra su contenido. Es una capa de compatibilidad, **no una migración completa a componentes declarativos**. No se debe remontar esa frontera durante la sesión. Los cambios en desarrollo requieren recarga completa.
+## Resumen
+
+El proyecto es un sitio estático compilado con Vite y desplegado en GitHub Pages. La aplicación combina una base heredada estable para el generador con módulos React incorporados de forma progresiva.
+
+La prioridad arquitectónica es **compatibilidad antes que reescritura**: una función existente no debe sustituirse sólo para “modernizarla” si no existe una prueba clara de equivalencia.
+
+## Entradas
+
+| Ruta | Entrada | Responsabilidad |
+| --- | --- | --- |
+| `/` | `index.html` | Generador principal. |
+| `/registro-entrega/` | `registro-entrega/index.html` | Recepción y control de bitácoras. |
+| `/presentacion/` | `presentacion/index.html` | Landing pública. |
+| `/faq/` | `faq/index.html` | Ayuda y preguntas frecuentes. |
+
+## Capas
+
+### Dominio
+
+`src/domain/` contiene reglas que deben poder probarse sin depender de la interfaz.
+
+Ejemplos:
+
+- estructura de registros;
+- fechas;
+- validación;
+- reglas de presentación reutilizables.
+
+### Catálogos
+
+`src/data/` contiene configuración compartida de escuelas y empresas.
+
+No almacena datos individuales de alumnos.
+
+### Generador heredado
+
+`src/legacy/` conserva el flujo principal que produce la bitácora.
+
+Archivos importantes:
 
 | Archivo | Responsabilidad |
 | --- | --- |
-| `src/legacy/shell.html` | Interfaz original, sin scripts ni datos introducidos por usuarios |
-| `src/styles.css` | Estilos originales y ajustes pequeños de accesibilidad táctil |
-| `src/legacy/editor.js` | Jornadas, presupuesto de líneas, historial, formulario y PDF |
-| `src/legacy/guide.js` | Navegación, bienvenida, tutorial y créditos |
-| `src/legacy/people.js` | Selector de responsables de TecNM |
-| `src/legacy/signatures.js` | Sincronización del cargo de jefe inmediato |
-| `src/legacy/easter-egg.js` | Interacción Virtual Insanity |
-| `src/data/*.json` | Catálogos editados en el repositorio |
-| `src/services/recover-original.js` | Recuperación de datos de beta.1 |
-| `src/services/rare-notification.jsx` | Carga diferida de Sileo para acciones explícitas y avisos breves |
-| `faq/index.html` | FAQ con buscador, ejemplos y notas de versión |
-| `presentacion/index.html` | Landing pública de presentación del proyecto |
-| `src/presentation.css` | Diseño responsive, estados de movimiento y microinteracciones de la landing |
-| `src/presentation.jsx` | Aplicación React de la landing, iconos Phosphor, animaciones progresivas y registro del service worker |
-| `registro-entrega/index.html` | Entrada independiente del Subsistema de registro de entrega |
-| `src/components/DeliveryRegistry.jsx` | Flujo React del registro: configuración, alumnos, semanas, tutorial y escáner |
-| `src/services/delivery-registry.js` | Esquema local, migraciones, Data Matrix, estados, JSON portátil y CSV |
-| `src/delivery-registry.css` | Diseño y estados visuales del subsistema |
+| `shell.html` | Estructura base de la interfaz. |
+| `editor.js` | Jornadas, formulario, historial y motor PDF real. |
+| `guide.js` | Tutorial, navegación y créditos. |
+| `people.js` | Selección de responsables. |
+| `signatures.js` | Reglas de firmas. |
+| `easter-egg.js` | Interacción especial conservada. |
 
-La vista previa espera 120 ms desde la última modificación y solo dibuja si su panel es visible. La exportación mantiene la resolución original de 11.81 píxeles/mm. Los ajustes del logotipo y etiquetas de firma se aplican dentro del motor, sin modificar prototipos globales de Canvas.
+Aunque React monta la aplicación, esta zona no es una migración declarativa completa.
 
-La prioridad de esta corrección es recuperar comportamiento e identidad visual. La extracción futura de componentes React debe hacerse por partes, con pruebas de equivalencia antes de sustituir los controladores originales.
+### React
 
-## Parte 2
+`src/components/` contiene módulos que sí funcionan como componentes React independientes.
 
-`src/components/Profile.jsx` monta un componente React independiente en la barra superior. Usa `blobatar/react` y `src/services/profile.js`; no envía el nombre a un servicio externo. El controlador original sigue a cargo del formulario. `src/domain/presentation.js` concentra las reglas del martes, nombres de firma y disparadores secretos. La hoja de estilos aplica animaciones cortas con alternativas de movimiento reducido.
+- `Profile.jsx`: perfil local.
+- `DeliveryRegistry.jsx`: registro de entrega.
 
+La landing vive en `src/presentation.jsx`.
 
-## Serie 0.50 · Registro de entrega
+### Servicios
 
-El registro de entrega es una segunda entrada de la aplicación, compilada por Vite como `registro-entrega/index.html`. No aparece en la navegación principal del generador. `App.jsx` detecta esa ruta y monta `DeliveryRegistry`; el generador normal conserva la frontera heredada.
+`src/services/` concentra persistencia, recuperación, PDF extraído, perfil, ortografía, reportes y diagnóstico.
 
-El subsistema mantiene una base por plantel y alumnos con nombre, especialidad y empresa. El Data Matrix se genera también en el motor heredado de PDF (`src/legacy/editor.js`) porque ese sigue siendo el camino real de descarga del generador principal. `src/services/pdf.js` conserva la misma codificación para mantener equivalencia.
+Una regla que afecte al PDF o Data Matrix puede existir también en el flujo heredado; antes de modificarla busca sus dos implementaciones y mantenlas consistentes.
 
-El escáner carga explícitamente el bundle UMD de ZXing Browser 0.2.1 y conserva `BarcodeDetector` como alternativa cuando el navegador ofrece Data Matrix. ZXing usa un intervalo corto entre intentos y solicita enfoque continuo cuando el dispositivo lo permite. El cuadro de detección compensa `object-fit: cover` para alinear las coordenadas de la lectura con el video visible. También existe lectura desde archivo de imagen para prueba o contingencia.
+## Flujo del generador
 
-El payload Data Matrix v4 es deliberadamente más compacto que v3 y contiene identidad del alumno más fecha inicial/final. El escáner resuelve primero el alumno y después la semana por periodo; la cola puede contener múltiples semanas y al confirmar aplica cada entrega a su destino. El estado a tiempo/destiempo se calcula con la fecha real de recepción y el límite de la semana encontrada. Las confirmaciones breves usan Sileo; los errores o datos faltantes que requieren corrección permanecen dentro de la pantalla.
+```text
+Catálogos
+   ↓
+Formulario → validación → borrador/historial
+   ↓
+Vista previa
+   ↓
+Motor PDF + Data Matrix
+   ↓
+PDF descargado
+```
 
+## Flujo del registro de entrega
 
-## Cámara móvil · Beta 0.50.0-beta.7
+```text
+Base local de alumnos
+        +
+Semanas y fecha límite
+        ↓
+Cámara / imagen → parsear Data Matrix
+        ↓
+Coincidencia exacta
+        ↓
+si falla: candidatos aproximados + confirmación humana
+        ↓
+Resolver periodo/semana
+        ↓
+Cola de sesión
+        ↓
+Confirmar → persistir entrega
+        ↓
+JSON / CSV / reportes PDF
+```
 
-El registro se considera **mobile-first**. En iOS/iPadOS el acceso a cámara se inicia únicamente desde una acción explícita del usuario. `getUserMedia` abre el stream con restricciones simples y preferencia por cámara trasera; después `BrowserDatamatrixCodeReader.scan(video, ...)` analiza ese elemento sin volver a solicitar el dispositivo.
+La coincidencia aproximada es una ayuda de recuperación, no una decisión automática.
 
-El stream se detiene al salir del escáner, al ocultarse la página o al producirse `pagehide`. Al regresar no se reinicia automáticamente: el usuario vuelve a tocar **Activar cámara**. Esto evita conservar tracks inválidos después de bloquear el dispositivo, cambiar de app o reanudar una PWA/pestaña de Safari.
+## Data Matrix
 
-El diseño móvil usa `100dvh`, `viewport-fit=cover` y `env(safe-area-inset-*)`. Los controles críticos tienen objetivo táctil mínimo de 44 px y el escáner oculta la barra superior en móvil para dedicar la mayor parte de la pantalla a la cámara.
+El payload actual es versionado. El lector conserva compatibilidad con formatos anteriores cuando es razonable.
 
+Reglas:
 
-## Diagnóstico del escáner · Beta 0.50.0-beta.9
+- nunca cambies la estructura de un payload manteniendo el mismo número de versión;
+- si agregas o reinterpretas campos, crea una nueva versión;
+- actualiza generación y lectura;
+- conserva pruebas de versiones anteriores;
+- documenta la migración.
 
-`src/services/scanner-diagnostics.js` concentra los códigos de error y la generación del reporte copiable. La clasificación queda separada por capas:
+## Persistencia
 
-- `CAM-xxx`: contexto seguro, API de cámara, permisos, dispositivo ocupado o restricciones.
-- `VID-xxx`: elemento `<video>`, reproducción y llegada de fotogramas.
-- `ZX-xxx`: carga de ZXing, creación del lector, inicio de `scan()` y fallos fatales del ciclo.
-- `BD-xxx`: disponibilidad de Data Matrix en `BarcodeDetector`.
-- `IMG-xxx`: lectura desde archivo de imagen.
+No hay base central. Las aplicaciones utilizan almacenamiento del navegador y archivos descargables.
 
-El diagnóstico toma únicamente estado técnico necesario para reproducir el fallo. No incluye el contenido del Data Matrix y sustituye el identificador concreto de la cámara por un booleano que sólo indica si el navegador expuso `deviceId`.
+Consulta [DATOS_Y_CACHE.md](DATOS_Y_CACHE.md).
 
+## Service worker
 
-## Recuperación ZX-205 · Beta 0.50.0-beta.10
+La compilación genera una caché versionada. La caché sirve recursos de aplicación; no es el respaldo del historial.
 
-El escáner ya no delega el ciclo continuo a `BrowserCodeReader.scan()`. Ese método detiene su loop ante cualquier excepción que no sea una instancia reconocida de `NotFoundException`, `ChecksumException` o `FormatException`, lo que resultaba demasiado frágil en Safari/iOS.
+Una actualización no debe borrar deliberadamente datos locales.
 
-La aplicación ejecuta ahora su propio loop con `reader.decode(video)`. `scannerDecoderErrorKind()` clasifica cada excepción como `miss`, `frame` o `fatal`. Los misses son normales; los errores de frame se reintentan hasta un umbral y producen `ZX-207`; los fatales necesitan repetirse tres veces antes de producir `ZX-205`. El loop continúa después del aviso para permitir recuperación espontánea del video o decoder.
+## Dependencias externas del registro
 
+El registro puede cargar desde su HTML bibliotecas destinadas a:
 
-## Lista y estados manuales · Beta 0.50.0-beta.11
+- leer Data Matrix;
+- importar hojas de cálculo;
+- generar códigos cuando corresponda.
 
-La vista semanal mantiene el estado automático generado por cámara, pero permite una corrección explícita mediante `setDeliveryStatus()`. Los valores manuales reutilizan los estados existentes (`entregado`, `entregado_tarde`, `no_entregado`) y marcan el origen como `manual`; `no_entregado` elimina el registro de entrega.
+Cambiar proveedores, URLs o versiones es un cambio técnico y de seguridad que debe documentarse.
 
-La lista semanal aplica búsqueda, estado, especialidad y empresa antes de agrupar. La agrupación es sólo de presentación y puede hacerse por especialidad o empresa sin modificar el esquema persistente.
+## Invariantes
 
+Estas reglas deben preservarse salvo cambio deliberado y documentado:
 
-## Filtro de entrega y sonido de lectura · Beta 0.50.0-beta.12
-
-La vista semanal reutiliza `statusFilter` tanto para las tarjetas-resumen como para el selector explícito de Entrega. De esta forma ambos controles permanecen sincronizados y el filtro puede combinarse con especialidad, empresa, texto y agrupación sin duplicar lógica.
-
-`ScanSound` reproduce `Assets/asset_chime.mp3` únicamente para una lectura aceptada (`tone === "ok"`). Repetidos y lecturas no coincidentes conservan tonos sintetizados distintos. El archivo de chime se incluye en el núcleo del service worker para disponibilidad posterior sin conexión.
-
-
-## Reportes de entrega PDF · Beta 0.50.0-beta.13
-
-`src/services/delivery-report.js` separa la construcción del modelo de reporte de su renderizado. `buildDeliveryReportModel()` produce un modelo estable para una semana o para todo el historial; `generateDeliveryReportPdf()` lo convierte en páginas A4.
-
-El renderizado se hace sobre canvas para mantener tipografía, Blobatars, tablas y estados consistentes en navegadores móviles. Cada página se rasteriza como JPEG y un escritor PDF mínimo empaqueta las imágenes en un PDF multipágina A4 sin depender de servicios externos ni de una librería PDF adicional.
-
-El diseño es deliberadamente institucional: fondo blanco, tipografía del sistema, líneas discretas, un único acento azul y colores de estado moderados. El servicio añade fecha de creación, versión, plantel, generación dual, periodo, límite, resumen y numeración de páginas.
-
-
-## Reporte global · Beta 0.50.0-beta.14
-
-El modo `global` reutiliza el mismo modelo de semanas, pero construye `globalRows`: una fila por alumno con un arreglo de estados alineado cronológicamente con las semanas.
-
-El renderizado usa A4 horizontal. La matriz se divide en bloques de hasta 15 semanas por ancho y 14 alumnos por alto. El escritor PDF acepta ahora dimensiones por página, de forma que los reportes verticales existentes y el reporte global horizontal pueden convivir en el mismo servicio.
-
-Cada celda usa únicamente el estado resumido; el detalle de fecha/hora permanece disponible en los otros dos formatos. El primer campo conserva mini Blobatar, alumno, especialidad y empresa.
-
-
-## Landing de presentación · Beta 0.50.0-beta.15
-
-`presentacion/index.html` es una entrada Vite independiente y no monta React. Su objetivo es presentar el proyecto sin mezclarlo con la interfaz operativa del generador.
-
-El hero usa `public/Assets/asset_landing.png`; la sección de Data Matrix usa `public/Assets/Asset_cont_matrix.png`. La landing explica los tres frentes del ecosistema (generador, registro de entregas y sistema complementario de constancias), el flujo de alumno a Vinculación y un proceso sugerido de incorporación por plantel.
-
-`src/presentation.css` usa tipografía del sistema, superficies sobrias, safe areas y `prefers-reduced-motion`. Desde la beta.18, `src/presentation.jsx` concentra el montaje React, la aparición progresiva y el registro del service worker; no captura datos del visitante.
-
-
-## Presentación editorial · Beta 0.50.0-beta.16
-
-La landing conserva la entrada estática independiente, pero cambia a una composición image-first. El hero utiliza `asset_landing.png` a pantalla completa con contenido superpuesto; las secciones posteriores evitan depender de tarjetas decorativas y usan líneas, tipografía, espacios y bloques editoriales.
-
-El contenido distingue claramente beneficios para alumnos y planteles, muestra las dos rutas de adopción institucional (colaboración por pull request o integración solicitada al creador) y añade bloques de privacidad y open source. No se incorpora telemetría ni captura de formularios.
-
-
-## Comparación temporal y colaboración autónoma · Beta 0.50.0-beta.17
-
-La landing incorpora una sección estática de comparación de tiempos con relojes hechos en CSS. Las manecillas usan `@keyframes` únicamente como recurso visual; los valores mostrados son texto explícito y se acompañan de una advertencia de que son aproximaciones orientativas. Con `prefers-reduced-motion`, las manecillas dejan de animarse.
-
-La navegación y los CTA priorizan la guía de contribución. La ruta de contacto con el creador permanece disponible, pero ya no es la acción principal para incorporar una escuela. El contenido deja claro que estudiantes, docentes y planteles pueden modificar catálogos y proponer cambios mediante pull requests.
-
-
-## Landing React e iconografía · Beta 0.50.0-beta.18
-
-`presentacion/index.html` se reduce a un contenedor de montaje. `src/presentation.jsx` renderiza la página mediante React 19 y reutiliza `@phosphor-icons/react`, ya presente como dependencia del proyecto.
-
-La capa React gestiona IntersectionObserver para apariciones progresivas, detección de `prefers-reduced-motion`, progreso de scroll, parallax leve del hero y registro del service worker. No se añade una dependencia externa de animación.
-
-Las microinteracciones se resuelven principalmente con CSS y se desactivan cuando el usuario solicita movimiento reducido.
-
-
-## Iconos inline y actualización de la landing · Beta 0.50.0-beta.19
-
-La landing mantiene React, pero deja de depender de componentes de iconografía externos para el render visual. `src/presentation.jsx` define un componente `SvgIcon` y pequeñas fábricas de iconos que producen SVG inline con `currentColor`. Esto garantiza que el icono viaje dentro del mismo bundle de la landing y elimina una posible diferencia entre compilación y render en navegador.
-
-El registro del service worker en la landing también comprueba actualizaciones, activa un worker en espera con `SKIP_WAITING` y escucha `controllerchange` para recargar una sola vez. Este comportamiento se limita a la landing y evita que una caché anterior mantenga una presentación desactualizada.
+1. los datos del usuario no dependen de una cuenta;
+2. el historial local no se borra por actualizar assets;
+3. el PDF debe seguir siendo imprimible;
+4. el Data Matrix debe ser legible y versionado;
+5. una coincidencia aproximada no registra a una persona sin confirmación;
+6. cambios de esquema deben migrar datos anteriores;
+7. el generador debe seguir funcionando en móvil;
+8. `npm run check` debe pasar antes de publicar.
+
+## Modificar arquitectura
+
+Si extraes lógica del legado hacia un módulo nuevo:
+
+1. escribe primero pruebas sobre el comportamiento actual;
+2. extrae la regla sin cambiar su resultado;
+3. compara PDF o salida;
+4. elimina la implementación anterior sólo cuando ya no sea usada;
+5. documenta el cambio en arquitectura y CHANGELOG.
+
+No mantengas dos implementaciones divergentes de una misma regla.

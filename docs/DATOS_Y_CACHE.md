@@ -1,43 +1,148 @@
-# Datos y caché
+# Datos, almacenamiento y respaldos
 
-Las bitácoras permanecen en el navegador. No hay cuentas ni sincronización entre dispositivos.
+## Principio general
 
-## Generador de bitácoras
+El proyecto es local-first. No existe una cuenta obligatoria ni una base central propia donde el mantenedor reciba automáticamente las bitácoras.
 
-- Historial: `bitacora_dual_clean_v3`.
-- Borrador: `bitacora_dual_draft_v1`.
-- La primera apertura tras beta.1 recupera su historial y borrador. Conserva intacto `bitacora_dual_react_v1` como copia de recuperación; una marca evita repetir la migración.
-- Los catálogos se leen exclusivamente del código. Los cambios locales de catálogos de beta.1 no sustituyen esa configuración; sus datos de origen no se eliminan.
-- Exportar respaldo descarga el historial en el formato JSON original. Guardar o Descargar PDF incorpora la bitácora al historial. Si cancelas compartir el PDF, el registro ya guardado permanece. Si falla el almacenamiento, aparece un aviso y la descarga sigue disponible.
-- Importar acepta el formato original y los respaldos de beta.1; valida estructura y tamaño máximo de 5 MB, pide confirmación y agrega registros. Las coincidencias de identificador reciben un identificador nuevo para evitar sobrescribir registros existentes.
+Los datos se dividen entre:
 
-El service worker guarda una versión identificada por el contenido del generador, FAQ y recursos compilados. La caché almacena el HTML exacto de cada compilación para no mezclarlo con archivos de otra versión. Conserva las cachés anteriores durante esta corrección para no romper pestañas abiertas. Las actualizaciones se aplican al pulsar Actualizar y se solicita guardar el borrador antes de recargar. Sileo, audio y ejemplos no se precargan. Sileo requiere conexión para su primera carga; si no carga, aparece un aviso local accesible.
+- almacenamiento del navegador;
+- archivos exportados por la persona usuaria;
+- caché de recursos de la aplicación.
 
-Limpiar los datos del sitio elimina el historial local. La caché de archivos no es un respaldo de las bitácoras.
+Estas tres cosas no son equivalentes.
 
-El perfil usa `bitacora_profile_v1`, separado de la caché de archivos. Puede recordar localmente el nombre, plantel, especialidad, semestre o grado, grupo, empresa, horario, área común, responsable que autoriza, instructor formador y preferencias recurrentes como Markdown o firma genérica del alumno. También guarda si la sección de firma del alumno ya fue presentada: se abre automáticamente sólo antes del primer guardado y después queda plegada, conservando activada o desactivada la elección realizada. Estos datos sirven únicamente para completar nuevas bitácoras; no se guardan en el perfil fechas, estados de jornada, actividades ni justificaciones. El nombre también se actualiza al escribirlo y las palabras secretas no lo sustituyen. Desde el avatar se puede editar u olvidar la información predeterminada sin eliminar el borrador ni el historial. El avatar se genera localmente a partir del nombre; no hay cuentas.
+## Generador
 
+Claves principales:
 
-## Registro de entrega · Beta 0.50
+| Clave | Contenido |
+| --- | --- |
+| `bitacora_dual_clean_v3` | Historial de bitácoras. |
+| `bitacora_dual_draft_v1` | Borrador actual. |
+| `bitacora_profile_v1` | Datos recurrentes y preferencias del perfil local. |
 
-El Subsistema de registro de entrega usa almacenamiento separado del historial del generador.
+Existen claves de versiones anteriores usadas únicamente para recuperación o migración. No deben reutilizarse como formatos nuevos.
 
-- Estado actual: `bitacora_dual_delivery_registry_v5`.
-- Las claves `bitacora_dual_delivery_registry_v4`, `bitacora_dual_delivery_registry_v3`, `bitacora_dual_delivery_registry_v2` y `bitacora_dual_delivery_registry_v1` se leen para migración y no se usan como formato nuevo.
-- La configuración general guarda el plantel y la **generación dual**. Cada alumno conserva nombre, especialidad y empresa.
-- Cada semana guarda fecha inicial, fecha final, fecha límite, cierre y entregas por alumno con estado, fecha/hora y origen (`camera`, `manual` o `import`).
-- **Guardar archivo** descarga un JSON portátil del registro completo. Terminar una sesión de cámara con lecturas nuevas descarga también una copia actualizada.
-- El CSV semanal es una exportación de consulta; no sustituye al JSON portátil.
-- El Data Matrix actual utiliza un formato compacto versionado con nombre, especialidad, empresa y periodo (fecha inicial y final). Esto permite clasificar automáticamente varias semanas en una misma sesión. Los códigos anteriores sin periodo usan la semana seleccionada como respaldo.
-- El lector de cámara y la importación de hojas se procesan en el navegador. El subsistema carga bwip-js, SheetJS y ZXing Browser desde las URLs declaradas en el HTML; esas dependencias externas no forman parte del caché principal del service worker.
+### Historial
 
+Guardar o descargar una bitácora puede incorporarla al historial local. El historial puede exportarse como respaldo.
 
-## Reportes PDF · Beta 0.50.0-beta.13
+### Borrador
 
-Los reportes se construyen completamente en el navegador a partir del estado local. No crean un registro adicional ni modifican semanas o entregas.
+El borrador permite continuar una captura interrumpida. Una actualización de assets no debe borrarlo.
 
-- **Listado simplificado:** usa una semana seleccionada.
-- **Semana por semana:** recorre el historial completo en orden de fecha inicial.
-- El PDF incluye plantel, generación dual, fecha de creación, versión, periodo, límite, resumen de estados y filas de alumnos.
-- Los Blobatars se generan localmente desde el nombre mediante la dependencia ya instalada.
-- El archivo PDF descargado queda bajo control de la persona que lo conserva; no se sincroniza ni se sube automáticamente.
+### Perfil
+
+El perfil recuerda datos recurrentes como:
+
+- nombre;
+- plantel;
+- especialidad;
+- semestre/grado;
+- grupo;
+- empresa;
+- horario;
+- área;
+- responsables;
+- instructor;
+- preferencias recurrentes.
+
+No sustituye al historial y no debe contener actividades semanales como fuente canónica.
+
+## Registro de entrega
+
+Clave actual:
+
+```text
+bitacora_dual_delivery_registry_v5
+```
+
+Las claves `v1` a `v4` pueden leerse para migración.
+
+El estado contiene, entre otros:
+
+- plantel;
+- generación dual;
+- alumnos;
+- especialidad y empresa por alumno;
+- semanas;
+- periodo;
+- fecha límite;
+- estado de cierre;
+- entregas por alumno;
+- fecha/hora;
+- origen de registro.
+
+## Respaldo portátil
+
+**Guardar archivo** en el registro de entrega genera un JSON que contiene el estado editable completo del subsistema.
+
+Ese JSON es el respaldo recomendado para mover o conservar el registro.
+
+El CSV es una exportación de consulta y no conserva toda la estructura necesaria para restaurar el sistema.
+
+## PDF
+
+El PDF es el documento final de una bitácora o reporte. No debe considerarse respaldo editable del historial.
+
+## Service worker y caché
+
+La caché contiene HTML, JS, CSS y otros recursos necesarios para abrir una versión de la aplicación.
+
+**La caché no es un respaldo.**
+
+Borrar caché puede obligar a descargar nuevamente la aplicación. Borrar los datos completos del sitio sí puede eliminar historial, borrador, perfil y registro local según lo que el navegador incluya en esa operación.
+
+## Migraciones
+
+Cuando cambie un esquema persistente:
+
+1. crea una nueva clave o versión de esquema cuando corresponda;
+2. lee el formato anterior;
+3. convierte a la estructura actual;
+4. conserva datos que aún tengan significado;
+5. evita sobrescribir silenciosamente una copia anterior si puede servir para recuperación;
+6. agrega pruebas de migración;
+7. documenta la migración en CHANGELOG y aquí.
+
+## Data Matrix
+
+El Data Matrix contiene información necesaria para identificar la bitácora y su periodo.
+
+El formato actual incluye identidad del alumno y fechas del periodo. Versiones anteriores pueden contener menos información.
+
+El contenido del Data Matrix no debe incluir secretos ni información innecesaria. Tampoco debe copiarse en diagnósticos públicos.
+
+## Coincidencias aproximadas
+
+El registro intenta primero coincidencia exacta. Si el nombre contiene una diferencia pequeña, puede proponer candidatos.
+
+En los payloads actuales, la especialidad y empresa siguen funcionando como restricciones adicionales.
+
+La sugerencia:
+
+- no modifica al alumno;
+- no corrige el Data Matrix;
+- no registra automáticamente;
+- requiere confirmación explícita.
+
+La asociación confirmada puede recordarse durante la sesión de escaneo para evitar preguntas repetidas.
+
+## Exportar antes de operaciones destructivas
+
+Antes de:
+
+- limpiar datos del sitio;
+- cambiar de dispositivo;
+- reinstalar navegador;
+- realizar una migración manual;
+- probar cambios de persistencia;
+
+exporta el respaldo correspondiente.
+
+## Privacidad
+
+Los archivos descargados quedan bajo control de quien los conserva. No subas respaldos ni bitácoras reales al repositorio.
+
+Consulta [../SECURITY.md](../SECURITY.md).

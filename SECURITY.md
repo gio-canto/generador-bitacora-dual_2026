@@ -1,11 +1,58 @@
 # Seguridad
 
-La aplicación procesa bitácoras en el navegador y las conserva en su almacenamiento local. No tiene autenticación ni servidor para recibir registros. Cualquier persona con acceso al mismo perfil del navegador podría consultar los datos guardados.
+## Alcance
 
-No adjuntes bitácoras reales ni respaldos con datos personales a incidencias públicas. Para reportar una vulnerabilidad, utiliza el canal privado de seguridad de GitHub si está habilitado en el repositorio; en caso contrario, solicita al mantenedor un medio privado sin publicar detalles explotables.
+Generador de Bitácora Dual 2026 es una aplicación web principalmente local-first. No ofrece cuentas de usuario ni una base de datos central propia para recibir las bitácoras creadas desde el generador.
 
-Los respaldos se validan antes de importarse. La interfaz no interpreta HTML suministrado por el usuario. El contenido HTML del FAQ procede exclusivamente de archivos mantenidos en Git. No introduzcas dependencias, scripts remotos ni envíos de registros a terceros sin revisión.
+El navegador sí puede conservar información local como borrador, historial, perfil y registro de entrega. Cualquier persona con acceso al mismo perfil del navegador o a un respaldo exportado podría consultar esos datos.
 
-La foto de los créditos se solicita a GitHub únicamente al abrirlos. La ayuda contiene enlaces externos que se abren por decisión del usuario. Los recursos de la aplicación se sirven desde GitHub Pages.
+## Reportar una vulnerabilidad
 
-Antes de borrar datos del navegador, exporta un respaldo. La limpieza de caché del programa nunca debe borrar bitácoras ni catálogos.
+No publiques detalles explotables en un issue público.
+
+Utiliza el canal privado de seguridad de GitHub cuando esté habilitado. Si no está disponible, solicita al mantenedor un medio privado sin incluir inicialmente secretos, datos personales ni un exploit completo en espacios públicos.
+
+Incluye, cuando sea posible:
+
+- versión afectada;
+- navegador y sistema operativo;
+- componente afectado;
+- pasos mínimos para reproducir;
+- impacto observado;
+- evidencia técnica sin datos personales;
+- propuesta de mitigación, si la conoces.
+
+## Datos que no deben publicarse
+
+No adjuntes a issues, PR o discusiones públicas:
+
+- bitácoras reales;
+- respaldos JSON;
+- listas de alumnos;
+- firmas;
+- nombres vinculados con horarios o entregas si no son datos destinados al catálogo público;
+- contenido real de Data Matrix;
+- identificadores de cámara;
+- capturas que revelen datos personales.
+
+Usa datos sintéticos para reproducir errores.
+
+## Principios del proyecto
+
+- Los datos del generador se procesan localmente siempre que sea posible.
+- La caché de archivos no debe confundirse con un respaldo de datos.
+- Limpiar o actualizar caché no debe borrar deliberadamente historial o registro de entrega.
+- Los archivos importados deben validarse antes de incorporarse.
+- El contenido introducido por usuarios no debe ejecutarse como HTML o código.
+- No deben agregarse envíos remotos, analítica identificable, autenticación o sincronización sin revisar previamente privacidad, seguridad y documentación.
+- Las dependencias y scripts externos deben mantenerse limitados, justificados y documentados.
+
+## Dependencias externas
+
+El registro de entrega puede cargar bibliotecas declaradas en su entrada para lectura Data Matrix e importación de hojas. Una modificación de esos orígenes, permisos o versiones debe tratarse como un cambio de seguridad y documentarse en la versión correspondiente.
+
+## Pérdida de datos
+
+Antes de borrar datos del navegador o realizar una migración manual, exporta un respaldo. Un PDF, CSV o caché no sustituye al respaldo JSON cuando se necesita conservar el estado editable completo.
+
+Consulta [docs/DATOS_Y_CACHE.md](docs/DATOS_Y_CACHE.md).
