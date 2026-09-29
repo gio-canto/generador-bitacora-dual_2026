@@ -67,3 +67,10 @@ El diagnóstico toma únicamente estado técnico necesario para reproducir el fa
 El escáner ya no delega el ciclo continuo a `BrowserCodeReader.scan()`. Ese método detiene su loop ante cualquier excepción que no sea una instancia reconocida de `NotFoundException`, `ChecksumException` o `FormatException`, lo que resultaba demasiado frágil en Safari/iOS.
 
 La aplicación ejecuta ahora su propio loop con `reader.decode(video)`. `scannerDecoderErrorKind()` clasifica cada excepción como `miss`, `frame` o `fatal`. Los misses son normales; los errores de frame se reintentan hasta un umbral y producen `ZX-207`; los fatales necesitan repetirse tres veces antes de producir `ZX-205`. El loop continúa después del aviso para permitir recuperación espontánea del video o decoder.
+
+
+## Lista y estados manuales · Beta 0.50.0-beta.11
+
+La vista semanal mantiene el estado automático generado por cámara, pero permite una corrección explícita mediante `setDeliveryStatus()`. Los valores manuales reutilizan los estados existentes (`entregado`, `entregado_tarde`, `no_entregado`) y marcan el origen como `manual`; `no_entregado` elimina el registro de entrega.
+
+La lista semanal aplica búsqueda, estado, especialidad y empresa antes de agrupar. La agrupación es sólo de presentación y puede hacerse por especialidad o empresa sin modificar el esquema persistente.
