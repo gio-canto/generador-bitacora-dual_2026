@@ -480,6 +480,90 @@ export function mergeStudents(current, incoming) {
   return { students: result, added, updated, skipped };
 }
 
+function matrixMetadataMatchesStudent(student, payload) {
+  if (payload.version >= 4) {
+    return (
+      normalizeName(student.specialty) === normalizeName(payload.specialty) &&
+      companyMatrixValue(student.company) ===
+        normalizeMatrixText(payload.company, 80)
+    );
+  }
+
+  if (payload.version === 3) {
+    return (
+      normalizeName(student.specialty) === normalizeName(payload.specialty) &&
+      normalizeName(student.company) === normalizeName(payload.company)
+    );
+  }
+
+  return true;
+}
+
+function editDistance(left, right) {
+  const a = String(left || "");
+  const b = String(right || "");
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+
+  let previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  for (let row = 1; row <= a.length; row++) {
+    const current = [row];
+    for (let column = 1; column <= b.length; column++) {
+      const cost = a[row - 1] === b[column - 1] ? 0 : 1;
+      current[column] = Math.min(
+        current[column - 1] + 1,
+        previous[column] + 1,
+        previous[column - 1] + cost,
+      );
+    }
+    previous = current;
+  }
+  return previous[b.length];
+}
+
+function allowedNameDistance(length) {
+  if (length <= 6) return 1;
+  if (length <= 12) return 2;
+  return Math.max(2, Math.floor(length * 0.16));
+}
+
+export function findStudentSuggestionsByMatrixValue(
+  students,
+  rawValue,
+  limit = 3,
+) {
+  const payload = parseMatrixPayload(rawValue);
+  const scannedName = normalizeName(payload.name);
+  if (!scannedName) return [];
+
+  const safeLimit = Math.max(1, Math.min(5, Number(limit) || 3));
+  return students
+    .map((student) => {
+      const storedName = normalizeName(student?.name);
+      if (!storedName || storedName === scannedName) return null;
+      if (!matrixMetadataMatchesStudent(student, payload)) return null;
+
+      const distance = editDistance(scannedName, storedName);
+      const longest = Math.max(scannedName.length, storedName.length);
+      const similarity = longest ? 1 - distance / longest : 0;
+      if (distance > allowedNameDistance(longest) || similarity < 0.72)
+        return null;
+
+      return { student, distance, similarity };
+    })
+    .filter(Boolean)
+    .sort(
+      (a, b) =>
+        a.distance - b.distance ||
+        b.similarity - a.similarity ||
+        a.student.name.localeCompare(b.student.name, "es", {
+          sensitivity: "base",
+        }),
+    )
+    .slice(0, safeLimit);
+}
+
 export function matrixValueToName(rawValue) {
   return parseMatrixPayload(rawValue).name;
 }
