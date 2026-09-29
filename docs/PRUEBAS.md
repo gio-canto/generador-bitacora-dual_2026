@@ -103,3 +103,14 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Probar más de 15 semanas para revisar la división horizontal.
 - Probar más de 14 alumnos para revisar la división vertical y la numeración de páginas.
 - Abrir e imprimir el PDF en A4 horizontal al 100%.
+
+
+## Landing de presentación · Beta 0.50.0-beta.15
+
+- Abrir `/presentacion/` y verificar hero, navegación y CTA al generador.
+- Confirmar que `asset_landing.png` aparece en el hero y `Asset_cont_matrix.png` en la sección Data Matrix.
+- Revisar las secciones de alumno, Vinculación, constancias, flujo, reportes e instituciones.
+- Comprobar los enlaces a generador, Registro de entregas, FAQ, privacidad, accesibilidad, GitHub y contacto.
+- Revisar 390, 430, 768, 1024 y 1440 px sin desbordamientos.
+- Activar `prefers-reduced-motion` y confirmar que el contenido permanece visible sin animaciones.
+- Después de una primera carga, comprobar que la landing y sus dos imágenes siguen disponibles desde el service worker.

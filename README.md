@@ -4,22 +4,22 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.14-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.15-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
 
-[Abrir aplicación](https://gio-canto.github.io/generador-bitacora-dual_2026/) · [Registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/) · [Preguntas frecuentes](https://gio-canto.github.io/generador-bitacora-dual_2026/faq/) · [Notas de versión](CHANGELOG.md) · [Reportar un problema](https://github.com/gio-canto/generador-bitacora-dual_2026/issues)
+[Presentación](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/) · [Abrir aplicación](https://gio-canto.github.io/generador-bitacora-dual_2026/) · [Registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/) · [Preguntas frecuentes](https://gio-canto.github.io/generador-bitacora-dual_2026/faq/) · [Notas de versión](CHANGELOG.md) · [Reportar un problema](https://github.com/gio-canto/generador-bitacora-dual_2026/issues)
 
 </div>
 
-## Beta 0.50.0-beta.14 · Registro de entrega · Parte 14
+## Beta 0.50.0-beta.15 · Presentación del proyecto · Parte 1
 
-La beta.14 añade un tercer formato de reporte: **Global de todas**. Es una matriz general en A4 horizontal, pensada como control escolar, donde cada fila corresponde a un alumno y cada columna a una semana.
+La beta.15 incorpora una nueva landing pública en **[/presentacion/](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/)**. Presenta Bitácora Dual 2026 desde la perspectiva del alumno y de Vinculación, con un hero construido alrededor de **“Nunca fue tan fácil hacer una bitácora.”**
 
-La primera columna conserva mini Blobatar, nombre, especialidad y empresa. Las semanas muestran su número y fecha inicial y cada celda marca el estado con **✓ A tiempo**, **! A destiempo** o **× No entregado**. Si la generación tiene muchas semanas o alumnos, el sistema divide automáticamente la tabla en varias páginas.
+La página explica el Generador de Bitácora Dual, el Registro de entregas, el sistema complementario de gestión y emisión de constancias, el papel del Data Matrix y el flujo completo desde la captura semanal hasta los reportes.
 
-Se mantienen los formatos **Listado simplificado** y **Semana por semana**, además del encabezado institucional con plantel, generación dual, fecha de creación, versión y paginación.
+También incluye una sección para instituciones que explica cómo podría incorporarse el sistema a un plantel: revisar el procedimiento actual, configurar catálogos y responsables, probar con una generación y documentar el uso. Usa `asset_landing.png` como visual principal y `Asset_cont_matrix.png` como ejemplo de una bitácora con Data Matrix.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 

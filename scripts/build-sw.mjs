@@ -1,7 +1,7 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 const files = await readdir("dist/assets");
-const staticPages = ["faq", "privacy", "terms", "accessibility", "acknowledgements", "registro-entrega"];
+const staticPages = ["faq", "privacy", "terms", "accessibility", "acknowledgements", "presentacion", "registro-entrega"];
 const pagePaths = staticPages.flatMap((page) => [
   `./${page}/`,
   `./${page}/index.html`,
@@ -11,6 +11,8 @@ const core = [
   "./index.html",
   "./Assets/Edu.png",
   "./Assets/asset_chime.mp3",
+  "./Assets/asset_landing.png",
+  "./Assets/Asset_cont_matrix.png",
   "./licenses/nspell.txt",
   "./licenses/dictionary-es.txt",
   ...pagePaths,
@@ -22,6 +24,8 @@ const hash = createHash("sha256");
 for (const f of [
   "dist/index.html",
   "dist/Assets/asset_chime.mp3",
+  "dist/Assets/asset_landing.png",
+  "dist/Assets/Asset_cont_matrix.png",
   ...staticPages.map((page) => `dist/${page}/index.html`),
   "dist/licenses/nspell.txt",
   "dist/licenses/dictionary-es.txt",
