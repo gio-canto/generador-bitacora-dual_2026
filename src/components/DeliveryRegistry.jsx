@@ -1106,16 +1106,22 @@ export default function DeliveryRegistry({ onClose }) {
           <button
             className="btn"
             type="button"
+            aria-label="Abrir tutorial"
             onClick={() => {
               setTutorialStep(0);
               setTutorialOpen(true);
             }}
           >
-            Tutorial
+            <Info size={18} />
+            <span className="delivery-action-label">Tutorial</span>
           </button>
-          <label className="btn delivery-file-button">
+          <label
+            className="btn delivery-file-button"
+            aria-label="Abrir archivo de registro"
+            title="Abrir archivo"
+          >
             <UploadSimple size={18} />
-            Abrir archivo
+            <span className="delivery-action-label">Abrir archivo</span>
             <input
               hidden
               type="file"
@@ -1130,6 +1136,8 @@ export default function DeliveryRegistry({ onClose }) {
             <button
               className="btn primary"
               type="button"
+              aria-label="Guardar archivo de registro"
+              title="Guardar archivo"
               onClick={() => {
                 exportDeliveryState(state);
                 notify(
@@ -1140,7 +1148,7 @@ export default function DeliveryRegistry({ onClose }) {
               }}
             >
               <DownloadSimple size={18} />
-              Guardar archivo
+              <span className="delivery-action-label">Guardar archivo</span>
             </button>
           )}
         </div>
@@ -1805,8 +1813,8 @@ export default function DeliveryRegistry({ onClose }) {
                 <span className="delivery-kicker">Escaneo continuo</span>
                 <h2>Clasificación automática por semana</h2>
                 <p>
-                  Puedes mezclar bitácoras de distintas semanas. El Data Matrix
-                  indica el periodo y el sistema registra cada entrega donde corresponde.
+                  Escanea en cualquier orden. En iPhone o iPad, toca Activar cámara
+                  una vez y después pasa las bitácoras frente al lector.
                 </p>
               </div>
               <div className="delivery-scan-counter">
@@ -1913,6 +1921,7 @@ export default function DeliveryRegistry({ onClose }) {
                   <strong>No se pudo iniciar el lector</strong>
                   <p>{scannerError}</p>
                   <span>
+                    En iPhone o iPad revisa Safari → Configuración del sitio web → Cámara.
                     También puedes fotografiar el Data Matrix y leerlo sin cámara en vivo.
                   </span>
                   <div className="delivery-scanner-error-actions">
