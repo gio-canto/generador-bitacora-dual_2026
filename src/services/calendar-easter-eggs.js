@@ -21,8 +21,9 @@ const EVENTS = Object.freeze({
     kind: "bilateral",
     eyebrow: "México × Alemania",
     title: "23 de enero de 1879",
-    description: ({ year }) =>
-      `${year - 1879} años desde esta fecha histórica de las relaciones México-Alemania.`,
+    anniversaryFrom: 1879,
+    description: () =>
+      "Fecha histórica de las relaciones México-Alemania.",
   },
   "05-15": {
     id: "teachers-day",
@@ -37,14 +38,16 @@ const EVENTS = Object.freeze({
     kind: "germany",
     eyebrow: "Formación profesional alemana",
     title: "BBiG · 1 de septiembre de 1969",
-    description: ({ year }) =>
-      `${year - 1969} años desde la entrada en vigor de la Ley de Formación Profesional alemana.`,
+    anniversaryFrom: 1969,
+    description: () =>
+      "Aniversario de la entrada en vigor de la Ley de Formación Profesional alemana.",
   },
   "09-16": {
     id: "mexican-independence",
     kind: "mexico",
     eyebrow: "16 de septiembre",
     title: "Independencia de México",
+    anniversaryFrom: 1810,
     description: () => "Una fecha nacional dentro de la bitácora dual.",
   },
   "10-01": {
@@ -52,16 +55,18 @@ const EVENTS = Object.freeze({
     kind: "dual",
     eyebrow: "Modelo Mexicano de Formación Dual",
     title: "1 de octubre de 2013",
-    description: ({ year }) =>
-      `${year - 2013} años de historia del modelo. Escuela y empresa, aprendiendo juntas.`,
+    anniversaryFrom: 2013,
+    description: () =>
+      "Escuela y empresa, aprendiendo juntas a través del Modelo Mexicano de Formación Dual.",
   },
   "10-02": {
     id: "mmfd-october-2",
     kind: "dual",
     eyebrow: "Modelo Mexicano de Formación Dual",
     title: "2 de octubre de 2013",
-    description: ({ year }) =>
-      `${year - 2013} años de historia del modelo. La formación continúa dentro y fuera del aula.`,
+    anniversaryFrom: 2013,
+    description: () =>
+      "La formación continúa dentro y fuera del aula.",
   },
   "10-31": {
     id: "halloween",
@@ -75,6 +80,7 @@ const EVENTS = Object.freeze({
     kind: "revolution",
     eyebrow: "20 de noviembre",
     title: "Revolución Mexicana",
+    anniversaryFrom: 1910,
     description: () => "Una pequeña pausa histórica antes de continuar la semana.",
   },
   "12-24": {
@@ -113,15 +119,26 @@ function mexicoDateParts(date) {
   };
 }
 
+function anniversaryFor(year, originYear) {
+  if (!Number.isInteger(originYear) || year < originYear) return null;
+  const years = year - originYear;
+  return {
+    years,
+    label: `${years}.º aniversario`,
+  };
+}
+
 function eventFor(parts) {
   const key = `${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
   const definition = EVENTS[key];
   if (!definition) return null;
+  const anniversary = anniversaryFor(parts.year, definition.anniversaryFrom);
   return {
     ...definition,
+    anniversary,
     description:
       typeof definition.description === "function"
-        ? definition.description(parts)
+        ? definition.description({ ...parts, anniversary })
         : definition.description,
   };
 }
@@ -232,11 +249,20 @@ function createEventCard(event, state, onDismiss) {
   const eyebrow = document.createElement("span");
   eyebrow.className = "calendar-easter-eyebrow";
   eyebrow.textContent = event.eyebrow;
+  const anniversary = event.anniversary
+    ? document.createElement("span")
+    : null;
+  if (anniversary) {
+    anniversary.className = "calendar-easter-anniversary";
+    anniversary.textContent = event.anniversary.label;
+  }
   const title = document.createElement("h2");
   title.textContent = event.title;
   const description = document.createElement("p");
   description.textContent = event.description;
-  copy.append(eyebrow, title, description);
+  copy.append(eyebrow);
+  if (anniversary) copy.append(anniversary);
+  copy.append(title, description);
 
   card.append(close, visual, copy);
   host.append(card);
