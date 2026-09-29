@@ -8,11 +8,13 @@ import {
 const midday = (iso) => new Date(`${iso}T18:00:00Z`);
 
 describe("efemérides del calendario", () => {
-  it("mantiene Nuevo año, nueva bitácora durante todo enero", () => {
-    const state = getCalendarState(midday("2027-01-15"));
-    expect(state.monthTheme).toBe("january");
-    expect(state.monthDetail).toBe("2027 · Nuevo año, nueva bitácora");
-    expect(state.event).toBeNull();
+  it("mantiene Nuevo año, nueva bitácora durante todo enero con el año actual", () => {
+    const state2027 = getCalendarState(midday("2027-01-15"));
+    const state2028 = getCalendarState(midday("2028-01-15"));
+    expect(state2027.monthTheme).toBe("january");
+    expect(state2027.monthDetail).toBe("2027 · Nuevo año, nueva bitácora");
+    expect(state2028.monthDetail).toBe("2028 · Nuevo año, nueva bitácora");
+    expect(state2027.event).toBeNull();
   });
 
   it("activa el cambio de año el 1 de enero", () => {
@@ -40,6 +42,27 @@ describe("efemérides del calendario", () => {
     ["2027-11-20", "mexican-revolution"],
   ])("activa %s correctamente", (iso, id) => {
     expect(getCalendarState(midday(iso)).event?.id).toBe(id);
+  });
+
+  it("calcula automáticamente los aniversarios según el año actual", () => {
+    expect(
+      getCalendarState(midday("2027-01-23")).event?.anniversary,
+    ).toEqual({ years: 148, label: "148.º aniversario" });
+    expect(
+      getCalendarState(midday("2027-09-01")).event?.anniversary,
+    ).toEqual({ years: 58, label: "58.º aniversario" });
+    expect(
+      getCalendarState(midday("2028-09-01")).event?.anniversary,
+    ).toEqual({ years: 59, label: "59.º aniversario" });
+    expect(
+      getCalendarState(midday("2027-09-16")).event?.anniversary,
+    ).toEqual({ years: 217, label: "217.º aniversario" });
+    expect(
+      getCalendarState(midday("2027-10-01")).event?.anniversary,
+    ).toEqual({ years: 14, label: "14.º aniversario" });
+    expect(
+      getCalendarState(midday("2027-11-20")).event?.anniversary,
+    ).toEqual({ years: 117, label: "117.º aniversario" });
   });
 
   it("calcula las fechas usando la zona de Ciudad de México", () => {
