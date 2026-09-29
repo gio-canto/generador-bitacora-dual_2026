@@ -61,3 +61,13 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Confirmar que sólo después de errores repetidos de captura aparece ZX-207.
 - Confirmar que ZX-205 requiere varios errores fatales consecutivos.
 - En iPhone pequeño, verificar que Salir / Foto / Terminar caben en una sola fila, el error queda encima de la barra inferior y los detalles técnicos empiezan plegados.
+
+
+## Estados, filtros y agrupación · Beta 0.50.0-beta.11
+
+- Cambiar manualmente un alumno entre Entregado a tiempo, Entregado a destiempo y No entregado.
+- Comprobar que una selección manual conserva origen Manual y que No entregado elimina la entrega.
+- Combinar filtro de estado + especialidad + empresa + búsqueda.
+- Agrupar por especialidad y por empresa y revisar contadores.
+- En iPhone, comprobar que los iconos de la barra superior permanecen visibles por debajo de 520 px.
+- En la vista semanal móvil, comprobar que Semanas, CSV, Cerrar/Reabrir y Escanear muestran icono y no se superponen.
