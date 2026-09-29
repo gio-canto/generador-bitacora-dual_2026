@@ -37,6 +37,8 @@ describe("efemérides del calendario", () => {
     ["2027-09-01", "bbig"],
     ["2027-09-16", "mexican-independence"],
     ["2027-10-31", "halloween"],
+    ["2027-11-01", "day-of-the-dead-1"],
+    ["2027-11-02", "day-of-the-dead-2"],
     ["2027-11-20", "mexican-revolution"],
   ])("activa %s correctamente", (iso, id) => {
     expect(getCalendarState(midday(iso)).event?.id).toBe(id);
@@ -63,6 +65,11 @@ describe("efemérides del calendario", () => {
   it("no activa efemérides el 1 ni el 2 de octubre", () => {
     expect(getCalendarState(midday("2027-10-01")).event).toBeNull();
     expect(getCalendarState(midday("2027-10-02")).event).toBeNull();
+  });
+
+  it("Día de Muertos no inventa un número de aniversario", () => {
+    expect(getCalendarState(midday("2027-11-01")).event?.anniversary).toBeNull();
+    expect(getCalendarState(midday("2027-11-02")).event?.anniversary).toBeNull();
   });
 
   it("calcula las fechas usando la zona de Ciudad de México", () => {
