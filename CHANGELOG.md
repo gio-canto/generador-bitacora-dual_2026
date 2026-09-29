@@ -1,5 +1,18 @@
 # Notas de versión
 
+## 0.50.0-beta.31 · Efemérides y temporadas · 2026-09-29
+
+- Se añade un motor independiente de efemérides, separado del easter egg **Virtual Insanity**, para mantener la lógica de fechas aislada del editor.
+- **Enero** muestra durante todo el mes el detalle discreto **“Nuevo año, nueva bitácora”** con el año calculado automáticamente; el **1 de enero** añade una transición especial del año anterior al nuevo.
+- **Diciembre** conserva durante todo el mes una ambientación ligera con pocos copos decorativos; el **24 de diciembre** y el **25 de diciembre** añaden intervenciones propias de Nochebuena y Navidad.
+- Se incorporan efemérides para **23 de enero**, **15 de mayo**, **1 y 16 de septiembre**, **1 y 2 de octubre**, **31 de octubre** y **20 de noviembre**.
+- Las fechas relacionadas con México y Alemania utilizan las banderas de México y Alemania indicadas desde Wikimedia Commons; los eventos de Formación Dual distinguen visualmente escuela, empresa, Betrieb y Berufsschule según el caso.
+- **31 de octubre** se reserva para Halloween.
+- Las fechas se calculan expresamente en la zona **America/Mexico_City**, evitando que el cambio de día dependa de la zona horaria del dispositivo.
+- Las intervenciones grandes sólo se muestran una vez por fecha en el navegador mediante almacenamiento local; las ambientaciones mensuales permanecen mientras corresponda.
+- Los efectos no usan audio, no interfieren con escritura, guardado o PDF y respetan `prefers-reduced-motion`.
+- Se añaden pruebas para enero, diciembre, las efemérides puntuales, la zona horaria y las banderas configuradas.
+
 ## 0.50.0-beta.30 · Diccionario técnico e institucional · 2026-09-29
 
 - El corrector ortográfico amplía `dictionary-es` con un diccionario propio del proyecto.

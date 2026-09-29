@@ -1,0 +1,219 @@
+/* Calendar easter eggs: seasonal details stay decorative and never block editing. */
+.calendar-month-detail{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  margin:10px 0 0;
+  padding:6px 10px;
+  border:1px solid rgba(0,113,227,.16);
+  border-radius:999px;
+  background:rgba(0,113,227,.07);
+  color:#0059b3;
+  font-size:11px;
+  font-weight:760;
+  letter-spacing:-.01em;
+}
+body.calendar-season-january .hero h1{margin-top:10px}
+
+.calendar-snow{
+  position:fixed;
+  inset:0;
+  z-index:45;
+  overflow:hidden;
+  pointer-events:none;
+  contain:layout paint;
+}
+.calendar-snow span{
+  position:absolute;
+  top:-24px;
+  left:var(--snow-left);
+  color:rgba(90,110,135,.34);
+  font-size:18px;
+  line-height:1;
+  text-shadow:0 1px 8px rgba(255,255,255,.9);
+  animation:calendar-snow-fall var(--snow-duration) linear infinite;
+  animation-delay:var(--snow-delay);
+}
+@keyframes calendar-snow-fall{
+  from{transform:translate3d(0,-5vh,0) rotate(0deg)}
+  to{transform:translate3d(34px,108vh,0) rotate(260deg)}
+}
+body.calendar-season-december .topbar{
+  box-shadow:0 8px 30px rgba(0,0,0,.07),0 0 0 1px rgba(168,34,45,.04),0 10px 34px rgba(28,98,62,.05);
+}
+
+.calendar-easter{
+  position:fixed;
+  inset:0;
+  z-index:170;
+  display:grid;
+  place-items:start center;
+  padding:86px 16px 20px;
+  background:linear-gradient(to bottom,rgba(20,20,24,.14),transparent 46%);
+  opacity:0;
+  transform:translateY(-8px);
+  pointer-events:none;
+  transition:opacity .24s ease,transform .28s cubic-bezier(.22,1,.36,1);
+}
+.calendar-easter.show{opacity:1;transform:none}
+.calendar-easter-card{
+  position:relative;
+  width:min(520px,calc(100vw - 24px));
+  display:grid;
+  grid-template-columns:150px minmax(0,1fr);
+  gap:20px;
+  align-items:center;
+  padding:18px;
+  border:1px solid rgba(255,255,255,.76);
+  border-radius:24px;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 24px 70px rgba(0,0,0,.18);
+  backdrop-filter:blur(22px) saturate(145%);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  pointer-events:auto;
+}
+.calendar-easter-close{
+  position:absolute;
+  top:9px;
+  right:9px;
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:50%;
+  background:#f1f1f3;
+  color:#5f6065;
+  font:600 21px/1 system-ui,sans-serif;
+  cursor:pointer;
+}
+.calendar-easter-copy{min-width:0;padding-right:18px}
+.calendar-easter-eyebrow{
+  display:block;
+  margin-bottom:5px;
+  color:#6e6e73;
+  font-size:10px;
+  font-weight:820;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.calendar-easter-copy h2{
+  margin:0;
+  font-size:clamp(22px,4vw,30px);
+  line-height:1.02;
+  letter-spacing:-.045em;
+}
+.calendar-easter-copy p{
+  margin:8px 0 0;
+  color:#59595e;
+  font-size:12px;
+  line-height:1.5;
+}
+.calendar-visual{
+  min-height:120px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border-radius:18px;
+  background:#f5f5f7;
+}
+.calendar-flags{display:flex;align-items:center;justify-content:center;gap:8px}
+.calendar-flags img{
+  width:54px;
+  height:34px;
+  object-fit:cover;
+  border-radius:6px;
+  box-shadow:0 2px 9px rgba(0,0,0,.15);
+}
+.calendar-bridge{display:flex;align-items:center;gap:7px;margin-top:12px;font-size:9px;font-weight:850;letter-spacing:.08em}
+.calendar-bridge i,.dual-nodes i{width:32px;height:1px;background:currentColor;opacity:.35}
+.dual-nodes{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:11px;color:#3f4147;font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+
+.calendar-visual--newyear{
+  grid-template-columns:auto auto auto;
+  gap:7px;
+  background:radial-gradient(circle at 50% 20%,#fff 0,#eef5ff 58%,#e3ecf8 100%);
+  color:#15233a;
+}
+.calendar-year-old{color:#8b8f98;text-decoration:line-through;font-size:17px}
+.calendar-year-arrow{color:#637083;font-size:17px}
+.calendar-visual--newyear strong{font-size:31px;letter-spacing:-.05em;animation:calendar-year-in .7s cubic-bezier(.22,1,.36,1)}
+@keyframes calendar-year-in{from{opacity:0;transform:translateY(14px) scale(.9)}to{opacity:1;transform:none}}
+
+.calendar-visual--bilateral,.calendar-visual--dual,.calendar-visual--germany{
+  align-content:center;
+  background:linear-gradient(145deg,#f8f8f9,#eef1f5);
+}
+.calendar-visual--germany .calendar-flags img{width:66px;height:41px}
+
+.calendar-visual--teacher{background:#f0eee8}
+.teacher-sheet{
+  width:88px;
+  min-height:92px;
+  padding:18px 10px 9px;
+  border-radius:4px;
+  background:#fff;
+  box-shadow:0 10px 24px rgba(45,39,28,.14);
+  transform:rotate(-2deg);
+}
+.teacher-sheet i{display:block;height:1px;margin:0 0 10px;background:#d8dde5}
+.teacher-sheet span{
+  display:block;
+  margin-top:14px;
+  color:#225e9d;
+  font-family:"Segoe Script","Bradley Hand",cursive;
+  font-size:10px;
+  transform:rotate(-4deg);
+}
+
+.calendar-visual--mexico{align-content:center;gap:8px;background:#f7f7f5}
+.mexico-ribbon{display:grid;grid-template-columns:repeat(3,26px);height:46px;overflow:hidden;border-radius:7px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.mexico-ribbon i:nth-child(1){background:#006847}
+.mexico-ribbon i:nth-child(2){background:#fff}
+.mexico-ribbon i:nth-child(3){background:#ce1126}
+.calendar-visual--mexico strong{font-size:16px;letter-spacing:.08em}
+
+.calendar-visual--halloween{align-content:center;gap:11px;background:#17171b;color:#f2f0e9}
+.halloween-eyes{display:flex;gap:16px}
+.halloween-eyes i{width:14px;height:7px;border-radius:80% 20%;background:#f3bd47;box-shadow:0 0 14px rgba(243,189,71,.5)}
+.halloween-eyes i+ i{transform:scaleX(-1)}
+.calendar-visual--halloween strong{font-size:19px;letter-spacing:.12em}
+body.calendar-event-halloween .shell{filter:saturate(.78) brightness(.94);transition:filter .4s ease}
+
+.calendar-visual--revolution{
+  align-content:center;
+  gap:2px;
+  background:linear-gradient(145deg,#ddd0b6,#bca98a);
+  color:#493b29;
+  box-shadow:inset 0 0 40px rgba(81,57,32,.14);
+}
+.calendar-visual--revolution small{font-size:7px;font-weight:850;letter-spacing:.14em}
+.calendar-visual--revolution strong{font-family:Georgia,serif;font-size:25px}
+.calendar-visual--revolution span{font-family:Georgia,serif;font-size:12px}
+
+.calendar-visual--christmas-eve,.calendar-visual--christmas{
+  position:relative;
+  background:radial-gradient(circle at 50% 20%,#fff 0,#f4f0e8 62%,#ece5d9 100%);
+}
+.calendar-visual--christmas-eve{grid-template-columns:repeat(3,18px);gap:10px;align-content:center}
+.calendar-visual--christmas-eve i{width:5px;height:5px;border-radius:50%;background:#d7b36a;box-shadow:0 0 13px rgba(198,153,65,.75)}
+.calendar-visual--christmas-eve strong{grid-column:1/-1;font-size:28px;color:#74443e}
+.gift-box{position:relative;width:54px;height:46px;border-radius:7px;background:#af3d3d;box-shadow:0 9px 18px rgba(92,37,37,.16)}
+.gift-box i{position:absolute;left:23px;top:0;width:8px;height:46px;background:#efe0b1}
+.gift-box span{position:absolute;left:-3px;right:-3px;top:10px;height:7px;background:#efe0b1}
+.calendar-visual--christmas strong{position:absolute;right:15px;bottom:10px;color:#2e6547;font-size:18px}
+
+@media(max-width:560px){
+  .calendar-easter{padding-top:70px}
+  .calendar-easter-card{grid-template-columns:1fr;gap:12px;padding:14px}
+  .calendar-visual{min-height:92px}
+  .calendar-easter-copy{padding:0 4px 5px}
+  .calendar-easter-copy h2{font-size:24px}
+  .calendar-easter-close{top:8px;right:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .calendar-snow{display:none}
+  .calendar-easter,.calendar-visual--newyear strong{transition:none;animation:none}
+  body.calendar-event-halloween .shell{transition:none}
+}
