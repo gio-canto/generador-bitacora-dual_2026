@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.8 · Registro de entrega · Parte 8 · 2026-09-28
+
+- Se corrige un fallo de iPhone/iPad donde un error del decodificador podía cerrar inmediatamente un stream de cámara que sí había abierto correctamente.
+- El arranque de cámara y el arranque del lector Data Matrix quedan separados: primero se confirma la vista de cámara y después se inicia ZXing.
+- Se corrige una condición de carrera de Safari con `loadedmetadata`: los listeners se registran antes de asignar `srcObject` y se acepta `loadedmetadata`, `canplay` o `playing`.
+- Si ZXing no está disponible al cargar la página, el registro vuelve a intentar cargarlo dinámicamente desde jsDelivr y luego unpkg.
+- Un fallo de ZXing ya no apaga la cámara; la vista permanece activa y se informa por separado que el lector no pudo iniciar.
+- La lectura desde imagen usa el mismo mecanismo de recuperación de ZXing.
+- Los mensajes distinguen ahora entre **no se pudo abrir la cámara** y **la cámara está activa, pero el lector falló**.
+
 ## 0.50.0-beta.7 · Registro de entrega · Parte 7 · 2026-09-28
 
 - El escáner pasa a un flujo **mobile-first** pensado principalmente para iPhone, iPad y otros dispositivos táctiles.
