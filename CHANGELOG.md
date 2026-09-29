@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.50.0-beta.33 · Día de Muertos corregido · 2026-09-29
+
+- Se corrige la asignación errónea del **1 y 2 de octubre**: esas fechas dejan de activar una efeméride del Modelo Mexicano de Formación Dual.
+- **Día de Muertos** se activa correctamente el **1 y 2 de noviembre**.
+- **Halloween** permanece exclusivamente el **31 de octubre**.
+- Día de Muertos recibe una intervención visual propia con cempasúchil y vela, separada de Halloween.
+- Las fechas de Día de Muertos no muestran un número de aniversario artificial.
+- Se añaden pruebas para comprobar que el 1 y 2 de octubre no activen ninguna efeméride y que el 1 y 2 de noviembre sí activen Día de Muertos.
+
 ## 0.50.0-beta.32 · Aniversarios automáticos · 2026-09-29
 
 - Enero deja de depender de un año escrito manualmente: **“Nuevo año, nueva bitácora”** muestra siempre el año correspondiente al calendario actual.
