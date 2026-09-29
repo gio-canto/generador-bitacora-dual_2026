@@ -105,7 +105,8 @@ Prueba:
 - importación de Excel/CSV;
 - crear semana;
 - cerrar/reabrir;
-- estado manual;
+- estado manual en **Entregado a tiempo**, **Entregado a destiempo**, **No entregado** y **No aplica**;
+- comprobar que **No aplica** se conserva al recargar/importar y no reduce el porcentaje de cumplimiento;
 - filtros y agrupación;
 - JSON;
 - CSV;
