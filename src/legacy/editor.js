@@ -1233,7 +1233,7 @@ export function startEditor() {
         days.length +
         " de " +
         MAX_DAYS +
-        "</span></div><div class="record-review-days">" +
+        '</span></div><div class="record-review-days">' +
         dayCards +
         "</div></section>" +
         '<section class="record-review-section"><div class="record-review-section-head"><h3>Responsables</h3><span>' +
