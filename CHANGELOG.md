@@ -1,5 +1,21 @@
 # Notas de versión
 
+## 0.50.0-beta.21 · Documentación y adopción institucional · 2026-09-29
+
+- Se reestructura el README para funcionar como portada real del repositorio: propósito, componentes, funciones, privacidad, desarrollo, estructura y rutas de documentación.
+- Se crea `docs/README.md` como índice de documentación viva y se separa la documentación actual del historial acumulativo del CHANGELOG.
+- Se añade `docs/IMPLEMENTAR_INSTITUCION.md` con una guía completa para incorporar otra escuela, configurar empresas o adaptar un formato institucional diferente.
+- La guía distingue tres niveles de integración: catálogos, reglas/identidad institucional y adaptación completa del formato.
+- Se documentan requisitos previos, campos institucionales, firmas, jornadas, PDF, Data Matrix, registro de entrega, pruebas, privacidad y criterios de aceptación.
+- `docs/CATALOGOS.md` pasa a documentar formalmente los esquemas de escuelas y empresas, IDs estables, nombres cortos y límites de los datos publicados.
+- `docs/ARQUITECTURA.md` se reescribe como descripción de la arquitectura actual, con capas, flujos, invariantes y reglas de compatibilidad.
+- `docs/DATOS_Y_CACHE.md` se reorganiza por tipo de almacenamiento, respaldo, migración, Data Matrix y coincidencias aproximadas.
+- `docs/PRUEBAS.md` se convierte en una matriz de verificación mantenible para generador, PDF, responsive, registro, escáner, catálogos, persistencia y Data Matrix.
+- Se crea `docs/VERSIONADO.md`: todo cambio publicado en `main` debe incrementar versión, actualizar CHANGELOG, sincronizar archivos de versión, mantener documentación viva y ejecutar verificación.
+- `CONTRIBUTING.md` incorpora flujo de ramas/PR, Definition of Done, reglas para cambios de formato y requisitos de documentación.
+- `SECURITY.md` se amplía con alcance, reporte privado, datos que no deben publicarse y principios para dependencias y persistencia.
+- La versión pública queda sincronizada como **0.50.0-beta.21**.
+
 ## 0.50.0-beta.20 · Registro de entrega · coincidencias aproximadas y edición · 2026-09-29
 
 - El escáner mantiene primero la coincidencia exacta de nombre, especialidad y empresa.
