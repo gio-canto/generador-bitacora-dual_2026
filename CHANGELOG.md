@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.11 · Registro de entrega · Parte 11 · 2026-09-28
+
+- Los tres estados pueden fijarse también de forma manual por alumno: **Entregado a tiempo**, **Entregado a destiempo** y **No entregado**.
+- El cambio manual es explícito y no depende de la hora límite; el escaneo por cámara conserva el cálculo automático a tiempo/destiempo.
+- La lista de alumnos puede filtrarse por **especialidad** y por **empresa**, además del estado y la búsqueda por texto.
+- Se añade agrupación visual de alumnos por **especialidad** o por **empresa**, con contador por grupo.
+- El origen de un registro distingue Cámara, Manual e Importado.
+- La navegación de la semana en teléfono conserva iconos visibles y adopta botones compactos para Semanas, CSV, Cerrar/Reabrir y Escanear.
+- Se corrige una regla heredada que ocultaba los iconos de la barra superior por debajo de 520 px.
+- Los controles de filtro y estado manual están adaptados a iPhone/iPad con selectores de 16 px para evitar zoom automático de Safari.
+
 ## 0.50.0-beta.10 · Registro de entrega · Parte 10 · 2026-09-28
 
 - Se corrige el caso identificado como **ZX-205**: el primer error genérico del ciclo de lectura ya no se considera fatal.

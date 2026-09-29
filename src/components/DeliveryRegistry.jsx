@@ -39,6 +39,7 @@ import {
   readDeliveryState,
   registerDelivery,
   removeDelivery,
+  setDeliveryStatus,
   statusFromTimestamp,
   weekSummary,
   writeDeliveryState,
@@ -131,7 +132,7 @@ async function ensureZxingBrowser() {
 }
 
 const statusMeta = {
-  entregado: { label: "Entregado", icon: CheckCircle },
+  entregado: { label: "Entregado a tiempo", icon: CheckCircle },
   entregado_tarde: { label: "Entregado a destiempo", icon: Clock },
   no_entregado: { label: "No entregado", icon: XCircle },
 };
@@ -341,6 +342,9 @@ export default function DeliveryRegistry({ onClose }) {
   const [notice, setNotice] = useState(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [specialtyFilter, setSpecialtyFilter] = useState("all");
+  const [companyFilter, setCompanyFilter] = useState("all");
+  const [groupBy, setGroupBy] = useState("none");
   const [scanQueue, setScanQueue] = useState([]);
   const [scanMessage, setScanMessage] = useState("Apunta la cámara al Data Matrix.");
   const [scanTone, setScanTone] = useState("");
@@ -1222,28 +1226,30 @@ export default function DeliveryRegistry({ onClose }) {
     setView("week");
   };
 
-  const registerManual = (studentId) => {
-    if (!activeWeek || activeWeek.closedAt) return;
-    const student = state.students.find((item) => item.id === studentId);
-    const weeks = state.weeks.map((week) =>
-      week.id === activeWeek.id
-        ? registerDelivery(week, studentId, new Date().toISOString(), "manual")
-        : week,
-    );
-    commit({ ...state, weeks });
-    notify("success", "Entrega registrada", student?.name || "");
-  };
-
-  const undoDelivery = (studentId) => {
+  const setManualStatus = (studentId, status) => {
     if (!activeWeek || activeWeek.closedAt) return;
     const student = state.students.find((item) => item.id === studentId);
     commit({
       ...state,
       weeks: state.weeks.map((week) =>
-        week.id === activeWeek.id ? removeDelivery(week, studentId) : week,
+        week.id === activeWeek.id
+          ? setDeliveryStatus(
+              week,
+              studentId,
+              status,
+              status === "no_entregado" ? "" : new Date().toISOString(),
+              "manual",
+            )
+          : week,
       ),
     });
-    notify("info", "Registro retirado", student?.name || "");
+
+    const label = statusMeta[status]?.label || "Estado actualizado";
+    notify(
+      status === "no_entregado" ? "info" : "success",
+      label,
+      student?.name || "",
+    );
   };
 
   const toggleWeekClosed = () => {
@@ -1373,6 +1379,20 @@ export default function DeliveryRegistry({ onClose }) {
     }
   };
 
+  const specialtyOptions = useMemo(
+    () =>
+      [...new Set(state.students.map((student) => student.specialty).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, "es")),
+    [state.students],
+  );
+
+  const companyOptions = useMemo(
+    () =>
+      [...new Set(state.students.map((student) => student.company).filter(Boolean))]
+        .sort((a, b) => shortCompany(a).localeCompare(shortCompany(b), "es")),
+    [state.students],
+  );
+
   const filteredStudents = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("es-MX");
     let list = state.students.filter((student) =>
@@ -1381,10 +1401,18 @@ export default function DeliveryRegistry({ onClose }) {
         .toLocaleLowerCase("es-MX")
         .includes(term),
     );
+
+    if (specialtyFilter !== "all")
+      list = list.filter((student) => student.specialty === specialtyFilter);
+
+    if (companyFilter !== "all")
+      list = list.filter((student) => student.company === companyFilter);
+
     if (activeWeek && statusFilter !== "all")
       list = list.filter(
         (student) => deliveryStatus(activeWeek, student.id) === statusFilter,
       );
+
     if (activeWeek) {
       const order = { no_entregado: 0, entregado_tarde: 1, entregado: 2 };
       list = [...list].sort((a, b) => {
@@ -1394,8 +1422,51 @@ export default function DeliveryRegistry({ onClose }) {
         return difference || a.name.localeCompare(b.name, "es");
       });
     }
+
     return list;
-  }, [state.students, search, activeWeek, statusFilter]);
+  }, [
+    state.students,
+    search,
+    activeWeek,
+    statusFilter,
+    specialtyFilter,
+    companyFilter,
+  ]);
+
+  const groupedStudents = useMemo(() => {
+    if (groupBy === "none")
+      return [{ key: "all", label: "", students: filteredStudents }];
+
+    const groups = new Map();
+    for (const student of filteredStudents) {
+      const raw =
+        groupBy === "specialty" ? student.specialty : student.company;
+      const key = raw || "";
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(student);
+    }
+
+    return [...groups.entries()]
+      .sort(([a], [b]) => {
+        const aLabel =
+          groupBy === "company"
+            ? shortCompany(a || "Sin empresa")
+            : a || "Sin especialidad";
+        const bLabel =
+          groupBy === "company"
+            ? shortCompany(b || "Sin empresa")
+            : b || "Sin especialidad";
+        return aLabel.localeCompare(bLabel, "es");
+      })
+      .map(([key, students]) => ({
+        key: key || "empty",
+        label:
+          groupBy === "company"
+            ? shortCompany(key) || "Sin empresa"
+            : key || "Sin especialidad",
+        students,
+      }));
+  }, [filteredStudents, groupBy]);
 
   const renderStatus = (week, student) => {
     const status = deliveryStatus(week, student.id);
@@ -1423,29 +1494,31 @@ export default function DeliveryRegistry({ onClose }) {
           <span>Registro</span>
           <strong>{formatDateTime(delivery?.registeredAt)}</strong>
           {delivery?.source && (
-            <small>{delivery.source === "camera" ? "Cámara" : "Manual"}</small>
+            <small>
+              {delivery.source === "camera"
+                ? "Cámara"
+                : delivery.source === "import"
+                  ? "Importado"
+                  : "Manual"}
+            </small>
           )}
         </div>
         <div className="delivery-row-actions">
-          {status === "no_entregado" ? (
-            <button
-              className="btn"
-              type="button"
+          <label className="delivery-manual-status">
+            <span>Estado manual</span>
+            <select
+              value={status}
               disabled={Boolean(week.closedAt)}
-              onClick={() => registerManual(student.id)}
+              onChange={(event) =>
+                setManualStatus(student.id, event.target.value)
+              }
+              aria-label={"Cambiar estado de " + student.name}
             >
-              Registrar
-            </button>
-          ) : (
-            <button
-              className="btn"
-              type="button"
-              disabled={Boolean(week.closedAt)}
-              onClick={() => undoDelivery(student.id)}
-            >
-              Corregir
-            </button>
-          )}
+              <option value="entregado">Entregado a tiempo</option>
+              <option value="entregado_tarde">Entregado a destiempo</option>
+              <option value="no_entregado">No entregado</option>
+            </select>
+          </label>
         </div>
       </div>
     );
@@ -2049,12 +2122,14 @@ export default function DeliveryRegistry({ onClose }) {
           <>
             <section className="delivery-week-head">
               <button
-                className="btn"
+                className="btn delivery-nav-button"
                 type="button"
+                aria-label="Volver a semanas"
+                title="Semanas"
                 onClick={() => setView("home")}
               >
                 <ArrowLeft size={18} />
-                Semanas
+                <span>Semanas</span>
               </button>
               <div>
                 <span className="delivery-kicker">
@@ -2068,24 +2143,39 @@ export default function DeliveryRegistry({ onClose }) {
               </div>
               <div className="delivery-week-head-actions">
                 <button
-                  className="btn"
+                  className="btn delivery-nav-button"
                   type="button"
+                  aria-label="Descargar CSV"
+                  title="CSV"
                   onClick={() => exportWeekCsv(state, activeWeek.id)}
                 >
                   <DownloadSimple size={18} />
-                  CSV
-                </button>
-                <button className="btn" type="button" onClick={toggleWeekClosed}>
-                  {activeWeek.closedAt ? "Reabrir" : "Cerrar semana"}
+                  <span>CSV</span>
                 </button>
                 <button
-                  className="btn primary"
+                  className="btn delivery-nav-button"
                   type="button"
+                  aria-label={activeWeek.closedAt ? "Reabrir semana" : "Cerrar semana"}
+                  title={activeWeek.closedAt ? "Reabrir semana" : "Cerrar semana"}
+                  onClick={toggleWeekClosed}
+                >
+                  {activeWeek.closedAt ? (
+                    <CheckCircle size={18} />
+                  ) : (
+                    <XCircle size={18} />
+                  )}
+                  <span>{activeWeek.closedAt ? "Reabrir" : "Cerrar"}</span>
+                </button>
+                <button
+                  className="btn primary delivery-nav-button"
+                  type="button"
+                  aria-label="Escanear entregas"
+                  title="Escanear"
                   disabled={!state.students.length}
                   onClick={() => setView("scanner")}
                 >
                   <Camera size={18} />
-                  Escanear
+                  <span>Escanear</span>
                 </button>
               </div>
             </section>
@@ -2131,19 +2221,25 @@ export default function DeliveryRegistry({ onClose }) {
 
             <section className="delivery-panel">
               <div className="delivery-list-toolbar">
-                <div>
+                <div className="delivery-list-title">
                   <strong>
                     {statusFilter === "all"
-                      ? "Todos los alumnos"
+                      ? "Alumnos"
                       : statusMeta[statusFilter].label}
                   </strong>
-                  {statusFilter !== "all" && (
+                  {(statusFilter !== "all" ||
+                    specialtyFilter !== "all" ||
+                    companyFilter !== "all") && (
                     <button
                       className="delivery-clear-filter"
                       type="button"
-                      onClick={() => setStatusFilter("all")}
+                      onClick={() => {
+                        setStatusFilter("all");
+                        setSpecialtyFilter("all");
+                        setCompanyFilter("all");
+                      }}
                     >
-                      Mostrar todos
+                      Limpiar filtros
                     </button>
                   )}
                 </div>
@@ -2154,14 +2250,69 @@ export default function DeliveryRegistry({ onClose }) {
                   placeholder="Buscar alumno"
                 />
               </div>
+
+              <div className="delivery-roster-controls">
+                <label>
+                  <span>Especialidad</span>
+                  <select
+                    value={specialtyFilter}
+                    onChange={(event) => setSpecialtyFilter(event.target.value)}
+                  >
+                    <option value="all">Todas</option>
+                    {specialtyOptions.map((specialty) => (
+                      <option key={specialty} value={specialty}>
+                        {specialty}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Empresa</span>
+                  <select
+                    value={companyFilter}
+                    onChange={(event) => setCompanyFilter(event.target.value)}
+                  >
+                    <option value="all">Todas</option>
+                    {companyOptions.map((company) => (
+                      <option key={company} value={company}>
+                        {shortCompany(company)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Agrupar</span>
+                  <select
+                    value={groupBy}
+                    onChange={(event) => setGroupBy(event.target.value)}
+                  >
+                    <option value="none">Sin agrupar</option>
+                    <option value="specialty">Por especialidad</option>
+                    <option value="company">Por empresa</option>
+                  </select>
+                </label>
+              </div>
+
               <div className="delivery-student-list">
                 {filteredStudents.length ? (
-                  filteredStudents.map((student) =>
-                    renderStatus(activeWeek, student),
-                  )
+                  groupedStudents.map((group) => (
+                    <section className="delivery-student-group" key={group.key}>
+                      {groupBy !== "none" && (
+                        <div className="delivery-student-group-head">
+                          <strong>{group.label}</strong>
+                          <span>{group.students.length}</span>
+                        </div>
+                      )}
+                      <div className="delivery-student-group-list">
+                        {group.students.map((student) =>
+                          renderStatus(activeWeek, student),
+                        )}
+                      </div>
+                    </section>
+                  ))
                 ) : (
                   <div className="delivery-empty-week">
-                    No hay alumnos con este filtro.
+                    No hay alumnos con estos filtros.
                   </div>
                 )}
               </div>

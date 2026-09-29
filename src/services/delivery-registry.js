@@ -409,6 +409,33 @@ export function registerDelivery(week, studentId, timestamp, source = "manual") 
   };
 }
 
+export function setDeliveryStatus(
+  week,
+  studentId,
+  status,
+  timestamp = "",
+  source = "manual",
+) {
+  if (status === "no_entregado") return removeDelivery(week, studentId);
+  if (!["entregado", "entregado_tarde"].includes(status)) return week;
+
+  const previous = week?.deliveries?.[studentId];
+  const registeredAt =
+    timestamp || previous?.registeredAt || new Date().toISOString();
+
+  return {
+    ...week,
+    deliveries: {
+      ...week.deliveries,
+      [studentId]: {
+        status,
+        registeredAt,
+        source,
+      },
+    },
+  };
+}
+
 export function removeDelivery(week, studentId) {
   const deliveries = { ...(week?.deliveries || {}) };
   delete deliveries[studentId];

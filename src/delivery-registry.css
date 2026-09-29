@@ -1664,3 +1664,293 @@ button.delivery-action-tile{cursor:pointer}
     grid-column:1/-1;
   }
 }
+
+
+/* Beta 0.50.0-beta.11 · controles de alumnos y estados manuales */
+.delivery-roster-controls{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  margin:0 0 14px;
+}
+.delivery-roster-controls label,
+.delivery-manual-status{
+  display:grid;
+  gap:5px;
+}
+.delivery-roster-controls label>span,
+.delivery-manual-status>span{
+  color:#6e6e73;
+  font-size:10.5px;
+  font-weight:720;
+  letter-spacing:.025em;
+}
+.delivery-roster-controls select,
+.delivery-manual-status select{
+  width:100%;
+  min-height:40px;
+  padding:8px 32px 8px 10px;
+  border:1px solid rgba(0,0,0,.10);
+  border-radius:12px;
+  outline:0;
+  background:#f7f7f9;
+  color:#1d1d1f;
+  font:inherit;
+  font-size:12px;
+}
+.delivery-roster-controls select:focus,
+.delivery-manual-status select:focus{
+  border-color:rgba(0,113,227,.38);
+  box-shadow:0 0 0 3px rgba(0,113,227,.08);
+}
+.delivery-manual-status{
+  min-width:190px;
+}
+.delivery-manual-status select:disabled{
+  opacity:.56;
+  cursor:not-allowed;
+}
+.delivery-student-group{
+  display:grid;
+  gap:8px;
+}
+.delivery-student-group+.delivery-student-group{
+  margin-top:8px;
+}
+.delivery-student-group-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 11px 5px;
+}
+.delivery-student-group-head strong{
+  font-size:12px;
+  letter-spacing:-.01em;
+}
+.delivery-student-group-head span{
+  min-width:25px;
+  height:25px;
+  display:grid;
+  place-items:center;
+  padding:0 7px;
+  border-radius:999px;
+  background:#ececf0;
+  color:#5f5f63;
+  font-size:10px;
+  font-weight:760;
+}
+.delivery-student-group-list{
+  display:grid;
+  gap:8px;
+}
+.delivery-list-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+@media(max-width:980px){
+  .delivery-student-card{
+    grid-template-columns:auto minmax(0,1fr) minmax(170px,.8fr);
+  }
+  .delivery-row-actions{
+    grid-column:2/-1;
+    grid-row:auto;
+    justify-content:flex-end;
+  }
+  .delivery-manual-status{
+    width:min(260px,100%);
+  }
+}
+
+@media (max-width:900px), (pointer:coarse){
+  /* Los iconos de navegación se conservan en teléfono. Una regla heredada
+     los ocultaba por debajo de 520 px. */
+  .delivery-top-actions .btn svg{
+    display:block;
+  }
+  .delivery-top-actions .btn{
+    position:relative;
+  }
+
+  .delivery-roster-controls{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:7px;
+  }
+  .delivery-roster-controls select,
+  .delivery-manual-status select{
+    min-height:44px;
+    font-size:16px;
+  }
+
+  .delivery-week-head{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    align-items:center;
+    gap:10px 12px;
+  }
+  .delivery-week-head>div:not(.delivery-week-head-actions){
+    min-width:0;
+  }
+  .delivery-week-head>.delivery-nav-button{
+    width:44px!important;
+    min-width:44px;
+    height:44px;
+    padding:0;
+    display:grid;
+    place-items:center;
+    align-self:start;
+  }
+  .delivery-week-head>.delivery-nav-button span{
+    display:none;
+  }
+  .delivery-week-head-actions{
+    grid-column:1/-1;
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:7px;
+  }
+  .delivery-week-head-actions .delivery-nav-button{
+    width:auto!important;
+    min-width:0;
+    min-height:46px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    padding:7px 8px;
+    font-size:11px;
+  }
+  .delivery-week-head-actions .delivery-nav-button svg{
+    display:block;
+    flex:0 0 auto;
+  }
+  .delivery-week-head-actions .delivery-nav-button span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .delivery-list-toolbar{
+    margin-top:16px;
+  }
+  .delivery-list-toolbar input{
+    min-height:44px;
+  }
+}
+
+@media(max-width:640px){
+  .delivery-roster-controls{
+    grid-template-columns:1fr 1fr;
+  }
+  .delivery-roster-controls label:last-child{
+    grid-column:1/-1;
+  }
+  .delivery-student-card{
+    grid-template-columns:auto minmax(0,1fr);
+    gap:9px 10px;
+    padding:11px;
+  }
+  .delivery-student-time{
+    grid-column:2;
+  }
+  .delivery-row-actions{
+    grid-column:1/-1;
+    justify-content:stretch;
+  }
+  .delivery-manual-status{
+    width:100%;
+    min-width:0;
+  }
+}
+
+@media(max-width:430px){
+  .delivery-week-head{
+    padding:12px;
+    grid-template-columns:42px minmax(0,1fr);
+  }
+  .delivery-week-head h2{
+    font-size:22px;
+  }
+  .delivery-week-head p{
+    font-size:11px;
+    line-height:1.35;
+  }
+  .delivery-week-head-actions{
+    gap:5px;
+  }
+  .delivery-week-head-actions .delivery-nav-button{
+    min-height:44px;
+    padding:6px 4px;
+    border-radius:12px;
+    font-size:10px;
+    flex-direction:column;
+    gap:2px;
+  }
+  .delivery-week-head-actions .delivery-nav-button svg{
+    width:17px;
+    height:17px;
+  }
+
+  .delivery-panel{
+    padding:12px;
+  }
+  .delivery-list-toolbar{
+    margin:12px 0 9px;
+    gap:8px;
+  }
+  .delivery-list-title strong{
+    font-size:13px;
+  }
+  .delivery-roster-controls{
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+  .delivery-roster-controls label:last-child{
+    grid-column:auto;
+  }
+  .delivery-roster-controls label>span{
+    font-size:10px;
+  }
+
+  .delivery-avatar canvas,
+  .delivery-avatar img{
+    max-width:42px;
+    max-height:42px;
+  }
+  .delivery-student-main>strong{
+    font-size:13px;
+  }
+  .delivery-student-main>span{
+    font-size:10.5px;
+  }
+  .delivery-student-time{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    flex-wrap:wrap;
+  }
+  .delivery-student-time span{
+    display:none;
+  }
+  .delivery-student-time strong{
+    font-size:10.5px;
+  }
+  .delivery-status{
+    margin-top:3px;
+    font-size:10px;
+  }
+  .delivery-manual-status>span{
+    display:none;
+  }
+  .delivery-manual-status select{
+    min-height:42px;
+    border-radius:11px;
+  }
+  .delivery-student-group-head{
+    padding-inline:4px;
+  }
+}
