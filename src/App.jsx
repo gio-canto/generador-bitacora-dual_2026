@@ -8,6 +8,8 @@ import { startGuide } from "./legacy/guide.js";
 import { startPeople } from "./legacy/people.js";
 import { startSignatureFixes } from "./legacy/signatures.js";
 import { startEasterEgg } from "./legacy/easter-egg.js";
+import { startCalendarEasterEggs } from "./services/calendar-easter-eggs.js";
+import "./calendar-easter-eggs.css";
 import { recoverPreviousVersion } from "./services/recover-original.js";
 
 const isDeliveryPage = () =>
@@ -44,6 +46,7 @@ export default function App() {
     startPeople();
     startSignatureFixes();
     startEasterEgg();
+    startCalendarEasterEggs();
     startProfile();
     startSpelling();
   }, [deliveryMode]);
