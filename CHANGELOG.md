@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.14 · Registro de entrega · Parte 14 · 2026-09-28
+
+- Se añade el modo **Global de todas** dentro de Reporte de entregas.
+- El PDF global usa una tabla tipo control escolar: una fila por alumno y una columna por semana.
+- Cada alumno conserva un **mini Blobatar**, nombre, especialidad y empresa en la primera columna.
+- Cada semana muestra su número y fecha inicial, con símbolo visual por estado: ✓ Entregado a tiempo, ! Entregado a destiempo y × No entregado.
+- El reporte global se genera en A4 horizontal para aprovechar mejor el ancho.
+- Cuando existen más de 15 semanas o más de 14 alumnos, la matriz se divide automáticamente en varias páginas sin perder encabezado ni leyenda.
+- El encabezado mantiene plantel, generación dual, fecha de creación, versión del sistema y numeración de páginas.
+
 ## 0.50.0-beta.13 · Registro de entrega · Parte 13 · 2026-09-28
 
 - Se añade **Reporte de entregas en PDF** con diseño institucional, preparado para imprimir o archivar.
