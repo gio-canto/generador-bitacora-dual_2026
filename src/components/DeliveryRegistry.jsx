@@ -1103,7 +1103,14 @@ export default function DeliveryRegistry({ onClose }) {
     if (!file) return;
     try {
       setScannerError("");
-      const ZX = window.ZXingBrowser;
+      let ZX = window.ZXingBrowser;
+      if (!ZX) {
+        try {
+          ZX = await ensureZxingBrowser();
+        } catch {
+          ZX = null;
+        }
+      }
       if (ZX?.BrowserDatamatrixCodeReader || ZX?.BrowserMultiFormatReader) {
         const Reader =
           ZX.BrowserDatamatrixCodeReader || ZX.BrowserMultiFormatReader;
