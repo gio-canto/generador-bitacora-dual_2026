@@ -36,8 +36,6 @@ describe("efemérides del calendario", () => {
     ["2027-05-15", "teachers-day"],
     ["2027-09-01", "bbig"],
     ["2027-09-16", "mexican-independence"],
-    ["2027-10-01", "mmfd-october-1"],
-    ["2027-10-02", "mmfd-october-2"],
     ["2027-10-31", "halloween"],
     ["2027-11-20", "mexican-revolution"],
   ])("activa %s correctamente", (iso, id) => {
@@ -58,11 +56,13 @@ describe("efemérides del calendario", () => {
       getCalendarState(midday("2027-09-16")).event?.anniversary,
     ).toEqual({ years: 217, label: "217.º aniversario" });
     expect(
-      getCalendarState(midday("2027-10-01")).event?.anniversary,
-    ).toEqual({ years: 14, label: "14.º aniversario" });
-    expect(
       getCalendarState(midday("2027-11-20")).event?.anniversary,
     ).toEqual({ years: 117, label: "117.º aniversario" });
+  });
+
+  it("no activa efemérides el 1 ni el 2 de octubre", () => {
+    expect(getCalendarState(midday("2027-10-01")).event).toBeNull();
+    expect(getCalendarState(midday("2027-10-02")).event).toBeNull();
   });
 
   it("calcula las fechas usando la zona de Ciudad de México", () => {

@@ -711,5 +711,8 @@ export function Profile() {
 
 export function startProfile() {
   const host = document.getElementById("profileSlot");
-  if (host) createRoot(host).render(<Profile />);
+  if (!host) return () => {};
+  const root = createRoot(host);
+  root.render(<Profile />);
+  return () => root.unmount();
 }

@@ -46,9 +46,13 @@ export default function App() {
     startPeople();
     startSignatureFixes();
     startEasterEgg();
-    startCalendarEasterEggs();
-    startProfile();
+    const stopCalendarEasterEggs = startCalendarEasterEggs();
+    const stopProfile = startProfile();
     startSpelling();
+    return () => {
+      stopCalendarEasterEggs?.();
+      stopProfile?.();
+    };
   }, [deliveryMode]);
 
   if (deliveryMode) {

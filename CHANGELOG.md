@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.50.0-beta.33 · Efemérides de octubre corregidas · 2026-09-29
+
+- Se eliminan por completo las efemérides del **1 y 2 de octubre**.
+- Esas fechas dejan de asociarse al Modelo Mexicano de Formación Dual y dejan de calcular o mostrar aniversarios.
+- **31 de octubre** conserva su easter egg de Halloween.
+- Se añade una prueba de regresión que exige que el 1 y 2 de octubre no activen ninguna efeméride.
+- El resto del calendario y los aniversarios automáticos permanecen sin cambios.
+- Se corrige la limpieza del root React del perfil al desmontar la aplicación, evitando errores residuales de CI sin modificar la interfaz ni los datos.
+
 ## 0.50.0-beta.32 · Aniversarios automáticos · 2026-09-29
 
 - Enero deja de depender de un año escrito manualmente: **“Nuevo año, nueva bitácora”** muestra siempre el año correspondiente al calendario actual.
