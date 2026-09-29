@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.20 · Registro de entrega · coincidencias aproximadas y edición · 2026-09-29
+
+- El escáner mantiene primero la coincidencia exacta de nombre, especialidad y empresa.
+- Cuando no existe coincidencia exacta, busca **posibles alumnos con diferencias pequeñas en el nombre** mediante distancia de edición.
+- Las sugerencias nunca registran una entrega automáticamente: aparece una confirmación con el nombre encontrado y la persona debe indicar si corresponde al alumno.
+- En Data Matrix v4 y v3, una sugerencia sólo se considera si especialidad y empresa siguen coincidiendo; esto reduce falsos positivos entre alumnos con nombres parecidos.
+- La confirmación de una coincidencia se recuerda durante la sesión de escaneo para no preguntar de nuevo por el mismo código; un rechazo tiene un breve enfriamiento para evitar alertas repetidas mientras la cámara sigue viendo el mismo Data Matrix.
+- Se añade acceso directo a **Editar alumno** desde la lista de una semana. La edición existente de Administrar base se conserva y usa el mismo formulario.
+- Se agregan pruebas para el caso de una letra de diferencia y para impedir sugerencias cuando especialidad o empresa no corresponden.
+
 ## 0.50.0-beta.19 · Presentación del proyecto · Parte 5 · 2026-09-28
 
 - Se corrige la carga de iconos de la landing: ahora se renderizan como **SVG inline dentro de React**, sin depender del componente visual de una librería externa en tiempo de ejecución.
