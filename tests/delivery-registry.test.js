@@ -154,15 +154,19 @@ describe("subsistema de registro de entrega", () => {
     );
   });
 
-  it("usa únicamente la escuela como configuración general", () => {
+  it("usa escuela y generación dual como configuración general", () => {
     const context = createRegistryContext({
       school: "CBTis 134",
+      generation: "2025-2028",
       specialty: "Programación",
       semester: "4",
       group: "B",
       company: "COCYTIEG",
     });
-    expect(context).toEqual({ school: "CBTis 134" });
+    expect(context).toEqual({
+      school: "CBTis 134",
+      generation: "2025-2028",
+    });
     expect(contextIsComplete(context)).toBe(true);
   });
 
@@ -294,8 +298,11 @@ describe("subsistema de registro de entrega", () => {
         ],
       }),
     );
-    expect(parsed.schemaVersion).toBe(4);
-    expect(parsed.context).toEqual({ school: "CBTis 134" });
+    expect(parsed.schemaVersion).toBe(5);
+    expect(parsed.context).toEqual({
+      school: "CBTis 134",
+      generation: "",
+    });
     expect(parsed.students[0]).toMatchObject({
       name: "Alumno de prueba",
       specialty: "Programación",
@@ -319,7 +326,10 @@ describe("subsistema de registro de entrega", () => {
         weeks: [],
       }),
     );
-    expect(parsed.context).toEqual({ school: "CBTis 134" });
+    expect(parsed.context).toEqual({
+      school: "CBTis 134",
+      generation: "",
+    });
     expect(parsed.students[0]).toMatchObject({
       specialty: "Contabilidad",
       company: "ITCH",
