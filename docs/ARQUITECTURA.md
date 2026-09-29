@@ -15,6 +15,9 @@ Sitio estático compilado con Vite. La corrección beta.2 restaura el HTML, CSS 
 | `src/services/recover-original.js` | Recuperación de datos de beta.1 |
 | `src/services/rare-notification.jsx` | Carga diferida de Sileo para acciones explícitas y avisos breves |
 | `faq/index.html` | FAQ con buscador, ejemplos y notas de versión |
+| `presentacion/index.html` | Landing pública de presentación del proyecto |
+| `src/presentation.css` | Diseño responsive y visual de la landing |
+| `src/presentation.js` | Animaciones discretas y registro del service worker en la landing |
 | `registro-entrega/index.html` | Entrada independiente del Subsistema de registro de entrega |
 | `src/components/DeliveryRegistry.jsx` | Flujo React del registro: configuración, alumnos, semanas, tutorial y escáner |
 | `src/services/delivery-registry.js` | Esquema local, migraciones, Data Matrix, estados, JSON portátil y CSV |
@@ -99,3 +102,12 @@ El modo `global` reutiliza el mismo modelo de semanas, pero construye `globalRow
 El renderizado usa A4 horizontal. La matriz se divide en bloques de hasta 15 semanas por ancho y 14 alumnos por alto. El escritor PDF acepta ahora dimensiones por página, de forma que los reportes verticales existentes y el reporte global horizontal pueden convivir en el mismo servicio.
 
 Cada celda usa únicamente el estado resumido; el detalle de fecha/hora permanece disponible en los otros dos formatos. El primer campo conserva mini Blobatar, alumno, especialidad y empresa.
+
+
+## Landing de presentación · Beta 0.50.0-beta.15
+
+`presentacion/index.html` es una entrada Vite independiente y no monta React. Su objetivo es presentar el proyecto sin mezclarlo con la interfaz operativa del generador.
+
+El hero usa `public/Assets/asset_landing.png`; la sección de Data Matrix usa `public/Assets/Asset_cont_matrix.png`. La landing explica los tres frentes del ecosistema (generador, registro de entregas y sistema complementario de constancias), el flujo de alumno a Vinculación y un proceso sugerido de incorporación por plantel.
+
+`src/presentation.css` usa tipografía del sistema, superficies sobrias, safe areas y `prefers-reduced-motion`. `src/presentation.js` sólo gestiona aparición progresiva y el registro del service worker; no captura datos del visitante.
