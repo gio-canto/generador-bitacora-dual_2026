@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ArrowRight,
@@ -26,6 +26,8 @@ import {
   Users,
 } from "@phosphor-icons/react";
 import "./presentation.css";
+
+document.documentElement.classList.add("js", "presentation-react");
 
 const REPO = "https://github.com/gio-canto/generador-bitacora-dual_2026";
 const CONTRIBUTE = REPO + "/blob/main/CONTRIBUTING.md";
@@ -757,13 +759,6 @@ function Presentation() {
   const reducedMotion = useReducedMotion();
   useReveal();
   useScrollMotion(reducedMotion);
-
-  useEffect(() => {
-    document.documentElement.classList.add("js", "presentation-react");
-    return () => {
-      document.documentElement.classList.remove("js", "presentation-react");
-    };
-  }, []);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
