@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.22 · Revisión de bitácoras guardadas · 2026-09-29
+
+- El generador normal incorpora una acción **Revisar** dentro de Registros guardados.
+- La revisión abre una vista de sólo lectura y no reemplaza el borrador ni carga automáticamente la bitácora en el formulario.
+- La vista muestra periodo, alumno, plantel, especialidad, semestre, grupo, empresa, jornadas, estados, horarios, áreas, actividades y responsables.
+- También indica si la firma genérica del alumno estaba activada en ese registro.
+- Desde la revisión se puede elegir **Abrir para editar** cuando sí se desea cargar la bitácora guardada en el formulario.
+- La lista de registros ahora muestra también el nombre del alumno para distinguir mejor semanas similares.
+- Se añade una prueba automatizada que confirma que revisar una bitácora guardada no modifica las jornadas del borrador actual.
+- Se actualizan README, documentación de datos y matriz de pruebas para reflejar el nuevo flujo.
+
 ## 0.50.0-beta.21 · Documentación y adopción institucional · 2026-09-29
 
 - Se reestructura el README para funcionar como portada real del repositorio: propósito, componentes, funciones, privacidad, desarrollo, estructura y rutas de documentación.
