@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.10-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.11-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,15 +13,13 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.10 · Registro de entrega · Parte 10
+## Beta 0.50.0-beta.11 · Registro de entrega · Parte 11
 
-La beta.10 corrige específicamente el error **ZX-205** observado en iPhone/iPad. El problema estaba en que el ciclo de ZXing detenía el escáner ante cualquier excepción que no reconociera como NotFound/Checksum/Format, aunque en Safari algunas de esas excepciones pueden ser transitorias.
+La beta.11 amplía el control manual del registro. Cada alumno puede cambiarse directamente entre **Entregado a tiempo**, **Entregado a destiempo** y **No entregado**. El escaneo por cámara sigue calculando automáticamente el estado según la hora límite; la selección manual permite corregir o capturar excepciones sin depender de ese cálculo.
 
-El registro ahora controla su propio bucle de lectura. Los fotogramas sin código se ignoran normalmente, los fallos temporales de video/canvas se reintentan y un error genérico sólo se reporta después de repetirse varias veces. Incluso después de mostrar el aviso, el lector sigue intentando recuperarse.
+La lista semanal incorpora filtros por **especialidad**, **empresa**, estado y búsqueda de texto. También puede agruparse por especialidad o empresa, mostrando cada grupo con su contador.
 
-También se simplificó la pantalla móvil: cámara más grande, menos texto, controles **Salir / Foto / Terminar** en una sola fila y detalles técnicos plegados.
-
-El diagnóstico por códigos se conserva. Si vuelve a aparecer un error, `ZX-207` indica problemas repetidos capturando fotogramas y `ZX-205` queda reservado para fallos repetidos del decodificador.
+En teléfono se reforzó la navegación: los iconos permanecen visibles, las acciones de semana usan icono + etiqueta compacta y los selectores están preparados para Safari/iPhone sin zoom automático.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
