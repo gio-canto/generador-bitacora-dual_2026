@@ -159,7 +159,6 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect($("studentGenericSignature").checked).toBe(true);
   expect(document.querySelectorAll("#days .day-card")).toHaveLength(0);
 
-  $("#historyDisclosure").open = true;
   const reviewButton = document.querySelector("[data-review]");
   expect(reviewButton).toBeTruthy();
   fireEvent.click(reviewButton);
