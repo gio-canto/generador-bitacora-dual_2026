@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.10 · Registro de entrega · Parte 10 · 2026-09-28
+
+- Se corrige el caso identificado como **ZX-205**: el primer error genérico del ciclo de lectura ya no se considera fatal.
+- Se reemplaza el bucle interno `reader.scan()` de ZXing por un bucle controlado por la aplicación que usa `reader.decode(video)` y puede recuperarse de fallos transitorios de Safari.
+- `NotFoundException`, `ChecksumException`, `FormatException` y mensajes equivalentes se tratan como intentos normales sin código detectado.
+- Los errores de fotograma/canvas de iOS se reintentan varias veces antes de mostrar **ZX-207**.
+- Un error no reconocido debe repetirse tres veces consecutivas antes de mostrarse como **ZX-205** y el lector continúa intentando recuperarse después del aviso.
+- El diseño del escáner en iPhone/iPad se simplifica: cámara más grande, encabezado más corto, barra inferior de una sola fila con **Salir / Foto / Terminar**, resultados ocultos durante el escaneo y errores como tarjeta compacta sobre los controles.
+- Los detalles técnicos del error quedan plegados por defecto para evitar saturar la pantalla pequeña.
+
 ## 0.50.0-beta.9 · Registro de entrega · Parte 9 · 2026-09-28
 
 - El escáner incorpora **códigos de error estables** para identificar en qué etapa falla el flujo: cámara (`CAM-xxx`), vista de video (`VID-xxx`), lector ZXing/BarcodeDetector (`ZX-xxx` / `BD-xxx`) e imagen (`IMG-xxx`).
