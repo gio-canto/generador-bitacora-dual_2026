@@ -1940,7 +1940,7 @@ export default function DeliveryRegistry({ onClose }) {
                   <strong>No se pudo iniciar el lector</strong>
                   <p>{scannerError}</p>
                   <span>
-                    En iPhone o iPad revisa Safari → Configuración del sitio web → Cámara.
+                    En iPhone o iPad revisa que Safari tenga permiso de cámara para este sitio.
                     También puedes fotografiar el Data Matrix y leerlo sin cámara en vivo.
                   </span>
                   <div className="delivery-scanner-error-actions">
