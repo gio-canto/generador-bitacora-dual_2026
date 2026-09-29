@@ -103,6 +103,9 @@ export function startGuide() {
       document.getElementById("student").focus();
       document.getElementById("student").select();
     });
+    window.addEventListener("bitacora-open-pdf-review", () => {
+      showStep(4, true);
+    });
     const welcome = document.getElementById("welcomeDialog"),
       layer = document.getElementById("tourLayer"),
       focus = document.getElementById("tourFocus"),
