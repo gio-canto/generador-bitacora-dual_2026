@@ -641,6 +641,25 @@ export default function DeliveryRegistry({ onClose }) {
     };
   }, [view]);
 
+  useEffect(() => {
+    if (view !== "scanner") return;
+
+    const suspendForIos = () => {
+      if (!document.hidden && document.visibilityState !== "hidden") return;
+      stopCamera();
+      setCameraState("idle");
+      setScannerError("");
+      setScanMessage("Cámara pausada. Toca Activar cámara para continuar.");
+    };
+
+    document.addEventListener("visibilitychange", suspendForIos);
+    window.addEventListener("pagehide", suspendForIos);
+    return () => {
+      document.removeEventListener("visibilitychange", suspendForIos);
+      window.removeEventListener("pagehide", suspendForIos);
+    };
+  }, [view]);
+
 
   const startSetup = () => {
     setContextForm(createRegistryContext(state.context));
