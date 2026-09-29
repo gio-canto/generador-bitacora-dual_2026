@@ -47,9 +47,9 @@ Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regl
 - responsables e instructor;
 - firma genérica;
 - guardar, recargar y reabrir;
-- consultar el historial desde el inicio y comprobar contador/última semana;
+- consultar el historial desde la barra superior y comprobar contador/última semana;
 - revisar un registro guardado sin reemplazar el borrador actual;
-- desde la revisión, abrir explícitamente un registro para editar;
+- desde la revisión, usar **Volver a descargar PDF** y comprobar el salto directo al paso 5;
 - exportar/importar respaldo;
 - descargar PDF.
 
