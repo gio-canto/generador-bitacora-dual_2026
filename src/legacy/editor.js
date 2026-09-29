@@ -2307,12 +2307,14 @@ export function startEditor() {
         event.preventDefault();
         closeRecordReview();
       });
-      $("#recordReviewEdit")?.addEventListener("click", () => {
+      $("#recordReviewPdf")?.addEventListener("click", () => {
         const record = readStore().find(
           (item) => item.id === reviewingRecordId,
         );
         closeRecordReview();
-        if (record) loadRecord(record);
+        if (!record) return;
+        loadRecord(record);
+        window.dispatchEvent(new CustomEvent("bitacora-open-pdf-review"));
       });
       $("#statusClose")?.addEventListener("click", () =>
         $("#statusDialog")?.close(),
