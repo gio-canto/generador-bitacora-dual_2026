@@ -16,8 +16,8 @@ Sitio estático compilado con Vite. La corrección beta.2 restaura el HTML, CSS 
 | `src/services/rare-notification.jsx` | Carga diferida de Sileo para acciones explícitas y avisos breves |
 | `faq/index.html` | FAQ con buscador, ejemplos y notas de versión |
 | `presentacion/index.html` | Landing pública de presentación del proyecto |
-| `src/presentation.css` | Diseño responsive y visual de la landing |
-| `src/presentation.js` | Animaciones discretas y registro del service worker en la landing |
+| `src/presentation.css` | Diseño responsive, estados de movimiento y microinteracciones de la landing |
+| `src/presentation.jsx` | Aplicación React de la landing, iconos Phosphor, animaciones progresivas y registro del service worker |
 | `registro-entrega/index.html` | Entrada independiente del Subsistema de registro de entrega |
 | `src/components/DeliveryRegistry.jsx` | Flujo React del registro: configuración, alumnos, semanas, tutorial y escáner |
 | `src/services/delivery-registry.js` | Esquema local, migraciones, Data Matrix, estados, JSON portátil y CSV |
@@ -110,7 +110,7 @@ Cada celda usa únicamente el estado resumido; el detalle de fecha/hora permanec
 
 El hero usa `public/Assets/asset_landing.png`; la sección de Data Matrix usa `public/Assets/Asset_cont_matrix.png`. La landing explica los tres frentes del ecosistema (generador, registro de entregas y sistema complementario de constancias), el flujo de alumno a Vinculación y un proceso sugerido de incorporación por plantel.
 
-`src/presentation.css` usa tipografía del sistema, superficies sobrias, safe areas y `prefers-reduced-motion`. `src/presentation.js` sólo gestiona aparición progresiva y el registro del service worker; no captura datos del visitante.
+`src/presentation.css` usa tipografía del sistema, superficies sobrias, safe areas y `prefers-reduced-motion`. Desde la beta.18, `src/presentation.jsx` concentra el montaje React, la aparición progresiva y el registro del service worker; no captura datos del visitante.
 
 
 ## Presentación editorial · Beta 0.50.0-beta.16
@@ -125,3 +125,12 @@ El contenido distingue claramente beneficios para alumnos y planteles, muestra l
 La landing incorpora una sección estática de comparación de tiempos con relojes hechos en CSS. Las manecillas usan `@keyframes` únicamente como recurso visual; los valores mostrados son texto explícito y se acompañan de una advertencia de que son aproximaciones orientativas. Con `prefers-reduced-motion`, las manecillas dejan de animarse.
 
 La navegación y los CTA priorizan la guía de contribución. La ruta de contacto con el creador permanece disponible, pero ya no es la acción principal para incorporar una escuela. El contenido deja claro que estudiantes, docentes y planteles pueden modificar catálogos y proponer cambios mediante pull requests.
+
+
+## Landing React e iconografía · Beta 0.50.0-beta.18
+
+`presentacion/index.html` se reduce a un contenedor de montaje. `src/presentation.jsx` renderiza la página mediante React 19 y reutiliza `@phosphor-icons/react`, ya presente como dependencia del proyecto.
+
+La capa React gestiona IntersectionObserver para apariciones progresivas, detección de `prefers-reduced-motion`, progreso de scroll, parallax leve del hero y registro del service worker. No se añade una dependencia externa de animación.
+
+Las microinteracciones se resuelven principalmente con CSS y se desactivan cuando el usuario solicita movimiento reducido.

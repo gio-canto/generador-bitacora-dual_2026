@@ -2,31 +2,40 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 describe("landing de presentación", () => {
-  it("incluye hero, sistemas, Data Matrix e integración institucional", async () => {
+  it("monta la landing con React, iconos y contenido institucional", async () => {
     const html = await readFile("presentacion/index.html", "utf8");
+    const jsx = await readFile("src/presentation.jsx", "utf8");
 
-    expect(html).toContain("Nunca fue tan fácil hacer una bitácora.");
-    expect(html).toContain("../Assets/asset_landing.png");
-    expect(html).toContain("../Assets/Asset_cont_matrix.png");
-    expect(html).toContain("Generador de Bitácora Dual");
-    expect(html).toContain("Registro de entregas");
-    expect(html).toContain("Sistema de gestión y emisión");
-    expect(html).toContain("¿Quieres que tu institución pueda usar este sistema?");
-    expect(html).toContain("pull request");
-    expect(html).toContain("Pedir apoyo al creador");
-    expect(html).toContain("Privacidad.");
-    expect(html).toContain("Open source.");
-    expect(html).toContain("10–20 min");
-    expect(html).toContain("≈ 5 min");
-    expect(html).toContain("1–1.5 h");
-    expect(html).toContain("&lt; 10 min");
-    expect(html).toContain("Tiempos aproximados");
-    expect(html).toContain("Tu escuela puede agregarse al proyecto.");
-    expect(html).toContain("Las aportaciones útiles son bienvenidas.");
-    expect(html).toContain("Colaborar en GitHub");
-    expect(html).toContain("Dar estrella");
-    expect(html).not.toContain('class="brand-mark"');
-    expect(html).toContain('href="../registro-entrega/"');
+    expect(html).toContain('id="presentation-root"');
+    expect(html).toContain("../src/presentation.jsx");
+    expect(jsx).toContain('from "@phosphor-icons/react"');
+    expect(jsx).toContain("createRoot(root).render(<Presentation />)");
+
+    expect(jsx).toContain("Nunca fue tan fácil hacer una bitácora.");
+    expect(jsx).toContain("../Assets/asset_landing.png");
+    expect(jsx).toContain("../Assets/Asset_cont_matrix.png");
+    expect(jsx).toContain("Generador de Bitácora Dual");
+    expect(jsx).toContain("Registro de entregas");
+    expect(jsx).toContain("Sistema de gestión y emisión");
+    expect(jsx).toContain("¿Quieres que tu institución pueda usar este sistema?");
+    expect(jsx).toContain("pull request");
+    expect(jsx).toContain("Pedir apoyo al creador");
+    expect(jsx).toContain("Privacidad.");
+    expect(jsx).toContain("Open source.");
+    expect(jsx).toContain("10–20 min");
+    expect(jsx).toContain("≈ 5 min");
+    expect(jsx).toContain("1–1.5 h");
+    expect(jsx).toContain("&lt; 10 min");
+    expect(jsx).toContain("Tiempos aproximados");
+    expect(jsx).toContain("Tu escuela puede agregarse al proyecto.");
+    expect(jsx).toContain("aportaciones útiles son bienvenidas.");
+    expect(jsx).toContain("Colaborar en GitHub");
+    expect(jsx).toContain("Dar estrella");
+    expect(jsx).toContain("<GitPullRequest");
+    expect(jsx).toContain("<QrCode");
+    expect(jsx).toContain("<ShieldCheck");
+    expect(jsx).toContain("<DeviceMobile");
+    expect(jsx).toContain('"../registro-entrega/"');
   });
 
   it("mantiene la presentación como entrada Vite y recurso offline", async () => {
@@ -37,5 +46,19 @@ describe("landing de presentación", () => {
     expect(sw).toContain('"presentacion"');
     expect(sw).toContain('"./Assets/asset_landing.png"');
     expect(sw).toContain('"./Assets/Asset_cont_matrix.png"');
+  });
+
+  it("incluye animaciones accesibles y movimiento progresivo", async () => {
+    const css = await readFile("src/presentation.css", "utf8");
+    const jsx = await readFile("src/presentation.jsx", "utf8");
+
+    expect(css).toContain("@keyframes clock-spin");
+    expect(css).toContain("@keyframes arrow-breathe");
+    expect(css).toContain("@media(prefers-reduced-motion:reduce)");
+    expect(css).toContain("--scroll-progress");
+    expect(css).toContain("--hero-shift");
+    expect(jsx).toContain("IntersectionObserver");
+    expect(jsx).toContain("requestAnimationFrame");
+    expect(jsx).toContain("prefers-reduced-motion: reduce");
   });
 });

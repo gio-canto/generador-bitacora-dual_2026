@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.17-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.18-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,13 +13,13 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.17 · Presentación del proyecto · Parte 3
+## Beta 0.50.0-beta.18 · Presentación del proyecto · Parte 4
 
-La landing añade una comparación temporal con relojes animados. Como referencia orientativa, presenta **10–20 minutos** para que un alumno elabore una bitácora sin el sistema frente a **≈ 5 minutos** con datos precargados, y **1–1.5 horas** de registro manual para una jornada de recepción frente a **menos de 10 minutos** con el registro automatizado. La propia página aclara que son tiempos aproximados, no un benchmark formal.
+La landing de **[/presentacion/](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/)** ahora está montada con **React 19** y reutiliza `@phosphor-icons/react` para mantener una iconografía coherente con el resto del proyecto.
 
-También refuerza la autonomía del proyecto: un alumno, docente o plantel puede proponer su escuela, empresa, catálogos o mejoras mediante GitHub y pull requests. **Colaborar** pasa a ser el CTA principal; pedir apoyo al creador queda como alternativa secundaria.
+Se añadieron iconos en ventajas para alumnos, beneficios para escuelas, sistemas, Data Matrix, flujo, privacidad, open source y colaboración. También se incorporaron microanimaciones sobrias: parallax suave del hero, progreso de lectura, flechas con movimiento mínimo, estados hover en iconos y una ligera profundidad en la imagen de ejemplo.
 
-Se elimina el monograma B de la navegación y se añaden iconos lineales discretos para mejorar lectura sin volver a una composición recargada.
+Las animaciones siguen siendo progresivas y respetan `prefers-reduced-motion`, por lo que pueden desactivarse completamente desde el sistema operativo.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 

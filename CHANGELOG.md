@@ -1,5 +1,18 @@
 # Notas de versión
 
+## 0.50.0-beta.18 · Presentación del proyecto · Parte 4 · 2026-09-28
+
+- La landing de `/presentacion/` ahora se renderiza con **React 19** en lugar de HTML estático.
+- Se aprovecha `@phosphor-icons/react` para incorporar iconografía consistente en ventajas, sistemas, flujo, Data Matrix, privacidad, colaboración y acciones.
+- Se añaden microanimaciones discretas en iconos, flechas, botones y la imagen de ejemplo, sin volver a un diseño recargado.
+- El hero incorpora un desplazamiento parallax muy suave controlado por scroll.
+- La navegación incluye una barra de progreso de lectura de 2 px.
+- Los relojes conservan su animación y la flecha de comparación añade un movimiento sutil.
+- El flujo Crear → Entregar → Registrar → Reportar ahora muestra iconos específicos por paso.
+- La sección institucional y los apartados de Privacidad/Open source incorporan iconos React reutilizables.
+- Todas las animaciones respetan `prefers-reduced-motion`; en ese modo se desactivan parallax, relojes y microinteracciones.
+- Se elimina el antiguo `src/presentation.js`; la lógica de animación, service worker y accesibilidad vive ahora en `src/presentation.jsx`.
+
 ## 0.50.0-beta.17 · Presentación del proyecto · Parte 3 · 2026-09-28
 
 - Se elimina el monograma **B** de la navegación y se simplifica la identidad visual de la landing.
