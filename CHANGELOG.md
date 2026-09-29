@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.15 · Presentación del proyecto · Parte 1 · 2026-09-28
+
+- Se crea la subpágina **/presentacion/** como landing pública del proyecto Bitácora Dual 2026.
+- El hero usa `public/Assets/asset_landing.png` y el mensaje **“Nunca fue tan fácil hacer una bitácora.”**
+- La página explica el beneficio tanto para alumnos como para Vinculación y presenta el generador, el Registro de entregas y el sistema complementario de gestión y emisión de constancias.
+- Se incorpora una sección dedicada al **Data Matrix**, usando `public/Assets/Asset_cont_matrix.png` como ejemplo real de una bitácora identificada.
+- Se muestra el flujo completo: generar, recibir, controlar y reportar.
+- Se añade una sección específica **“¿Quieres que tu institución pueda usar este sistema?”** con un proceso de integración por plantel: revisar el procedimiento, configurar catálogos y responsables, probar con una generación y documentar el uso.
+- El diseño es responsive, usa safe areas en móvil, animaciones discretas y respeta `prefers-reduced-motion`.
+- La landing se incluye como entrada de Vite y queda precargada junto con sus imágenes en el service worker.
+
 ## 0.50.0-beta.14 · Registro de entrega · Parte 14 · 2026-09-28
 
 - Se añade el modo **Global de todas** dentro de Reporte de entregas.
