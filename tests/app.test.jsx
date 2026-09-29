@@ -44,6 +44,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   ])
     expect($(id), id).toBeTruthy();
   expect($("homeHistoryDisclosure").open).toBe(false);
+  expect($("homeHistoryDisclosure").closest(".topbar")).toBeTruthy();
   expect($("homeHistoryDisclosure").querySelector("summary").textContent).toContain(
     "Bitácoras anteriores",
   );
@@ -182,8 +183,16 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     "Revisé los datos del sistema y corregí errores.",
   );
   expect(document.querySelectorAll("#days .day-card")).toHaveLength(0);
-  fireEvent.click($("recordReviewClose"));
+  expect($("recordReviewPdf").textContent).toContain("Volver a descargar PDF");
+  fireEvent.click($("recordReviewPdf"));
   expect($("recordReviewDialog").open).toBe(false);
+  expect(document.querySelectorAll("#days .day-card")).toHaveLength(4);
+  expect($("student").value).toBe("Alumno de Prueba");
+  expect(
+    document
+      .querySelector('.step-panel[data-step="4"]')
+      .classList.contains("active"),
+  ).toBe(true);
 });
 
 it("mantiene plegada y apagada la firma si ya se presentó y no se activó", async () => {
