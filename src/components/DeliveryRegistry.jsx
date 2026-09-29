@@ -283,8 +283,38 @@ function spreadsheetRowsToStudents(rows) {
 }
 
 function ScanSound({ tone }) {
+  const chimeRef = useRef(null);
+
+  useEffect(() => {
+    const src = location.pathname.includes("/registro-entrega/")
+      ? "../Assets/asset_chime.mp3"
+      : "Assets/asset_chime.mp3";
+    const audio = new Audio(src);
+    audio.preload = "auto";
+    audio.volume = 0.9;
+    chimeRef.current = audio;
+    return () => {
+      audio.pause();
+      chimeRef.current = null;
+    };
+  }, []);
+
   useEffect(() => {
     if (!tone) return;
+
+    if (tone === "ok") {
+      const audio = chimeRef.current;
+      if (!audio) return;
+      try {
+        audio.currentTime = 0;
+        const played = audio.play();
+        played?.catch?.(() => {});
+      } catch {
+        // El registro no depende del audio.
+      }
+      return;
+    }
+
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
@@ -292,22 +322,20 @@ function ScanSound({ tone }) {
       const oscillator = ctx.createOscillator();
       const gain = ctx.createGain();
       oscillator.type = "square";
-      oscillator.frequency.value = tone === "ok" ? 1550 : tone === "seen" ? 760 : 420;
+      oscillator.frequency.value = tone === "seen" ? 760 : 420;
       gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.008);
-      gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        ctx.currentTime + (tone === "ok" ? 0.085 : 0.15),
-      );
+      gain.gain.exponentialRampToValueAtTime(0.1, ctx.currentTime + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
       oscillator.connect(gain);
       gain.connect(ctx.destination);
       oscillator.start();
-      oscillator.stop(ctx.currentTime + (tone === "ok" ? 0.09 : 0.16));
+      oscillator.stop(ctx.currentTime + 0.16);
       oscillator.addEventListener("ended", () => ctx.close());
     } catch {
       // El escaneo sigue funcionando aunque el navegador bloquee audio.
     }
   }, [tone]);
+
   return null;
 }
 
@@ -2252,6 +2280,18 @@ export default function DeliveryRegistry({ onClose }) {
               </div>
 
               <div className="delivery-roster-controls">
+                <label>
+                  <span>Entrega</span>
+                  <select
+                    value={statusFilter}
+                    onChange={(event) => setStatusFilter(event.target.value)}
+                  >
+                    <option value="all">Todos</option>
+                    <option value="entregado">Entregados a tiempo</option>
+                    <option value="entregado_tarde">A destiempo</option>
+                    <option value="no_entregado">No entregados</option>
+                  </select>
+                </label>
                 <label>
                   <span>Especialidad</span>
                   <select
