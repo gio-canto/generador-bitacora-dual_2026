@@ -90,3 +90,12 @@ La vista semanal reutiliza `statusFilter` tanto para las tarjetas-resumen como p
 El renderizado se hace sobre canvas para mantener tipografía, Blobatars, tablas y estados consistentes en navegadores móviles. Cada página se rasteriza como JPEG y un escritor PDF mínimo empaqueta las imágenes en un PDF multipágina A4 sin depender de servicios externos ni de una librería PDF adicional.
 
 El diseño es deliberadamente institucional: fondo blanco, tipografía del sistema, líneas discretas, un único acento azul y colores de estado moderados. El servicio añade fecha de creación, versión, plantel, generación dual, periodo, límite, resumen y numeración de páginas.
+
+
+## Reporte global · Beta 0.50.0-beta.14
+
+El modo `global` reutiliza el mismo modelo de semanas, pero construye `globalRows`: una fila por alumno con un arreglo de estados alineado cronológicamente con las semanas.
+
+El renderizado usa A4 horizontal. La matriz se divide en bloques de hasta 15 semanas por ancho y 14 alumnos por alto. El escritor PDF acepta ahora dimensiones por página, de forma que los reportes verticales existentes y el reporte global horizontal pueden convivir en el mismo servicio.
+
+Cada celda usa únicamente el estado resumido; el detalle de fecha/hora permanece disponible en los otros dos formatos. El primer campo conserva mini Blobatar, alumno, especialidad y empresa.
