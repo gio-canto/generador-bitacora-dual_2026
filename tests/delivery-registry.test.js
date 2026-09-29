@@ -246,7 +246,7 @@ describe("subsistema de registro de entrega", () => {
     });
   });
 
-  it("permite fijar manualmente cualquiera de los tres estados", () => {
+  it("permite fijar manualmente cualquiera de los cuatro estados", () => {
     const student = createStudent({ name: "Alumno manual" });
     let week = createWeek({
       dueAt: "2026-09-30T20:00:00.000Z",
@@ -271,6 +271,19 @@ describe("subsistema de registro de entrega", () => {
     );
     expect(deliveryStatus(week, student.id)).toBe("entregado_tarde");
 
+    week = setDeliveryStatus(
+      week,
+      student.id,
+      "no_aplica",
+      "2026-09-30T18:05:00.000Z",
+      "manual",
+    );
+    expect(deliveryStatus(week, student.id)).toBe("no_aplica");
+    expect(week.deliveries[student.id]).toMatchObject({
+      status: "no_aplica",
+      source: "manual",
+    });
+
     week = setDeliveryStatus(week, student.id, "no_entregado");
     expect(deliveryStatus(week, student.id)).toBe("no_entregado");
     expect(week.deliveries[student.id]).toBeUndefined();
@@ -281,6 +294,7 @@ describe("subsistema de registro de entrega", () => {
       createStudent({ name: "Uno" }),
       createStudent({ name: "Dos" }),
       createStudent({ name: "Tres" }),
+      createStudent({ name: "Cuatro" }),
     ];
     let week = createWeek({
       dueAt: "2026-09-30T20:00:00.000Z",
@@ -297,12 +311,21 @@ describe("subsistema de registro de entrega", () => {
       "2026-09-30T21:00:00.000Z",
       "manual",
     );
+    week = setDeliveryStatus(
+      week,
+      students[3].id,
+      "no_aplica",
+      "2026-09-30T19:10:00.000Z",
+      "manual",
+    );
     expect(weekSummary(week, students)).toMatchObject({
       entregado: 1,
       entregado_tarde: 1,
       no_entregado: 1,
+      no_aplica: 1,
       registered: 2,
-      total: 3,
+      applicable: 3,
+      total: 4,
       percent: 67,
     });
   });
@@ -333,7 +356,7 @@ describe("subsistema de registro de entrega", () => {
         ],
       }),
     );
-    expect(parsed.schemaVersion).toBe(5);
+    expect(parsed.schemaVersion).toBe(6);
     expect(parsed.context).toEqual({
       school: "CBTis 134",
       generation: "",
@@ -343,6 +366,30 @@ describe("subsistema de registro de entrega", () => {
       specialty: "Programación",
       company: "COCYTIEG",
     });
+  });
+
+  it("conserva No aplica al importar un registro", () => {
+    const parsed = parsePortableDeliveryFile(
+      JSON.stringify({
+        schemaVersion: 6,
+        context: { school: "CBTis 134" },
+        students: [{ id: "student-1", name: "Alumno de prueba" }],
+        weeks: [
+          {
+            id: "week-1",
+            label: "Semana 1",
+            deliveries: {
+              "student-1": {
+                status: "no_aplica",
+                registeredAt: "2026-09-30T18:00:00.000Z",
+                source: "manual",
+              },
+            },
+          },
+        ],
+      }),
+    );
+    expect(deliveryStatus(parsed.weeks[0], "student-1")).toBe("no_aplica");
   });
 
   it("conserva datos individuales de archivos antiguos", () => {
