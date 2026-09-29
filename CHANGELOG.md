@@ -1,5 +1,18 @@
 # Notas de versión
 
+## 0.50.0-beta.23 · Historial accesible desde el inicio · 2026-09-29
+
+- Se agrega un acceso compacto **Bitácoras anteriores** directamente debajo del encabezado principal del generador.
+- El bloque está disponible desde que se abre la aplicación, sin tener que avanzar hasta el paso 5.
+- Muestra cuántas bitácoras están guardadas y cuál es la semana guardada más reciente.
+- Al desplegarlo se pueden consultar todas las semanas conservadas en el navegador.
+- Cada registro del acceso inicial incluye **Revisar**, que abre la vista de sólo lectura creada en beta.22.
+- Consultar desde el inicio no modifica ni sustituye la bitácora o borrador que esté actualmente en edición.
+- La administración completa —abrir para editar, duplicar o eliminar— se mantiene en Registros guardados del paso 5.
+- Se reutiliza el mismo renderizador de registros para mantener sincronizados el acceso inicial y el historial de administración.
+- Se amplía la prueba de interfaz para comprobar que el contador, la última semana y la consulta desde inicio se actualizan al guardar.
+- Se actualizan README y documentación de datos y pruebas.
+
 ## 0.50.0-beta.22 · Revisión de bitácoras guardadas · 2026-09-29
 
 - El generador normal incorpora una acción **Revisar** dentro de Registros guardados.
