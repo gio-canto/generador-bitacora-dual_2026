@@ -21,6 +21,7 @@ import {
   UploadSimple,
   Users,
   Info,
+  MinusCircle,
   WarningCircle,
   XCircle,
 } from "@phosphor-icons/react";
@@ -138,6 +139,7 @@ const statusMeta = {
   entregado: { label: "Entregado a tiempo", icon: CheckCircle },
   entregado_tarde: { label: "Entregado a destiempo", icon: Clock },
   no_entregado: { label: "No entregado", icon: XCircle },
+  no_aplica: { label: "No aplica", icon: MinusCircle },
 };
 
 function formatDateTime(value) {
@@ -1393,7 +1395,7 @@ export default function DeliveryRegistry({ onClose }) {
 
     const label = statusMeta[status]?.label || "Estado actualizado";
     notify(
-      status === "no_entregado" ? "info" : "success",
+      ["no_entregado", "no_aplica"].includes(status) ? "info" : "success",
       label,
       student?.name || "",
     );
@@ -1561,7 +1563,12 @@ export default function DeliveryRegistry({ onClose }) {
       );
 
     if (activeWeek) {
-      const order = { no_entregado: 0, entregado_tarde: 1, entregado: 2 };
+      const order = {
+        no_entregado: 0,
+        entregado_tarde: 1,
+        entregado: 2,
+        no_aplica: 3,
+      };
       list = [...list].sort((a, b) => {
         const difference =
           order[deliveryStatus(activeWeek, a.id)] -
@@ -1673,6 +1680,7 @@ export default function DeliveryRegistry({ onClose }) {
               <option value="entregado">Entregado a tiempo</option>
               <option value="entregado_tarde">Entregado a destiempo</option>
               <option value="no_entregado">No entregado</option>
+              <option value="no_aplica">No aplica</option>
             </select>
           </label>
         </div>
@@ -2235,7 +2243,7 @@ export default function DeliveryRegistry({ onClose }) {
                           </div>
                         </div>
                         <b>
-                          {summary.registered}/{summary.total}
+                          {summary.registered}/{summary.applicable}
                         </b>
                       </button>
                     );
@@ -2387,7 +2395,7 @@ export default function DeliveryRegistry({ onClose }) {
             </section>
 
             <section className="delivery-stat-row">
-              {["entregado", "entregado_tarde", "no_entregado"].map(
+              {["entregado", "entregado_tarde", "no_entregado", "no_aplica"].map(
                 (status) => {
                   const meta = statusMeta[status];
                   return (
@@ -2417,7 +2425,10 @@ export default function DeliveryRegistry({ onClose }) {
               <div>
                 <strong>{activeSummary.percent}% registrado</strong>
                 <span>
-                  {activeSummary.registered} de {activeSummary.total} alumnos
+                  {activeSummary.registered} de {activeSummary.applicable} alumnos que aplican
+                  {activeSummary.no_aplica
+                    ? " · " + activeSummary.no_aplica + " no aplica"
+                    : ""}
                 </span>
               </div>
               <div>
@@ -2468,6 +2479,7 @@ export default function DeliveryRegistry({ onClose }) {
                     <option value="entregado">Entregados a tiempo</option>
                     <option value="entregado_tarde">A destiempo</option>
                     <option value="no_entregado">No entregados</option>
+                    <option value="no_aplica">No aplica</option>
                   </select>
                 </label>
                 <label>
