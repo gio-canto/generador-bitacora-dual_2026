@@ -71,3 +71,13 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Agrupar por especialidad y por empresa y revisar contadores.
 - En iPhone, comprobar que los iconos de la barra superior permanecen visibles por debajo de 520 px.
 - En la vista semanal móvil, comprobar que Semanas, CSV, Cerrar/Reabrir y Escanear muestran icono y no se superponen.
+
+
+## Filtro de estado y chime · Beta 0.50.0-beta.12
+
+- Seleccionar Todos, Entregados a tiempo, A destiempo y No entregados desde el filtro Entrega.
+- Confirmar que las tarjetas-resumen y el selector actualizan el mismo filtro.
+- Combinar el estado con especialidad, empresa, búsqueda y agrupación.
+- Escanear una entrega válida y comprobar que reproduce `asset_chime.mp3`.
+- Confirmar que repetido y no coincide no reproducen el chime de éxito.
+- Tras una primera carga, probar el registro con la caché del service worker y verificar que el chime sigue disponible.

@@ -10,6 +10,7 @@ const core = [
   "./",
   "./index.html",
   "./Assets/Edu.png",
+  "./Assets/asset_chime.mp3",
   "./licenses/nspell.txt",
   "./licenses/dictionary-es.txt",
   ...pagePaths,
@@ -20,6 +21,7 @@ const core = [
 const hash = createHash("sha256");
 for (const f of [
   "dist/index.html",
+  "dist/Assets/asset_chime.mp3",
   ...staticPages.map((page) => `dist/${page}/index.html`),
   "dist/licenses/nspell.txt",
   "dist/licenses/dictionary-es.txt",

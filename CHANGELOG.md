@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.12 · Registro de entrega · Parte 12 · 2026-09-28
+
+- La barra de filtros añade un selector explícito de **Entrega** con: Todos, Entregados a tiempo, A destiempo y No entregados.
+- El filtro de entrega se puede combinar con especialidad, empresa, búsqueda y agrupación.
+- Las tarjetas-resumen de los tres estados siguen funcionando como accesos rápidos y permanecen sincronizadas con el mismo filtro.
+- El sonido de una lectura válida deja de usar el tono sintetizado y utiliza `public/Assets/asset_chime.mp3`.
+- Los avisos de repetido y no coincide conservan sonidos diferenciados para no confundirlos con una entrega aceptada.
+- El chime se precarga al abrir el registro y se añade a la caché del service worker para que también esté disponible después de la primera carga.
+- Los cuatro filtros se reorganizan como 4 columnas en escritorio, 2 × 2 en móvil intermedio y una sola columna en iPhone estrecho.
+
 ## 0.50.0-beta.11 · Registro de entrega · Parte 11 · 2026-09-28
 
 - Los tres estados pueden fijarse también de forma manual por alumno: **Entregado a tiempo**, **Entregado a destiempo** y **No entregado**.
