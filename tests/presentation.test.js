@@ -28,6 +28,12 @@ describe("landing de presentación", () => {
     expect(jsx).toContain("1–1.5 h");
     expect(jsx).toContain("&lt; 10 min");
     expect(jsx).toContain("Tiempos aproximados");
+    expect(jsx).toContain("Lo que dicen quienes lo usan");
+    expect(jsx).toContain("Wuendy G.");
+    expect(jsx).toContain("Alumna del Sistema Dual");
+    expect(jsx).toContain("CBTis 134");
+    expect(jsx).toContain("corregir mis faltas ortográficas");
+    expect(jsx).toContain("<TestimonialsSection />");
     expect(jsx).toContain("Tu escuela puede agregarse al proyecto.");
     expect(jsx).toContain("aportaciones útiles son bienvenidas.");
     expect(jsx).toContain("Colaborar en GitHub");
