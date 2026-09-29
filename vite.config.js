@@ -13,6 +13,7 @@ export default defineConfig({
         terms: "terms/index.html",
         accessibility: "accessibility/index.html",
         acknowledgements: "acknowledgements/index.html",
+        presentation: "presentacion/index.html",
         deliveryRegistry: "registro-entrega/index.html",
       },
     },
