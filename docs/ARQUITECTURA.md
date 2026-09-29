@@ -74,3 +74,10 @@ La aplicación ejecuta ahora su propio loop con `reader.decode(video)`. `scanner
 La vista semanal mantiene el estado automático generado por cámara, pero permite una corrección explícita mediante `setDeliveryStatus()`. Los valores manuales reutilizan los estados existentes (`entregado`, `entregado_tarde`, `no_entregado`) y marcan el origen como `manual`; `no_entregado` elimina el registro de entrega.
 
 La lista semanal aplica búsqueda, estado, especialidad y empresa antes de agrupar. La agrupación es sólo de presentación y puede hacerse por especialidad o empresa sin modificar el esquema persistente.
+
+
+## Filtro de entrega y sonido de lectura · Beta 0.50.0-beta.12
+
+La vista semanal reutiliza `statusFilter` tanto para las tarjetas-resumen como para el selector explícito de Entrega. De esta forma ambos controles permanecen sincronizados y el filtro puede combinarse con especialidad, empresa, texto y agrupación sin duplicar lógica.
+
+`ScanSound` reproduce `Assets/asset_chime.mp3` únicamente para una lectura aceptada (`tone === "ok"`). Repetidos y lecturas no coincidentes conservan tonos sintetizados distintos. El archivo de chime se incluye en el núcleo del service worker para disponibilidad posterior sin conexión.
