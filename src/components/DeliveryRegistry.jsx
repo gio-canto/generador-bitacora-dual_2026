@@ -44,6 +44,74 @@ import {
 import { notify } from "../services/rare-notification.jsx";
 import "../delivery-registry.css";
 
+const ZXING_SOURCES = [
+  "https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js",
+  "https://unpkg.com/@zxing/browser@0.2.1/umd/zxing-browser.min.js",
+];
+
+let zxingLoadPromise = null;
+
+function loadExternalScript(src, timeout = 8000) {
+  return new Promise((resolve, reject) => {
+    const existing = [...document.scripts].find((script) => script.src === src);
+    if (existing?.dataset.loaded === "true") {
+      resolve();
+      return;
+    }
+
+    const script = existing || document.createElement("script");
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("El lector tardó demasiado en cargar."));
+    }, timeout);
+
+    const cleanup = () => {
+      clearTimeout(timer);
+      script.removeEventListener("load", onLoad);
+      script.removeEventListener("error", onError);
+    };
+    const onLoad = () => {
+      script.dataset.loaded = "true";
+      cleanup();
+      resolve();
+    };
+    const onError = () => {
+      cleanup();
+      if (!existing) script.remove();
+      reject(new Error("No se pudo cargar el lector Data Matrix."));
+    };
+
+    script.addEventListener("load", onLoad, { once: true });
+    script.addEventListener("error", onError, { once: true });
+    if (!existing) {
+      script.src = src;
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  });
+}
+
+async function ensureZxingBrowser() {
+  if (window.ZXingBrowser) return window.ZXingBrowser;
+  if (!zxingLoadPromise) {
+    zxingLoadPromise = (async () => {
+      for (const src of ZXING_SOURCES) {
+        try {
+          await loadExternalScript(src);
+          if (window.ZXingBrowser) return window.ZXingBrowser;
+        } catch {
+          // Prueba el siguiente origen.
+        }
+      }
+      throw new Error("No se pudo cargar ZXing Browser.");
+    })().catch((error) => {
+      zxingLoadPromise = null;
+      throw error;
+    });
+  }
+  return zxingLoadPromise;
+}
+
 const statusMeta = {
   entregado: { label: "Entregado", icon: CheckCircle },
   entregado_tarde: { label: "Entregado a destiempo", icon: Clock },
@@ -465,24 +533,159 @@ export default function DeliveryRegistry({ onClose }) {
     );
   };
 
+  const attachStreamToVideo = async (video, stream) => {
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.setAttribute("muted", "");
+    video.muted = true;
+    video.autoplay = true;
+
+    await new Promise((resolve, reject) => {
+      let settled = false;
+      const finish = (error) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        video.removeEventListener("loadedmetadata", check);
+        video.removeEventListener("canplay", check);
+        video.removeEventListener("playing", check);
+        if (error) reject(error);
+        else resolve();
+      };
+      const check = () => {
+        if (
+          video.srcObject === stream &&
+          video.readyState >= 2 &&
+          video.videoWidth > 0 &&
+          video.videoHeight > 0
+        )
+          finish();
+      };
+      const timer = setTimeout(
+        () => finish(new Error("La vista de cámara no recibió video.")),
+        8000,
+      );
+
+      // Los listeners se registran antes de asignar srcObject. En Safari el
+      // evento loadedmetadata puede ocurrir antes de que video.play() resuelva.
+      video.addEventListener("loadedmetadata", check);
+      video.addEventListener("canplay", check);
+      video.addEventListener("playing", check);
+      video.srcObject = stream;
+
+      const playResult = video.play();
+      if (playResult?.catch)
+        playResult.catch((error) => finish(error));
+
+      check();
+    });
+  };
+
+  const startLiveDecoder = async (video) => {
+    let ZX = window.ZXingBrowser;
+    if (!ZX) ZX = await ensureZxingBrowser();
+
+    const Reader =
+      ZX?.BrowserDatamatrixCodeReader || ZX?.BrowserMultiFormatReader;
+
+    if (Reader) {
+      const options = {
+        delayBetweenScanAttempts: 90,
+        delayBetweenScanSuccess: 220,
+        tryPlayVideoTimeout: 8000,
+      };
+      const reader = ZX.BrowserDatamatrixCodeReader
+        ? new ZX.BrowserDatamatrixCodeReader(undefined, options)
+        : new ZX.BrowserMultiFormatReader(undefined, options);
+
+      if (
+        !ZX.BrowserDatamatrixCodeReader &&
+        ZX.BarcodeFormat?.DATA_MATRIX !== undefined
+      )
+        reader.possibleFormats = [ZX.BarcodeFormat.DATA_MATRIX];
+
+      scanControls.current = reader.scan(video, (result, error) => {
+        if (result) {
+          scanProcessorRef.current?.(
+            result.getText?.() || result.text || "",
+            result.getResultPoints?.() || [],
+          );
+          return;
+        }
+
+        const errorName = String(
+          error?.name || error?.constructor?.name || "",
+        );
+        if (
+          error &&
+          errorName &&
+          !/NotFound|Checksum|Format/i.test(errorName)
+        ) {
+          setScannerError(
+            "La cámara sigue activa, pero el decodificador encontró un problema: " +
+              (error?.message || errorName),
+          );
+        }
+      });
+      return true;
+    }
+
+    if ("BarcodeDetector" in window) {
+      const formats = await window.BarcodeDetector.getSupportedFormats?.();
+      if (formats && !formats.includes("data_matrix"))
+        return false;
+
+      const detector = new window.BarcodeDetector({
+        formats: ["data_matrix"],
+      });
+      const loop = async () => {
+        if (!cameraStreamRef.current) return;
+        try {
+          const results = await detector.detect(video);
+          results.forEach((result) => {
+            const b = result.boundingBox;
+            scanProcessorRef.current?.(
+              result.rawValue,
+              b
+                ? [
+                    { x: b.x, y: b.y },
+                    { x: b.x + b.width, y: b.y + b.height },
+                  ]
+                : [],
+            );
+          });
+        } catch {
+          // Un fotograma sin lectura no detiene el escáner.
+        }
+        nativeFrameRef.current = requestAnimationFrame(loop);
+      };
+      loop();
+      return true;
+    }
+
+    return false;
+  };
+
   const startCamera = async () => {
     if (cameraState === "starting") return;
     stopCamera();
     setScannerError("");
     setCameraState("starting");
-    setScanMessage("Preparando cámara…");
+    setScanMessage("Solicitando cámara…");
 
     let stream = null;
     try {
+      if (!window.isSecureContext)
+        throw new Error("La cámara requiere una conexión HTTPS segura.");
       if (!navigator.mediaDevices?.getUserMedia)
         throw new Error("Este navegador no ofrece acceso compatible a la cámara.");
 
-      // En iOS el permiso funciona de forma más fiable si getUserMedia se
-      // inicia directamente desde el toque del usuario y con constraints simples.
+      // Pedimos la cámara antes de cargar cualquier otra cosa para conservar el
+      // gesto del usuario en Safari/iOS.
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           audio: false,
-          video: { facingMode: { ideal: "environment" } },
+          video: { facingMode: "environment" },
         });
       } catch (firstError) {
         const name = String(firstError?.name || "");
@@ -492,6 +695,7 @@ export default function DeliveryRegistry({ onClose }) {
           )
         )
           throw firstError;
+
         stream = await navigator.mediaDevices.getUserMedia({
           audio: false,
           video: true,
@@ -502,119 +706,32 @@ export default function DeliveryRegistry({ onClose }) {
       const video = videoRef.current;
       if (!video) throw new Error("No se encontró la vista de cámara.");
 
-      video.setAttribute("playsinline", "");
-      video.setAttribute("webkit-playsinline", "");
-      video.muted = true;
-      video.autoplay = true;
-      video.srcObject = stream;
-      await video.play();
+      setScanMessage("Iniciando vista de cámara…");
+      await attachStreamToVideo(video, stream);
 
-      if (!video.videoWidth || !video.videoHeight) {
-        await new Promise((resolve, reject) => {
-          const timer = setTimeout(
-            () => reject(new Error("La cámara tardó demasiado en iniciar.")),
-            6000,
+      // Desde este punto la cámara ya está funcionando. Un fallo del lector no
+      // debe volver a apagarla, especialmente en Safari.
+      setCameraState("ready");
+      setScanMessage("Cámara lista. Preparando lector…");
+
+      try {
+        const decoderReady = await startLiveDecoder(video);
+        if (decoderReady) {
+          setScannerError("");
+          setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
+        } else {
+          setScannerError(
+            "La cámara está activa, pero este navegador no pudo iniciar el decodificador Data Matrix. Prueba Leer imagen.",
           );
-          const ready = () => {
-            clearTimeout(timer);
-            resolve();
-          };
-          video.addEventListener("loadedmetadata", ready, { once: true });
-        });
+          setScanMessage("Cámara activa · lector no disponible.");
+        }
+      } catch (decoderError) {
+        setScannerError(
+          "La cámara está activa, pero el lector Data Matrix no pudo cargarse: " +
+            (decoderError?.message || "error desconocido"),
+        );
+        setScanMessage("Cámara activa · lector no disponible.");
       }
-
-      await new Promise((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(resolve)),
-      );
-
-      const ZX = window.ZXingBrowser;
-      const Reader =
-        ZX?.BrowserDatamatrixCodeReader || ZX?.BrowserMultiFormatReader;
-
-      if (Reader) {
-        const options = {
-          delayBetweenScanAttempts: 90,
-          delayBetweenScanSuccess: 220,
-          tryPlayVideoTimeout: 8000,
-        };
-        const reader = ZX.BrowserDatamatrixCodeReader
-          ? new ZX.BrowserDatamatrixCodeReader(undefined, options)
-          : new ZX.BrowserMultiFormatReader(undefined, options);
-
-        if (
-          !ZX.BrowserDatamatrixCodeReader &&
-          ZX.BarcodeFormat?.DATA_MATRIX !== undefined
-        )
-          reader.possibleFormats = [ZX.BarcodeFormat.DATA_MATRIX];
-
-        // El stream ya está abierto. scan() evita que ZXing vuelva a pedir
-        // la cámara, que es donde Safari/iOS estaba fallando.
-        scanControls.current = reader.scan(video, (result, error) => {
-          if (result) {
-            scanProcessorRef.current?.(
-              result.getText?.() || result.text || "",
-              result.getResultPoints?.() || [],
-            );
-            return;
-          }
-          const errorName = String(
-            error?.name || error?.constructor?.name || "",
-          );
-          if (
-            error &&
-            errorName &&
-            !/NotFound|Checksum|Format/i.test(errorName)
-          ) {
-            setScannerError(
-              error?.message || "El lector se detuvo inesperadamente.",
-            );
-            setCameraState("error");
-          }
-        });
-
-        setCameraState("ready");
-        setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
-        return;
-      }
-
-      if ("BarcodeDetector" in window) {
-        const formats = await window.BarcodeDetector.getSupportedFormats?.();
-        if (formats && !formats.includes("data_matrix"))
-          throw new Error("Este navegador no admite Data Matrix con la cámara.");
-
-        const detector = new window.BarcodeDetector({
-          formats: ["data_matrix"],
-        });
-        const loop = async () => {
-          if (!cameraStreamRef.current) return;
-          try {
-            const results = await detector.detect(video);
-            results.forEach((result) => {
-              const b = result.boundingBox;
-              scanProcessorRef.current?.(
-                result.rawValue,
-                b
-                  ? [
-                      { x: b.x, y: b.y },
-                      { x: b.x + b.width, y: b.y + b.height },
-                    ]
-                  : [],
-              );
-            });
-          } catch {
-            // Un fotograma sin lectura no detiene el escáner.
-          }
-          nativeFrameRef.current = requestAnimationFrame(loop);
-        };
-        setCameraState("ready");
-        setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
-        loop();
-        return;
-      }
-
-      throw new Error(
-        "No se cargó un lector Data Matrix compatible. Usa Leer imagen o recarga la página.",
-      );
     } catch (error) {
       stream?.getTracks?.().forEach((track) => {
         try {
@@ -624,6 +741,8 @@ export default function DeliveryRegistry({ onClose }) {
         }
       });
       if (cameraStreamRef.current === stream) cameraStreamRef.current = null;
+      const video = videoRef.current;
+      if (video?.srcObject === stream) video.srcObject = null;
       setScannerError(cameraErrorMessage(error));
       setCameraState("error");
       setScanMessage("La cámara necesita atención.");
@@ -1877,7 +1996,7 @@ export default function DeliveryRegistry({ onClose }) {
                         : "Usar cámara trasera"}
                   </strong>
                   <span>
-                    Toca el botón para que iPhone o iPad solicite el permiso de cámara.
+                    Safari debe mostrar la vista de cámara inmediatamente después del permiso.
                   </span>
                   <button
                     className="btn primary"
@@ -1945,7 +2064,11 @@ export default function DeliveryRegistry({ onClose }) {
               <div className="delivery-scanner-error" role="alert">
                 <WarningCircle size={22} weight="fill" aria-hidden="true" />
                 <div>
-                  <strong>No se pudo iniciar el lector</strong>
+                  <strong>
+                    {cameraState === "ready"
+                      ? "La cámara está activa, pero el lector falló"
+                      : "No se pudo abrir la cámara"}
+                  </strong>
                   <p>{scannerError}</p>
                   <span>
                     En iPhone o iPad revisa que Safari tenga permiso de cámara para este sitio.
