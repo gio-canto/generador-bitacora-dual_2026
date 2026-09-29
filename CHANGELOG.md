@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.27 · Landing multilingüe · 2026-09-29
+
+- La landing de `/presentacion/` incorpora versiones completas en **español, inglés y alemán** mediante un selector **ES / EN / DE**.
+- El idioma seleccionado se conserva en la URL con `?lang=en` o `?lang=de`, de modo que una versión traducida puede compartirse directamente; español permanece como idioma predeterminado.
+- La traducción se limita deliberadamente a la landing. El generador, el registro de entregas y el resto de los sistemas continúan en español.
+- Al intentar abrir el generador o el registro de entregas desde las versiones inglesa o alemana, aparece un aviso previo que explica que el sistema completo está en español y permite quedarse en la landing o continuar.
+- El selector actualiza también el atributo `lang` del documento y el título de la página.
+- El testimonio de **Wuendy G.** reemplaza el monograma por un **Blobatar** determinista generado a partir de su nombre.
+- En inglés y alemán, el testimonio se muestra traducido y se indica expresamente que es una traducción del español.
+- Se amplían las pruebas de la landing para cubrir idiomas, parámetros de URL, aviso previo y Blobatar.
+
 ## 0.50.0-beta.26 · Opiniones de estudiantes · 2026-09-29
 
 - La landing de `/presentacion/` incorpora una nueva sección **Lo que dicen quienes lo usan**.
