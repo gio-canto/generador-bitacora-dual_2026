@@ -12,6 +12,7 @@ import {
   parseMatrixPayload,
   parsePortableDeliveryFile,
   registerDelivery,
+  setDeliveryStatus,
   statusFromTimestamp,
   weekSummary,
 } from "../src/services/delivery-registry.js";
@@ -204,6 +205,36 @@ describe("subsistema de registro de entrega", () => {
       specialty: "Contabilidad",
       company: "ITCH",
     });
+  });
+
+  it("permite fijar manualmente cualquiera de los tres estados", () => {
+    const student = createStudent({ name: "Alumno manual" });
+    let week = createWeek({
+      dueAt: "2026-09-30T20:00:00.000Z",
+    });
+
+    week = setDeliveryStatus(
+      week,
+      student.id,
+      "entregado",
+      "2026-10-01T10:00:00.000Z",
+      "manual",
+    );
+    expect(deliveryStatus(week, student.id)).toBe("entregado");
+    expect(week.deliveries[student.id].source).toBe("manual");
+
+    week = setDeliveryStatus(
+      week,
+      student.id,
+      "entregado_tarde",
+      "2026-09-30T18:00:00.000Z",
+      "manual",
+    );
+    expect(deliveryStatus(week, student.id)).toBe("entregado_tarde");
+
+    week = setDeliveryStatus(week, student.id, "no_entregado");
+    expect(deliveryStatus(week, student.id)).toBe("no_entregado");
+    expect(week.deliveries[student.id]).toBeUndefined();
   });
 
   it("resume el avance de una semana", () => {
