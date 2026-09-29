@@ -168,6 +168,7 @@ export function scannerDiagnosticSnapshot({
     track: settings,
     zxing: {
       loaded: Boolean(zxing),
+      source: trim(globalThis.__deliveryZxingSource, 180),
       dataMatrixReader: Boolean(zxing?.BrowserDatamatrixCodeReader),
       multiFormatReader: Boolean(zxing?.BrowserMultiFormatReader),
       dataMatrixFormat:
