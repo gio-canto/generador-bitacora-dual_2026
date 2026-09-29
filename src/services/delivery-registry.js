@@ -1,12 +1,13 @@
 import companies from "../data/companies.json";
 
-export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v4";
-export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v3";
+export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v5";
+export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v4";
 export const LEGACY_DELIVERY_KEYS = [
+  "bitacora_dual_delivery_registry_v3",
   "bitacora_dual_delivery_registry_v2",
   "bitacora_dual_delivery_registry_v1",
 ];
-export const DELIVERY_SCHEMA = 4;
+export const DELIVERY_SCHEMA = 5;
 
 const uid = () =>
   globalThis.crypto?.randomUUID?.() ||
@@ -183,6 +184,7 @@ export function parseMatrixPayload(rawValue) {
 export function createRegistryContext(data = {}) {
   return {
     school: clean(data.school),
+    generation: clean(data.generation, 100),
   };
 }
 
@@ -285,6 +287,7 @@ function inferLegacyContext(raw) {
     {};
   return createRegistryContext({
     school: raw?.context?.school || first.school,
+    generation: raw?.context?.generation || "",
   });
 }
 
