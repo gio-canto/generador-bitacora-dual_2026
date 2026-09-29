@@ -13,7 +13,7 @@ describe("landing de presentación", () => {
     expect(html).toContain("Sistema de gestión y emisión");
     expect(html).toContain("¿Quieres que tu institución pueda usar este sistema?");
     expect(html).toContain("pull request");
-    expect(html).toContain("Contactar al creador");
+    expect(html).toContain("Pedir apoyo al creador");
     expect(html).toContain("Privacidad.");
     expect(html).toContain("Open source.");
     expect(html).toContain("10–20 min");
