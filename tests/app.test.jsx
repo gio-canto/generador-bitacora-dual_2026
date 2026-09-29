@@ -37,6 +37,10 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     "studentGenericSignature",
     "studentSignatureSample",
     "studentSignatureDisclosure",
+    "homeHistoryDisclosure",
+    "homeHistoryState",
+    "homeHistoryLatest",
+    "homeRecords",
   ])
     expect($(id), id).toBeTruthy();
   expect($("studentSignatureDisclosure").open).toBe(true);
@@ -149,6 +153,11 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   fireEvent.click($("pdfBtn"));
   await waitFor(()=>expect($("pdfBtn").disabled).toBe(false));
   expect(JSON.parse(localStorage.getItem("bitacora_dual_clean_v3"))).toHaveLength(before+1);
+  expect(document.querySelectorAll("#homeRecords [data-review]")).toHaveLength(
+    before + 1,
+  );
+  expect($("homeHistoryState").textContent).toContain(String(before + 1));
+  expect($("homeHistoryLatest").textContent).toContain("Semana");
   expect($("saveState").textContent).toBe("Guardado");
   expect(
     JSON.parse(localStorage.getItem("bitacora_profile_v1"))
@@ -159,7 +168,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect($("studentGenericSignature").checked).toBe(true);
   expect(document.querySelectorAll("#days .day-card")).toHaveLength(0);
 
-  const reviewButton = document.querySelector("[data-review]");
+  const reviewButton = document.querySelector("#homeRecords [data-review]");
   expect(reviewButton).toBeTruthy();
   fireEvent.click(reviewButton);
   expect($("recordReviewDialog").open).toBe(true);
