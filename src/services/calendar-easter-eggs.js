@@ -50,24 +50,6 @@ const EVENTS = Object.freeze({
     anniversaryFrom: 1810,
     description: () => "Una fecha nacional dentro de la bitácora dual.",
   },
-  "10-01": {
-    id: "mmfd-october-1",
-    kind: "dual",
-    eyebrow: "Modelo Mexicano de Formación Dual",
-    title: "1 de octubre de 2013",
-    anniversaryFrom: 2013,
-    description: () =>
-      "Escuela y empresa, aprendiendo juntas a través del Modelo Mexicano de Formación Dual.",
-  },
-  "10-02": {
-    id: "mmfd-october-2",
-    kind: "dual",
-    eyebrow: "Modelo Mexicano de Formación Dual",
-    title: "2 de octubre de 2013",
-    anniversaryFrom: 2013,
-    description: () =>
-      "La formación continúa dentro y fuera del aula.",
-  },
   "10-31": {
     id: "halloween",
     kind: "halloween",
