@@ -309,6 +309,14 @@ export default function DeliveryRegistry({ onClose }) {
     tutorialOpenRef.current = tutorialOpen;
   }, [tutorialOpen]);
 
+  useEffect(() => {
+    const theme = document.querySelector('meta[name="theme-color"]');
+    if (!theme) return;
+    const previous = theme.getAttribute("content") || "#f5f5f7";
+    theme.setAttribute("content", view === "scanner" ? "#050607" : "#f5f5f7");
+    return () => theme.setAttribute("content", previous);
+  }, [view]);
+
   const showDetection = (kind, box) => {
     setScanTone("");
     requestAnimationFrame(() => setScanTone(kind));
