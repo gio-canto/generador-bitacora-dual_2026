@@ -260,8 +260,11 @@ export default function DeliveryRegistry({ onClose }) {
   const [scanTone, setScanTone] = useState("");
   const [scanBox, setScanBox] = useState(null);
   const [scannerError, setScannerError] = useState("");
+  const [cameraState, setCameraState] = useState("idle");
   const videoRef = useRef(null);
   const scanControls = useRef(null);
+  const cameraStreamRef = useRef(null);
+  const nativeFrameRef = useRef(0);
   const pendingIds = useRef(new Set());
   const scanBoxTimer = useRef(null);
   const tutorialOpenRef = useRef(false);
@@ -307,243 +310,364 @@ export default function DeliveryRegistry({ onClose }) {
   }, [tutorialOpen]);
 
   useEffect(() => {
-    if (view !== "scanner" || !state.weeks.length) return;
-    let disposed = false;
-    let nativeStream = null;
-    let nativeFrame = 0;
-    pendingIds.current = new Set();
-    setScanQueue([]);
-    setScannerError("");
-    setScanMessage("Apunta la cámara al Data Matrix.");
+    const theme = document.querySelector('meta[name="theme-color"]');
+    if (!theme) return;
+    const previous = theme.getAttribute("content") || "#f5f5f7";
+    theme.setAttribute("content", view === "scanner" ? "#050607" : "#f5f5f7");
+    return () => theme.setAttribute("content", previous);
+  }, [view]);
 
-    const showDetection = (kind, box) => {
+  const showDetection = (kind, box) => {
+    setScanTone("");
+    requestAnimationFrame(() => setScanTone(kind));
+    setScanBox({
+      ...(box || { left: 31, top: 26, width: 38, height: 48 }),
+      tone: kind,
+    });
+    clearTimeout(scanBoxTimer.current);
+    scanBoxTimer.current = setTimeout(() => {
+      setScanBox(null);
       setScanTone("");
-      requestAnimationFrame(() => setScanTone(kind));
-      setScanBox({
-        ...(box || { left: 31, top: 26, width: 38, height: 48 }),
-        tone: kind,
-      });
-      clearTimeout(scanBoxTimer.current);
-      scanBoxTimer.current = setTimeout(() => {
-        setScanBox(null);
-        setScanTone("");
-      }, 900);
-    };
+    }, 900);
+  };
 
-    const processValue = (rawValue, points) => {
-      if (tutorialOpenRef.current) return;
-      const payload = parseMatrixPayload(rawValue);
-      const student = findStudentByMatrixValue(state.students, rawValue);
-      if (!student) {
-        setScanMessage("Código leído, pero el alumno no coincide con la base.");
-        showDetection("error");
-        return;
-      }
+  const processScanValue = (rawValue, points) => {
+    if (tutorialOpenRef.current) return;
+    const payload = parseMatrixPayload(rawValue);
+    const student = findStudentByMatrixValue(state.students, rawValue);
+    if (!student) {
+      setScanMessage("Código leído, pero el alumno no coincide con la base.");
+      showDetection("error");
+      return;
+    }
 
-      const targetWeek = findWeekByMatrixValue(
-        state.weeks,
-        rawValue,
-        activeWeekId,
-      );
-      if (!targetWeek) {
-        const period = matrixPeriodLabel(rawValue);
-        setScanMessage(
-          period
-            ? "No existe una semana para " + period + "."
-            : "Este código antiguo necesita una semana seleccionada.",
-        );
-        showDetection("error");
-        return;
-      }
-
-      if (targetWeek.deliveries?.[student.id]) {
-        setScanMessage(
-          student.name + " ya estaba registrado en " + targetWeek.label + ".",
-        );
-        showDetection("seen");
-        return;
-      }
-
-      const pendingKey = targetWeek.id + ":" + student.id;
-      if (pendingIds.current.has(pendingKey)) {
-        setScanMessage(
-          student.name + " ya fue detectado para " + targetWeek.label + ".",
-        );
-        showDetection("seen");
-        return;
-      }
-
-      pendingIds.current.add(pendingKey);
-      const at = new Date().toISOString();
-      const status = statusFromTimestamp(targetWeek, at);
-      setScanQueue((current) => [
-        ...current,
-        {
-          studentId: student.id,
-          name: student.name,
-          at,
-          weekId: targetWeek.id,
-          weekLabel: targetWeek.label,
-          startDate: targetWeek.startDate,
-          endDate: targetWeek.endDate,
-          status,
-          matrixVersion: payload.version,
-        },
-      ]);
+    const targetWeek = findWeekByMatrixValue(
+      state.weeks,
+      rawValue,
+      activeWeekId,
+    );
+    if (!targetWeek) {
+      const period = matrixPeriodLabel(rawValue);
       setScanMessage(
-        student.name +
-          " → " +
-          targetWeek.label +
-          (status === "entregado_tarde" ? " · A destiempo" : ""),
+        period
+          ? "No existe una semana para " + period + "."
+          : "Este código antiguo necesita una semana seleccionada.",
       );
+      showDetection("error");
+      return;
+    }
 
-      const box = resultBoxFromPoints(videoRef.current, points);
-      showDetection("ok", box);
-    };
+    if (targetWeek.deliveries?.[student.id]) {
+      setScanMessage(
+        student.name + " ya estaba registrado en " + targetWeek.label + ".",
+      );
+      showDetection("seen");
+      return;
+    }
 
-    scanProcessorRef.current = processValue;
+    const pendingKey = targetWeek.id + ":" + student.id;
+    if (pendingIds.current.has(pendingKey)) {
+      setScanMessage(
+        student.name + " ya fue detectado para " + targetWeek.label + ".",
+      );
+      showDetection("seen");
+      return;
+    }
 
-    async function start() {
-      const video = videoRef.current;
-      if (!video) return;
+    pendingIds.current.add(pendingKey);
+    const at = new Date().toISOString();
+    const status = statusFromTimestamp(targetWeek, at);
+    setScanQueue((current) => [
+      ...current,
+      {
+        studentId: student.id,
+        name: student.name,
+        at,
+        weekId: targetWeek.id,
+        weekLabel: targetWeek.label,
+        startDate: targetWeek.startDate,
+        endDate: targetWeek.endDate,
+        status,
+        matrixVersion: payload.version,
+      },
+    ]);
+    setScanMessage(
+      student.name +
+        " → " +
+        targetWeek.label +
+        (status === "entregado_tarde" ? " · A destiempo" : ""),
+    );
+
+    const box = resultBoxFromPoints(videoRef.current, points);
+    showDetection("ok", box);
+  };
+
+  scanProcessorRef.current =
+    view === "scanner" ? processScanValue : null;
+
+  const stopCamera = () => {
+    const controls = scanControls.current;
+    scanControls.current = null;
+    if (controls?.stop) {
       try {
-        const ZX = window.ZXingBrowser;
-        const Reader =
-          ZX?.BrowserDatamatrixCodeReader || ZX?.BrowserMultiFormatReader;
-
-        if (Reader) {
-          const options = {
-            delayBetweenScanAttempts: 120,
-            delayBetweenScanSuccess: 220,
-            tryPlayVideoTimeout: 8000,
-          };
-          const reader = ZX.BrowserDatamatrixCodeReader
-            ? new ZX.BrowserDatamatrixCodeReader(undefined, options)
-            : new ZX.BrowserMultiFormatReader(undefined, options);
-          if (
-            !ZX.BrowserDatamatrixCodeReader &&
-            ZX.BarcodeFormat?.DATA_MATRIX !== undefined
-          )
-            reader.possibleFormats = [ZX.BarcodeFormat.DATA_MATRIX];
-
-          const controls = await reader.decodeFromConstraints(
-            {
-              audio: false,
-              video: {
-                facingMode: { ideal: "environment" },
-                width: { ideal: 1920 },
-                height: { ideal: 1080 },
-              },
-            },
-            video,
-            (result, error) => {
-              if (disposed) return;
-              if (result) {
-                processValue(
-                  result.getText?.() || result.text || "",
-                  result.getResultPoints?.() || [],
-                );
-                return;
-              }
-              const errorName = String(error?.name || error?.constructor?.name || "");
-              if (
-                error &&
-                errorName &&
-                !/NotFound|Checksum|Format/i.test(errorName)
-              ) {
-                setScannerError(
-                  error?.message || "El lector se detuvo inesperadamente.",
-                );
-              }
-            },
-          );
-
-          const track = video.srcObject?.getVideoTracks?.()[0];
-          if (track?.getCapabilities && track?.applyConstraints) {
-            try {
-              const capabilities = track.getCapabilities();
-              if (Array.isArray(capabilities.focusMode) &&
-                  capabilities.focusMode.includes("continuous")) {
-                await track.applyConstraints({
-                  advanced: [{ focusMode: "continuous" }],
-                });
-              }
-            } catch {
-              // El enfoque automático es una mejora, no un requisito.
-            }
-          }
-
-          setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
-          if (disposed) controls?.stop?.();
-          else scanControls.current = controls;
-          return;
-        }
-
-        if ("BarcodeDetector" in window) {
-          nativeStream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-              facingMode: { ideal: "environment" },
-              width: { ideal: 1920 },
-              height: { ideal: 1080 },
-            },
-          });
-          video.srcObject = nativeStream;
-          await video.play();
-          const formats = await window.BarcodeDetector.getSupportedFormats?.();
-          if (formats && !formats.includes("data_matrix"))
-            throw new Error("Este navegador no admite Data Matrix con la cámara.");
-          const detector = new window.BarcodeDetector({
-            formats: ["data_matrix"],
-          });
-          setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
-          const loop = async () => {
-            if (disposed) return;
-            try {
-              const results = await detector.detect(video);
-              results.forEach((result) => {
-                const b = result.boundingBox;
-                processValue(
-                  result.rawValue,
-                  b
-                    ? [
-                        { x: b.x, y: b.y },
-                        { x: b.x + b.width, y: b.y + b.height },
-                      ]
-                    : [],
-                );
-              });
-            } catch {
-              // Un fotograma sin lectura no detiene el escáner.
-            }
-            nativeFrame = requestAnimationFrame(loop);
-          };
-          loop();
-          return;
-        }
-
-        throw new Error(
-          "No se cargó un lector Data Matrix compatible. Recarga la página e inténtalo de nuevo.",
-        );
-      } catch (error) {
-        setScannerError(
-          error?.message ||
-            "No se pudo abrir la cámara. Revisa el permiso e inténtalo de nuevo.",
-        );
+        const stopped = controls.stop();
+        Promise.resolve(stopped).catch(() => {});
+      } catch {
+        // Safari puede lanzar si el track terminó al cambiar de app.
       }
     }
 
-    start();
+    if (nativeFrameRef.current) {
+      cancelAnimationFrame(nativeFrameRef.current);
+      nativeFrameRef.current = 0;
+    }
+
+    const stream = cameraStreamRef.current;
+    cameraStreamRef.current = null;
+    stream?.getTracks?.().forEach((track) => {
+      try {
+        track.stop();
+      } catch {
+        // El track ya puede estar terminado en iOS.
+      }
+    });
+
+    const video = videoRef.current;
+    if (video) {
+      try {
+        video.pause();
+      } catch {
+        // Sin acción.
+      }
+      try {
+        video.srcObject = null;
+      } catch {
+        video.removeAttribute("src");
+      }
+    }
+  };
+
+  const cameraErrorMessage = (error) => {
+    const name = String(error?.name || "");
+    if (name === "NotAllowedError" || name === "SecurityError")
+      return "Safari no tiene permiso para usar la cámara. Permite la cámara para este sitio y toca Reintentar.";
+    if (name === "NotFoundError" || name === "DevicesNotFoundError")
+      return "No se encontró una cámara disponible en este dispositivo.";
+    if (name === "NotReadableError" || name === "TrackStartError")
+      return "La cámara está ocupada por otra app o pestaña. Ciérrala y vuelve a intentarlo.";
+    if (name === "OverconstrainedError")
+      return "La cámara no aceptó la configuración solicitada. Toca Reintentar.";
+    if (name === "AbortError")
+      return "iPhone o iPad interrumpió el acceso a la cámara. Toca Reintentar.";
+    return (
+      error?.message ||
+      "No se pudo abrir la cámara. Revisa el permiso e inténtalo de nuevo."
+    );
+  };
+
+  const startCamera = async () => {
+    if (cameraState === "starting") return;
+    stopCamera();
+    setScannerError("");
+    setCameraState("starting");
+    setScanMessage("Preparando cámara…");
+
+    let stream = null;
+    try {
+      if (!navigator.mediaDevices?.getUserMedia)
+        throw new Error("Este navegador no ofrece acceso compatible a la cámara.");
+
+      // En iOS el permiso funciona de forma más fiable si getUserMedia se
+      // inicia directamente desde el toque del usuario y con constraints simples.
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: { ideal: "environment" } },
+        });
+      } catch (firstError) {
+        const name = String(firstError?.name || "");
+        if (
+          !["OverconstrainedError", "NotFoundError", "DevicesNotFoundError"].includes(
+            name,
+          )
+        )
+          throw firstError;
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: true,
+        });
+      }
+
+      cameraStreamRef.current = stream;
+      const video = videoRef.current;
+      if (!video) throw new Error("No se encontró la vista de cámara.");
+
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
+      video.muted = true;
+      video.autoplay = true;
+      video.srcObject = stream;
+      await video.play();
+
+      if (!video.videoWidth || !video.videoHeight) {
+        await new Promise((resolve, reject) => {
+          const timer = setTimeout(
+            () => reject(new Error("La cámara tardó demasiado en iniciar.")),
+            6000,
+          );
+          const ready = () => {
+            clearTimeout(timer);
+            resolve();
+          };
+          video.addEventListener("loadedmetadata", ready, { once: true });
+        });
+      }
+
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      );
+
+      const ZX = window.ZXingBrowser;
+      const Reader =
+        ZX?.BrowserDatamatrixCodeReader || ZX?.BrowserMultiFormatReader;
+
+      if (Reader) {
+        const options = {
+          delayBetweenScanAttempts: 90,
+          delayBetweenScanSuccess: 220,
+          tryPlayVideoTimeout: 8000,
+        };
+        const reader = ZX.BrowserDatamatrixCodeReader
+          ? new ZX.BrowserDatamatrixCodeReader(undefined, options)
+          : new ZX.BrowserMultiFormatReader(undefined, options);
+
+        if (
+          !ZX.BrowserDatamatrixCodeReader &&
+          ZX.BarcodeFormat?.DATA_MATRIX !== undefined
+        )
+          reader.possibleFormats = [ZX.BarcodeFormat.DATA_MATRIX];
+
+        // El stream ya está abierto. scan() evita que ZXing vuelva a pedir
+        // la cámara, que es donde Safari/iOS estaba fallando.
+        scanControls.current = reader.scan(video, (result, error) => {
+          if (result) {
+            scanProcessorRef.current?.(
+              result.getText?.() || result.text || "",
+              result.getResultPoints?.() || [],
+            );
+            return;
+          }
+          const errorName = String(
+            error?.name || error?.constructor?.name || "",
+          );
+          if (
+            error &&
+            errorName &&
+            !/NotFound|Checksum|Format/i.test(errorName)
+          ) {
+            setScannerError(
+              error?.message || "El lector se detuvo inesperadamente.",
+            );
+            setCameraState("error");
+          }
+        });
+
+        setCameraState("ready");
+        setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
+        return;
+      }
+
+      if ("BarcodeDetector" in window) {
+        const formats = await window.BarcodeDetector.getSupportedFormats?.();
+        if (formats && !formats.includes("data_matrix"))
+          throw new Error("Este navegador no admite Data Matrix con la cámara.");
+
+        const detector = new window.BarcodeDetector({
+          formats: ["data_matrix"],
+        });
+        const loop = async () => {
+          if (!cameraStreamRef.current) return;
+          try {
+            const results = await detector.detect(video);
+            results.forEach((result) => {
+              const b = result.boundingBox;
+              scanProcessorRef.current?.(
+                result.rawValue,
+                b
+                  ? [
+                      { x: b.x, y: b.y },
+                      { x: b.x + b.width, y: b.y + b.height },
+                    ]
+                  : [],
+              );
+            });
+          } catch {
+            // Un fotograma sin lectura no detiene el escáner.
+          }
+          nativeFrameRef.current = requestAnimationFrame(loop);
+        };
+        setCameraState("ready");
+        setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
+        loop();
+        return;
+      }
+
+      throw new Error(
+        "No se cargó un lector Data Matrix compatible. Usa Leer imagen o recarga la página.",
+      );
+    } catch (error) {
+      stream?.getTracks?.().forEach((track) => {
+        try {
+          track.stop();
+        } catch {
+          // Sin acción.
+        }
+      });
+      if (cameraStreamRef.current === stream) cameraStreamRef.current = null;
+      setScannerError(cameraErrorMessage(error));
+      setCameraState("error");
+      setScanMessage("La cámara necesita atención.");
+    }
+  };
+
+  useEffect(() => {
+    if (view !== "scanner") {
+      stopCamera();
+      setCameraState("idle");
+      return;
+    }
+
+    pendingIds.current = new Set();
+    setScanQueue([]);
+    setScannerError("");
+    setScanMessage("Toca Activar cámara para comenzar.");
+    setCameraState("idle");
+
     return () => {
-      disposed = true;
-      scanControls.current?.stop?.();
-      scanControls.current = null;
-      if (nativeFrame) cancelAnimationFrame(nativeFrame);
-      nativeStream?.getTracks?.().forEach((track) => track.stop());
+      stopCamera();
       clearTimeout(scanBoxTimer.current);
-      scanProcessorRef.current = null;
     };
-  }, [view, activeWeekId, state.students, state.weeks]);
+  }, [view]);
+
+  useEffect(() => {
+    if (view !== "scanner") return;
+
+    const suspendForIos = () => {
+      if (!document.hidden && document.visibilityState !== "hidden") return;
+      stopCamera();
+      setCameraState("idle");
+      setScannerError("");
+      setScanMessage("Cámara pausada. Toca Activar cámara para continuar.");
+    };
+
+    document.addEventListener("visibilitychange", suspendForIos);
+    window.addEventListener("pagehide", suspendForIos);
+    return () => {
+      document.removeEventListener("visibilitychange", suspendForIos);
+      window.removeEventListener("pagehide", suspendForIos);
+    };
+  }, [view]);
+
 
   const startSetup = () => {
     setContextForm(createRegistryContext(state.context));
@@ -812,6 +936,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const finishScan = () => {
+    stopCamera();
     let weeks = state.weeks;
     if (scanQueue.length) {
       const grouped = new Map();
@@ -991,7 +1116,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   return (
-    <div className="delivery-app">
+    <div className={"delivery-app" + (view === "scanner" ? " scanner-active" : "")}>
       <ScanSound tone={scanTone} />
       <header className="delivery-topbar">
         <button className="delivery-brand" type="button" onClick={onClose}>
@@ -1008,16 +1133,22 @@ export default function DeliveryRegistry({ onClose }) {
           <button
             className="btn"
             type="button"
+            aria-label="Abrir tutorial"
             onClick={() => {
               setTutorialStep(0);
               setTutorialOpen(true);
             }}
           >
-            Tutorial
+            <Info size={18} />
+            <span className="delivery-action-label">Tutorial</span>
           </button>
-          <label className="btn delivery-file-button">
+          <label
+            className="btn delivery-file-button"
+            aria-label="Abrir archivo de registro"
+            title="Abrir archivo"
+          >
             <UploadSimple size={18} />
-            Abrir archivo
+            <span className="delivery-action-label">Abrir archivo</span>
             <input
               hidden
               type="file"
@@ -1032,6 +1163,8 @@ export default function DeliveryRegistry({ onClose }) {
             <button
               className="btn primary"
               type="button"
+              aria-label="Guardar archivo de registro"
+              title="Guardar archivo"
               onClick={() => {
                 exportDeliveryState(state);
                 notify(
@@ -1042,7 +1175,7 @@ export default function DeliveryRegistry({ onClose }) {
               }}
             >
               <DownloadSimple size={18} />
-              Guardar archivo
+              <span className="delivery-action-label">Guardar archivo</span>
             </button>
           )}
         </div>
@@ -1707,18 +1840,56 @@ export default function DeliveryRegistry({ onClose }) {
                 <span className="delivery-kicker">Escaneo continuo</span>
                 <h2>Clasificación automática por semana</h2>
                 <p>
-                  Puedes mezclar bitácoras de distintas semanas. El Data Matrix
-                  indica el periodo y el sistema registra cada entrega donde corresponde.
+                  Escanea en cualquier orden. En iPhone o iPad, toca Activar cámara
+                  una vez y después pasa las bitácoras frente al lector.
                 </p>
               </div>
               <div className="delivery-scan-counter">
                 <strong>{scanQueue.length}</strong>
-                <span>detectados</span>
+                <span>
+                  {cameraState === "ready"
+                    ? "cámara activa"
+                    : cameraState === "starting"
+                      ? "abriendo cámara"
+                      : "detectados"}
+                </span>
               </div>
             </div>
 
-            <div className="delivery-camera-shell">
-              <video ref={videoRef} playsInline muted />
+            <div className={"delivery-camera-shell camera-" + cameraState}>
+              <video
+                ref={videoRef}
+                playsInline
+                muted
+                autoPlay
+                aria-label="Vista de la cámara para escanear Data Matrix"
+              />
+              {cameraState !== "ready" && (
+                <div className="delivery-camera-permission">
+                  <div className="delivery-camera-permission-icon">
+                    <Camera size={30} weight="fill" />
+                  </div>
+                  <strong>
+                    {cameraState === "starting"
+                      ? "Abriendo cámara…"
+                      : cameraState === "error"
+                        ? "Cámara detenida"
+                        : "Usar cámara trasera"}
+                  </strong>
+                  <span>
+                    Toca el botón para que iPhone o iPad solicite el permiso de cámara.
+                  </span>
+                  <button
+                    className="btn primary"
+                    type="button"
+                    disabled={cameraState === "starting"}
+                    onClick={startCamera}
+                  >
+                    <Camera size={18} />
+                    {cameraState === "error" ? "Reintentar" : "Activar cámara"}
+                  </button>
+                </div>
+              )}
               <div className="delivery-industrial-frame" aria-hidden="true">
                 <i className="corner tl" />
                 <i className="corner tr" />
@@ -1776,7 +1947,28 @@ export default function DeliveryRegistry({ onClose }) {
                 <div>
                   <strong>No se pudo iniciar el lector</strong>
                   <p>{scannerError}</p>
-                  <span>El registro manual sigue disponible.</span>
+                  <span>
+                    En iPhone o iPad revisa que Safari tenga permiso de cámara para este sitio.
+                    También puedes fotografiar el Data Matrix y leerlo sin cámara en vivo.
+                  </span>
+                  <div className="delivery-scanner-error-actions">
+                    <button className="btn" type="button" onClick={startCamera}>
+                      Reintentar cámara
+                    </button>
+                    <label className="btn delivery-file-button">
+                      Leer imagen
+                      <input
+                        hidden
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={(event) => {
+                          scanImageFile(event.target.files?.[0]);
+                          event.target.value = "";
+                        }}
+                      />
+                    </label>
+                  </div>
                 </div>
               </div>
             )}
@@ -1811,7 +2003,10 @@ export default function DeliveryRegistry({ onClose }) {
               <button
                 className="btn"
                 type="button"
-                onClick={() => setView(activeWeek ? "week" : "home")}
+                onClick={() => {
+                  stopCamera();
+                  setView(activeWeek ? "week" : "home");
+                }}
               >
                 Cancelar
               </button>
@@ -1822,6 +2017,7 @@ export default function DeliveryRegistry({ onClose }) {
                   hidden
                   type="file"
                   accept="image/*"
+                  capture="environment"
                   onChange={(event) => {
                     scanImageFile(event.target.files?.[0]);
                     event.target.value = "";

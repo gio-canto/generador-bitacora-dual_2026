@@ -1,5 +1,19 @@
 # Notas de versión
 
+## 0.50.0-beta.7 · Registro de entrega · Parte 7 · 2026-09-28
+
+- El escáner pasa a un flujo **mobile-first** pensado principalmente para iPhone, iPad y otros dispositivos táctiles.
+- En iOS la cámara ya no se abre automáticamente al entrar al lector: se activa con un toque explícito en **Activar cámara**, de modo que Safari puede conceder el permiso dentro del gesto del usuario.
+- ZXing deja de administrar la apertura de cámara en iOS: el sistema abre primero el stream con `getUserMedia` y ZXing sólo analiza el video ya activo.
+- Se usan restricciones de cámara simples con preferencia por la cámara trasera y una segunda tentativa genérica si el dispositivo rechaza `facingMode`.
+- Se eliminó la aplicación automática de constraints de enfoque que podía fallar con tracks terminados en Safari/iOS.
+- Al enviar Safari al fondo, bloquear el iPhone/iPad o cambiar de app, el stream se detiene de forma segura y pide reactivación al volver.
+- Los errores de permiso, cámara ocupada, cámara inexistente e interrupción reciben mensajes diferenciados y botón **Reintentar cámara**.
+- **Leer imagen** usa `capture="environment"` en móviles para permitir fotografiar el Data Matrix directamente con la cámara trasera.
+- El modo escáner adopta una vista dedicada en móvil: cámara más grande, controles inferiores fijos con safe areas, botones táctiles de 44–48 px y diseño adaptable para orientación vertical/horizontal.
+- Los campos usan 16 px en móvil para evitar el zoom automático de Safari al enfocarlos.
+- La barra superior se compacta en iPhone/iPad con controles por icono y respeta `safe-area-inset-*`.
+
 ## 0.50.0-beta.6 · Registro de entrega · Parte 6 · 2026-09-28
 
 - Se corrige la lectura real del Data Matrix: el lector carga explícitamente el bundle UMD de ZXing Browser, reduce el intervalo entre intentos y solicita enfoque continuo cuando la cámara lo permite.

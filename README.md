@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.6-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.7-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,15 +13,17 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.6 · Registro de entrega · Parte 6
+## Beta 0.50.0-beta.7 · Registro de entrega · Parte 7
 
 La serie 0.50 incorpora el **Subsistema de registro de entrega** como página independiente. El plantel mantiene una base común; cada alumno conserva nombre, especialidad y empresa.
 
-La versión actual corrige la lectura del Data Matrix y añade el **periodo de la bitácora** al identificador. El código contiene nombre, especialidad, empresa, fecha inicial y fecha final. El escáner puede recibir bitácoras de distintas semanas en una misma sesión, ubicarlas automáticamente en su semana y marcar como **Entregado a destiempo** aquellas recibidas después de su fecha y hora límite.
+La versión actual está diseñada con prioridad para **iPhone, iPad y dispositivos móviles**. El lector ya no intenta abrir la cámara automáticamente en iOS: el usuario toca **Activar cámara**, el navegador concede el permiso y después ZXing analiza el stream ya abierto. Esto evita depender de un segundo intento de acceso a cámara dentro de la librería.
 
-También se aumentó el tamaño físico del Data Matrix, se compactó su contenido, se fijó explícitamente el bundle UMD de ZXing Browser y se añadió **Leer imagen** como método alterno de prueba.
+El Data Matrix conserva nombre, especialidad, empresa, fecha inicial y fecha final, por lo que una sola sesión puede recibir varias semanas y calcular entregas a destiempo. **Leer imagen** continúa disponible y en móviles puede abrir directamente la cámara trasera para tomar una fotografía del código.
 
-La numeración de esta serie sigue los cambios funcionales publicados en `main`: beta.1 (subsistema inicial), beta.2 (página independiente y corrección del Data Matrix), beta.3 (registro a nivel plantel), beta.4 (identidad completa y tutorial/actualización), beta.5 (avisos y estados visuales) y beta.6 (lectura corregida y clasificación automática por periodo).
+El modo escáner ahora usa una vista móvil dedicada con cámara amplia, safe areas, controles inferiores fijos, botones táctiles grandes, soporte vertical/horizontal y campos de 16 px para evitar el zoom automático de Safari.
+
+La numeración de esta serie sigue los cambios funcionales publicados en `main`: beta.1 (subsistema inicial), beta.2 (página independiente), beta.3 (registro a nivel plantel), beta.4 (identidad completa y tutorial/actualización), beta.5 (avisos), beta.6 (periodo y varias semanas) y beta.7 (cámara y diseño mobile-first para iOS).
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 

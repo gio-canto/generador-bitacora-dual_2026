@@ -38,3 +38,12 @@ El subsistema mantiene una base por plantel y alumnos con nombre, especialidad y
 El escáner carga explícitamente el bundle UMD de ZXing Browser 0.2.1 y conserva `BarcodeDetector` como alternativa cuando el navegador ofrece Data Matrix. ZXing usa un intervalo corto entre intentos y solicita enfoque continuo cuando el dispositivo lo permite. El cuadro de detección compensa `object-fit: cover` para alinear las coordenadas de la lectura con el video visible. También existe lectura desde archivo de imagen para prueba o contingencia.
 
 El payload Data Matrix v4 es deliberadamente más compacto que v3 y contiene identidad del alumno más fecha inicial/final. El escáner resuelve primero el alumno y después la semana por periodo; la cola puede contener múltiples semanas y al confirmar aplica cada entrega a su destino. El estado a tiempo/destiempo se calcula con la fecha real de recepción y el límite de la semana encontrada. Las confirmaciones breves usan Sileo; los errores o datos faltantes que requieren corrección permanecen dentro de la pantalla.
+
+
+## Cámara móvil · Beta 0.50.0-beta.7
+
+El registro se considera **mobile-first**. En iOS/iPadOS el acceso a cámara se inicia únicamente desde una acción explícita del usuario. `getUserMedia` abre el stream con restricciones simples y preferencia por cámara trasera; después `BrowserDatamatrixCodeReader.scan(video, ...)` analiza ese elemento sin volver a solicitar el dispositivo.
+
+El stream se detiene al salir del escáner, al ocultarse la página o al producirse `pagehide`. Al regresar no se reinicia automáticamente: el usuario vuelve a tocar **Activar cámara**. Esto evita conservar tracks inválidos después de bloquear el dispositivo, cambiar de app o reanudar una PWA/pestaña de Safari.
+
+El diseño móvil usa `100dvh`, `viewport-fit=cover` y `env(safe-area-inset-*)`. Los controles críticos tienen objetivo táctil mínimo de 44 px y el escáner oculta la barra superior en móvil para dedicar la mayor parte de la pantalla a la cámara.
