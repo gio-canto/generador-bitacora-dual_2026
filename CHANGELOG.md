@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.16 · Presentación del proyecto · Parte 2 · 2026-09-28
+
+- La landing pasa a un diseño **image-first**: `asset_landing.png` ocupa el hero desde la primera pantalla y el mensaje aparece directamente sobre la imagen.
+- Se elimina gran parte del tratamiento visual basado en tarjetas, brillos y degradados para usar una composición más editorial, sobria y cercana a una página de producto.
+- La sección para alumnos destaca creación desde teléfono, PC o iPad, historial local, menor riesgo de errores y datos precargados para evitar repetir información cada semana.
+- La sección para escuelas explica estandarización del formato, facilidad para el alumno, prevención de cambios accidentales y control más rápido de entregas.
+- La incorporación institucional ofrece dos rutas: colaborar directamente en GitHub mediante ramas y pull requests, o solicitar apoyo al creador para adaptar el flujo del plantel.
+- Se añaden secciones explícitas de **Privacidad** y **Open source**.
+- Se incorpora un CTA para **dar una estrella al proyecto en GitHub**.
+- La navegación, tipografía y espaciado móvil se simplifican para mantener una presentación clara en iPhone, iPad y escritorio.
+
 ## 0.50.0-beta.15 · Presentación del proyecto · Parte 1 · 2026-09-28
 
 - Se crea la subpágina **/presentacion/** como landing pública del proyecto Bitácora Dual 2026.
