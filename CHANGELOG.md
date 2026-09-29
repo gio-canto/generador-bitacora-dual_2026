@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.50.0-beta.24 · Acceso discreto al historial · 2026-09-29
+
+- El acceso **Bitácoras anteriores** del inicio deja de mostrarse como una tarjeta ancha y pasa a presentarse como un control secundario compacto.
+- En estado cerrado muestra únicamente icono, nombre, contador numérico y desplegable.
+- La última semana guardada y la explicación del historial sólo aparecen después de abrir el control.
+- El contenido desplegado conserva la consulta rápida de semanas anteriores y el visor de sólo lectura.
+- Se mantiene el historial completo del paso 5 para las acciones de administración.
+- Se ajusta la prueba de interfaz para verificar que el acceso inicia cerrado y mantiene un contador compacto.
+
 ## 0.50.0-beta.23 · Historial accesible desde el inicio · 2026-09-29
 
 - Se agrega un acceso compacto **Bitácoras anteriores** directamente debajo del encabezado principal del generador.
