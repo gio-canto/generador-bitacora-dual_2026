@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.26 · Opiniones de estudiantes · 2026-09-29
+
+- La landing de `/presentacion/` incorpora una nueva sección **Lo que dicen quienes lo usan**.
+- La sección se ubica después de la comparación de tiempos para conectar los beneficios explicados con experiencias reales de uso.
+- Se añade como primer testimonio la opinión de **Wuendy G.**, alumna del Sistema Dual del **CBTis 134**.
+- El testimonio conserva el sentido de la frase original y corrige únicamente redacción y ortografía para su publicación.
+- La presentación usa una composición editorial amplia, con atribución clara de nombre, rol e institución, sin calificaciones artificiales ni elementos de reseña inventados.
+- La navegación incorpora un acceso directo a **Opiniones**.
+- La estructura queda preparada para añadir nuevos testimonios mediante datos reutilizables.
+- Se amplía la prueba automatizada de la landing para verificar la presencia de la sección y su atribución.
+
 ## 0.50.0-beta.25 · Historial en barra y retorno al PDF · 2026-09-29
 
 - **Bitácoras anteriores** se mueve de la portada a la barra superior para estar disponible sin competir visualmente con el contenido principal.
