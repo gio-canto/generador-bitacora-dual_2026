@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.15-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.16-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,13 +13,13 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.15 · Presentación del proyecto · Parte 1
+## Beta 0.50.0-beta.16 · Presentación del proyecto · Parte 2
 
-La beta.15 incorpora una nueva landing pública en **[/presentacion/](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/)**. Presenta Bitácora Dual 2026 desde la perspectiva del alumno y de Vinculación, con un hero construido alrededor de **“Nunca fue tan fácil hacer una bitácora.”**
+La landing de **[/presentacion/](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/)** se rediseña para que la primera pantalla sea directamente `asset_landing.png`, con **“Nunca fue tan fácil hacer una bitácora.”** sobre la imagen.
 
-La página explica el Generador de Bitácora Dual, el Registro de entregas, el sistema complementario de gestión y emisión de constancias, el papel del Data Matrix y el flujo completo desde la captura semanal hasta los reportes.
+La página explica de forma más directa las ventajas para el alumno: crear desde teléfono, PC o iPad sin depender de archivos de Excel/Word, conservar historial local, reducir errores y reutilizar información frecuente. Para el plantel destaca estandarización, menor riesgo de que se altere el formato y control más rápido de entregas.
 
-También incluye una sección para instituciones que explica cómo podría incorporarse el sistema a un plantel: revisar el procedimiento actual, configurar catálogos y responsables, probar con una generación y documentar el uso. Usa `asset_landing.png` como visual principal y `Asset_cont_matrix.png` como ejemplo de una bitácora con Data Matrix.
+También se presentan dos formas de incorporar el sistema en una institución: colaborar directamente en GitHub mediante ramas y pull requests, o solicitar apoyo al creador. La landing incorpora además apartados de privacidad, naturaleza open source y un CTA para dar una estrella al repositorio.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 

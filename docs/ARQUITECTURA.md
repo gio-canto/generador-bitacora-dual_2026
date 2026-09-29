@@ -111,3 +111,10 @@ Cada celda usa únicamente el estado resumido; el detalle de fecha/hora permanec
 El hero usa `public/Assets/asset_landing.png`; la sección de Data Matrix usa `public/Assets/Asset_cont_matrix.png`. La landing explica los tres frentes del ecosistema (generador, registro de entregas y sistema complementario de constancias), el flujo de alumno a Vinculación y un proceso sugerido de incorporación por plantel.
 
 `src/presentation.css` usa tipografía del sistema, superficies sobrias, safe areas y `prefers-reduced-motion`. `src/presentation.js` sólo gestiona aparición progresiva y el registro del service worker; no captura datos del visitante.
+
+
+## Presentación editorial · Beta 0.50.0-beta.16
+
+La landing conserva la entrada estática independiente, pero cambia a una composición image-first. El hero utiliza `asset_landing.png` a pantalla completa con contenido superpuesto; las secciones posteriores evitan depender de tarjetas decorativas y usan líneas, tipografía, espacios y bloques editoriales.
+
+El contenido distingue claramente beneficios para alumnos y planteles, muestra las dos rutas de adopción institucional (colaboración por pull request o integración solicitada al creador) y añade bloques de privacidad y open source. No se incorpora telemetría ni captura de formularios.

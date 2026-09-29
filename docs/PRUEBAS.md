@@ -114,3 +114,13 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Revisar 390, 430, 768, 1024 y 1440 px sin desbordamientos.
 - Activar `prefers-reduced-motion` y confirmar que el contenido permanece visible sin animaciones.
 - Después de una primera carga, comprobar que la landing y sus dos imágenes siguen disponibles desde el service worker.
+
+
+## Landing editorial · Beta 0.50.0-beta.16
+
+- Confirmar que `asset_landing.png` ocupa la primera pantalla y que el texto del hero aparece encima.
+- Verificar las ventajas de alumno: teléfono/PC/iPad, historial local, menos errores y datos precargados.
+- Verificar las ventajas de escuela: facilidad para el alumno, estandarización, protección del formato y control rápido.
+- Revisar las rutas institucionales de GitHub/pull request y contacto con el creador.
+- Confirmar las secciones de Privacidad y Open source y el CTA para dar estrella en GitHub.
+- Revisar 390, 430, 768, 1024 y 1440 px sin solapamientos ni bloques decorativos innecesarios.
