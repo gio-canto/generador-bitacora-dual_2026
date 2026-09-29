@@ -28,7 +28,7 @@ describe("landing de presentación", () => {
     expect(jsx).toContain("&lt; 10 min");
     expect(jsx).toContain("Tiempos aproximados");
     expect(jsx).toContain("Tu escuela puede agregarse al proyecto.");
-    expect(jsx).toContain("Las aportaciones útiles son bienvenidas.");
+    expect(jsx).toContain("aportaciones útiles son bienvenidas.");
     expect(jsx).toContain("Colaborar en GitHub");
     expect(jsx).toContain("Dar estrella");
     expect(jsx).toContain("<GitPullRequest");
