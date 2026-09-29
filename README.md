@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.13-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.14-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,15 +13,13 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.13 · Registro de entrega · Parte 13
+## Beta 0.50.0-beta.14 · Registro de entrega · Parte 14
 
-La beta.13 incorpora **reportes de entrega en PDF** con un diseño institucional y sobrio. Pueden generarse como **Listado simplificado** de una semana concreta o como **Semana por semana** para imprimir el historial completo.
+La beta.14 añade un tercer formato de reporte: **Global de todas**. Es una matriz general en A4 horizontal, pensada como control escolar, donde cada fila corresponde a un alumno y cada columna a una semana.
 
-El PDF muestra plantel, generación dual, fecha de creación, periodo, fecha límite, resumen de estados y la lista de alumnos con Blobatar, especialidad, empresa, estado de entrega, fecha/hora y origen del registro. Incluye numeración de páginas y la versión del sistema.
+La primera columna conserva mini Blobatar, nombre, especialidad y empresa. Las semanas muestran su número y fecha inicial y cada celda marca el estado con **✓ A tiempo**, **! A destiempo** o **× No entregado**. Si la generación tiene muchas semanas o alumnos, el sistema divide automáticamente la tabla en varias páginas.
 
-También se añade **Generación dual** a la configuración del registro. El dato se conserva en el JSON portátil y aparece en los reportes. El esquema local pasa a v5 y migra automáticamente los registros anteriores.
-
-Todo el reporte se genera localmente en el navegador: no se envían alumnos ni entregas a un servicio externo.
+Se mantienen los formatos **Listado simplificado** y **Semana por semana**, además del encabezado institucional con plantel, generación dual, fecha de creación, versión y paginación.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
@@ -54,7 +52,7 @@ No hay cuentas ni servidor de bitácoras. Los datos permanecen en el navegador. 
 
 Acceso directo: **[Abrir Subsistema de registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/)**.
 
-El plantel configura una sola base de alumnos y puede registrar la **generación dual**. Cada alumno conserva nombre, especialidad y empresa. Las bitácoras incluyen un **Data Matrix** con identidad y periodo (fecha inicial y fecha final). El escáner puede mezclar varias semanas en una misma sesión, ubicar cada bitácora en la semana correspondiente y calcular automáticamente si la entrega fue a tiempo o a destiempo. El subsistema también genera reportes PDF simplificados o semana por semana.
+El plantel configura una sola base de alumnos y puede registrar la **generación dual**. Cada alumno conserva nombre, especialidad y empresa. Las bitácoras incluyen un **Data Matrix** con identidad y periodo (fecha inicial y fecha final). El escáner puede mezclar varias semanas en una misma sesión, ubicar cada bitácora en la semana correspondiente y calcular automáticamente si la entrega fue a tiempo o a destiempo. El subsistema también genera reportes PDF como listado simplificado, semana por semana o matriz global de todas las semanas.
 
 ## Uso rápido
 
