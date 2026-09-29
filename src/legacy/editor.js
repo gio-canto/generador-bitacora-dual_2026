@@ -1253,62 +1253,97 @@ export function startEditor() {
       if (typeof dialog.close === "function") dialog.close();
       else dialog.removeAttribute("open");
     }
-    function renderRecords() {
-      const h = $("#records"),
-        all = readStore()
-          .slice()
-          .sort((a, b) =>
-            String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")),
-          );
-      h.innerHTML = "";
+    function bindRecordReviewButtons(host) {
+      host.querySelectorAll("[data-review]").forEach(
+        (button) =>
+          (button.onclick = () => {
+            const record = readStore().find(
+              (item) => item.id === button.dataset.review,
+            );
+            if (record) openRecordReview(record);
+          }),
+      );
+    }
+    function renderRecordList(host, all, management = false) {
+      if (!host) return;
+      host.innerHTML = "";
       if (!all.length) {
-        h.innerHTML = '<div class="empty">Sin registros guardados.</div>';
+        host.innerHTML =
+          '<div class="empty">Aún no tienes bitácoras guardadas.</div>';
         return;
       }
-      all.forEach((r) => {
-        const n = document.createElement("div");
-        n.className = "record";
-        n.innerHTML = `<div><strong>${escapeHtml(r.title || "Bitácora")}</strong><small>${escapeHtml(r.student || "Sin alumno")} · ${(r.entries || []).length} día(s)</small></div><div class="record-actions"><button class="record-review-button" data-review="${escapeHtml(r.id)}" type="button">Revisar</button><button data-open="${escapeHtml(r.id)}" type="button" aria-label="Abrir para editar" title="Abrir para editar">↗</button><button data-copy="${escapeHtml(r.id)}" type="button" aria-label="Duplicar" title="Duplicar">⧉</button><button data-remove="${escapeHtml(r.id)}" type="button" aria-label="Eliminar" title="Eliminar">⌫</button></div>`;
-        h.appendChild(n);
+      all.forEach((record) => {
+        const node = document.createElement("div");
+        node.className = "record" + (management ? "" : " home-record");
+        node.innerHTML =
+          `<div><strong>${escapeHtml(record.title || "Bitácora")}</strong><small>${escapeHtml(record.student || "Sin alumno")} · ${(record.entries || []).length} día(s)</small></div><div class="record-actions"><button class="record-review-button" data-review="${escapeHtml(record.id)}" type="button">Revisar</button>${
+            management
+              ? `<button data-open="${escapeHtml(record.id)}" type="button" aria-label="Abrir para editar" title="Abrir para editar">↗</button><button data-copy="${escapeHtml(record.id)}" type="button" aria-label="Duplicar" title="Duplicar">⧉</button><button data-remove="${escapeHtml(record.id)}" type="button" aria-label="Eliminar" title="Eliminar">⌫</button>`
+              : ""
+          }</div>`;
+        host.appendChild(node);
       });
-      h.querySelectorAll("[data-review]").forEach(
-        (b) =>
-          (b.onclick = () => {
-            const r = readStore().find((x) => x.id === b.dataset.review);
-            if (r) openRecordReview(r);
+      bindRecordReviewButtons(host);
+      if (!management) return;
+      host.querySelectorAll("[data-open]").forEach(
+        (button) =>
+          (button.onclick = () => {
+            const record = readStore().find(
+              (item) => item.id === button.dataset.open,
+            );
+            if (record) loadRecord(record);
           }),
       );
-      h.querySelectorAll("[data-open]").forEach(
-        (b) =>
-          (b.onclick = () => {
-            const r = readStore().find((x) => x.id === b.dataset.open);
-            if (r) loadRecord(r);
-          }),
-      );
-      h.querySelectorAll("[data-copy]").forEach(
-        (b) =>
-          (b.onclick = () => {
-            const s = readStore().find((x) => x.id === b.dataset.copy);
-            if (!s) return;
-            const c = deepCopy(s);
-            c.id = createId();
-            c.updatedAt = new Date().toISOString();
-            const all = readStore();
-            all.unshift(c);
-            writeStore(all);
+      host.querySelectorAll("[data-copy]").forEach(
+        (button) =>
+          (button.onclick = () => {
+            const source = readStore().find(
+              (item) => item.id === button.dataset.copy,
+            );
+            if (!source) return;
+            const copy = deepCopy(source);
+            copy.id = createId();
+            copy.updatedAt = new Date().toISOString();
+            const records = readStore();
+            records.unshift(copy);
+            writeStore(records);
             renderRecords();
-            loadRecord(c);
+            loadRecord(copy);
           }),
       );
-      h.querySelectorAll("[data-remove]").forEach(
-        (b) =>
-          (b.onclick = () => {
+      host.querySelectorAll("[data-remove]").forEach(
+        (button) =>
+          (button.onclick = () => {
             if (confirm("¿Eliminar este registro?")) {
-              writeStore(readStore().filter((x) => x.id !== b.dataset.remove));
+              writeStore(
+                readStore().filter(
+                  (item) => item.id !== button.dataset.remove,
+                ),
+              );
               renderRecords();
             }
           }),
       );
+    }
+    function renderRecords() {
+      const all = readStore()
+        .slice()
+        .sort((a, b) =>
+          String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")),
+        );
+      renderRecordList($("#records"), all, true);
+      renderRecordList($("#homeRecords"), all, false);
+
+      const state = $("#homeHistoryState"),
+        latest = $("#homeHistoryLatest");
+      if (state)
+        state.textContent = all.length
+          ? `${all.length} ${all.length === 1 ? "guardada" : "guardadas"}`
+          : "Sin registros";
+      if (latest)
+        latest.textContent = all.length
+          ? `Última: ${all[0].title || "Bitácora guardada"}`
+          : "Cuando guardes una semana, aparecerá aquí.";
     }
     function exportBackup() {
       const blob = new Blob([JSON.stringify(readStore(), null, 2)], {
