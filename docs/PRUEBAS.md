@@ -35,3 +35,19 @@ La prueba del servicio PDF extraído cubre su formato; el generador restaurado c
 ## Registro de entrega · Serie 0.50
 
 La verificación de la serie 0.50 debe ejecutarse en la página independiente y no sólo en el generador. En CI, `npm test` y `npm run build` deben pasar antes de publicar. La construcción de producción incluye `registro-entrega/index.html` y el service worker incorpora esa página al conjunto versionado.
+
+
+## Códigos de error del escáner · Beta 0.50.0-beta.9
+
+Durante pruebas en iPhone/iPad, si aparece un error, registrar primero el código visible y usar **Copiar diagnóstico**. Como mínimo deben distinguirse:
+
+- `CAM-003`: permiso denegado.
+- `VID-102`: stream obtenido pero sin fotogramas utilizables.
+- `ZX-201`: ZXing no pudo cargarse.
+- `ZX-203`: ZXing cargó pero no se pudo construir el lector.
+- `ZX-204`: el lector se creó pero `scan()` no pudo iniciar.
+- `ZX-205`: fallo fatal durante el ciclo de lectura.
+- `BD-206`: BarcodeDetector existe pero no soporta Data Matrix.
+- `IMG-301`: fallo leyendo una fotografía.
+
+El texto copiado debe incluir versión, código, etapa, estado del stream/video y disponibilidad de los lectores, pero nunca el contenido del Data Matrix ni el `deviceId` real.
