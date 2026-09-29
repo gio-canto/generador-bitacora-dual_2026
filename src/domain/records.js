@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.25";
-export const RELEASE = "Historial en barra y retorno al PDF";
+export const VERSION = "0.50.0-beta.26";
+export const RELEASE = "Opiniones de estudiantes";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
