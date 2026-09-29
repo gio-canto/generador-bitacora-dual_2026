@@ -29,11 +29,17 @@ describe("landing de presentación", () => {
     expect(jsx).toContain("&lt; 10 min");
     expect(jsx).toContain("Tiempos aproximados");
     expect(jsx).toContain("Lo que dicen quienes lo usan");
+    expect(jsx).toContain("What users are saying");
+    expect(jsx).toContain("Was Nutzer sagen");
     expect(jsx).toContain("Wuendy G.");
     expect(jsx).toContain("Alumna del Sistema Dual");
+    expect(jsx).toContain("Dual Education student");
+    expect(jsx).toContain("Schülerin im dualen System");
     expect(jsx).toContain("CBTis 134");
     expect(jsx).toContain("corregir mis faltas ortográficas");
-    expect(jsx).toContain("<TestimonialsSection />");
+    expect(jsx).toContain('import { Blobatar } from "blobatar/react"');
+    expect(jsx).toContain("<Blobatar name={t.name}");
+    expect(jsx).toContain("<TestimonialsSection copy={copy} />");
     expect(jsx).toContain("Tu escuela puede agregarse al proyecto.");
     expect(jsx).toContain("aportaciones útiles son bienvenidas.");
     expect(jsx).toContain("Colaborar en GitHub");
@@ -45,6 +51,12 @@ describe("landing de presentación", () => {
     expect(jsx).toContain('registration.waiting?.postMessage({ type: "SKIP_WAITING" })');
     expect(jsx).toContain('"controllerchange"');
     expect(jsx).toContain('"../registro-entrega/"');
+    expect(jsx).toContain('const LANGS = ["es", "en", "de"]');
+    expect(jsx).toContain('url.searchParams.set("lang", next)');
+    expect(jsx).toContain("The full system is currently in Spanish");
+    expect(jsx).toContain("Das vollständige System ist derzeit auf Spanisch");
+    expect(jsx).toContain("<LanguageNotice");
+    expect(jsx).toContain("event.preventDefault()");
   });
 
   it("mantiene la presentación como entrada Vite y recurso offline", async () => {
@@ -66,6 +78,9 @@ describe("landing de presentación", () => {
     expect(css).toContain("@media(prefers-reduced-motion:reduce)");
     expect(css).toContain("--scroll-progress");
     expect(css).toContain("--hero-shift");
+    expect(css).toContain(".language-picker");
+    expect(css).toContain(".language-warning");
+    expect(css).toContain(".testimonial figcaption>svg");
     expect(jsx).toContain("IntersectionObserver");
     expect(jsx).toContain("requestAnimationFrame");
     expect(jsx).toContain("prefers-reduced-motion: reduce");
