@@ -43,6 +43,7 @@ Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regl
 - generar jornadas;
 - estados Falta, Sin labores e Inhábil;
 - editar actividades;
+- ejecutar el corrector con un término institucional y vocabulario técnico conocido; confirmar que no los marque como error y que siga detectando faltas reales;
 - revisar contador/espacio;
 - responsables e instructor;
 - firma genérica;
