@@ -1336,10 +1336,7 @@ export function startEditor() {
 
       const state = $("#homeHistoryState"),
         latest = $("#homeHistoryLatest");
-      if (state)
-        state.textContent = all.length
-          ? `${all.length} ${all.length === 1 ? "guardada" : "guardadas"}`
-          : "Sin registros";
+      if (state) state.textContent = String(all.length);
       if (latest)
         latest.textContent = all.length
           ? `Última: ${all[0].title || "Bitácora guardada"}`
