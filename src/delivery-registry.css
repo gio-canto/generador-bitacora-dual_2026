@@ -1490,3 +1490,62 @@ button.delivery-action-tile{cursor:pointer}
     min-height:260px;
   }
 }
+
+
+/* Diagnóstico del escáner */
+.delivery-error-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.delivery-error-heading code,
+.delivery-camera-error-code{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  width:max-content;
+  padding:4px 7px;
+  border-radius:8px;
+  background:rgba(255,255,255,.72);
+  color:inherit;
+  font:750 10px ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.035em;
+}
+.delivery-error-technical{
+  display:block;
+  padding:8px 9px;
+  border-radius:10px;
+  background:rgba(255,255,255,.52);
+  font:600 10.5px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;
+  overflow-wrap:anywhere;
+}
+.delivery-camera-error-code{
+  flex:0 0 auto;
+  background:rgba(255,83,75,.18);
+  color:#ffe4e1;
+}
+.delivery-camera-hud>.delivery-camera-error-code+ .delivery-camera-live{
+  margin-left:0;
+}
+.delivery-scanner-error-actions .btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+@media(max-width:520px){
+  .delivery-error-heading{
+    align-items:flex-start;
+  }
+  .delivery-error-heading strong{
+    min-width:0;
+  }
+  .delivery-error-heading code{
+    flex:0 0 auto;
+  }
+  .delivery-scanner-error-actions{
+    grid-template-columns:1fr;
+  }
+}
