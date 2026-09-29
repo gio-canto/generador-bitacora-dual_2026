@@ -71,8 +71,13 @@ export const SCANNER_ERROR_CATALOG = {
   },
   "ZX-205": {
     area: "Lector",
-    title: "Fallo fatal durante lectura",
-    description: "ZXing encontró un error distinto de NoFound/Checksum/Format durante el ciclo de lectura.",
+    title: "Fallo repetido durante lectura",
+    description: "El decodificador produjo varias veces seguidas un error no recuperable.",
+  },
+  "ZX-207": {
+    area: "Video",
+    title: "No se pudo capturar el fotograma",
+    description: "Safari mantuvo la cámara activa, pero la captura del fotograma falló repetidamente.",
   },
   "BD-206": {
     area: "Lector",
@@ -100,6 +105,34 @@ export function scannerCodeForCameraError(error) {
   if (name === "OverconstrainedError") return "CAM-006";
   if (name === "AbortError") return "CAM-007";
   return "CAM-005";
+}
+
+
+export function scannerDecoderErrorKind(error) {
+  const parts = [
+    error?.name,
+    error?.constructor?.name,
+    error?.getKind?.(),
+    error?.message,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (
+    /NotFoundException|ChecksumException|FormatException|No MultiFormat Readers|not found|checksum|format/i.test(
+      parts,
+    )
+  )
+    return "miss";
+
+  if (
+    /InvalidStateError|IndexSizeError|AbortError|drawImage|canvas|frame|video|source image|not ready|readyState/i.test(
+      parts,
+    )
+  )
+    return "frame";
+
+  return "fatal";
 }
 
 export function createScannerIssue(code, error, extra = {}) {
