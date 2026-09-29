@@ -136,3 +136,13 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Verificar que Colaborar sea el CTA principal y apunte a `CONTRIBUTING.md`.
 - Confirmar que la landing indique que alumnos y planteles pueden agregar escuela/empresa y enviar pull requests.
 - Revisar iconos en botones y ventajas en 390, 430, 768, 1024 y 1440 px.
+
+
+## React, iconos y movimiento · Beta 0.50.0-beta.18
+
+- Confirmar que `/presentacion/` monta `src/presentation.jsx` mediante `createRoot`.
+- Verificar iconos Phosphor en alumno, escuela, sistemas, Data Matrix, flujo, privacidad, open source y colaboración.
+- Desplazarse por la página y comprobar la barra de progreso superior y el parallax suave del hero.
+- Revisar hover de iconos, flechas y botones sin saltos de layout.
+- Activar `prefers-reduced-motion` y comprobar que parallax, reloj, flecha animada y transiciones queden desactivados.
+- Validar la landing en iPhone, iPad y escritorio sin pérdida de contenido o desbordamientos.
