@@ -1095,6 +1095,164 @@ export function startEditor() {
         );
       return true;
     }
+    let reviewingRecordId = "";
+    function reviewStatusLabel(status) {
+      return status === "sin_labores"
+        ? "Sin labores"
+        : status === "inhabil"
+          ? "Día inhábil"
+          : status === "falta"
+            ? "Falta"
+            : "Con labores";
+    }
+    function reviewUpdatedAt(value) {
+      const date = new Date(value || "");
+      if (!Number.isFinite(+date)) return "";
+      return new Intl.DateTimeFormat("es-MX", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(date);
+    }
+    function openRecordReview(record) {
+      if (!record) return;
+      reviewingRecordId = record.id || "";
+      const dialog = $("#recordReviewDialog"),
+        title = $("#recordReviewTitle"),
+        meta = $("#recordReviewMeta"),
+        content = $("#recordReviewContent");
+      if (!dialog || !title || !meta || !content) return;
+
+      const school =
+          schools.find((item) => item.name === record.school)?.shortName ||
+          record.school ||
+          "Sin plantel",
+        company =
+          companies.find((item) => item.name === record.company)?.shortName ||
+          record.company ||
+          "Sin empresa",
+        days = Array.isArray(record.entries) ? record.entries : [],
+        dates = days
+          .map((entry) => entry.date)
+          .filter(Boolean)
+          .sort(),
+        period = dates.length
+          ? formatDate(dates[0]) +
+            (dates.length > 1 ? " – " + formatDate(dates.at(-1)) : "")
+          : "Sin periodo",
+        authorities = record.authorities || {},
+        instructor = record.instructor || {};
+
+      title.textContent = record.title || "Bitácora guardada";
+      meta.textContent =
+        period +
+        (record.updatedAt
+          ? " · Guardada " + reviewUpdatedAt(record.updatedAt)
+          : "");
+
+      const identityRows = [
+        ["Alumno", record.student || "Sin alumno"],
+        ["Plantel", school],
+        ["Especialidad", record.specialty || "Sin especialidad"],
+        ["Semestre", record.semester ? String(record.semester) + "°" : "—"],
+        ["Grupo", record.group || "—"],
+        ["Empresa", company],
+      ]
+        .map(
+          ([label, value]) =>
+            '<div class="record-review-field"><span>' +
+            escapeHtml(label) +
+            "</span><strong>" +
+            escapeHtml(value) +
+            "</strong></div>",
+        )
+        .join("");
+
+      const dayCards = days.length
+        ? days
+            .map((entry) => {
+              const laboral = (entry.status || "laboral") === "laboral";
+              const when = laboral
+                ? [formatTime(entry.start), formatTime(entry.end)]
+                    .filter(Boolean)
+                    .join(" – ")
+                : "Sin horario";
+              return (
+                '<article class="record-review-day">' +
+                '<div class="record-review-day-head"><div><strong>' +
+                escapeHtml(formatDate(entry.date) || "Sin fecha") +
+                '</strong><span>' +
+                escapeHtml(reviewStatusLabel(entry.status)) +
+                '</span></div><small>' +
+                escapeHtml(when) +
+                "</small></div>" +
+                (laboral && entry.area
+                  ? '<div class="record-review-area">' +
+                    escapeHtml(entry.area) +
+                    "</div>"
+                  : "") +
+                '<p class="record-review-activity">' +
+                escapeHtml(entry.activity || "Sin actividad registrada.").replace(
+                  /\n/g,
+                  "<br>",
+                ) +
+                "</p></article>"
+              );
+            })
+            .join("")
+        : '<div class="record-review-empty">Este registro no contiene jornadas.</div>';
+
+      const people = [
+        ["Elaboró", authorities.elaboroName || record.student || "—", authorities.elaboroRole || ""],
+        ["Vo.Bo.", authorities.voboName || "—", authorities.voboRole || ""],
+        ["Autorizó", authorities.autorizoName || "—", authorities.autorizoRole || ""],
+        ...(instructor.enabled
+          ? [["Instructor formador", instructor.name || "—", instructor.roleMain || ""]]
+          : []),
+      ]
+        .map(
+          ([label, name, role]) =>
+            '<div class="record-review-person"><span>' +
+            escapeHtml(label) +
+            "</span><strong>" +
+            escapeHtml(name) +
+            "</strong>" +
+            (role
+              ? "<small>" +
+                escapeHtml(role).replace(/\n/g, "<br>") +
+                "</small>"
+              : "") +
+            "</div>",
+        )
+        .join("");
+
+      content.innerHTML =
+        '<section class="record-review-section"><h3>Datos generales</h3><div class="record-review-grid">' +
+        identityRows +
+        "</div></section>" +
+        '<section class="record-review-section"><div class="record-review-section-head"><h3>Jornadas</h3><span>' +
+        days.length +
+        " de " +
+        MAX_DAYS +
+        "</span></div><div class="record-review-days">" +
+        dayCards +
+        "</div></section>" +
+        '<section class="record-review-section"><div class="record-review-section-head"><h3>Responsables</h3><span>' +
+        (record.studentGenericSignature
+          ? "Firma genérica del alumno activada"
+          : "Firma genérica del alumno desactivada") +
+        '</span></div><div class="record-review-people">' +
+        people +
+        "</div></section>";
+
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "");
+    }
+    function closeRecordReview() {
+      const dialog = $("#recordReviewDialog");
+      if (!dialog) return;
+      if (typeof dialog.close === "function") dialog.close();
+      else dialog.removeAttribute("open");
+    }
     function renderRecords() {
       const h = $("#records"),
         all = readStore()
@@ -1110,9 +1268,16 @@ export function startEditor() {
       all.forEach((r) => {
         const n = document.createElement("div");
         n.className = "record";
-        n.innerHTML = `<div><strong>${escapeHtml(r.title || "Bitácora")}</strong><small>${(r.entries || []).length} día(s)</small></div><div class="record-actions"><button data-open="${escapeHtml(r.id)}" title="Abrir">↗</button><button data-copy="${escapeHtml(r.id)}" title="Duplicar">⧉</button><button data-remove="${escapeHtml(r.id)}" title="Eliminar">⌫</button></div>`;
+        n.innerHTML = `<div><strong>${escapeHtml(r.title || "Bitácora")}</strong><small>${escapeHtml(r.student || "Sin alumno")} · ${(r.entries || []).length} día(s)</small></div><div class="record-actions"><button class="record-review-button" data-review="${escapeHtml(r.id)}" type="button">Revisar</button><button data-open="${escapeHtml(r.id)}" type="button" aria-label="Abrir para editar" title="Abrir para editar">↗</button><button data-copy="${escapeHtml(r.id)}" type="button" aria-label="Duplicar" title="Duplicar">⧉</button><button data-remove="${escapeHtml(r.id)}" type="button" aria-label="Eliminar" title="Eliminar">⌫</button></div>`;
         h.appendChild(n);
       });
+      h.querySelectorAll("[data-review]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            const r = readStore().find((x) => x.id === b.dataset.review);
+            if (r) openRecordReview(r);
+          }),
+      );
       h.querySelectorAll("[data-open]").forEach(
         (b) =>
           (b.onclick = () => {
@@ -2103,6 +2268,19 @@ export function startEditor() {
       $("#guardDialog")?.addEventListener("cancel", (e) => {
         e.preventDefault();
         settleGuard(false);
+      });
+      $("#recordReviewClose")?.addEventListener("click", closeRecordReview);
+      $("#recordReviewX")?.addEventListener("click", closeRecordReview);
+      $("#recordReviewDialog")?.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        closeRecordReview();
+      });
+      $("#recordReviewEdit")?.addEventListener("click", () => {
+        const record = readStore().find(
+          (item) => item.id === reviewingRecordId,
+        );
+        closeRecordReview();
+        if (record) loadRecord(record);
       });
       $("#statusClose")?.addEventListener("click", () =>
         $("#statusDialog")?.close(),
