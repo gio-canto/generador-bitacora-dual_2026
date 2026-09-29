@@ -368,3 +368,33 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
   .record-review-actions{padding:14px 18px max(16px,env(safe-area-inset-bottom))}
   .record-review-actions .btn{flex:1}
 }
+
+
+/* Compact saved-history access on the generator start page */
+.home-history{margin:0 0 14px;border:1px solid rgba(0,0,0,.065);border-radius:19px;background:rgba(255,255,255,.88);box-shadow:0 7px 24px rgba(0,0,0,.04);overflow:hidden}
+.home-history>summary{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:11px;min-height:66px;padding:10px 14px;cursor:pointer;list-style:none}
+.home-history>summary::-webkit-details-marker{display:none}
+.home-history-mark{width:36px;height:36px;display:grid;place-items:center;border-radius:12px;background:rgba(0,113,227,.09);color:var(--blue);font-size:18px;font-weight:800}
+.home-history-copy{min-width:0}
+.home-history-copy strong{display:block;font-size:13px;line-height:1.35}
+.home-history-copy span{display:block;margin-top:2px;color:var(--muted);font-size:11px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-history-count{padding:6px 9px;border-radius:999px;background:#f2f2f4;color:#4b4b50;font-size:10.5px;font-weight:750;white-space:nowrap}
+.home-history-chevron{color:var(--muted);font-size:16px;transition:transform .18s ease}
+.home-history[open] .home-history-chevron{transform:rotate(180deg)}
+.home-history-body{padding:0 14px 14px;border-top:1px solid #f0f0f2}
+.home-history-intro{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 1px 9px}
+.home-history-intro p,.home-history-intro small{margin:0;color:var(--muted);font-size:10.8px;line-height:1.4}
+.home-history-intro small{font-size:9.8px;text-align:right}
+.home-records{max-height:245px}
+.home-record .record-actions{justify-content:flex-end}
+.home-record .record-review-button{min-width:76px}
+@media(max-width:620px){
+  .home-history{margin-bottom:12px}
+  .home-history>summary{grid-template-columns:auto minmax(0,1fr) auto;padding:9px 11px}
+  .home-history-count{grid-column:2;justify-self:start;margin-top:-4px}
+  .home-history-chevron{grid-column:3;grid-row:1/3}
+  .home-history-intro{display:block}
+  .home-history-intro small{display:block;margin-top:3px;text-align:left}
+  .home-record{grid-template-columns:minmax(0,1fr) auto}
+  .home-record .record-actions{justify-content:flex-end}
+}
