@@ -51,3 +51,13 @@ Durante pruebas en iPhone/iPad, si aparece un error, registrar primero el códig
 - `IMG-301`: fallo leyendo una fotografía.
 
 El texto copiado debe incluir versión, código, etapa, estado del stream/video y disponibilidad de los lectores, pero nunca el contenido del Data Matrix ni el `deviceId` real.
+
+
+## Regresión ZX-205 · Beta 0.50.0-beta.10
+
+- Confirmar que apuntar la cámara a una superficie sin código no muestra ZX-205.
+- Confirmar que `NotFoundException`, Checksum y Format se tratan como intentos normales.
+- Simular un error transitorio de frame y comprobar que no aparece un aviso inmediato.
+- Confirmar que sólo después de errores repetidos de captura aparece ZX-207.
+- Confirmar que ZX-205 requiere varios errores fatales consecutivos.
+- En iPhone pequeño, verificar que Salir / Foto / Terminar caben en una sola fila, el error queda encima de la barra inferior y los detalles técnicos empiezan plegados.

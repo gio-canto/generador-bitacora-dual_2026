@@ -48,6 +48,7 @@ import {
   createScannerIssue,
   formatScannerDiagnostic,
   scannerCodeForCameraError,
+  scannerDecoderErrorKind,
   scannerDiagnosticSnapshot,
 } from "../services/scanner-diagnostics.js";
 import { notify } from "../services/rare-notification.jsx";
@@ -682,31 +683,106 @@ export default function DeliveryRegistry({ onClose }) {
         reader.possibleFormats = [ZX.BarcodeFormat.DATA_MATRIX];
 
       try {
-        scanControls.current = reader.scan(video, (result, error) => {
-        if (result) {
-          scanProcessorRef.current?.(
-            result.getText?.() || result.text || "",
-            result.getResultPoints?.() || [],
-          );
-          return;
-        }
+        let stopped = false;
+        let timer = 0;
+        let consecutiveFatal = 0;
+        let consecutiveFrame = 0;
 
-        const errorName = String(
-          error?.name || error?.constructor?.name || "",
-        );
-        if (
-          error &&
-          errorName &&
-          !/NotFound|Checksum|Format/i.test(errorName)
-        ) {
-          reportScannerIssue("ZX-205", error, {
-            stage: "decode-loop",
-            source: "ZXing Browser",
-            message:
-              "La cámara sigue activa, pero el decodificador encontró un error durante la lectura.",
-          });
-        }
-        });
+        const schedule = (delay) => {
+          if (stopped) return;
+          clearTimeout(timer);
+          timer = window.setTimeout(loop, delay);
+        };
+
+        const loop = () => {
+          if (
+            stopped ||
+            !cameraStreamRef.current ||
+            video.srcObject !== cameraStreamRef.current
+          )
+            return;
+
+          if (
+            video.readyState < 2 ||
+            video.videoWidth < 2 ||
+            video.videoHeight < 2
+          ) {
+            schedule(120);
+            return;
+          }
+
+          try {
+            const result = reader.decode(video);
+            consecutiveFatal = 0;
+            consecutiveFrame = 0;
+            if (result) {
+              clearScannerIssue();
+              scanProcessorRef.current?.(
+                result.getText?.() || result.text || "",
+                result.getResultPoints?.() || [],
+              );
+            }
+            schedule(220);
+          } catch (error) {
+            const kind = scannerDecoderErrorKind(error);
+
+            // No encontrar un código, checksum incompleto o formato parcial es
+            // el estado normal entre fotogramas y nunca debe mostrarse como fallo.
+            if (kind === "miss") {
+              consecutiveFatal = 0;
+              consecutiveFrame = 0;
+              schedule(90);
+              return;
+            }
+
+            // Safari puede fallar de forma transitoria al copiar un fotograma
+            // del video al canvas. Damos margen amplio antes de informar.
+            if (kind === "frame") {
+              consecutiveFrame += 1;
+              consecutiveFatal = 0;
+              if (consecutiveFrame < 24) {
+                schedule(110);
+                return;
+              }
+              reportScannerIssue("ZX-207", error, {
+                stage: "capture-frame",
+                source: "ZXing Browser / Safari canvas",
+                message:
+                  "La cámara sigue activa, pero Safari no pudo entregar fotogramas al lector de forma estable.",
+              });
+              consecutiveFrame = 0;
+              schedule(350);
+              return;
+            }
+
+            // Un error genérico aislado no debe matar el lector. Sólo se
+            // reporta después de repetirse varias veces consecutivas.
+            consecutiveFatal += 1;
+            consecutiveFrame = 0;
+            if (consecutiveFatal < 3) {
+              schedule(140);
+              return;
+            }
+
+            reportScannerIssue("ZX-205", error, {
+              stage: "decode-loop",
+              source: "ZXing Browser",
+              message:
+                "La cámara sigue activa, pero el decodificador repitió un error durante la lectura.",
+            });
+            consecutiveFatal = 0;
+            schedule(400);
+          }
+        };
+
+        scanControls.current = {
+          stop() {
+            stopped = true;
+            clearTimeout(timer);
+          },
+        };
+
+        loop();
       } catch (error) {
         error.scannerCode = "ZX-204";
         throw error;
@@ -2216,18 +2292,21 @@ export default function DeliveryRegistry({ onClose }) {
                     <code>{scannerError.code}</code>
                   </div>
                   <p>{scannerError.message}</p>
-                  {scannerError.technical && (
-                    <span className="delivery-error-technical">
-                      {scannerError.errorName
-                        ? scannerError.errorName + ": "
-                        : ""}
-                      {scannerError.technical}
+                  <details className="delivery-error-details">
+                    <summary>Detalles técnicos</summary>
+                    {scannerError.technical && (
+                      <span className="delivery-error-technical">
+                        {scannerError.errorName
+                          ? scannerError.errorName + ": "
+                          : ""}
+                        {scannerError.technical}
+                      </span>
+                    )}
+                    <span>
+                      Etapa: {scannerError.stage || "sin identificar"} · Área:{" "}
+                      {scannerError.area}
                     </span>
-                  )}
-                  <span>
-                    Etapa: {scannerError.stage || "sin identificar"} · Área:{" "}
-                    {scannerError.area}
-                  </span>
+                  </details>
                   <div className="delivery-scanner-error-actions">
                     <button className="btn" type="button" onClick={startCamera}>
                       Reintentar
@@ -2293,11 +2372,12 @@ export default function DeliveryRegistry({ onClose }) {
                   setView(activeWeek ? "week" : "home");
                 }}
               >
-                Cancelar
+                <ArrowLeft size={18} />
+                Salir
               </button>
               <label className="btn delivery-file-button">
                 <FileArrowUp size={18} />
-                Leer imagen
+                Foto
                 <input
                   hidden
                   type="file"
@@ -2314,7 +2394,8 @@ export default function DeliveryRegistry({ onClose }) {
                 type="button"
                 onClick={finishScan}
               >
-                Terminar registro
+                <CheckCircle size={18} />
+                Terminar
               </button>
             </div>
           </section>

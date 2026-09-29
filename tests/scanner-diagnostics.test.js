@@ -4,6 +4,7 @@ import {
   createScannerIssue,
   formatScannerDiagnostic,
   scannerCodeForCameraError,
+  scannerDecoderErrorKind,
   scannerDiagnosticSnapshot,
 } from "../src/services/scanner-diagnostics.js";
 
@@ -22,6 +23,29 @@ describe("scanner diagnostics", () => {
       "CAM-006",
     );
     expect(scannerCodeForCameraError({ name: "AbortError" })).toBe("CAM-007");
+  });
+
+  it("trata los errores normales de decodificación como intentos, no como fallos", () => {
+    expect(
+      scannerDecoderErrorKind({
+        name: "Error",
+        constructor: { name: "Error" },
+        getKind: () => "NotFoundException",
+        message: "No MultiFormat Readers were able to detect the code.",
+      }),
+    ).toBe("miss");
+    expect(
+      scannerDecoderErrorKind({
+        name: "InvalidStateError",
+        message: "The video frame is not ready.",
+      }),
+    ).toBe("frame");
+    expect(
+      scannerDecoderErrorKind({
+        name: "TypeError",
+        message: "Unexpected decoder failure",
+      }),
+    ).toBe("fatal");
   });
 
   it("crea un problema con mensaje de usuario y detalle técnico separados", () => {

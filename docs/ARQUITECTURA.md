@@ -60,3 +60,10 @@ El diseño móvil usa `100dvh`, `viewport-fit=cover` y `env(safe-area-inset-*)`.
 - `IMG-xxx`: lectura desde archivo de imagen.
 
 El diagnóstico toma únicamente estado técnico necesario para reproducir el fallo. No incluye el contenido del Data Matrix y sustituye el identificador concreto de la cámara por un booleano que sólo indica si el navegador expuso `deviceId`.
+
+
+## Recuperación ZX-205 · Beta 0.50.0-beta.10
+
+El escáner ya no delega el ciclo continuo a `BrowserCodeReader.scan()`. Ese método detiene su loop ante cualquier excepción que no sea una instancia reconocida de `NotFoundException`, `ChecksumException` o `FormatException`, lo que resultaba demasiado frágil en Safari/iOS.
+
+La aplicación ejecuta ahora su propio loop con `reader.decode(video)`. `scannerDecoderErrorKind()` clasifica cada excepción como `miss`, `frame` o `fatal`. Los misses son normales; los errores de frame se reintentan hasta un umbral y producen `ZX-207`; los fatales necesitan repetirse tres veces antes de producir `ZX-205`. El loop continúa después del aviso para permitir recuperación espontánea del video o decoder.
