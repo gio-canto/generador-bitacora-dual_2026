@@ -194,6 +194,43 @@ body.calendar-season-december .topbar{
 .calendar-visual--halloween strong{font-size:19px;letter-spacing:.12em}
 body.calendar-event-halloween .shell{filter:saturate(.78) brightness(.94);transition:filter .4s ease}
 
+.calendar-visual--day-of-the-dead{
+  position:relative;
+  align-content:center;
+  gap:8px;
+  background:radial-gradient(circle at 50% 35%,#fff7df 0,#f3e6c7 52%,#dbc39e 100%);
+  color:#5a3b2b;
+}
+.cempasuchil{display:flex;gap:4px}
+.cempasuchil i{
+  width:13px;
+  height:13px;
+  border-radius:45% 55% 50% 48%;
+  background:#e69a2a;
+  box-shadow:0 0 0 3px rgba(222,126,24,.12);
+  transform:rotate(18deg);
+}
+.cempasuchil i:nth-child(even){transform:rotate(-18deg) scale(.88)}
+.memorial-candle{
+  position:relative;
+  width:18px;
+  height:34px;
+  border-radius:5px 5px 3px 3px;
+  background:#f7efe0;
+  box-shadow:0 5px 12px rgba(77,45,24,.12);
+}
+.memorial-candle span{
+  position:absolute;
+  left:6px;
+  top:-12px;
+  width:7px;
+  height:12px;
+  border-radius:70% 30% 65% 35%;
+  background:#d97828;
+  transform:rotate(8deg);
+}
+.calendar-visual--day-of-the-dead strong{font-size:13px;letter-spacing:.09em}
+
 .calendar-visual--revolution{
   align-content:center;
   gap:2px;
