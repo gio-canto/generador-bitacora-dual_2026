@@ -32,6 +32,7 @@ import {
   exportDeliveryState,
   exportWeekCsv,
   findStudentByMatrixValue,
+  findStudentSuggestionsByMatrixValue,
   findWeekByMatrixValue,
   matrixPeriodLabel,
   mergeStudents,
@@ -395,6 +396,8 @@ export default function DeliveryRegistry({ onClose }) {
   const scanBoxTimer = useRef(null);
   const tutorialOpenRef = useRef(false);
   const scanProcessorRef = useRef(null);
+  const fuzzyStudentAliases = useRef(new Map());
+  const rejectedFuzzyScans = useRef(new Map());
 
   const activeWeek = useMemo(
     () => state.weeks.find((week) => week.id === activeWeekId) || null,
@@ -500,7 +503,61 @@ export default function DeliveryRegistry({ onClose }) {
   const processScanValue = (rawValue, points) => {
     if (tutorialOpenRef.current) return;
     const payload = parseMatrixPayload(rawValue);
-    const student = findStudentByMatrixValue(state.students, rawValue);
+    const rawKey = String(rawValue || "").trim();
+    let student = findStudentByMatrixValue(state.students, rawValue);
+
+    if (!student && rawKey) {
+      const rememberedId = fuzzyStudentAliases.current.get(rawKey);
+      if (rememberedId)
+        student =
+          state.students.find((item) => item.id === rememberedId) || null;
+    }
+
+    if (!student) {
+      const rejectedUntil = rejectedFuzzyScans.current.get(rawKey) || 0;
+      if (rawKey && rejectedUntil > Date.now()) return;
+
+      const suggestions = findStudentSuggestionsByMatrixValue(
+        state.students,
+        rawValue,
+        3,
+      );
+
+      if (suggestions.length) {
+        for (const suggestion of suggestions) {
+          const candidate = suggestion.student;
+          const details = [candidate.specialty, shortCompany(candidate.company)]
+            .filter(Boolean)
+            .join(" · ");
+          const confirmed = window.confirm(
+            "No encontré una coincidencia exacta.\n\n" +
+              'El Data Matrix indica: "' +
+              (payload.name || "Nombre no disponible") +
+              '"\n\n' +
+              "Posible persona: " +
+              candidate.name +
+              (details ? "\n" + details : "") +
+              "\n\n¿Es esta persona?",
+          );
+          if (confirmed) {
+            student = candidate;
+            if (rawKey) fuzzyStudentAliases.current.set(rawKey, candidate.id);
+            break;
+          }
+        }
+
+        if (!student) {
+          if (rawKey)
+            rejectedFuzzyScans.current.set(rawKey, Date.now() + 4000);
+          setScanMessage(
+            "Código leído, pero no se confirmó ninguna coincidencia sugerida.",
+          );
+          showDetection("error");
+          return;
+        }
+      }
+    }
+
     if (!student) {
       setScanMessage("Código leído, pero el alumno no coincide con la base.");
       showDetection("error");
@@ -1235,6 +1292,9 @@ export default function DeliveryRegistry({ onClose }) {
       specialty: student.specialty || "",
       company: student.company || "",
     });
+    setContextForm(state.context);
+    setSetupStep(1);
+    setView("setup");
     clearNotice();
   };
 
@@ -1591,6 +1651,15 @@ export default function DeliveryRegistry({ onClose }) {
           )}
         </div>
         <div className="delivery-row-actions">
+          <button
+            className="btn"
+            type="button"
+            aria-label={"Editar " + student.name}
+            title="Editar alumno"
+            onClick={() => editStudent(student)}
+          >
+            <PencilSimple size={18} />
+          </button>
           <label className="delivery-manual-status">
             <span>Estado manual</span>
             <select
