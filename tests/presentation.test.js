@@ -13,10 +13,19 @@ describe("landing de presentación", () => {
     expect(html).toContain("Sistema de gestión y emisión");
     expect(html).toContain("¿Quieres que tu institución pueda usar este sistema?");
     expect(html).toContain("pull request");
-    expect(html).toContain("Contactar al creador");
+    expect(html).toContain("Pedir apoyo al creador");
     expect(html).toContain("Privacidad.");
     expect(html).toContain("Open source.");
-    expect(html).toContain("Dale una estrella en GitHub.");
+    expect(html).toContain("10–20 min");
+    expect(html).toContain("≈ 5 min");
+    expect(html).toContain("1–1.5 h");
+    expect(html).toContain("&lt; 10 min");
+    expect(html).toContain("Tiempos aproximados");
+    expect(html).toContain("Tu escuela puede agregarse al proyecto.");
+    expect(html).toContain("Las aportaciones útiles son bienvenidas.");
+    expect(html).toContain("Colaborar en GitHub");
+    expect(html).toContain("Dar estrella");
+    expect(html).not.toContain('class="brand-mark"');
     expect(html).toContain('href="../registro-entrega/"');
   });
 

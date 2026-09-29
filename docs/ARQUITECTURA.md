@@ -118,3 +118,10 @@ El hero usa `public/Assets/asset_landing.png`; la sección de Data Matrix usa `p
 La landing conserva la entrada estática independiente, pero cambia a una composición image-first. El hero utiliza `asset_landing.png` a pantalla completa con contenido superpuesto; las secciones posteriores evitan depender de tarjetas decorativas y usan líneas, tipografía, espacios y bloques editoriales.
 
 El contenido distingue claramente beneficios para alumnos y planteles, muestra las dos rutas de adopción institucional (colaboración por pull request o integración solicitada al creador) y añade bloques de privacidad y open source. No se incorpora telemetría ni captura de formularios.
+
+
+## Comparación temporal y colaboración autónoma · Beta 0.50.0-beta.17
+
+La landing incorpora una sección estática de comparación de tiempos con relojes hechos en CSS. Las manecillas usan `@keyframes` únicamente como recurso visual; los valores mostrados son texto explícito y se acompañan de una advertencia de que son aproximaciones orientativas. Con `prefers-reduced-motion`, las manecillas dejan de animarse.
+
+La navegación y los CTA priorizan la guía de contribución. La ruta de contacto con el creador permanece disponible, pero ya no es la acción principal para incorporar una escuela. El contenido deja claro que estudiantes, docentes y planteles pueden modificar catálogos y proponer cambios mediante pull requests.

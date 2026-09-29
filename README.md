@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.16-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.17-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,13 +13,13 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.16 · Presentación del proyecto · Parte 2
+## Beta 0.50.0-beta.17 · Presentación del proyecto · Parte 3
 
-La landing de **[/presentacion/](https://gio-canto.github.io/generador-bitacora-dual_2026/presentacion/)** se rediseña para que la primera pantalla sea directamente `asset_landing.png`, con **“Nunca fue tan fácil hacer una bitácora.”** sobre la imagen.
+La landing añade una comparación temporal con relojes animados. Como referencia orientativa, presenta **10–20 minutos** para que un alumno elabore una bitácora sin el sistema frente a **≈ 5 minutos** con datos precargados, y **1–1.5 horas** de registro manual para una jornada de recepción frente a **menos de 10 minutos** con el registro automatizado. La propia página aclara que son tiempos aproximados, no un benchmark formal.
 
-La página explica de forma más directa las ventajas para el alumno: crear desde teléfono, PC o iPad sin depender de archivos de Excel/Word, conservar historial local, reducir errores y reutilizar información frecuente. Para el plantel destaca estandarización, menor riesgo de que se altere el formato y control más rápido de entregas.
+También refuerza la autonomía del proyecto: un alumno, docente o plantel puede proponer su escuela, empresa, catálogos o mejoras mediante GitHub y pull requests. **Colaborar** pasa a ser el CTA principal; pedir apoyo al creador queda como alternativa secundaria.
 
-También se presentan dos formas de incorporar el sistema en una institución: colaborar directamente en GitHub mediante ramas y pull requests, o solicitar apoyo al creador. La landing incorpora además apartados de privacidad, naturaleza open source y un CTA para dar una estrella al repositorio.
+Se elimina el monograma B de la navegación y se añaden iconos lineales discretos para mejorar lectura sin volver a una composición recargada.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
