@@ -5,8 +5,10 @@ import companies from "../data/companies.json";
 import {
   ArrowLeft,
   ArrowRight,
+  Bug,
   Camera,
   CheckCircle,
+  CopySimple,
   Clock,
   DownloadSimple,
   FileArrowUp,
@@ -41,6 +43,13 @@ import {
   weekSummary,
   writeDeliveryState,
 } from "../services/delivery-registry.js";
+import { VERSION } from "../domain/records.js";
+import {
+  createScannerIssue,
+  formatScannerDiagnostic,
+  scannerCodeForCameraError,
+  scannerDiagnosticSnapshot,
+} from "../services/scanner-diagnostics.js";
 import { notify } from "../services/rare-notification.jsx";
 import "../delivery-registry.css";
 
@@ -59,7 +68,11 @@ function loadExternalScript(src, timeout = 8000) {
       return;
     }
 
-    const script = existing || document.createElement("script");
+    // Los scripts del HTML son parser-blocking. Si llegamos aquí y el global
+    // no existe, ese elemento ya no va a volver a emitir "load"; se reemplaza
+    // para que el reintento tenga eventos observables y un código diagnóstico.
+    if (existing) existing.remove();
+    const script = document.createElement("script");
     const timer = setTimeout(() => {
       cleanup();
       reject(new Error("El lector tardó demasiado en cargar."));
@@ -77,28 +90,32 @@ function loadExternalScript(src, timeout = 8000) {
     };
     const onError = () => {
       cleanup();
-      if (!existing) script.remove();
+      script.remove();
       reject(new Error("No se pudo cargar el lector Data Matrix."));
     };
 
     script.addEventListener("load", onLoad, { once: true });
     script.addEventListener("error", onError, { once: true });
-    if (!existing) {
-      script.src = src;
-      script.async = true;
-      document.head.appendChild(script);
-    }
+    script.src = src;
+    script.async = true;
+    document.head.appendChild(script);
   });
 }
 
 async function ensureZxingBrowser() {
-  if (window.ZXingBrowser) return window.ZXingBrowser;
+  if (window.ZXingBrowser) {
+    window.__deliveryZxingSource ||= "preloaded";
+    return window.ZXingBrowser;
+  }
   if (!zxingLoadPromise) {
     zxingLoadPromise = (async () => {
       for (const src of ZXING_SOURCES) {
         try {
           await loadExternalScript(src);
-          if (window.ZXingBrowser) return window.ZXingBrowser;
+          if (window.ZXingBrowser) {
+            window.__deliveryZxingSource = src;
+            return window.ZXingBrowser;
+          }
         } catch {
           // Prueba el siguiente origen.
         }
@@ -327,7 +344,7 @@ export default function DeliveryRegistry({ onClose }) {
   const [scanMessage, setScanMessage] = useState("Apunta la cámara al Data Matrix.");
   const [scanTone, setScanTone] = useState("");
   const [scanBox, setScanBox] = useState(null);
-  const [scannerError, setScannerError] = useState("");
+  const [scannerError, setScannerError] = useState(null);
   const [cameraState, setCameraState] = useState("idle");
   const videoRef = useRef(null);
   const scanControls = useRef(null);
@@ -367,6 +384,46 @@ export default function DeliveryRegistry({ onClose }) {
     setNotice({ kind, title, description });
 
   const clearNotice = () => setNotice(null);
+
+  const reportScannerIssue = (code, error, extra = {}) => {
+    const issue = createScannerIssue(code, error, extra);
+    setScannerError(issue);
+    console.error("[Registro de entrega][" + issue.code + "]", {
+      ...issue,
+      cameraState,
+      zxingLoaded: Boolean(window.ZXingBrowser),
+    });
+    return issue;
+  };
+
+  const clearScannerIssue = () => setScannerError(null);
+
+  const copyScannerDiagnostic = async () => {
+    if (!scannerError) return;
+    const diagnostic = scannerDiagnosticSnapshot({
+      issue: scannerError,
+      cameraState,
+      video: videoRef.current,
+      stream: cameraStreamRef.current,
+      zxing: window.ZXingBrowser,
+      version: VERSION,
+    });
+    const text = formatScannerDiagnostic(diagnostic);
+    try {
+      await navigator.clipboard.writeText(text);
+      notify("success", "Diagnóstico copiado", scannerError.code);
+    } catch {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand?.("copy");
+      area.remove();
+      notify("success", "Diagnóstico copiado", scannerError.code);
+    }
+  };
 
   useEffect(() => {
     if (activeWeekId && !state.weeks.some((week) => week.id === activeWeekId))
@@ -515,7 +572,7 @@ export default function DeliveryRegistry({ onClose }) {
     }
   };
 
-  const cameraErrorMessage = (error) => {
+  const cameraErrorUserMessage = (error) => {
     const name = String(error?.name || "");
     if (name === "NotAllowedError" || name === "SecurityError")
       return "Safari no tiene permiso para usar la cámara. Permite la cámara para este sitio y toca Reintentar.";
@@ -562,7 +619,11 @@ export default function DeliveryRegistry({ onClose }) {
           finish();
       };
       const timer = setTimeout(
-        () => finish(new Error("La vista de cámara no recibió video.")),
+        () => {
+          const error = new Error("La vista de cámara no recibió video.");
+          error.scannerCode = "VID-102";
+          finish(error);
+        },
         8000,
       );
 
@@ -575,7 +636,10 @@ export default function DeliveryRegistry({ onClose }) {
 
       const playResult = video.play();
       if (playResult?.catch)
-        playResult.catch((error) => finish(error));
+        playResult.catch((error) => {
+          error.scannerCode = error.scannerCode || "VID-103";
+          finish(error);
+        });
 
       check();
     });
@@ -583,7 +647,14 @@ export default function DeliveryRegistry({ onClose }) {
 
   const startLiveDecoder = async (video) => {
     let ZX = window.ZXingBrowser;
-    if (!ZX) ZX = await ensureZxingBrowser();
+    if (!ZX) {
+      try {
+        ZX = await ensureZxingBrowser();
+      } catch (error) {
+        error.scannerCode = error.scannerCode || "ZX-201";
+        throw error;
+      }
+    }
 
     const Reader =
       ZX?.BrowserDatamatrixCodeReader || ZX?.BrowserMultiFormatReader;
@@ -594,9 +665,15 @@ export default function DeliveryRegistry({ onClose }) {
         delayBetweenScanSuccess: 220,
         tryPlayVideoTimeout: 8000,
       };
-      const reader = ZX.BrowserDatamatrixCodeReader
-        ? new ZX.BrowserDatamatrixCodeReader(undefined, options)
-        : new ZX.BrowserMultiFormatReader(undefined, options);
+      let reader;
+      try {
+        reader = ZX.BrowserDatamatrixCodeReader
+          ? new ZX.BrowserDatamatrixCodeReader(undefined, options)
+          : new ZX.BrowserMultiFormatReader(undefined, options);
+      } catch (error) {
+        error.scannerCode = "ZX-203";
+        throw error;
+      }
 
       if (
         !ZX.BrowserDatamatrixCodeReader &&
@@ -604,7 +681,8 @@ export default function DeliveryRegistry({ onClose }) {
       )
         reader.possibleFormats = [ZX.BarcodeFormat.DATA_MATRIX];
 
-      scanControls.current = reader.scan(video, (result, error) => {
+      try {
+        scanControls.current = reader.scan(video, (result, error) => {
         if (result) {
           scanProcessorRef.current?.(
             result.getText?.() || result.text || "",
@@ -621,19 +699,30 @@ export default function DeliveryRegistry({ onClose }) {
           errorName &&
           !/NotFound|Checksum|Format/i.test(errorName)
         ) {
-          setScannerError(
-            "La cámara sigue activa, pero el decodificador encontró un problema: " +
-              (error?.message || errorName),
-          );
+          reportScannerIssue("ZX-205", error, {
+            stage: "decode-loop",
+            source: "ZXing Browser",
+            message:
+              "La cámara sigue activa, pero el decodificador encontró un error durante la lectura.",
+          });
         }
-      });
+        });
+      } catch (error) {
+        error.scannerCode = "ZX-204";
+        throw error;
+      }
       return true;
     }
 
     if ("BarcodeDetector" in window) {
       const formats = await window.BarcodeDetector.getSupportedFormats?.();
-      if (formats && !formats.includes("data_matrix"))
-        return false;
+      if (formats && !formats.includes("data_matrix")) {
+        const error = new Error(
+          "BarcodeDetector no soporta Data Matrix en este navegador.",
+        );
+        error.scannerCode = "BD-206";
+        throw error;
+      }
 
       const detector = new window.BarcodeDetector({
         formats: ["data_matrix"],
@@ -663,22 +752,34 @@ export default function DeliveryRegistry({ onClose }) {
       return true;
     }
 
-    return false;
+    const error = new Error(
+      "ZXing cargó sin un lector Data Matrix compatible y no hay BarcodeDetector utilizable.",
+    );
+    error.scannerCode = "ZX-202";
+    throw error;
   };
 
   const startCamera = async () => {
     if (cameraState === "starting") return;
     stopCamera();
-    setScannerError("");
+    clearScannerIssue();
     setCameraState("starting");
     setScanMessage("Solicitando cámara…");
 
     let stream = null;
     try {
-      if (!window.isSecureContext)
-        throw new Error("La cámara requiere una conexión HTTPS segura.");
-      if (!navigator.mediaDevices?.getUserMedia)
-        throw new Error("Este navegador no ofrece acceso compatible a la cámara.");
+      if (!window.isSecureContext) {
+        const error = new Error("La cámara requiere una conexión HTTPS segura.");
+        error.scannerCode = "CAM-001";
+        throw error;
+      }
+      if (!navigator.mediaDevices?.getUserMedia) {
+        const error = new Error(
+          "Este navegador no ofrece acceso compatible a la cámara.",
+        );
+        error.scannerCode = "CAM-002";
+        throw error;
+      }
 
       // Pedimos la cámara antes de cargar cualquier otra cosa para conservar el
       // gesto del usuario en Safari/iOS.
@@ -704,7 +805,11 @@ export default function DeliveryRegistry({ onClose }) {
 
       cameraStreamRef.current = stream;
       const video = videoRef.current;
-      if (!video) throw new Error("No se encontró la vista de cámara.");
+      if (!video) {
+        const error = new Error("No se encontró la vista de cámara.");
+        error.scannerCode = "VID-101";
+        throw error;
+      }
 
       setScanMessage("Iniciando vista de cámara…");
       await attachStreamToVideo(video, stream);
@@ -717,18 +822,34 @@ export default function DeliveryRegistry({ onClose }) {
       try {
         const decoderReady = await startLiveDecoder(video);
         if (decoderReady) {
-          setScannerError("");
+          clearScannerIssue();
           setScanMessage("Cámara lista. Acerca el Data Matrix al recuadro.");
         } else {
-          setScannerError(
-            "La cámara está activa, pero este navegador no pudo iniciar el decodificador Data Matrix. Prueba Leer imagen.",
-          );
+          reportScannerIssue("ZX-202", null, {
+            stage: "decoder-capability",
+            source: "ZXing / BarcodeDetector",
+            message:
+              "La cámara está activa, pero no se encontró un lector Data Matrix compatible.",
+          });
           setScanMessage("Cámara activa · lector no disponible.");
         }
       } catch (decoderError) {
-        setScannerError(
-          "La cámara está activa, pero el lector Data Matrix no pudo cargarse: " +
-            (decoderError?.message || "error desconocido"),
+        reportScannerIssue(
+          decoderError?.scannerCode || "ZX-204",
+          decoderError,
+          {
+            stage:
+              decoderError?.scannerCode === "ZX-201"
+                ? "load-library"
+                : decoderError?.scannerCode === "ZX-203"
+                  ? "create-reader"
+                  : decoderError?.scannerCode === "BD-206"
+                    ? "barcode-detector"
+                    : "start-reader",
+            source: "ZXing Browser",
+            message:
+              "La cámara está activa, pero el lector Data Matrix no pudo iniciar.",
+          },
         );
         setScanMessage("Cámara activa · lector no disponible.");
       }
@@ -743,7 +864,19 @@ export default function DeliveryRegistry({ onClose }) {
       if (cameraStreamRef.current === stream) cameraStreamRef.current = null;
       const video = videoRef.current;
       if (video?.srcObject === stream) video.srcObject = null;
-      setScannerError(cameraErrorMessage(error));
+      const code =
+        error?.scannerCode ||
+        (String(error?.scannerCode || "").startsWith("VID-")
+          ? error.scannerCode
+          : scannerCodeForCameraError(error));
+      reportScannerIssue(code, error, {
+        stage: code.startsWith("VID-") ? "video-preview" : "open-camera",
+        source: "getUserMedia / HTMLVideoElement",
+        message:
+          code.startsWith("VID-")
+            ? "La cámara entregó un stream, pero la vista de video no pudo iniciar."
+            : cameraErrorUserMessage(error),
+      });
       setCameraState("error");
       setScanMessage("La cámara necesita atención.");
     }
@@ -758,7 +891,7 @@ export default function DeliveryRegistry({ onClose }) {
 
     pendingIds.current = new Set();
     setScanQueue([]);
-    setScannerError("");
+    clearScannerIssue();
     setScanMessage("Toca Activar cámara para comenzar.");
     setCameraState("idle");
 
@@ -775,7 +908,7 @@ export default function DeliveryRegistry({ onClose }) {
       if (!document.hidden && document.visibilityState !== "hidden") return;
       stopCamera();
       setCameraState("idle");
-      setScannerError("");
+      clearScannerIssue();
       setScanMessage("Cámara pausada. Toca Activar cámara para continuar.");
     };
 
@@ -1102,7 +1235,7 @@ export default function DeliveryRegistry({ onClose }) {
   const scanImageFile = async (file) => {
     if (!file) return;
     try {
-      setScannerError("");
+      clearScannerIssue();
       let ZX = window.ZXingBrowser;
       if (!ZX) {
         try {
@@ -1156,10 +1289,11 @@ export default function DeliveryRegistry({ onClose }) {
 
       throw new Error("No hay un lector Data Matrix disponible.");
     } catch (error) {
-      setScannerError(
-        error?.message ||
-          "No se pudo leer el Data Matrix de la imagen seleccionada.",
-      );
+      reportScannerIssue(error?.scannerCode || "IMG-301", error, {
+        stage: "decode-image",
+        source: "Archivo / ZXing",
+        message: "No se pudo leer el Data Matrix de la imagen seleccionada.",
+      });
     }
   };
 
@@ -2045,6 +2179,12 @@ export default function DeliveryRegistry({ onClose }) {
                 </div>
               )}
               <div className={"delivery-camera-hud " + (scanTone || "")}>
+                {scannerError && (
+                  <span className="delivery-camera-error-code">
+                    <Bug size={14} />
+                    {scannerError.code}
+                  </span>
+                )}
                 <span className="delivery-camera-live">
                   {scanTone === "ok" ? (
                     <CheckCircle size={15} weight="fill" />
@@ -2071,19 +2211,34 @@ export default function DeliveryRegistry({ onClose }) {
               <div className="delivery-scanner-error" role="alert">
                 <WarningCircle size={22} weight="fill" aria-hidden="true" />
                 <div>
-                  <strong>
-                    {cameraState === "ready"
-                      ? "La cámara está activa, pero el lector falló"
-                      : "No se pudo abrir la cámara"}
-                  </strong>
-                  <p>{scannerError}</p>
+                  <div className="delivery-error-heading">
+                    <strong>{scannerError.title}</strong>
+                    <code>{scannerError.code}</code>
+                  </div>
+                  <p>{scannerError.message}</p>
+                  {scannerError.technical && (
+                    <span className="delivery-error-technical">
+                      {scannerError.errorName
+                        ? scannerError.errorName + ": "
+                        : ""}
+                      {scannerError.technical}
+                    </span>
+                  )}
                   <span>
-                    En iPhone o iPad revisa que Safari tenga permiso de cámara para este sitio.
-                    También puedes fotografiar el Data Matrix y leerlo sin cámara en vivo.
+                    Etapa: {scannerError.stage || "sin identificar"} · Área:{" "}
+                    {scannerError.area}
                   </span>
                   <div className="delivery-scanner-error-actions">
                     <button className="btn" type="button" onClick={startCamera}>
-                      Reintentar cámara
+                      Reintentar
+                    </button>
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={copyScannerDiagnostic}
+                    >
+                      <CopySimple size={16} />
+                      Copiar diagnóstico
                     </button>
                     <label className="btn delivery-file-button">
                       Leer imagen

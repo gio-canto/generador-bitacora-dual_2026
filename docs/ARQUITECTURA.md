@@ -47,3 +47,16 @@ El registro se considera **mobile-first**. En iOS/iPadOS el acceso a cámara se 
 El stream se detiene al salir del escáner, al ocultarse la página o al producirse `pagehide`. Al regresar no se reinicia automáticamente: el usuario vuelve a tocar **Activar cámara**. Esto evita conservar tracks inválidos después de bloquear el dispositivo, cambiar de app o reanudar una PWA/pestaña de Safari.
 
 El diseño móvil usa `100dvh`, `viewport-fit=cover` y `env(safe-area-inset-*)`. Los controles críticos tienen objetivo táctil mínimo de 44 px y el escáner oculta la barra superior en móvil para dedicar la mayor parte de la pantalla a la cámara.
+
+
+## Diagnóstico del escáner · Beta 0.50.0-beta.9
+
+`src/services/scanner-diagnostics.js` concentra los códigos de error y la generación del reporte copiable. La clasificación queda separada por capas:
+
+- `CAM-xxx`: contexto seguro, API de cámara, permisos, dispositivo ocupado o restricciones.
+- `VID-xxx`: elemento `<video>`, reproducción y llegada de fotogramas.
+- `ZX-xxx`: carga de ZXing, creación del lector, inicio de `scan()` y fallos fatales del ciclo.
+- `BD-xxx`: disponibilidad de Data Matrix en `BarcodeDetector`.
+- `IMG-xxx`: lectura desde archivo de imagen.
+
+El diagnóstico toma únicamente estado técnico necesario para reproducir el fallo. No incluye el contenido del Data Matrix y sustituye el identificador concreto de la cámara por un booleano que sólo indica si el navegador expuso `deviceId`.

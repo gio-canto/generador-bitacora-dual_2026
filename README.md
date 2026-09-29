@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.8-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.9-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,17 +13,19 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.8 · Registro de entrega · Parte 8
+## Beta 0.50.0-beta.9 · Registro de entrega · Parte 9
 
-La serie 0.50 incorpora el **Subsistema de registro de entrega** como página independiente y está diseñada con prioridad para iPhone, iPad y otros dispositivos móviles.
+La versión actual añade un sistema de **diagnóstico por códigos** al escáner móvil. Cuando algo falla, el registro ya no muestra solamente “el lector falló”: indica exactamente la zona del problema.
 
-La beta.8 corrige el arranque real de cámara en Safari/iOS. La aplicación confirma primero el stream y la vista de cámara; después inicia el decodificador Data Matrix. Si ZXing tarda, falla o no estaba cargado, la cámara ya no se apaga: el lector intenta recuperarse desde una segunda fuente y el error se muestra por separado.
+Los códigos se agrupan así: `CAM-xxx` para acceso a cámara, `VID-xxx` para la vista de video, `ZX-xxx` para ZXing, `BD-xxx` para BarcodeDetector e `IMG-xxx` para lectura desde fotografía.
 
-También se corrigió una condición de carrera con los eventos de video de Safari y se reforzó **Leer imagen** con el mismo mecanismo de recuperación del lector.
+Cada aviso incluye un botón **Copiar diagnóstico** con versión, etapa, estado del stream, dimensiones del video, disponibilidad de los lectores y navegador. El reporte no copia el contenido del Data Matrix ni el identificador real de la cámara.
 
-El Data Matrix conserva nombre, especialidad, empresa, fecha inicial y fecha final, por lo que una misma sesión puede recibir bitácoras de varias semanas y calcular entregas a destiempo.
+También se reforzó la recuperación de ZXing: si el script inicial quedó cargado sin exponer el global esperado, el sistema lo reemplaza y reintenta desde jsDelivr y unpkg.
 
-La serie queda: beta.1 (subsistema inicial), beta.2 (página independiente), beta.3 (registro por plantel), beta.4 (identidad completa), beta.5 (avisos), beta.6 (periodo y varias semanas), beta.7 (mobile-first para iOS) y beta.8 (separación cámara/decodificador y arranque estable).
+El Data Matrix conserva nombre, especialidad, empresa, fecha inicial y fecha final, por lo que una sesión puede recibir varias semanas y calcular entregas a destiempo.
+
+La serie 0.50 llega a beta.9 con instrumentación específica para localizar el fallo restante del lector en iPhone/iPad.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
