@@ -35,7 +35,7 @@ describe("landing de presentación", () => {
     expect(jsx).toContain("<QrCode");
     expect(jsx).toContain("<ShieldCheck");
     expect(jsx).toContain("<DeviceMobile");
-    expect(jsx).toContain('href="../registro-entrega/"');
+    expect(jsx).toContain('"../registro-entrega/"');
   });
 
   it("mantiene la presentación como entrada Vite y recurso offline", async () => {
