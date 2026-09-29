@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.25 · Historial en barra y retorno al PDF · 2026-09-29
+
+- **Bitácoras anteriores** se mueve de la portada a la barra superior para estar disponible sin competir visualmente con el contenido principal.
+- El acceso funciona como un menú compacto; en móvil reduce su etiqueta a **Anteriores** y mantiene el contador.
+- La lista de semanas aparece como un desplegable flotante desde la barra superior.
+- En la revisión de una bitácora guardada, la acción principal cambia de **Abrir para editar** a **Volver a descargar PDF**.
+- Esa acción carga la bitácora seleccionada y lleva directamente al **paso 5 · Revisión y PDF**, sin recorrer los pasos 1 a 4.
+- La revisión inicial sigue siendo de sólo lectura hasta que la persona elige explícitamente volver al PDF.
+- La administración completa del paso 5 conserva las acciones para abrir, duplicar o eliminar registros.
+- Se amplía la prueba de interfaz para comprobar la nueva ubicación y el salto directo al paso 5.
+
 ## 0.50.0-beta.24 · Acceso discreto al historial · 2026-09-29
 
 - El acceso **Bitácoras anteriores** del inicio deja de mostrarse como una tarjeta ancha y pasa a presentarse como un control secundario compacto.
