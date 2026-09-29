@@ -57,6 +57,22 @@ const EVENTS = Object.freeze({
     title: "Halloween",
     description: () => "Hoy la bitácora se ve un poco distinta.",
   },
+  "11-01": {
+    id: "day-of-the-dead-1",
+    kind: "day-of-the-dead",
+    eyebrow: "1 de noviembre",
+    title: "Día de Muertos",
+    description: () =>
+      "Entre cempasúchil y luz, recordamos a quienes siguen presentes en nuestra memoria.",
+  },
+  "11-02": {
+    id: "day-of-the-dead-2",
+    kind: "day-of-the-dead",
+    eyebrow: "2 de noviembre",
+    title: "Día de Muertos",
+    description: () =>
+      "Una tradición mexicana de memoria, encuentro y homenaje.",
+  },
   "11-20": {
     id: "mexican-revolution",
     kind: "revolution",
@@ -196,6 +212,8 @@ function visualMarkup(event, state) {
       return `<div class="calendar-visual calendar-visual--dual">${flagsMarkup(true)}<div class="dual-nodes" aria-hidden="true"><span>Escuela</span><i></i><span>Empresa</span></div></div>`;
     case "halloween":
       return '<div class="calendar-visual calendar-visual--halloween" aria-hidden="true"><div class="halloween-eyes"><i></i><i></i></div><strong>31 / 10</strong></div>';
+    case "day-of-the-dead":
+      return '<div class="calendar-visual calendar-visual--day-of-the-dead" aria-hidden="true"><div class="cempasuchil"><i></i><i></i><i></i><i></i><i></i></div><div class="memorial-candle"><span></span></div><strong>1 · 2 XI</strong></div>';
     case "revolution":
       return '<div class="calendar-visual calendar-visual--revolution" aria-hidden="true"><small>ARCHIVO</small><strong>20 · XI</strong><span>1910</span></div>';
     case "christmas-eve":
