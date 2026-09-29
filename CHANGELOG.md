@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.9 · Registro de entrega · Parte 9 · 2026-09-28
+
+- El escáner incorpora **códigos de error estables** para identificar en qué etapa falla el flujo: cámara (`CAM-xxx`), vista de video (`VID-xxx`), lector ZXing/BarcodeDetector (`ZX-xxx` / `BD-xxx`) e imagen (`IMG-xxx`).
+- Los errores muestran código, área, etapa, mensaje para el usuario y detalle técnico separado.
+- Se añade **Copiar diagnóstico**, que genera un reporte con versión, código, etapa, estado de cámara, stream, dimensiones de video, disponibilidad de ZXing, lector Data Matrix, BarcodeDetector y navegador.
+- El diagnóstico no copia el contenido del Data Matrix ni el identificador real del dispositivo; sólo indica si existe un `deviceId`.
+- El sistema registra el mismo código en consola para facilitar pruebas remotas.
+- Se mejora el reintento de carga de ZXing: si existe un script previo sin global disponible, se reemplaza y se vuelve a cargar desde jsDelivr o unpkg con eventos observables.
+- El diagnóstico incluye qué fuente cargó ZXing.
+
 ## 0.50.0-beta.8 · Registro de entrega · Parte 8 · 2026-09-28
 
 - Se corrige un fallo de iPhone/iPad donde un error del decodificador podía cerrar inmediatamente un stream de cámara que sí había abierto correctamente.
