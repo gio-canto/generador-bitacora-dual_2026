@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.13 · Registro de entrega · Parte 13 · 2026-09-28
+
+- Se añade **Reporte de entregas en PDF** con diseño institucional, preparado para imprimir o archivar.
+- El reporte ofrece dos modos: **Listado simplificado** de una semana seleccionada y **Semana por semana** con el historial completo.
+- Cada alumno aparece con su **Blobatar**, nombre, especialidad, empresa, estado, fecha/hora de registro y origen de la entrega.
+- El encabezado del PDF incluye plantel, **generación dual**, fecha de creación, versión del sistema, periodo, fecha límite y estado de la semana.
+- Cada sección incluye resumen de **Entregado a tiempo**, **Entregado a destiempo** y **No entregado**, numeración de páginas y total de alumnos de la base.
+- Se añade el campo **Generación dual** a la configuración del registro y al archivo portátil JSON.
+- El almacenamiento del registro pasa a esquema v5 y migra automáticamente las bases anteriores.
+- El reporte se genera completamente en el navegador y no envía datos a un servidor.
+
 ## 0.50.0-beta.12 · Registro de entrega · Parte 12 · 2026-09-28
 
 - La barra de filtros añade un selector explícito de **Entrega** con: Todos, Entregados a tiempo, A destiempo y No entregados.
