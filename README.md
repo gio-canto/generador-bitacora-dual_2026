@@ -4,7 +4,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.25-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.26-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -35,7 +35,7 @@ El proyecto funciona sin cuentas y sin una base de datos central propia. El gene
 | **Registro de entrega** | Mantiene una base local de alumnos, semanas y estados de recepción. |
 | **Data Matrix** | Relaciona la bitácora con alumno, especialidad, empresa y periodo. |
 | **Reportes** | Genera listados por semana, historial y matriz global de entregas. |
-| **Presentación** | Explica el proyecto y las rutas para adoptarlo o colaborar. |
+| **Presentación** | Explica el proyecto, muestra experiencias de uso y las rutas para adoptarlo o colaborar. |
 
 ## Funciones principales
 
