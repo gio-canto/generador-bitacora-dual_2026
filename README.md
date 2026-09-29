@@ -4,7 +4,7 @@
 
 Una semana de actividades, un PDF listo para firmar.
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.9-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.10-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![MIT](https://img.shields.io/badge/licencia-MIT-555)](LICENSE)
@@ -13,19 +13,15 @@ Una semana de actividades, un PDF listo para firmar.
 
 </div>
 
-## Beta 0.50.0-beta.9 · Registro de entrega · Parte 9
+## Beta 0.50.0-beta.10 · Registro de entrega · Parte 10
 
-La versión actual añade un sistema de **diagnóstico por códigos** al escáner móvil. Cuando algo falla, el registro ya no muestra solamente “el lector falló”: indica exactamente la zona del problema.
+La beta.10 corrige específicamente el error **ZX-205** observado en iPhone/iPad. El problema estaba en que el ciclo de ZXing detenía el escáner ante cualquier excepción que no reconociera como NotFound/Checksum/Format, aunque en Safari algunas de esas excepciones pueden ser transitorias.
 
-Los códigos se agrupan así: `CAM-xxx` para acceso a cámara, `VID-xxx` para la vista de video, `ZX-xxx` para ZXing, `BD-xxx` para BarcodeDetector e `IMG-xxx` para lectura desde fotografía.
+El registro ahora controla su propio bucle de lectura. Los fotogramas sin código se ignoran normalmente, los fallos temporales de video/canvas se reintentan y un error genérico sólo se reporta después de repetirse varias veces. Incluso después de mostrar el aviso, el lector sigue intentando recuperarse.
 
-Cada aviso incluye un botón **Copiar diagnóstico** con versión, etapa, estado del stream, dimensiones del video, disponibilidad de los lectores y navegador. El reporte no copia el contenido del Data Matrix ni el identificador real de la cámara.
+También se simplificó la pantalla móvil: cámara más grande, menos texto, controles **Salir / Foto / Terminar** en una sola fila y detalles técnicos plegados.
 
-También se reforzó la recuperación de ZXing: si el script inicial quedó cargado sin exponer el global esperado, el sistema lo reemplaza y reintenta desde jsDelivr y unpkg.
-
-El Data Matrix conserva nombre, especialidad, empresa, fecha inicial y fecha final, por lo que una sesión puede recibir varias semanas y calcular entregas a destiempo.
-
-La serie 0.50 llega a beta.9 con instrumentación específica para localizar el fallo restante del lector en iPhone/iPad.
+El diagnóstico por códigos se conserva. Si vuelve a aparecer un error, `ZX-207` indica problemas repetidos capturando fotogramas y `ZX-205` queda reservado para fallos repetidos del decodificador.
 
 ## Beta 0.49.0-beta.3 · Anti-fool upgrade · Parte 3
 
