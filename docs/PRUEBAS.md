@@ -92,3 +92,14 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Confirmar que el PDF muestre plantel, generación, fecha de creación, versión, periodo, límite, resumen y numeración.
 - Abrir el PDF en Safari/iPhone, Vista Previa/macOS o un lector equivalente y verificar que no existan recortes ni páginas vacías.
 - Imprimir una página de prueba en A4 y comprobar legibilidad en escala 100%.
+
+
+## Reporte global · Beta 0.50.0-beta.14
+
+- Generar **Global de todas** con al menos dos alumnos y dos semanas.
+- Confirmar que las semanas se ordenan cronológicamente aunque hayan sido creadas en otro orden.
+- Verificar que cada fila conserva mini Blobatar, nombre, especialidad y empresa.
+- Comprobar la leyenda ✓ A tiempo, ! A destiempo y × No entregado.
+- Probar más de 15 semanas para revisar la división horizontal.
+- Probar más de 14 alumnos para revisar la división vertical y la numeración de páginas.
+- Abrir e imprimir el PDF en A4 horizontal al 100%.
