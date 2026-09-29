@@ -124,3 +124,15 @@ El texto copiado debe incluir versión, código, etapa, estado del stream/video 
 - Revisar las rutas institucionales de GitHub/pull request y contacto con el creador.
 - Confirmar las secciones de Privacidad y Open source y el CTA para dar estrella en GitHub.
 - Revisar 390, 430, 768, 1024 y 1440 px sin solapamientos ni bloques decorativos innecesarios.
+
+
+## Tiempos y autonomía · Beta 0.50.0-beta.17
+
+- Verificar la sección de tiempos con reloj animado para Alumno y Escuela.
+- Confirmar textos 10–20 min, ≈ 5 min, 1–1.5 h y menos de 10 min.
+- Confirmar que la página aclara que son tiempos aproximados y no benchmark formal.
+- Activar `prefers-reduced-motion` y revisar que los relojes queden estáticos.
+- Confirmar que no aparezca el monograma B en la navegación.
+- Verificar que Colaborar sea el CTA principal y apunte a `CONTRIBUTING.md`.
+- Confirmar que la landing indique que alumnos y planteles pueden agregar escuela/empresa y enviar pull requests.
+- Revisar iconos en botones y ventajas en 390, 430, 768, 1024 y 1440 px.
