@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.29";
-export const RELEASE = "Estado No aplica";
+export const VERSION = "0.50.0-beta.30";
+export const RELEASE = "Diccionario técnico e institucional";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
