@@ -110,7 +110,7 @@ Cada celda usa únicamente el estado resumido; el detalle de fecha/hora permanec
 
 El hero usa `public/Assets/asset_landing.png`; la sección de Data Matrix usa `public/Assets/Asset_cont_matrix.png`. La landing explica los tres frentes del ecosistema (generador, registro de entregas y sistema complementario de constancias), el flujo de alumno a Vinculación y un proceso sugerido de incorporación por plantel.
 
-`src/presentation.css` usa tipografía del sistema, superficies sobrias, safe areas y `prefers-reduced-motion`. `src/presentation.js` sólo gestiona aparición progresiva y el registro del service worker; no captura datos del visitante.
+`src/presentation.css` usa tipografía del sistema, superficies sobrias, safe areas y `prefers-reduced-motion`. Desde la beta.18, `src/presentation.jsx` concentra el montaje React, la aparición progresiva y el registro del service worker; no captura datos del visitante.
 
 
 ## Presentación editorial · Beta 0.50.0-beta.16
