@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { Blobatar } from "blobatar/react";
 function SvgIcon({
   name,
   size = 20,
@@ -222,111 +223,462 @@ document.documentElement.classList.add("js", "presentation-react");
 
 const REPO = "https://github.com/gio-canto/generador-bitacora-dual_2026";
 const CONTRIBUTE = REPO + "/blob/main/CONTRIBUTING.md";
+const LANGS = ["es", "en", "de"];
 
-const studentAdvantages = [
-  {
-    icon: DeviceMobile,
-    title: "En cualquier dispositivo.",
-    text: "Crea tu bitácora desde teléfono, PC o iPad, sin depender de un Excel raro o de un Word que cambia según el equipo.",
+const COPY = {
+  es: {
+    nav: {
+      students: "Alumnos",
+      schools: "Escuelas",
+      time: "Tiempos",
+      opinions: "Opiniones",
+      systems: "Sistemas",
+      institutions: "Instituciones",
+      collaborate: "Colaborar",
+      label: "Navegación",
+    },
+    hero: {
+      alt: "Vista de Bitácora Dual 2026",
+      title: "Nunca fue tan fácil hacer una bitácora.",
+      text: "Hazla desde tu teléfono, iPad o computadora. La escuela la recibe con un formato consistente y puede llevar un control más rápido de las entregas.",
+      collaborate: "Colaborar",
+      try: "Probar el generador",
+      devices: "Disponible en distintos dispositivos",
+      phone: "Teléfono",
+      tablet: "iPad",
+      desktop: "Computadora",
+    },
+    student: {
+      label: "Para el alumno",
+      title: "Escribe lo que hiciste. Lo demás ya debería estar listo.",
+      text: "La bitácora deja de ser un archivo que tienes que reconstruir cada semana. Tus datos frecuentes pueden quedar preparados y tú te concentras en registrar las actividades que realmente realizaste.",
+      advantages: [
+        ["En cualquier dispositivo.", "Crea tu bitácora desde teléfono, PC o iPad, sin depender de un Excel raro o de un Word que cambia según el equipo."],
+        ["Tu historial se queda contigo.", "Guarda bitácoras y respaldos en tu propio dispositivo para volver a ellas cuando lo necesites."],
+        ["Más intuitivo, menos errores.", "El sistema guía el llenado y mantiene el formato para reducir equivocaciones de captura o estructura."],
+        ["Sin repetir lo mismo cada semana.", "Plantel, especialidad, empresa, horarios y otros datos pueden quedar precargados. Tú escribes lo que realizaste y continúas."],
+      ],
+    },
+    school: {
+      label: "Para la escuela",
+      title: "Un formato igual para todos. Un seguimiento más rápido para Vinculación.",
+      text: "Facilitarle la bitácora al alumno también ayuda al plantel: menos formatos alterados, menos archivos distintos y una forma más clara de saber quién entregó.",
+      advantages: [
+        ["Facilita el proceso al alumno", "Un flujo claro reduce la fricción de elaborar la evidencia semanal."],
+        ["Estandariza las bitácoras", "Todos parten de la misma estructura y del mismo formato institucional."],
+        ["Evita cambios accidentales", "El alumno no necesita mover celdas, márgenes o elementos del documento para poder llenarlo."],
+        ["Controla entregas con rapidez", "Vinculación puede registrar, filtrar y reportar entregas sin volver a capturar cada dato."],
+      ],
+    },
+    time: {
+      label: "Tiempo aproximado",
+      title: "Menos tiempo llenando y registrando. Más tiempo para lo importante.",
+      text: "Comparación orientativa basada en el flujo esperado del proyecto. No es un benchmark formal: los tiempos reales cambian según la persona, el plantel y la cantidad de alumnos.",
+      student: "Alumno",
+      school: "Escuela",
+      without: "Sin el sistema",
+      perLog: "aprox. por bitácora",
+      with: "Con el sistema",
+      preloaded: "cuando sus datos ya están precargados",
+      manual: "Registro manual",
+      reception: "aprox. para una jornada de recepción",
+      automated: "Registro automatizado",
+      scanning: "aprox. con escaneo y base preparada",
+      disclaimer: "Tiempos aproximados de uso previstos para explicar la diferencia de flujo; no representan una medición científica ni garantizan un tiempo específico.",
+      clockAria: "Reloj animado ilustrativo para",
+    },
+    testimonials: {
+      label: "Lo que dicen quienes lo usan",
+      title: "Hecho para resolver una tarea real, semana tras semana.",
+      text: "Opiniones de estudiantes que ya han usado el generador dentro de su proceso de Educación Dual.",
+      quote: "Pues me ha ayudado a hacerlos de manera rápida y limpia; también me ha ayudado bastante a corregir mis faltas ortográficas.",
+      name: "Wuendy G.",
+      role: "Alumna del Sistema Dual",
+      institution: "CBTis 134",
+      translated: "",
+    },
+    systems: {
+      label: "El proyecto",
+      title: "Tres herramientas para distintas partes del proceso.",
+      text: "El alumno no necesita una pantalla administrativa y Vinculación no necesita llenar la bitácora. Cada sistema hace una sola cosa y la hace de forma clara.",
+      items: [
+        ["Alumnos", "Generador de Bitácora Dual", "Captura la semana, reutiliza información frecuente, conserva historial, muestra una vista previa y genera un PDF listo para revisión y firma.", "Abrir"],
+        ["Vinculación", "Registro de entregas", "Administra alumnos y semanas, escanea Data Matrix, distingue entregas a tiempo o a destiempo y genera listados y reportes globales.", "Abrir"],
+        ["Constancias", "Sistema de gestión y emisión", "Un sistema complementario para organizar la gestión y emisión de constancias de alumnos de modalidad dual y reducir otro trámite repetitivo.", "Complementario"],
+      ],
+    },
+    matrix: {
+      title: "La bitácora también puede identificarse sola.",
+      text: "El Data Matrix conecta el documento con el registro de entrega. Incluye la identidad necesaria para ubicar al alumno y el periodo correcto, sin guardar las actividades ni las firmas.",
+      student: "Alumno",
+      name: "Nombre",
+      affiliation: "Adscripción",
+      specialty: "Especialidad y empresa",
+      period: "Periodo",
+      dates: "Fecha inicial y final",
+      alt: "Ejemplo de una bitácora con Data Matrix",
+      caption: "Ejemplo de una bitácora preparada para el registro de entrega.",
+    },
+    workflow: {
+      label: "Un flujo simple",
+      title: "Crear. Entregar. Registrar. Reportar.",
+      items: [
+        ["El alumno crea", "Completa sus actividades y descarga la bitácora."],
+        ["La escuela recibe", "Escanea o registra la entrega manualmente."],
+        ["El sistema organiza", "Relaciona alumno, semana y estado de entrega."],
+        ["Vinculación reporta", "Consulta por semana o genera una matriz global."],
+      ],
+    },
+    institution: {
+      label: "Para instituciones",
+      title: "¿Quieres que tu institución pueda usar este sistema?",
+      text: "La idea es que el proyecto pueda crecer de forma autónoma. Un alumno, docente o plantel puede aportar directamente: agregar su escuela, empresa, responsable o una mejora completa sin tener que esperar a que alguien lo haga por ellos.",
+      route1: "Ruta 1 · Colaborar",
+      route1Title: "Tu escuela puede agregarse al proyecto.",
+      route1Text: "Estudiantes, docentes o personal de Vinculación pueden editar los catálogos, agregar una escuela o empresa, corregir datos, crear una rama y enviar una pull request. Las aportaciones útiles son bienvenidas.",
+      route1Action: "Colaborar en GitHub",
+      route2: "Ruta 2 · Implementación acompañada",
+      route2Title: "Si necesitan ayuda, también pueden pedirla.",
+      route2Text: "Si el plantel no quiere tocar código, se puede revisar su formato, responsables, empresas, calendario, reglas de entrega y reportes para plantear una integración compatible con su procedimiento actual.",
+      route2Action: "Pedir apoyo al creador",
+      noteTitle: "La meta no es cambiar el procedimiento porque sí.",
+      noteText: "Es quitar captura repetida y conservar los controles que la escuela realmente necesita.",
+    },
+    principles: {
+      label: "Cómo está construido",
+      privacy: "Privacidad.",
+      privacyText: "El generador no necesita una cuenta para crear bitácoras. Los datos de trabajo, historial y registro se mantienen en el navegador o dispositivo y las exportaciones quedan bajo control de quien las descarga.",
+      privacyAction: "Leer aviso de privacidad",
+      open: "Open source.",
+      openText: "El código está disponible públicamente bajo la licencia del proyecto. Cualquier persona puede estudiarlo, proponer mejoras y colaborar mediante issues o pull requests. Un estudiante puede incluso proponer su propio plantel o actualizar un catálogo sin depender de una administración central.",
+      openAction: "Colaborar en GitHub",
+    },
+    github: {
+      label: "Proyecto abierto",
+      title: "Úsalo. Mejora lo que haga falta. Compártelo.",
+      text: "La colaboración es la acción principal del proyecto. Si encuentras algo que pueda mejorar, propón el cambio. Y si te sirve tal como está, una estrella en GitHub ayuda a que más personas lo encuentren.",
+      collaborate: "Colaborar",
+      star: "Dar estrella",
+    },
+    closing: {
+      title: "Menos tiempo acomodando formatos. Más tiempo documentando lo que hiciste.",
+      collaborate: "Colaborar con el proyecto",
+      create: "Crear una bitácora",
+    },
+    footer: {
+      beta: "Proyecto open source en beta.",
+      links: "Enlaces del pie",
+      privacy: "Privacidad",
+      accessibility: "Accesibilidad",
+    },
+    warning: {
+      title: "El sistema completo está en español",
+      text: "Esta traducción corresponde únicamente a la landing page. El generador, el registro de entregas y sus controles internos continúan disponibles en español.",
+      stay: "Quedarme aquí",
+      continue: "Continuar al sistema",
+    },
   },
-  {
-    icon: Folder,
-    title: "Tu historial se queda contigo.",
-    text: "Guarda bitácoras y respaldos en tu propio dispositivo para volver a ellas cuando lo necesites.",
+  en: {
+    nav: { students: "Students", schools: "Schools", time: "Time", opinions: "Reviews", systems: "Systems", institutions: "Institutions", collaborate: "Contribute", label: "Navigation" },
+    hero: {
+      alt: "Bitácora Dual 2026 preview",
+      title: "Creating a dual-education logbook has never been this easy.",
+      text: "Create it from your phone, iPad, or computer. Schools receive a consistent format and can track submissions more efficiently.",
+      collaborate: "Contribute",
+      try: "Try the generator",
+      devices: "Available on different devices",
+      phone: "Phone",
+      tablet: "iPad",
+      desktop: "Computer",
+    },
+    student: {
+      label: "For students",
+      title: "Write what you did. Everything else should already be ready.",
+      text: "Your weekly logbook no longer has to be rebuilt from scratch. Frequent information can stay prepared so you can focus on documenting the work you actually did.",
+      advantages: [
+        ["On any device.", "Create your logbook on a phone, PC, or iPad without depending on an awkward spreadsheet or a Word file that changes between devices."],
+        ["Your history stays with you.", "Keep logbooks and backups on your own device so you can return to them whenever you need them."],
+        ["More intuitive, fewer errors.", "The system guides data entry and keeps the format consistent to reduce capture and layout mistakes."],
+        ["No repeating the same data every week.", "School, program, company, schedules, and other recurring information can be preloaded. You write what you did and move on."],
+      ],
+    },
+    school: {
+      label: "For schools",
+      title: "One consistent format for everyone. Faster tracking for school coordinators.",
+      text: "Making the logbook easier for students also helps the school: fewer altered formats, fewer mismatched files, and a clearer way to know who submitted.",
+      advantages: [
+        ["Makes the student process easier", "A clear workflow reduces friction when preparing weekly evidence."],
+        ["Standardizes logbooks", "Everyone starts from the same structure and institutional format."],
+        ["Prevents accidental changes", "Students do not need to move cells, margins, or document elements just to complete the form."],
+        ["Tracks submissions quickly", "Coordinators can register, filter, and report submissions without re-entering every field."],
+      ],
+    },
+    time: {
+      label: "Approximate time",
+      title: "Less time filling and registering. More time for what matters.",
+      text: "An illustrative comparison based on the project's intended workflow. This is not a formal benchmark: actual times vary by person, school, and number of students.",
+      student: "Student",
+      school: "School",
+      without: "Without the system",
+      perLog: "approx. per logbook",
+      with: "With the system",
+      preloaded: "when recurring data is already preloaded",
+      manual: "Manual registration",
+      reception: "approx. for one intake session",
+      automated: "Automated registration",
+      scanning: "approx. with scanning and a prepared database",
+      disclaimer: "Approximate expected use times shown to illustrate the workflow difference; they are not a scientific measurement and do not guarantee a specific duration.",
+      clockAria: "Animated illustrative clock for",
+    },
+    testimonials: {
+      label: "What users are saying",
+      title: "Built to solve a real weekly task.",
+      text: "Feedback from students who have already used the generator as part of their Dual Education process.",
+      quote: "It has helped me do them quickly and neatly, and it has also helped me a lot with correcting my spelling mistakes.",
+      name: "Wuendy G.",
+      role: "Dual Education student",
+      institution: "CBTis 134",
+      translated: "Translated from Spanish.",
+    },
+    systems: {
+      label: "The project",
+      title: "Three tools for different parts of the process.",
+      text: "Students do not need an administrative dashboard, and school coordinators do not need to fill in the logbook. Each system does one job and keeps it clear.",
+      items: [
+        ["Students", "Dual Logbook Generator", "Capture the week, reuse recurring information, keep history, preview the document, and generate a PDF ready for review and signatures.", "Open"],
+        ["School coordination", "Submission registry", "Manage students and weeks, scan Data Matrix codes, distinguish on-time and late submissions, and create lists and global reports.", "Open"],
+        ["Certificates", "Management and issuance system", "A complementary system for organizing the management and issuance of certificates for dual-education students and reducing another repetitive process.", "Complementary"],
+      ],
+    },
+    matrix: {
+      title: "The logbook can identify itself, too.",
+      text: "The Data Matrix connects the document with the submission registry. It includes the identity needed to locate the student and the correct period without storing activities or signatures.",
+      student: "Student",
+      name: "Name",
+      affiliation: "Affiliation",
+      specialty: "Program and company",
+      period: "Period",
+      dates: "Start and end date",
+      alt: "Example of a logbook with a Data Matrix",
+      caption: "Example of a logbook prepared for submission registration.",
+    },
+    workflow: {
+      label: "A simple workflow",
+      title: "Create. Submit. Register. Report.",
+      items: [
+        ["The student creates", "Completes activities and downloads the logbook."],
+        ["The school receives", "Scans or manually registers the submission."],
+        ["The system organizes", "Links the student, week, and submission status."],
+        ["Coordination reports", "Reviews a week or generates a global matrix."],
+      ],
+    },
+    institution: {
+      label: "For institutions",
+      title: "Do you want your institution to use this system?",
+      text: "The project is designed to grow autonomously. A student, teacher, or school can contribute directly by adding their school, company, responsible staff, or a complete improvement without waiting for someone else to do it.",
+      route1: "Path 1 · Contribute",
+      route1Title: "Your school can be added to the project.",
+      route1Text: "Students, teachers, or coordination staff can edit catalogs, add a school or company, correct data, create a branch, and submit a pull request. Useful contributions are welcome.",
+      route1Action: "Contribute on GitHub",
+      route2: "Path 2 · Assisted implementation",
+      route2Title: "If you need help, you can ask for it too.",
+      route2Text: "If the school does not want to touch code, its format, responsible staff, companies, calendar, submission rules, and reports can be reviewed to propose an integration compatible with its current process.",
+      route2Action: "Ask the creator for help",
+      noteTitle: "The goal is not to change the process just for the sake of it.",
+      noteText: "It is to remove repetitive data entry while preserving the controls the school actually needs.",
+    },
+    principles: {
+      label: "How it is built",
+      privacy: "Privacy.",
+      privacyText: "The generator does not require an account to create logbooks. Work data, history, and registry information stay in the browser or device, and exported files remain under the control of the person who downloads them.",
+      privacyAction: "Read the privacy notice",
+      open: "Open source.",
+      openText: "The code is publicly available under the project's license. Anyone can study it, propose improvements, and contribute through issues or pull requests. A student can even propose their own school or update a catalog without relying on a central administration.",
+      openAction: "Contribute on GitHub",
+    },
+    github: {
+      label: "Open project",
+      title: "Use it. Improve what needs improving. Share it.",
+      text: "Collaboration is the project's main action. If you find something that can be better, propose the change. If it already helps you, a GitHub star can help more people find it.",
+      collaborate: "Contribute",
+      star: "Star the project",
+    },
+    closing: {
+      title: "Less time fixing formats. More time documenting what you actually did.",
+      collaborate: "Contribute to the project",
+      create: "Create a logbook",
+    },
+    footer: {
+      beta: "Open-source project in beta.",
+      links: "Footer links",
+      privacy: "Privacy",
+      accessibility: "Accessibility",
+    },
+    warning: {
+      title: "The full system is currently in Spanish",
+      text: "Only this landing page is translated. The generator, submission registry, and their internal controls are still available in Spanish.",
+      stay: "Stay on this page",
+      continue: "Continue to the Spanish system",
+    },
   },
-  {
-    icon: CheckCircle,
-    title: "Más intuitivo, menos errores.",
-    text: "El sistema guía el llenado y mantiene el formato para reducir equivocaciones de captura o estructura.",
+  de: {
+    nav: { students: "Schüler", schools: "Schulen", time: "Zeit", opinions: "Stimmen", systems: "Systeme", institutions: "Institutionen", collaborate: "Mitwirken", label: "Navigation" },
+    hero: {
+      alt: "Vorschau von Bitácora Dual 2026",
+      title: "Ein duales Wochenprotokoll zu erstellen war noch nie so einfach.",
+      text: "Erstelle es auf dem Smartphone, iPad oder Computer. Die Schule erhält ein einheitliches Format und kann Abgaben schneller nachverfolgen.",
+      collaborate: "Mitwirken",
+      try: "Generator ausprobieren",
+      devices: "Auf verschiedenen Geräten verfügbar",
+      phone: "Smartphone",
+      tablet: "iPad",
+      desktop: "Computer",
+    },
+    student: {
+      label: "Für Schüler",
+      title: "Schreib auf, was du gemacht hast. Der Rest sollte schon vorbereitet sein.",
+      text: "Das Wochenprotokoll muss nicht jede Woche neu aufgebaut werden. Wiederkehrende Angaben können vorbereitet bleiben, damit du dich auf die tatsächlich ausgeführten Tätigkeiten konzentrierst.",
+      advantages: [
+        ["Auf jedem Gerät.", "Erstelle dein Protokoll auf Smartphone, PC oder iPad, ohne von einer umständlichen Excel-Datei oder einem Word-Dokument abhängig zu sein, das sich je nach Gerät verändert."],
+        ["Dein Verlauf bleibt bei dir.", "Speichere Protokolle und Sicherungen auf deinem eigenen Gerät und greife später wieder darauf zu."],
+        ["Intuitiver, weniger Fehler.", "Das System führt durch die Eingabe und hält das Format konsistent, um Erfassungs- und Strukturfehler zu reduzieren."],
+        ["Nicht jede Woche dieselben Daten.", "Schule, Fachrichtung, Unternehmen, Zeiten und weitere wiederkehrende Angaben können vorausgefüllt werden. Du dokumentierst deine Tätigkeiten und machst weiter."],
+      ],
+    },
+    school: {
+      label: "Für Schulen",
+      title: "Ein einheitliches Format für alle. Schnellere Nachverfolgung für die Koordination.",
+      text: "Wenn das Protokoll für Schüler einfacher wird, profitiert auch die Schule: weniger veränderte Vorlagen, weniger unterschiedliche Dateien und ein klarerer Überblick über die Abgaben.",
+      advantages: [
+        ["Vereinfacht den Ablauf für Schüler", "Ein klarer Ablauf reduziert den Aufwand bei der wöchentlichen Dokumentation."],
+        ["Standardisiert die Protokolle", "Alle arbeiten mit derselben Struktur und demselben institutionellen Format."],
+        ["Verhindert versehentliche Änderungen", "Schüler müssen keine Zellen, Ränder oder Dokumentelemente verschieben, um das Formular auszufüllen."],
+        ["Erfasst Abgaben schneller", "Die Koordination kann Abgaben registrieren, filtern und auswerten, ohne alle Daten erneut einzugeben."],
+      ],
+    },
+    time: {
+      label: "Ungefähre Zeit",
+      title: "Weniger Zeit fürs Ausfüllen und Erfassen. Mehr Zeit für das Wesentliche.",
+      text: "Eine illustrative Gegenüberstellung auf Basis des vorgesehenen Projektablaufs. Dies ist kein formaler Benchmark: Die tatsächliche Dauer hängt von Person, Schule und Schülerzahl ab.",
+      student: "Schüler",
+      school: "Schule",
+      without: "Ohne das System",
+      perLog: "ca. pro Protokoll",
+      with: "Mit dem System",
+      preloaded: "wenn wiederkehrende Daten bereits vorausgefüllt sind",
+      manual: "Manuelle Erfassung",
+      reception: "ca. für einen Abgabetermin",
+      automated: "Automatisierte Erfassung",
+      scanning: "ca. mit Scan und vorbereiteter Datenbasis",
+      disclaimer: "Die ungefähren Nutzungszeiten dienen nur dazu, den Unterschied im Ablauf zu veranschaulichen; sie sind keine wissenschaftliche Messung und garantieren keine bestimmte Dauer.",
+      clockAria: "Animierte illustrative Uhr für",
+    },
+    testimonials: {
+      label: "Was Nutzer sagen",
+      title: "Für eine echte Aufgabe entwickelt, die jede Woche wiederkommt.",
+      text: "Rückmeldungen von Schülern, die den Generator bereits in ihrer dualen Ausbildung verwenden.",
+      quote: "Es hat mir geholfen, die Protokolle schnell und ordentlich zu erstellen, und außerdem hilft es mir sehr dabei, meine Rechtschreibfehler zu korrigieren.",
+      name: "Wuendy G.",
+      role: "Schülerin im dualen System",
+      institution: "CBTis 134",
+      translated: "Aus dem Spanischen übersetzt.",
+    },
+    systems: {
+      label: "Das Projekt",
+      title: "Drei Werkzeuge für unterschiedliche Teile des Ablaufs.",
+      text: "Schüler brauchen keine Verwaltungsoberfläche, und die Schulkoordination muss das Protokoll nicht ausfüllen. Jedes System erfüllt eine klar abgegrenzte Aufgabe.",
+      items: [
+        ["Schüler", "Generator für duale Wochenprotokolle", "Erfasst die Woche, nutzt wiederkehrende Daten erneut, speichert den Verlauf, zeigt eine Vorschau und erstellt ein PDF zur Prüfung und Unterschrift.", "Öffnen"],
+        ["Schulkoordination", "Abgaberegister", "Verwaltet Schüler und Wochen, scannt Data-Matrix-Codes, unterscheidet fristgerechte und verspätete Abgaben und erstellt Listen sowie Gesamtberichte.", "Öffnen"],
+        ["Bescheinigungen", "Verwaltungs- und Ausgabesystem", "Ein ergänzendes System zur Organisation und Ausgabe von Bescheinigungen für Schüler im dualen Modell und zur Reduzierung eines weiteren wiederkehrenden Verwaltungsablaufs.", "Ergänzend"],
+      ],
+    },
+    matrix: {
+      title: "Auch das Protokoll kann sich selbst identifizieren.",
+      text: "Der Data Matrix verbindet das Dokument mit dem Abgaberegister. Er enthält die nötigen Angaben, um Schüler und Zeitraum zuzuordnen, ohne Tätigkeiten oder Unterschriften zu speichern.",
+      student: "Schüler",
+      name: "Name",
+      affiliation: "Zuordnung",
+      specialty: "Fachrichtung und Unternehmen",
+      period: "Zeitraum",
+      dates: "Start- und Enddatum",
+      alt: "Beispiel eines Protokolls mit Data Matrix",
+      caption: "Beispiel eines für die Abgabeerfassung vorbereiteten Protokolls.",
+    },
+    workflow: {
+      label: "Ein einfacher Ablauf",
+      title: "Erstellen. Abgeben. Erfassen. Auswerten.",
+      items: [
+        ["Der Schüler erstellt", "Erfasst seine Tätigkeiten und lädt das Protokoll herunter."],
+        ["Die Schule erhält", "Scannt die Abgabe oder erfasst sie manuell."],
+        ["Das System organisiert", "Verknüpft Schüler, Woche und Abgabestatus."],
+        ["Die Koordination wertet aus", "Prüft einzelne Wochen oder erzeugt eine Gesamtmatrix."],
+      ],
+    },
+    institution: {
+      label: "Für Institutionen",
+      title: "Soll deine Institution dieses System nutzen können?",
+      text: "Das Projekt soll eigenständig wachsen können. Schüler, Lehrkräfte oder Schulen können direkt beitragen: die eigene Schule oder ein Unternehmen ergänzen, zuständige Personen eintragen oder eine vollständige Verbesserung vorschlagen.",
+      route1: "Weg 1 · Mitwirken",
+      route1Title: "Deine Schule kann zum Projekt hinzugefügt werden.",
+      route1Text: "Schüler, Lehrkräfte oder Koordinationspersonal können Kataloge bearbeiten, eine Schule oder ein Unternehmen ergänzen, Daten korrigieren, einen Branch erstellen und einen Pull Request senden. Sinnvolle Beiträge sind willkommen.",
+      route1Action: "Auf GitHub mitwirken",
+      route2: "Weg 2 · Begleitete Implementierung",
+      route2Title: "Wenn Unterstützung nötig ist, kann sie ebenfalls angefragt werden.",
+      route2Text: "Wenn die Schule keinen Code bearbeiten möchte, können Format, Verantwortliche, Unternehmen, Kalender, Abgaberegeln und Berichte geprüft werden, um eine mit dem bestehenden Ablauf kompatible Integration vorzuschlagen.",
+      route2Action: "Hilfe beim Ersteller anfragen",
+      noteTitle: "Das Ziel ist nicht, den Ablauf grundlos zu verändern.",
+      noteText: "Es geht darum, wiederholte Dateneingabe zu reduzieren und die Kontrollen zu erhalten, die die Schule tatsächlich benötigt.",
+    },
+    principles: {
+      label: "So ist es aufgebaut",
+      privacy: "Datenschutz.",
+      privacyText: "Der Generator benötigt kein Konto, um Protokolle zu erstellen. Arbeitsdaten, Verlauf und Register bleiben im Browser oder auf dem Gerät; exportierte Dateien bleiben unter Kontrolle der Person, die sie herunterlädt.",
+      privacyAction: "Datenschutzhinweis lesen",
+      open: "Open Source.",
+      openText: "Der Code ist unter der Projektlizenz öffentlich verfügbar. Jede Person kann ihn untersuchen, Verbesserungen vorschlagen und über Issues oder Pull Requests mitwirken. Schüler können sogar ihre eigene Schule vorschlagen oder einen Katalog aktualisieren, ohne von einer zentralen Verwaltung abhängig zu sein.",
+      openAction: "Auf GitHub mitwirken",
+    },
+    github: {
+      label: "Offenes Projekt",
+      title: "Nutze es. Verbessere, was verbessert werden muss. Teile es.",
+      text: "Zusammenarbeit ist die wichtigste Aktion des Projekts. Wenn du etwas verbessern kannst, schlage die Änderung vor. Wenn es dir bereits hilft, kann ein GitHub-Stern dafür sorgen, dass mehr Menschen das Projekt finden.",
+      collaborate: "Mitwirken",
+      star: "Stern vergeben",
+    },
+    closing: {
+      title: "Weniger Zeit für Formatierung. Mehr Zeit für die Dokumentation deiner tatsächlichen Arbeit.",
+      collaborate: "Am Projekt mitwirken",
+      create: "Protokoll erstellen",
+    },
+    footer: {
+      beta: "Open-Source-Projekt in der Beta-Phase.",
+      links: "Links im Seitenfuß",
+      privacy: "Datenschutz",
+      accessibility: "Barrierefreiheit",
+    },
+    warning: {
+      title: "Das vollständige System ist derzeit auf Spanisch",
+      text: "Nur diese Landingpage ist übersetzt. Der Generator, das Abgaberegister und ihre internen Bedienelemente sind weiterhin auf Spanisch verfügbar.",
+      stay: "Auf dieser Seite bleiben",
+      continue: "Zum spanischen System wechseln",
+    },
   },
-  {
-    icon: Database,
-    title: "Sin repetir lo mismo cada semana.",
-    text: "Plantel, especialidad, empresa, horarios y otros datos pueden quedar precargados. Tú escribes lo que realizaste y continúas.",
-  },
-];
+};
 
-const schoolAdvantages = [
-  {
-    icon: Student,
-    title: "Facilita el proceso al alumno",
-    text: "Un flujo claro reduce la fricción de elaborar la evidencia semanal.",
-  },
-  {
-    icon: FilePdf,
-    title: "Estandariza las bitácoras",
-    text: "Todos parten de la misma estructura y del mismo formato institucional.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Evita cambios accidentales",
-    text: "El alumno no necesita mover celdas, márgenes o elementos del documento para poder llenarlo.",
-  },
-  {
-    icon: Scan,
-    title: "Controla entregas con rapidez",
-    text: "Vinculación puede registrar, filtrar y reportar entregas sin volver a capturar cada dato.",
-  },
+const studentIcons = [DeviceMobile, Folder, CheckCircle, Database];
+const schoolIcons = [Student, FilePdf, ShieldCheck, Scan];
+const systemMeta = [
+  { icon: FilePdf, href: "../" },
+  { icon: Scan, href: "../registro-entrega/" },
+  { icon: Buildings },
 ];
+const processIcons = [FilePdf, Scan, Database, Buildings];
 
-const testimonials = [
-  {
-    quote:
-      "Pues me ha ayudado a hacerlos de manera rápida y limpia; también me ha ayudado bastante a corregir mis faltas ortográficas.",
-    name: "Wuendy G.",
-    role: "Alumna del Sistema Dual",
-    institution: "CBTis 134",
-  },
-];
-
-const systems = [
-  {
-    icon: FilePdf,
-    eyebrow: "Alumnos",
-    title: "Generador de Bitácora Dual",
-    text: "Captura la semana, reutiliza información frecuente, conserva historial, muestra una vista previa y genera un PDF listo para revisión y firma.",
-    href: "../",
-    action: "Abrir",
-  },
-  {
-    icon: Scan,
-    eyebrow: "Vinculación",
-    title: "Registro de entregas",
-    text: "Administra alumnos y semanas, escanea Data Matrix, distingue entregas a tiempo o a destiempo y genera listados y reportes globales.",
-    href: "../registro-entrega/",
-    action: "Abrir",
-  },
-  {
-    icon: Buildings,
-    eyebrow: "Constancias",
-    title: "Sistema de gestión y emisión",
-    text: "Un sistema complementario para organizar la gestión y emisión de constancias de alumnos de modalidad dual y reducir otro trámite repetitivo.",
-    note: "Complementario",
-  },
-];
-
-const process = [
-  {
-    icon: FilePdf,
-    title: "El alumno crea",
-    text: "Completa sus actividades y descarga la bitácora.",
-  },
-  {
-    icon: Scan,
-    title: "La escuela recibe",
-    text: "Escanea o registra la entrega manualmente.",
-  },
-  {
-    icon: Database,
-    title: "El sistema organiza",
-    text: "Relaciona alumno, semana y estado de entrega.",
-  },
-  {
-    icon: Buildings,
-    title: "Vinculación reporta",
-    text: "Consulta por semana o genera una matriz global.",
-  },
-];
+function initialLanguage() {
+  const value = new URLSearchParams(window.location.search).get("lang");
+  return LANGS.includes(value) ? value : "es";
+}
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -364,6 +716,8 @@ function useReveal() {
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
   }, []);
+
+  return undefined;
 }
 
 function useScrollMotion(reducedMotion) {
@@ -415,12 +769,12 @@ function IconCircle({ icon: Icon, dark = false }) {
   );
 }
 
-function MotionClock({ label, school = false }) {
+function MotionClock({ label, ariaPrefix, school = false }) {
   return (
     <div className="time-clock-wrap">
       <div
         className={school ? "moving-clock school-clock" : "moving-clock"}
-        aria-label={"Reloj animado ilustrativo para " + label.toLowerCase()}
+        aria-label={ariaPrefix + " " + label.toLowerCase()}
       >
         <span className="clock-dot c1" />
         <span className="clock-dot c2" />
@@ -437,97 +791,100 @@ function MotionClock({ label, school = false }) {
   );
 }
 
-function Header() {
+function LanguagePicker({ language, onChange }) {
+  return (
+    <div className="language-picker" aria-label="Language">
+      {LANGS.map((code) => (
+        <button
+          type="button"
+          key={code}
+          className={language === code ? "active" : ""}
+          aria-pressed={language === code}
+          onClick={() => onChange(code)}
+        >
+          {code.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Header({ language, copy, onLanguage }) {
   return (
     <header className="site-nav">
       <div className="scroll-progress" aria-hidden="true" />
       <a className="brand" href="./" aria-label="Bitácora Dual 2026">
         Bitácora Dual
       </a>
-      <nav className="desktop-nav" aria-label="Navegación">
-        <a href="#alumnos">Alumnos</a>
-        <a href="#escuelas">Escuelas</a>
-        <a href="#tiempos">Tiempos</a>
-        <a href="#opiniones">Opiniones</a>
-        <a href="#sistemas">Sistemas</a>
+      <nav className="desktop-nav" aria-label={copy.nav.label}>
+        <a href="#alumnos">{copy.nav.students}</a>
+        <a href="#escuelas">{copy.nav.schools}</a>
+        <a href="#tiempos">{copy.nav.time}</a>
+        <a href="#opiniones">{copy.nav.opinions}</a>
+        <a href="#sistemas">{copy.nav.systems}</a>
         <a href="#matrix">Data Matrix</a>
-        <a href="#instituciones">Instituciones</a>
+        <a href="#instituciones">{copy.nav.institutions}</a>
       </nav>
-      <a
-        className="nav-cta"
-        href={CONTRIBUTE}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <GitPullRequest size={15} weight="bold" />
-        Colaborar
-      </a>
+      <div className="nav-tools">
+        <LanguagePicker language={language} onChange={onLanguage} />
+        <a
+          className="nav-cta"
+          href={CONTRIBUTE}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <GitPullRequest size={15} weight="bold" />
+          {copy.nav.collaborate}
+        </a>
+      </div>
     </header>
   );
 }
 
-function Hero() {
+function Hero({ copy, onSystemLink }) {
   return (
     <section className="hero" aria-labelledby="hero-title">
-      <img
-        className="hero-image"
-        src="../Assets/asset_landing.png"
-        alt="Vista de Bitácora Dual 2026"
-      />
+      <img className="hero-image" src="../Assets/asset_landing.png" alt={copy.hero.alt} />
       <div className="hero-shade" aria-hidden="true" />
       <div className="hero-copy reveal">
         <p className="eyebrow light">Bitácora Dual 2026</p>
-        <h1 id="hero-title">Nunca fue tan fácil hacer una bitácora.</h1>
-        <p>
-          Hazla desde tu teléfono, iPad o computadora. La escuela la recibe
-          con un formato consistente y puede llevar un control más rápido de
-          las entregas.
-        </p>
+        <h1 id="hero-title">{copy.hero.title}</h1>
+        <p>{copy.hero.text}</p>
         <div className="hero-actions">
-          <a
-            className="button white"
-            href={CONTRIBUTE}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a className="button white" href={CONTRIBUTE} target="_blank" rel="noopener noreferrer">
             <GitPullRequest size={18} weight="bold" />
-            Colaborar
+            {copy.hero.collaborate}
           </a>
-          <a className="button glass" href="../">
+          <a className="button glass" href="../" onClick={(event) => onSystemLink(event, "../")}>
             <FilePdf size={18} weight="bold" />
-            Probar el generador
+            {copy.hero.try}
           </a>
         </div>
-        <div className="hero-device-row" aria-label="Disponible en distintos dispositivos">
-          <span><DeviceMobile size={18} /> Teléfono</span>
-          <span><DeviceTablet size={18} /> iPad</span>
-          <span><Desktop size={18} /> Computadora</span>
+        <div className="hero-device-row" aria-label={copy.hero.devices}>
+          <span><DeviceMobile size={18} /> {copy.hero.phone}</span>
+          <span><DeviceTablet size={18} /> {copy.hero.tablet}</span>
+          <span><Desktop size={18} /> {copy.hero.desktop}</span>
         </div>
       </div>
     </section>
   );
 }
 
-function StudentSection() {
+function StudentSection({ copy }) {
   return (
     <section className="editorial intro" id="alumnos">
       <div className="section-label reveal">
-        <Student size={16} weight="bold" /> Para el alumno
+        <Student size={16} weight="bold" /> {copy.student.label}
       </div>
       <div className="editorial-copy reveal">
-        <h2>Escribe lo que hiciste. Lo demás ya debería estar listo.</h2>
-        <p>
-          La bitácora deja de ser un archivo que tienes que reconstruir cada
-          semana. Tus datos frecuentes pueden quedar preparados y tú te
-          concentras en registrar las actividades que realmente realizaste.
-        </p>
+        <h2>{copy.student.title}</h2>
+        <p>{copy.student.text}</p>
       </div>
-
       <div className="advantage-list reveal">
-        {studentAdvantages.map(({ icon, title, text }) => (
+        {copy.student.advantages.map(([title, text], index) => (
           <article key={title}>
             <div className="advantage-title">
-              <IconCircle icon={icon} />
+              <IconCircle icon={studentIcons[index]} />
               <strong>{title}</strong>
             </div>
             <p>{text}</p>
@@ -538,369 +895,242 @@ function StudentSection() {
   );
 }
 
-function SchoolSection() {
+function SchoolSection({ copy }) {
   return (
     <section className="school-section" id="escuelas">
       <div className="school-inner">
         <div className="section-label light reveal">
-          <Buildings size={16} weight="bold" /> Para la escuela
+          <Buildings size={16} weight="bold" /> {copy.school.label}
         </div>
         <div className="school-lead reveal">
-          <h2>Un formato igual para todos. Un seguimiento más rápido para Vinculación.</h2>
-          <p>
-            Facilitarle la bitácora al alumno también ayuda al plantel: menos
-            formatos alterados, menos archivos distintos y una forma más clara
-            de saber quién entregó.
-          </p>
+          <h2>{copy.school.title}</h2>
+          <p>{copy.school.text}</p>
         </div>
-
         <div className="school-points reveal">
-          {schoolAdvantages.map(({ icon: Icon, title, text }, index) => (
-            <div key={title} className="school-point">
-              <div className="school-point-top">
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <Icon size={24} weight="regular" aria-hidden="true" />
+          {copy.school.advantages.map(([title, text], index) => {
+            const Icon = schoolIcons[index];
+            return (
+              <div key={title} className="school-point">
+                <div className="school-point-top">
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <Icon size={24} weight="regular" aria-hidden="true" />
+                </div>
+                <strong>{title}</strong>
+                <p>{text}</p>
               </div>
-              <strong>{title}</strong>
-              <p>{text}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-function TimeSection() {
+function TimeSection({ copy }) {
+  const t = copy.time;
   return (
     <section className="time-section" id="tiempos">
       <div className="time-inner">
         <div className="section-label reveal">
-          <Clock size={16} weight="bold" /> Tiempo aproximado
+          <Clock size={16} weight="bold" /> {t.label}
         </div>
         <div className="time-lead reveal">
-          <h2>Menos tiempo llenando y registrando. Más tiempo para lo importante.</h2>
-          <p>
-            Comparación orientativa basada en el flujo esperado del proyecto.
-            No es un benchmark formal: los tiempos reales cambian según la
-            persona, el plantel y la cantidad de alumnos.
-          </p>
+          <h2>{t.title}</h2>
+          <p>{t.text}</p>
         </div>
-
         <div className="time-comparisons">
           <article className="time-comparison reveal">
-            <MotionClock label="Alumno" />
+            <MotionClock label={t.student} ariaPrefix={t.clockAria} />
             <div className="time-data">
-              <div className="time-row old">
-                <span>Sin el sistema</span>
-                <strong>10–20 min</strong>
-                <small>aprox. por bitácora</small>
-              </div>
+              <div className="time-row old"><span>{t.without}</span><strong>10–20 min</strong><small>{t.perLog}</small></div>
               <ArrowRight className="time-arrow-icon" size={28} aria-hidden="true" />
-              <div className="time-row new">
-                <span>Con el sistema</span>
-                <strong>≈ 5 min</strong>
-                <small>cuando sus datos ya están precargados</small>
-              </div>
+              <div className="time-row new"><span>{t.with}</span><strong>≈ 5 min</strong><small>{t.preloaded}</small></div>
             </div>
           </article>
-
           <article className="time-comparison reveal">
-            <MotionClock label="Escuela" school />
+            <MotionClock label={t.school} ariaPrefix={t.clockAria} school />
             <div className="time-data">
-              <div className="time-row old">
-                <span>Registro manual</span>
-                <strong>1–1.5 h</strong>
-                <small>aprox. para una jornada de recepción</small>
-              </div>
+              <div className="time-row old"><span>{t.manual}</span><strong>1–1.5 h</strong><small>{t.reception}</small></div>
               <ArrowRight className="time-arrow-icon" size={28} aria-hidden="true" />
-              <div className="time-row new">
-                <span>Registro automatizado</span>
-                <strong>&lt; 10 min</strong>
-                <small>aprox. con escaneo y base preparada</small>
-              </div>
+              <div className="time-row new"><span>{t.automated}</span><strong>&lt; 10 min</strong><small>{t.scanning}</small></div>
             </div>
           </article>
         </div>
-
-        <p className="time-disclaimer reveal">
-          Tiempos aproximados de uso previstos para explicar la diferencia de
-          flujo; no representan una medición científica ni garantizan un tiempo
-          específico.
-        </p>
+        <p className="time-disclaimer reveal">{t.disclaimer}</p>
       </div>
     </section>
   );
 }
 
-function TestimonialsSection() {
+function TestimonialsSection({ copy }) {
+  const t = copy.testimonials;
   return (
     <section className="testimonials" id="opiniones">
       <div className="testimonials-inner">
-        <div className="section-label reveal">Lo que dicen quienes lo usan</div>
+        <div className="section-label reveal">{t.label}</div>
         <div className="testimonials-lead reveal">
-          <h2>Hecho para resolver una tarea real, semana tras semana.</h2>
-          <p>
-            Opiniones de estudiantes que ya han usado el generador dentro de su
-            proceso de Educación Dual.
-          </p>
+          <h2>{t.title}</h2>
+          <p>{t.text}</p>
         </div>
-
         <div className="testimonial-list">
-          {testimonials.map(({ quote, name, role, institution }) => (
-            <figure className="testimonial reveal" key={name + institution}>
-              <blockquote>“{quote}”</blockquote>
-              <figcaption>
-                <span className="testimonial-avatar" aria-hidden="true">
-                  {name.charAt(0)}
-                </span>
-                <span>
-                  <strong>{name}</strong>
-                  <small>
-                    {role} · {institution}
-                  </small>
-                </span>
-              </figcaption>
-            </figure>
-          ))}
+          <figure className="testimonial reveal">
+            <blockquote>“{t.quote}”</blockquote>
+            <figcaption>
+              <Blobatar name={t.name} size={44} alt="" />
+              <span>
+                <strong>{t.name}</strong>
+                <small>{t.role} · {t.institution}</small>
+                {t.translated && <em>{t.translated}</em>}
+              </span>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>
   );
 }
 
-function SystemsSection() {
+function SystemsSection({ copy, onSystemLink }) {
   return (
     <section className="editorial systems" id="sistemas">
       <div className="section-label reveal">
-        <Code size={16} weight="bold" /> El proyecto
+        <Code size={16} weight="bold" /> {copy.systems.label}
       </div>
       <div className="editorial-copy reveal">
-        <h2>Tres herramientas para distintas partes del proceso.</h2>
-        <p>
-          El alumno no necesita una pantalla administrativa y Vinculación no
-          necesita llenar la bitácora. Cada sistema hace una sola cosa y la
-          hace de forma clara.
-        </p>
+        <h2>{copy.systems.title}</h2>
+        <p>{copy.systems.text}</p>
       </div>
-
       <div className="systems-list">
-        {systems.map(({ icon: Icon, eyebrow, title, text, href, action, note }, index) => (
-          <article className="system-row reveal" key={title}>
-            <div className="system-number">
-              <Icon size={26} weight="regular" />
-              <span>{String(index + 1).padStart(2, "0")}</span>
-            </div>
-            <div className="system-text">
-              <p className="eyebrow">{eyebrow}</p>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </div>
-            {href ? (
-              <a className="arrow-link" href={href} aria-label={action + " " + title}>
-                {action} <ArrowUpRight size={16} weight="bold" />
-              </a>
-            ) : (
-              <span className="system-note">{note}</span>
-            )}
-          </article>
-        ))}
+        {copy.systems.items.map(([eyebrow, title, text, action], index) => {
+          const meta = systemMeta[index];
+          const Icon = meta.icon;
+          return (
+            <article className="system-row reveal" key={title}>
+              <div className="system-number">
+                <Icon size={26} weight="regular" />
+                <span>{String(index + 1).padStart(2, "0")}</span>
+              </div>
+              <div className="system-text">
+                <p className="eyebrow">{eyebrow}</p>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </div>
+              {meta.href ? (
+                <a className="arrow-link" href={meta.href} onClick={(event) => onSystemLink(event, meta.href)} aria-label={action + " " + title}>
+                  {action} <ArrowUpRight size={16} weight="bold" />
+                </a>
+              ) : (
+                <span className="system-note">{action}</span>
+              )}
+            </article>
+          );
+        })}
       </div>
     </section>
   );
 }
 
-function MatrixSection() {
+function MatrixSection({ copy }) {
+  const m = copy.matrix;
   return (
     <section className="matrix" id="matrix">
       <div className="matrix-inner">
         <div className="matrix-copy reveal">
-          <p className="eyebrow light">
-            <QrCode size={16} weight="bold" /> Data Matrix
-          </p>
-          <h2>La bitácora también puede identificarse sola.</h2>
-          <p>
-            El Data Matrix conecta el documento con el registro de entrega.
-            Incluye la identidad necesaria para ubicar al alumno y el periodo
-            correcto, sin guardar las actividades ni las firmas.
-          </p>
+          <p className="eyebrow light"><QrCode size={16} weight="bold" /> Data Matrix</p>
+          <h2>{m.title}</h2>
+          <p>{m.text}</p>
           <dl>
-            <div>
-              <dt><Student size={16} /> Alumno</dt>
-              <dd>Nombre</dd>
-            </div>
-            <div>
-              <dt><Buildings size={16} /> Adscripción</dt>
-              <dd>Especialidad y empresa</dd>
-            </div>
-            <div>
-              <dt><Clock size={16} /> Periodo</dt>
-              <dd>Fecha inicial y final</dd>
-            </div>
+            <div><dt><Student size={16} /> {m.student}</dt><dd>{m.name}</dd></div>
+            <div><dt><Buildings size={16} /> {m.affiliation}</dt><dd>{m.specialty}</dd></div>
+            <div><dt><Clock size={16} /> {m.period}</dt><dd>{m.dates}</dd></div>
           </dl>
         </div>
-
         <figure className="matrix-example reveal">
-          <img
-            src="../Assets/Asset_cont_matrix.png"
-            alt="Ejemplo de una bitácora con Data Matrix"
-          />
-          <figcaption>
-            <Scan size={15} /> Ejemplo de una bitácora preparada para el
-            registro de entrega.
-          </figcaption>
+          <img src="../Assets/Asset_cont_matrix.png" alt={m.alt} />
+          <figcaption><Scan size={15} /> {m.caption}</figcaption>
         </figure>
       </div>
     </section>
   );
 }
 
-function WorkflowSection() {
+function WorkflowSection({ copy }) {
   return (
     <section className="editorial workflow">
-      <div className="section-label reveal">
-        <ArrowRight size={16} weight="bold" /> Un flujo simple
-      </div>
-      <div className="editorial-copy reveal">
-        <h2>Crear. Entregar. Registrar. Reportar.</h2>
-      </div>
+      <div className="section-label reveal"><ArrowRight size={16} weight="bold" /> {copy.workflow.label}</div>
+      <div className="editorial-copy reveal"><h2>{copy.workflow.title}</h2></div>
       <ol className="process reveal">
-        {process.map(({ icon: Icon, title, text }, index) => (
-          <li key={title}>
-            <span className="process-icon">
-              <Icon size={21} weight="regular" />
-            </span>
-            <div className="process-index">{String(index + 1).padStart(2, "0")}</div>
-            <div>
-              <strong>{title}</strong>
-              <p>{text}</p>
-            </div>
-            <ArrowRight className="process-arrow" size={20} aria-hidden="true" />
-          </li>
-        ))}
+        {copy.workflow.items.map(([title, text], index) => {
+          const Icon = processIcons[index];
+          return (
+            <li key={title}>
+              <span className="process-icon"><Icon size={21} weight="regular" /></span>
+              <div className="process-index">{String(index + 1).padStart(2, "0")}</div>
+              <div><strong>{title}</strong><p>{text}</p></div>
+              <ArrowRight className="process-arrow" size={20} aria-hidden="true" />
+            </li>
+          );
+        })}
       </ol>
     </section>
   );
 }
 
-function InstitutionSection() {
+function InstitutionSection({ copy }) {
+  const i = copy.institution;
   return (
     <section className="institution" id="instituciones">
       <div className="institution-inner">
-        <div className="section-label reveal">
-          <Users size={16} weight="bold" /> Para instituciones
-        </div>
-        <div className="institution-lead reveal">
-          <h2>¿Quieres que tu institución pueda usar este sistema?</h2>
-          <p>
-            La idea es que el proyecto pueda crecer de forma autónoma. Un
-            alumno, docente o plantel puede aportar directamente: agregar su
-            escuela, empresa, responsable o una mejora completa sin tener que
-            esperar a que alguien lo haga por ellos.
-          </p>
-        </div>
-
+        <div className="section-label reveal"><Users size={16} weight="bold" /> {i.label}</div>
+        <div className="institution-lead reveal"><h2>{i.title}</h2><p>{i.text}</p></div>
         <div className="adoption-paths">
           <article className="adoption-path reveal">
-            <div className="path-icon">
-              <GitPullRequest size={29} weight="regular" />
-            </div>
-            <p className="path-label">Ruta 1 · Colaborar</p>
-            <h3>Tu escuela puede agregarse al proyecto.</h3>
-            <p>
-              Estudiantes, docentes o personal de Vinculación pueden editar los
-              catálogos, agregar una escuela o empresa, corregir datos, crear
-              una rama y enviar una <strong>pull request</strong>. Las
-              aportaciones útiles son bienvenidas.
-            </p>
+            <div className="path-icon"><GitPullRequest size={29} weight="regular" /></div>
+            <p className="path-label">{i.route1}</p>
+            <h3>{i.route1Title}</h3>
+            <p>{i.route1Text}</p>
             <div className="path-actions">
-              <a
-                className="button dark"
-                href={CONTRIBUTE}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GitBranch size={18} weight="bold" />
-                Colaborar en GitHub
+              <a className="button dark" href={CONTRIBUTE} target="_blank" rel="noopener noreferrer">
+                <GitBranch size={18} weight="bold" /> {i.route1Action}
               </a>
             </div>
           </article>
-
           <article className="adoption-path reveal">
-            <div className="path-icon">
-              <Buildings size={29} weight="regular" />
-            </div>
-            <p className="path-label">Ruta 2 · Implementación acompañada</p>
-            <h3>Si necesitan ayuda, también pueden pedirla.</h3>
-            <p>
-              Si el plantel no quiere tocar código, se puede revisar su formato,
-              responsables, empresas, calendario, reglas de entrega y reportes
-              para plantear una integración compatible con su procedimiento
-              actual.
-            </p>
+            <div className="path-icon"><Buildings size={29} weight="regular" /></div>
+            <p className="path-label">{i.route2}</p>
+            <h3>{i.route2Title}</h3>
+            <p>{i.route2Text}</p>
             <div className="path-actions secondary-action">
-              <a
-                className="arrow-link"
-                href="https://www.instagram.com/gio_canto_g/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Pedir apoyo al creador <ArrowUpRight size={16} weight="bold" />
+              <a className="arrow-link" href="https://www.instagram.com/gio_canto_g/" target="_blank" rel="noopener noreferrer">
+                {i.route2Action} <ArrowUpRight size={16} weight="bold" />
               </a>
             </div>
           </article>
         </div>
-
-        <div className="institution-note reveal">
-          <strong>La meta no es cambiar el procedimiento porque sí.</strong>
-          <p>
-            Es quitar captura repetida y conservar los controles que la escuela
-            realmente necesita.
-          </p>
-        </div>
+        <div className="institution-note reveal"><strong>{i.noteTitle}</strong><p>{i.noteText}</p></div>
       </div>
     </section>
   );
 }
 
-function PrinciplesSection() {
+function PrinciplesSection({ copy }) {
+  const p = copy.principles;
   return (
     <section className="editorial principles">
-      <div className="section-label reveal">
-        <ShieldCheck size={16} weight="bold" /> Cómo está construido
-      </div>
+      <div className="section-label reveal"><ShieldCheck size={16} weight="bold" /> {p.label}</div>
       <div className="principles-grid">
         <article className="principle reveal">
           <IconCircle icon={Lock} />
-          <h2>Privacidad.</h2>
-          <p>
-            El generador no necesita una cuenta para crear bitácoras. Los datos
-            de trabajo, historial y registro se mantienen en el navegador o
-            dispositivo y las exportaciones quedan bajo control de quien las
-            descarga.
-          </p>
-          <a className="arrow-link" href="../privacy/">
-            Leer aviso de privacidad <ArrowUpRight size={16} weight="bold" />
-          </a>
+          <h2>{p.privacy}</h2>
+          <p>{p.privacyText}</p>
+          <a className="arrow-link" href="../privacy/">{p.privacyAction} <ArrowUpRight size={16} weight="bold" /></a>
         </article>
-
         <article className="principle reveal">
           <IconCircle icon={Code} />
-          <h2>Open source.</h2>
-          <p>
-            El código está disponible públicamente bajo la licencia del
-            proyecto. Cualquier persona puede estudiarlo, proponer mejoras y
-            colaborar mediante issues o pull requests. Un estudiante puede
-            incluso proponer su propio plantel o actualizar un catálogo sin
-            depender de una administración central.
-          </p>
-          <a
-            className="arrow-link"
-            href={REPO}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Colaborar en GitHub <ArrowUpRight size={16} weight="bold" />
+          <h2>{p.open}</h2>
+          <p>{p.openText}</p>
+          <a className="arrow-link" href={REPO} target="_blank" rel="noopener noreferrer">
+            {p.openAction} <ArrowUpRight size={16} weight="bold" />
           </a>
         </article>
       </div>
@@ -908,39 +1138,22 @@ function PrinciplesSection() {
   );
 }
 
-function GithubSection() {
+function GithubSection({ copy }) {
+  const g = copy.github;
   return (
     <section className="github-callout">
       <div className="github-inner reveal">
         <div>
-          <p className="eyebrow light">
-            <GithubLogo size={17} weight="bold" /> Proyecto abierto
-          </p>
-          <h2>Úsalo. Mejora lo que haga falta. Compártelo.</h2>
-          <p>
-            La colaboración es la acción principal del proyecto. Si encuentras
-            algo que pueda mejorar, propón el cambio. Y si te sirve tal como
-            está, una estrella en GitHub ayuda a que más personas lo
-            encuentren.
-          </p>
+          <p className="eyebrow light"><GithubLogo size={17} weight="bold" /> {g.label}</p>
+          <h2>{g.title}</h2>
+          <p>{g.text}</p>
         </div>
         <div className="github-actions">
-          <a
-            className="button white"
-            href={CONTRIBUTE}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GitPullRequest size={18} weight="bold" />
-            Colaborar
+          <a className="button white" href={CONTRIBUTE} target="_blank" rel="noopener noreferrer">
+            <GitPullRequest size={18} weight="bold" /> {g.collaborate}
           </a>
-          <a
-            className="button outline-light star-button"
-            href={REPO}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Star size={18} weight="fill" /> Dar estrella
+          <a className="button outline-light star-button" href={REPO} target="_blank" rel="noopener noreferrer">
+            <Star size={18} weight="fill" /> {g.star}
           </a>
         </div>
       </div>
@@ -948,25 +1161,18 @@ function GithubSection() {
   );
 }
 
-function Closing() {
+function Closing({ copy, onSystemLink }) {
   return (
     <section className="closing">
       <div className="closing-inner reveal">
         <p className="eyebrow">Bitácora Dual 2026</p>
-        <h2>Menos tiempo acomodando formatos. Más tiempo documentando lo que hiciste.</h2>
+        <h2>{copy.closing.title}</h2>
         <div className="closing-actions">
-          <a
-            className="button primary"
-            href={CONTRIBUTE}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GitPullRequest size={18} weight="bold" />
-            Colaborar con el proyecto
+          <a className="button primary" href={CONTRIBUTE} target="_blank" rel="noopener noreferrer">
+            <GitPullRequest size={18} weight="bold" /> {copy.closing.collaborate}
           </a>
-          <a className="button secondary" href="../">
-            <Plus size={18} weight="bold" />
-            Crear una bitácora
+          <a className="button secondary" href="../" onClick={(event) => onSystemLink(event, "../")}>
+            <Plus size={18} weight="bold" /> {copy.closing.create}
           </a>
         </div>
       </div>
@@ -974,29 +1180,69 @@ function Closing() {
   );
 }
 
-function Footer() {
+function Footer({ copy }) {
   return (
     <footer>
-      <div>
-        <strong>Bitácora Dual 2026</strong>
-        <span>Proyecto open source en beta.</span>
-      </div>
-      <nav aria-label="Enlaces del pie">
+      <div><strong>Bitácora Dual 2026</strong><span>{copy.footer.beta}</span></div>
+      <nav aria-label={copy.footer.links}>
         <a href="../faq/">FAQ</a>
-        <a href="../privacy/">Privacidad</a>
-        <a href="../accessibility/">Accesibilidad</a>
-        <a href={REPO} target="_blank" rel="noopener noreferrer">
-          <GithubLogo size={14} /> GitHub
-        </a>
+        <a href="../privacy/">{copy.footer.privacy}</a>
+        <a href="../accessibility/">{copy.footer.accessibility}</a>
+        <a href={REPO} target="_blank" rel="noopener noreferrer"><GithubLogo size={14} /> GitHub</a>
       </nav>
     </footer>
   );
 }
 
+function LanguageNotice({ copy, href, onClose }) {
+  if (!href) return null;
+  return (
+    <div className="language-warning" role="dialog" aria-modal="true" aria-labelledby="language-warning-title">
+      <div className="language-warning-card">
+        <div className="language-warning-icon" aria-hidden="true">ES</div>
+        <h2 id="language-warning-title">{copy.warning.title}</h2>
+        <p>{copy.warning.text}</p>
+        <div className="language-warning-actions">
+          <button className="button secondary" type="button" onClick={onClose}>{copy.warning.stay}</button>
+          <a className="button primary" href={href}>{copy.warning.continue}</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Presentation() {
+  const [language, setLanguage] = useState(initialLanguage);
+  const [pendingSystem, setPendingSystem] = useState("");
   const reducedMotion = useReducedMotion();
+  const copy = COPY[language];
   useReveal();
   useScrollMotion(reducedMotion);
+
+  const changeLanguage = (next) => {
+    if (!LANGS.includes(next)) return;
+    setLanguage(next);
+    const url = new URL(window.location.href);
+    if (next === "es") url.searchParams.delete("lang");
+    else url.searchParams.set("lang", next);
+    window.history.replaceState({}, "", url);
+  };
+
+  const openSystem = (event, href) => {
+    if (language === "es") return;
+    event.preventDefault();
+    setPendingSystem(href);
+  };
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.title =
+      language === "en"
+        ? "Bitácora Dual 2026 · Project presentation"
+        : language === "de"
+          ? "Bitácora Dual 2026 · Projektvorstellung"
+          : "Bitácora Dual 2026 · Presentación";
+  }, [language]);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return undefined;
@@ -1051,22 +1297,27 @@ function Presentation() {
 
   return (
     <>
-      <Header />
+      <Header language={language} copy={copy} onLanguage={changeLanguage} />
       <main>
-        <Hero />
-        <StudentSection />
-        <SchoolSection />
-        <TimeSection />
-        <TestimonialsSection />
-        <SystemsSection />
-        <MatrixSection />
-        <WorkflowSection />
-        <InstitutionSection />
-        <PrinciplesSection />
-        <GithubSection />
-        <Closing />
+        <Hero copy={copy} onSystemLink={openSystem} />
+        <StudentSection copy={copy} />
+        <SchoolSection copy={copy} />
+        <TimeSection copy={copy} />
+        <TestimonialsSection copy={copy} />
+        <SystemsSection copy={copy} onSystemLink={openSystem} />
+        <MatrixSection copy={copy} />
+        <WorkflowSection copy={copy} />
+        <InstitutionSection copy={copy} />
+        <PrinciplesSection copy={copy} />
+        <GithubSection copy={copy} />
+        <Closing copy={copy} onSystemLink={openSystem} />
       </main>
-      <Footer />
+      <Footer copy={copy} />
+      <LanguageNotice
+        copy={copy}
+        href={pendingSystem}
+        onClose={() => setPendingSystem("")}
+      />
     </>
   );
 }
