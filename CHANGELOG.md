@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.50.0-beta.29 · Estado No aplica · 2026-09-29
+
+- El Registro de entrega incorpora el cuarto estado **No aplica** para alumnos que no tienen obligación de entregar una bitácora en un periodo determinado.
+- **No aplica** se guarda por alumno y semana como un estado real y persiste al cerrar, recargar, exportar o importar el registro.
+- El esquema local del registro sube a **v6** y conserva migración automática desde v5 y versiones anteriores.
+- El porcentaje de avance excluye a los alumnos marcados como **No aplica**: el cumplimiento se calcula únicamente sobre quienes debían entregar esa semana.
+- La vista semanal incorpora contador, filtro y selector manual para **No aplica**.
+- El CSV distingue **No aplica** de **No entregado**.
+- Los reportes PDF simplificados y semana por semana muestran una cuarta categoría **No aplica**.
+- La matriz global representa **No aplica** con un estado neutro separado de entrega, atraso y falta de entrega.
+- Se actualizan pruebas de dominio, migración y reportes para comprobar persistencia y cálculo del nuevo estado.
+
 ## 0.50.0-beta.28 · Localización alemana contextual · 2026-09-29
 
 - La versión alemana de la landing deja de traducir literalmente **Educación Dual** y adopta terminología propia del sistema alemán de **duale Berufsausbildung**.
