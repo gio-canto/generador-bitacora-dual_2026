@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.30 · Diccionario técnico e institucional · 2026-09-29
+
+- El corrector ortográfico amplía `dictionary-es` con un diccionario propio del proyecto.
+- Las palabras de `schools.json` y `companies.json` se incorporan automáticamente, incluyendo nombres de instituciones, empresas, responsables, instructores, cargos, abreviaturas y especialidades.
+- Las futuras escuelas o empresas añadidas a los catálogos pasan automáticamente al vocabulario del corrector sin mantener una segunda lista manual.
+- Se incorpora vocabulario frecuente de **programación y desarrollo web**, **bases de datos y nube**, **IA y ciencia de datos**, **ciberseguridad y redes**, **contabilidad y finanzas**, **Recursos Humanos**, **e-commerce, ventas y marketing digital**, **diseño/UI-UX**, **gestión de proyectos**, **ofimática** y **Educación Dual**.
+- El diccionario técnico acepta términos como React, TypeScript, Docker, PostgreSQL, GitHub, onboarding, ecommerce, chatbot, dataset, Shopify, Data Matrix y terminología institucional del proyecto.
+- El vocabulario adicional no sustituye el diccionario español: el corrector sigue detectando faltas comunes fuera de las palabras explícitamente aceptadas.
+- Se añaden pruebas para comprobar términos institucionales, vocabulario técnico, deduplicación y detección de faltas reales.
+
 ## 0.50.0-beta.29 · Estado No aplica · 2026-09-29
 
 - El Registro de entrega incorpora el cuarto estado **No aplica** para alumnos que no tienen obligación de entregar una bitácora en un periodo determinado.
