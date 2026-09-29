@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.22";
-export const RELEASE = "Revisión de bitácoras guardadas";
+export const VERSION = "0.50.0-beta.23";
+export const RELEASE = "Historial accesible desde el inicio";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
