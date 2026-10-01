@@ -98,6 +98,8 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect(profile.instructor.enabled).toBe(true);
   expect(profile.instructor.name).toBe("Ing. Emmanuel Sandoval Mejía");
   expect(profile.authorities.autorizoName).toContain("Karen Paulina");
+  expect($("company").value).toContain("Instituto Tecnológico de Chilpancingo");
+  fireEvent.click($("newBtn"));
   expect($("company").value).toContain("COCYTIEG");
   expect($("defaultStart").value).toBe("07:30");
   expect($("defaultEnd").value).toBe("13:30");
