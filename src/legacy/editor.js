@@ -11,6 +11,8 @@ import {
   rememberProfile,
   initializeProfile,
   readActiveProfileId,
+  listProfiles,
+  listArchivedProfiles,
 } from "../services/profile.js";
 import companies from "../data/companies.json";
 import schools from "../data/schools.json";
@@ -249,19 +251,28 @@ export function startEditor() {
       logoImage = null;
     const createId = () =>
       "bitacora-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+    function legacyProfileMatchIsUnique(activeId, activeName) {
+      if (!activeId || !activeName) return false;
+      const matches = [...listProfiles(), ...listArchivedProfiles()].filter(
+        (profile) =>
+          String(profile.name || "").trim().toLowerCase() === activeName,
+      );
+      return matches.length === 1 && matches[0].id === activeId;
+    }
+
     function readStore() {
       try {
         const p = JSON.parse(localStorage.getItem(STORE_KEY) || "[]");
         const records = Array.isArray(p) ? p : [];
         const activeId = readActiveProfileId();
         const activeName = readProfileData().name.trim().toLowerCase();
+        const canClaimLegacy = legacyProfileMatchIsUnique(activeId, activeName);
         let migrated = false;
         for (const record of records) {
           const studentName = String(record.student || "").trim().toLowerCase();
           if (
             !record.profileId &&
-            activeId &&
-            activeName &&
+            canClaimLegacy &&
             studentName === activeName
           ) {
             record.profileId = activeId;
@@ -277,10 +288,12 @@ export function startEditor() {
     function recordsForActiveProfile() {
       const activeId = readActiveProfileId();
       const activeName = readProfileData().name.trim().toLowerCase();
+      const canClaimLegacy = legacyProfileMatchIsUnique(activeId, activeName);
       return readStore().filter((record) =>
         activeId
           ? record.profileId === activeId ||
-            (!record.profileId &&
+            (canClaimLegacy &&
+              !record.profileId &&
               String(record.student || "").trim().toLowerCase() === activeName)
           : !record.profileId,
       );
