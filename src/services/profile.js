@@ -60,16 +60,28 @@ function emitProfileChange() {
 function readProfilesState(storage = localStorage) {
   try {
     const saved = JSON.parse(storage.getItem(PROFILES_KEY) || "null");
-    if (saved?.profiles && typeof saved.profiles === "object") return saved;
+    if (saved?.profiles && typeof saved.profiles === "object")
+      return {
+        activeId: saved.activeId || "",
+        profiles: saved.profiles,
+        archivedProfiles:
+          saved.archivedProfiles && typeof saved.archivedProfiles === "object"
+            ? saved.archivedProfiles
+            : {},
+      };
     const legacy = JSON.parse(storage.getItem(KEY) || "null");
     if (legacy?.name) {
       const id = "profile-" + Date.now().toString(36);
-      const state = { activeId: id, profiles: { [id]: legacy } };
+      const state = {
+        activeId: id,
+        profiles: { [id]: legacy },
+        archivedProfiles: {},
+      };
       storage.setItem(PROFILES_KEY, JSON.stringify(state));
       return state;
     }
   } catch {}
-  return { activeId: "", profiles: {} };
+  return { activeId: "", profiles: {}, archivedProfiles: {} };
 }
 
 function writeProfilesState(state, storage = localStorage) {
@@ -83,6 +95,17 @@ export function listProfiles(storage = localStorage) {
     name: cleanText(profile?.name, 160),
   })).filter((item) => item.name);
 }
+
+export function listArchivedProfiles(storage = localStorage) {
+  const state = readProfilesState(storage);
+  return Object.entries(state.archivedProfiles || {})
+    .map(([id, profile]) => ({
+      id,
+      name: cleanText(profile?.name, 160),
+    }))
+    .filter((item) => item.name);
+}
+
 
 export function readActiveProfileId(storage = localStorage) {
   return readProfilesState(storage).activeId || "";
@@ -273,37 +296,80 @@ export function switchProfile(id, storage = localStorage) {
   } catch { return false; }
 }
 
+function provisionalNameFor(state) {
+  const usedNames = new Set(
+    [
+      ...Object.values(state.profiles || {}),
+      ...Object.values(state.archivedProfiles || {}),
+    ].map((profile) => cleanText(profile?.name, 160)),
+  );
+  let name = "Nueva persona";
+  let suffix = 2;
+  while (usedNames.has(name)) name = `Nueva persona ${suffix++}`;
+  return name;
+}
+
+function createProfileRecord(state, value = {}) {
+  const id =
+    "profile-" +
+    Date.now().toString(36) +
+    "-" +
+    Math.random().toString(36).slice(2, 7);
+  state.profiles[id] = {
+    ...structuredClone(EMPTY_PROFILE),
+    name: provisionalNameFor(state),
+    ...value,
+  };
+  state.activeId = id;
+  return id;
+}
+
 export function createProfile(value = {}, storage = localStorage) {
   try {
     const state = readProfilesState(storage);
-    const id = "profile-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
-    const usedNames = new Set(
-      Object.values(state.profiles).map((profile) => cleanText(profile?.name, 160)),
-    );
-    let provisionalName = "Nueva persona";
-    let suffix = 2;
-    while (usedNames.has(provisionalName)) provisionalName = `Nueva persona ${suffix++}`;
-    state.activeId = id;
-    state.profiles[id] = {
-      ...structuredClone(EMPTY_PROFILE),
-      name: provisionalName,
-      ...value,
-    };
+    const id = createProfileRecord(state, value);
     writeProfilesState(state, storage);
     storage.setItem(KEY, JSON.stringify(state.profiles[id]));
     emitProfileChange();
     return id;
-  } catch { return ""; }
+  } catch {
+    return "";
+  }
 }
 
 export function forgetProfile(storage = localStorage) {
   try {
     const state = readProfilesState(storage);
-    if (state.activeId) delete state.profiles[state.activeId];
-    const nextId = Object.keys(state.profiles)[0] || "";
-    state.activeId = nextId;
+    const deletedId = state.activeId;
+    if (!deletedId || !state.profiles[deletedId]) return false;
+
+    state.archivedProfiles ||= {};
+    state.archivedProfiles[deletedId] = state.profiles[deletedId];
+    delete state.profiles[deletedId];
+
+    let nextId = Object.keys(state.profiles)[0] || "";
+    if (!nextId) nextId = createProfileRecord(state);
+    else state.activeId = nextId;
+
     writeProfilesState(state, storage);
-    storage.setItem(KEY, JSON.stringify(nextId ? state.profiles[nextId] : EMPTY_PROFILE));
+    storage.setItem(KEY, JSON.stringify(state.profiles[state.activeId]));
+    emitProfileChange();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function restoreProfile(id, storage = localStorage) {
+  try {
+    const state = readProfilesState(storage);
+    const profile = state.archivedProfiles?.[id];
+    if (!profile) return false;
+    delete state.archivedProfiles[id];
+    state.profiles[id] = profile;
+    state.activeId = id;
+    writeProfilesState(state, storage);
+    storage.setItem(KEY, JSON.stringify(profile));
     emitProfileChange();
     return true;
   } catch {
