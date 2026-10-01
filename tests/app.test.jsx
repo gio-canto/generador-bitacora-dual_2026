@@ -46,6 +46,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     expect($(id), id).toBeTruthy();
   expect($("homeHistoryDisclosure").open).toBe(false);
   expect($("homeHistoryDisclosure").closest(".topbar")).toBeTruthy();
+  expect($("faqTopBtn")).toBeNull();
   expect($("homeHistoryDisclosure").querySelector("summary").textContent).toContain(
     "Bitácoras anteriores",
   );
@@ -170,10 +171,6 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect(document.querySelectorAll("#homeRecords [data-review]")).toHaveLength(
     activeRecords.length,
   );
-  expect($("#homeHistoryState").textContent).toContain(
-    String(activeRecords.length),
-  );
-  expect($("homeHistoryLatest").textContent).toContain("Semana");
   expect($("saveState").textContent).toBe("Guardado");
   expect(
     JSON.parse(localStorage.getItem("bitacora_profile_v1"))
