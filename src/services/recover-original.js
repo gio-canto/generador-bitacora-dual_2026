@@ -1,4 +1,5 @@
 import { parseBackup } from "./storage.js";
+import { readActiveProfileId, readProfileData } from "./profile.js";
 const marker = "bitacora_original_restored_v1";
 export function recoverPreviousVersion(storage = localStorage) {
   if (storage.getItem(marker)) return;
@@ -25,11 +26,19 @@ export function recoverPreviousVersion(storage = localStorage) {
     JSON.stringify([...records.values()]),
   );
   storage.setItem("bitacora_dual_clean_v3_seeded", "1");
-  if (draft)
+  if (draft) {
+    const activeProfileId = readActiveProfileId(storage);
+    const activeName = readProfileData(storage).name.trim().toLowerCase();
+    const draftName = String(draft.student || "").trim().toLowerCase();
+    const key =
+      activeProfileId && activeName && draftName === activeName
+        ? `bitacora_dual_draft_v1:${activeProfileId}`
+        : "bitacora_dual_draft_v1";
     storage.setItem(
-      "bitacora_dual_draft_v1",
+      key,
       JSON.stringify({
-        version: 1,
+        version: activeProfileId && key !== "bitacora_dual_draft_v1" ? 2 : 1,
+        profileId: key === "bitacora_dual_draft_v1" ? "" : activeProfileId,
         currentId: draft.id || null,
         identity: draft,
         entries: draft.entries,
@@ -40,5 +49,6 @@ export function recoverPreviousVersion(storage = localStorage) {
         savedAt: new Date().toISOString(),
       }),
     );
+  }
   storage.setItem(marker, "1");
 }
