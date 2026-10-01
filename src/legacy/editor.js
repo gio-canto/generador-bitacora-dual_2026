@@ -2609,7 +2609,7 @@ export function startEditor() {
         }
       };
       $("#deliveryClose").onclick = () => $("#deliveryDialog").close();
-      window.addEventListener("pagehide", saveDraftNow);
+      window.addEventListener("pagehide", () => saveDraftNow());
       document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") saveDraftNow();
       });
