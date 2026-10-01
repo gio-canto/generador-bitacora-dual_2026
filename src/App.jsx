@@ -41,7 +41,7 @@ export default function App() {
       const input = field.querySelector("input, select, textarea");
       if (label && input?.id && !label.htmlFor) label.htmlFor = input.id;
     });
-    startEditor();
+    const stopEditor = startEditor();
     startGuide();
     startPeople();
     startSignatureFixes();
@@ -50,6 +50,7 @@ export default function App() {
     const stopProfile = startProfile();
     startSpelling();
     return () => {
+      stopEditor?.();
       stopCalendarEasterEggs?.();
       stopProfile?.();
     };
