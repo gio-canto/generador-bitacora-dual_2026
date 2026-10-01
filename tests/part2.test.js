@@ -17,6 +17,8 @@ import {
   readActiveProfileId,
   switchProfile,
   createProfile,
+  listArchivedProfiles,
+  restoreProfile,
 } from "../src/services/profile.js";
 it("valida el martes y los horarios antes de crear la semana", () => {
   expect(weekSetup("2026-09-15", "14:00", "10:00").field).toBe("defaultEnd");
@@ -154,8 +156,12 @@ it("recuerda el nombre sin confundir los disparadores secretos con el perfil", (
     expect(rememberName(name)).toBe(false);
   expect(readProfile()).toBe("Alumno de Prueba");
   forgetProfile();
+  expect(readProfile()).toBe("Nueva persona");
+  expect(listArchivedProfiles().map((profile) => profile.name)).toContain(
+    "Alumno de Prueba",
+  );
   initializeProfile("Alumno de Prueba");
-  expect(readProfile()).toBe("");
+  expect(readProfile()).toBe("Nueva persona");
   expect(isVirtualName("  Virtual Insanity ")).toBe(true);
   expect(isVirtualName("JAMIROQUAI")).toBe(true);
 });
@@ -182,7 +188,7 @@ it("mantiene varios alumnos separados y permite cambiar el perfil activo", () =>
 });
 
 
-it("elimina solo el perfil activo y conserva los demás perfiles", () => {
+it("archiva solo el perfil activo y conserva los demás perfiles", () => {
   localStorage.clear();
   rememberProfile({ name: "Alumno Uno", company: "Empresa Uno" });
   const firstId = readActiveProfileId();
@@ -192,11 +198,22 @@ it("elimina solo el perfil activo y conserva los demás perfiles", () => {
   expect(readActiveProfileId()).toBe(secondId);
   expect(forgetProfile()).toBe(true);
   expect(listProfiles()).toHaveLength(1);
+  expect(listArchivedProfiles()).toEqual([
+    { id: secondId, name: "Alumno Dos" },
+  ]);
   expect(readActiveProfileId()).toBe(firstId);
   expect(readProfileData()).toMatchObject({
     name: "Alumno Uno",
     company: "Empresa Uno",
   });
+
+  expect(restoreProfile(secondId)).toBe(true);
+  expect(readActiveProfileId()).toBe(secondId);
+  expect(readProfileData()).toMatchObject({
+    name: "Alumno Dos",
+    company: "Empresa Dos",
+  });
+  expect(listArchivedProfiles()).toHaveLength(0);
 });
 
 it("crea nombres provisionales distintos para varios perfiles nuevos", () => {
@@ -209,4 +226,26 @@ it("crea nombres provisionales distintos para varios perfiles nuevos", () => {
     "Nueva persona",
     "Nueva persona 2",
   ]);
+});
+
+
+it("crea un perfil provisional si se elimina el último perfil", () => {
+  localStorage.clear();
+  rememberProfile({ name: "Único Alumno", company: "Empresa Única" });
+  const deletedId = readActiveProfileId();
+
+  expect(forgetProfile()).toBe(true);
+  expect(listProfiles()).toHaveLength(1);
+  expect(readProfile()).toBe("Nueva persona");
+  expect(readActiveProfileId()).not.toBe(deletedId);
+  expect(listArchivedProfiles()).toEqual([
+    { id: deletedId, name: "Único Alumno" },
+  ]);
+
+  expect(restoreProfile(deletedId)).toBe(true);
+  expect(readActiveProfileId()).toBe(deletedId);
+  expect(readProfileData()).toMatchObject({
+    name: "Único Alumno",
+    company: "Empresa Única",
+  });
 });
