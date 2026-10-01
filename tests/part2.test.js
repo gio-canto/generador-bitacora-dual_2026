@@ -131,7 +131,7 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
 
   forgetProfile();
   expect(readProfileData()).toMatchObject({
-    name: "",
+    name: "Nueva persona",
     school: "",
     company: "",
     area: "",
