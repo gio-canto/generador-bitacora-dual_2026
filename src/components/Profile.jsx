@@ -297,7 +297,9 @@ export function Profile() {
     setEditing(false);
     setReturnProfileId("");
     window.dispatchEvent(
-      new CustomEvent("bitacora-apply-profile", { detail: updated }),
+      new CustomEvent("bitacora-apply-profile", {
+        detail: { profile: updated, reason: "edit" },
+      }),
     );
     notify(
       "success",
@@ -341,7 +343,11 @@ export function Profile() {
                       if (switchProfile(item.id)) {
                         const next = readProfileData();
                         setEditing(false);
-                        window.dispatchEvent(new CustomEvent("bitacora-apply-profile", { detail: next }));
+                        window.dispatchEvent(
+                          new CustomEvent("bitacora-apply-profile", {
+                            detail: { profile: next, reason: "switch" },
+                          }),
+                        );
                         notify("success", "Perfil cambiado", `Ahora estás usando los datos de ${next.name}.`);
                       }
                     }}
@@ -361,6 +367,11 @@ export function Profile() {
                   if (!id) return;
                   setReturnProfileId(previousId);
                   const empty = readProfileData();
+                  window.dispatchEvent(
+                    new CustomEvent("bitacora-apply-profile", {
+                      detail: { profile: empty, reason: "switch" },
+                    }),
+                  );
                   setForm(editableDefaults(empty));
                   setEditing(true);
                 }}
@@ -449,10 +460,11 @@ export function Profile() {
                 if (forgetProfile()) {
                   const next = readProfileData();
                   setEditing(false);
-                  if (next.name)
-                    window.dispatchEvent(
-                      new CustomEvent("bitacora-apply-profile", { detail: next }),
-                    );
+                  window.dispatchEvent(
+                    new CustomEvent("bitacora-apply-profile", {
+                      detail: { profile: next, reason: "switch" },
+                    }),
+                  );
                   notify(
                     "info",
                     "Perfil eliminado",
@@ -758,7 +770,9 @@ export function Profile() {
                   if (returnProfileId && switchProfile(returnProfileId)) {
                     const previous = readProfileData();
                     window.dispatchEvent(
-                      new CustomEvent("bitacora-apply-profile", { detail: previous }),
+                      new CustomEvent("bitacora-apply-profile", {
+                        detail: { profile: previous, reason: "switch" },
+                      }),
                     );
                   }
                   setReturnProfileId("");
