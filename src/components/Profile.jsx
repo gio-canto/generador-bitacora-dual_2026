@@ -443,16 +443,27 @@ export function Profile() {
               className="profile-forget"
               type="button"
               onClick={() => {
-                if (forgetProfile())
+                const name = profile.name;
+                if (!window.confirm(`¿Eliminar el perfil de ${name}? Sus bitácoras guardadas se conservarán, pero este perfil dejará de aparecer en el selector.`))
+                  return;
+                if (forgetProfile()) {
+                  const next = readProfileData();
+                  setEditing(false);
+                  if (next.name)
+                    window.dispatchEvent(
+                      new CustomEvent("bitacora-apply-profile", { detail: next }),
+                    );
                   notify(
                     "info",
                     "Perfil eliminado",
-                    "Las bitácoras guardadas siguen aquí. Si había otro perfil, quedó seleccionado.",
+                    next.name
+                      ? `Ahora está activo el perfil de ${next.name}.`
+                      : "Sus bitácoras guardadas se conservaron.",
                   );
-                else
+                } else
                   notify(
                     "error",
-                    "No se pudo olvidar la información",
+                    "No se pudo eliminar el perfil",
                     "Revisa el almacenamiento del navegador.",
                   );
               }}
