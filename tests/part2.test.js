@@ -13,6 +13,10 @@ import {
   readProfileData,
   forgetProfile,
   initializeProfile,
+  listProfiles,
+  readActiveProfileId,
+  switchProfile,
+  createProfile,
 } from "../src/services/profile.js";
 it("valida el martes y los horarios antes de crear la semana", () => {
   expect(weekSetup("2026-09-15", "14:00", "10:00").field).toBe("defaultEnd");
@@ -154,4 +158,20 @@ it("recuerda el nombre sin confundir los disparadores secretos con el perfil", (
   expect(readProfile()).toBe("");
   expect(isVirtualName("  Virtual Insanity ")).toBe(true);
   expect(isVirtualName("JAMIROQUAI")).toBe(true);
+});
+
+it("mantiene varios alumnos separados y permite cambiar el perfil activo", () => {
+  localStorage.clear();
+  rememberProfile({ name: "Alumno Uno", company: "Empresa Uno", area: "Área Uno" });
+  const firstId = readActiveProfileId();
+  expect(listProfiles()).toHaveLength(1);
+
+  const secondId = createProfile({});
+  rememberProfile({ name: "Alumno Dos", company: "Empresa Dos", area: "Área Dos" });
+  expect(listProfiles()).toHaveLength(2);
+  expect(readActiveProfileId()).toBe(secondId);
+  expect(readProfileData()).toMatchObject({ name: "Alumno Dos", company: "Empresa Dos" });
+
+  expect(switchProfile(firstId)).toBe(true);
+  expect(readProfileData()).toMatchObject({ name: "Alumno Uno", company: "Empresa Uno", area: "Área Uno" });
 });
