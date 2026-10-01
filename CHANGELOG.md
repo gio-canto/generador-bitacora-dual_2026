@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.35 · Carrusel de testimonios · 2026-09-30
+
+- La sección **Lo que dicen quienes lo usan** pasa de una sola opinión a un carrusel accesible de testimonios reales.
+- Se conserva el testimonio de **Wuendy G.** y se incorporan las opiniones de **José Emiliano J.** y **Ezri M.**, todos estudiantes del Sistema Dual del **CBTis 134**.
+- El carrusel incluye navegación mediante flechas, puntos de posición e indicador numérico, manteniendo una sola opinión visible a la vez.
+- Los tres testimonios usan **Blobatar** generado a partir del nombre de cada estudiante.
+- La versión en español conserva el tono original de las opiniones y corrige únicamente ortografía y puntuación mínima para publicación.
+- Las versiones inglesa y alemana incluyen traducciones de los nuevos testimonios e indican expresamente que fueron traducidos del español.
+- En alemán, la atribución mantiene el contexto correcto: los estudiantes pertenecen al modelo dual mexicano, no a la formación dual alemana.
+- Se amplían las pruebas de la landing para cubrir nombres, citas, estructura del carrusel, controles y estilos.
+
 ## 0.50.0-beta.34 · Día de Muertos · 2026-09-29
 
 - Se añaden easter eggs de **Día de Muertos** para el **1 y 2 de noviembre**.
