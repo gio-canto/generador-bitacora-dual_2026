@@ -1,6 +1,7 @@
 import { isSecretName } from "../domain/presentation.js";
 
 const KEY = "bitacora_profile_v1";
+const PROFILES_KEY = "bitacora_profiles_v2";
 const EMPTY_PROFILE = Object.freeze({
   name: "",
   school: "",
@@ -56,9 +57,41 @@ function emitProfileChange() {
     window.dispatchEvent(new Event("bitacora-profile"));
 }
 
+function readProfilesState(storage = localStorage) {
+  try {
+    const saved = JSON.parse(storage.getItem(PROFILES_KEY) || "null");
+    if (saved?.profiles && typeof saved.profiles === "object") return saved;
+    const legacy = JSON.parse(storage.getItem(KEY) || "null");
+    if (legacy?.name) {
+      const id = "profile-" + Date.now().toString(36);
+      const state = { activeId: id, profiles: { [id]: legacy } };
+      storage.setItem(PROFILES_KEY, JSON.stringify(state));
+      return state;
+    }
+  } catch {}
+  return { activeId: "", profiles: {} };
+}
+
+function writeProfilesState(state, storage = localStorage) {
+  storage.setItem(PROFILES_KEY, JSON.stringify(state));
+}
+
+export function listProfiles(storage = localStorage) {
+  const state = readProfilesState(storage);
+  return Object.entries(state.profiles).map(([id, profile]) => ({
+    id,
+    name: cleanText(profile?.name, 160),
+  })).filter((item) => item.name);
+}
+
+export function readActiveProfileId(storage = localStorage) {
+  return readProfilesState(storage).activeId || "";
+}
+
 export function readProfileData(storage = localStorage) {
   try {
-    const raw = JSON.parse(storage.getItem(KEY) || "null");
+    const state = readProfilesState(storage);
+    const raw = state.profiles[state.activeId] || null;
     if (!raw || typeof raw !== "object" || Array.isArray(raw))
       return structuredClone(EMPTY_PROFILE);
 
@@ -207,6 +240,13 @@ export function rememberProfile(value, storage = localStorage) {
   };
 
   try {
+    const state = readProfilesState(storage);
+    let activeId = state.activeId;
+    if (!activeId || !state.profiles[activeId])
+      activeId = "profile-" + Date.now().toString(36);
+    state.activeId = activeId;
+    state.profiles[activeId] = next;
+    writeProfilesState(state, storage);
     storage.setItem(KEY, JSON.stringify(next));
     emitProfileChange();
     return true;
@@ -221,9 +261,39 @@ export function rememberName(value, storage = localStorage) {
   return rememberProfile({ name }, storage);
 }
 
+export function switchProfile(id, storage = localStorage) {
+  try {
+    const state = readProfilesState(storage);
+    if (!state.profiles[id]) return false;
+    state.activeId = id;
+    writeProfilesState(state, storage);
+    storage.setItem(KEY, JSON.stringify(state.profiles[id]));
+    emitProfileChange();
+    return true;
+  } catch { return false; }
+}
+
+export function createProfile(value = {}, storage = localStorage) {
+  try {
+    const state = readProfilesState(storage);
+    const id = "profile-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
+    state.activeId = id;
+    state.profiles[id] = { ...structuredClone(EMPTY_PROFILE), ...value };
+    writeProfilesState(state, storage);
+    storage.setItem(KEY, JSON.stringify(state.profiles[id]));
+    emitProfileChange();
+    return id;
+  } catch { return ""; }
+}
+
 export function forgetProfile(storage = localStorage) {
   try {
-    storage.setItem(KEY, JSON.stringify(EMPTY_PROFILE));
+    const state = readProfilesState(storage);
+    if (state.activeId) delete state.profiles[state.activeId];
+    const nextId = Object.keys(state.profiles)[0] || "";
+    state.activeId = nextId;
+    writeProfilesState(state, storage);
+    storage.setItem(KEY, JSON.stringify(nextId ? state.profiles[nextId] : EMPTY_PROFILE));
     emitProfileChange();
     return true;
   } catch {
@@ -233,6 +303,6 @@ export function forgetProfile(storage = localStorage) {
 
 export function initializeProfile(name, storage = localStorage) {
   try {
-    if (storage.getItem(KEY) === null) rememberName(name, storage);
+    if (storage.getItem(KEY) === null && !readActiveProfileId(storage)) rememberName(name, storage);
   } catch {}
 }
