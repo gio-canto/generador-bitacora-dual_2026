@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.34";
-export const RELEASE = "Día de Muertos";
+export const VERSION = "0.50.0-beta.35";
+export const RELEASE = "Carrusel de testimonios";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
