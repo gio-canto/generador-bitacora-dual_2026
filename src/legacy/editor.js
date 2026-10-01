@@ -21,7 +21,7 @@ import { notify, notifyImported } from "../services/rare-notification.jsx";
 import { createMatrixPayload } from "../services/delivery-registry.js";
 export function startEditor() {
   "use strict";
-  (() => {
+  return (() => {
     const $ = (s) => document.querySelector(s),
       deepCopy = (v) => JSON.parse(JSON.stringify(v)),
       escapeHtml = (v) =>
@@ -2672,5 +2672,10 @@ export function startEditor() {
       syncStudentSignatureDisclosure(readProfileData());
     }
     init();
+    return () => {
+      clearTimeout(previewTimer);
+      clearTimeout(draftTimer);
+      previewObserver.disconnect();
+    };
   })();
 }
