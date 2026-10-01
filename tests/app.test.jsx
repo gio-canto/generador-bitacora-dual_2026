@@ -1,5 +1,5 @@
-import { it, expect, vi } from "vitest";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { it, expect, vi, afterEach } from "vitest";
+import { render, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import App from "../src/App.jsx";
 import { readActiveProfileId } from "../src/services/profile.js";
 vi.stubGlobal(
@@ -10,6 +10,12 @@ vi.stubGlobal(
   },
 );
 vi.stubGlobal("devicePixelRatio", 1);
+
+afterEach(async () => {
+  cleanup();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+});
+
 it("recupera la interfaz original, genera cuatro días y conserva sus herramientas", async () => {
   localStorage.clear();
   render(<App />);
