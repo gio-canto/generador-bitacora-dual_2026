@@ -11,7 +11,6 @@ import {
   rememberProfile,
   initializeProfile,
   readActiveProfileId,
-  listProfiles,
 } from "../services/profile.js";
 import companies from "../data/companies.json";
 import schools from "../data/schools.json";
@@ -256,14 +255,11 @@ export function startEditor() {
         const records = Array.isArray(p) ? p : [];
         const activeId = readActiveProfileId();
         const activeName = readProfileData().name.trim().toLowerCase();
-        const validProfileIds = new Set(listProfiles().map((item) => item.id));
         let migrated = false;
         for (const record of records) {
           const studentName = String(record.student || "").trim().toLowerCase();
-          const ownerMissing =
-            !record.profileId || !validProfileIds.has(record.profileId);
           if (
-            ownerMissing &&
+            !record.profileId &&
             activeId &&
             activeName &&
             studentName === activeName
@@ -2492,14 +2488,16 @@ export function startEditor() {
         clearTimeout(profileDefaultsTimer);
 
         if (payload.reason === "switch" || payload.reason === "delete") {
-          if (payload.reason === "switch" && payload.fromProfileId)
-            saveDraftNow(payload.fromProfileId);
-          if (payload.reason === "delete" && payload.fromProfileId)
-            clearDraft(payload.fromProfileId);
+          if (payload.fromProfileId) saveDraftNow(payload.fromProfileId);
           currentId = null;
           entries = [];
           renderRecords();
           if (!restoreDraft()) newBlank(false);
+          return;
+        }
+
+        if (payload.reason === "edit") {
+          renderRecords();
           return;
         }
 
