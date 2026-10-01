@@ -7,6 +7,10 @@ import {
   readProfileData,
   rememberProfile,
   forgetProfile,
+  listProfiles,
+  readActiveProfileId,
+  switchProfile,
+  createProfile,
 } from "../services/profile.js";
 import { isSecretName } from "../domain/presentation.js";
 import { notify } from "../services/rare-notification.jsx";
@@ -100,9 +104,15 @@ export function Profile() {
   const [profile, setProfile] = useState(readProfileData);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(readProfileData);
+  const [profiles, setProfiles] = useState(listProfiles);
+  const [activeId, setActiveId] = useState(readActiveProfileId);
 
   useEffect(() => {
-    const sync = () => setProfile(readProfileData());
+    const sync = () => {
+      setProfile(readProfileData());
+      setProfiles(listProfiles());
+      setActiveId(readActiveProfileId());
+    };
     window.addEventListener("bitacora-profile", sync);
     return () => window.removeEventListener("bitacora-profile", sync);
   }, []);
@@ -308,13 +318,52 @@ export function Profile() {
           <>
             <header className="profile-popover-head">
               <div>
-                <strong>Tu información</strong>
-                <span>Predeterminados para nuevas bitácoras</span>
+                <strong>Personas en este equipo</strong>
+                <span>Cambia de alumno sin mezclar sus predeterminados</span>
               </div>
               <button className="profile-text-button" type="button" onClick={edit}>
                 Editar
               </button>
             </header>
+
+            <section className="profile-section profile-switcher">
+              <h3>Perfil activo</h3>
+              <div className="profile-switch-list">
+                {profiles.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={"profile-switch-item" + (item.id === activeId ? " active" : "")}
+                    onClick={() => {
+                      if (item.id === activeId) return;
+                      if (switchProfile(item.id)) {
+                        const next = readProfileData();
+                        setEditing(false);
+                        window.dispatchEvent(new CustomEvent("bitacora-apply-profile", { detail: next }));
+                        notify("success", "Perfil cambiado", `Ahora estás usando los datos de ${next.name}.`);
+                      }
+                    }}
+                  >
+                    <Blobatar name={item.name} size={30} alt="" />
+                    <span>{item.name}</span>
+                    {item.id === activeId ? <small>Activo</small> : null}
+                  </button>
+                ))}
+              </div>
+              <button
+                className="btn profile-add"
+                type="button"
+                onClick={() => {
+                  const id = createProfile({});
+                  if (!id) return;
+                  const empty = readProfileData();
+                  setForm(editableDefaults(empty));
+                  setEditing(true);
+                }}
+              >
+                + Agregar persona
+              </button>
+            </section>
 
             <section className="profile-section">
               <h3>Escuela</h3>
@@ -393,8 +442,8 @@ export function Profile() {
                 if (forgetProfile())
                   notify(
                     "info",
-                    "Información olvidada",
-                    "Tus bitácoras guardadas siguen aquí.",
+                    "Perfil eliminado",
+                    "Las bitácoras guardadas siguen aquí. Si había otro perfil, quedó seleccionado.",
                   );
                 else
                   notify(
@@ -404,7 +453,7 @@ export function Profile() {
                   );
               }}
             >
-              Olvidar predeterminados
+              Eliminar este perfil
             </button>
           </>
         ) : (
