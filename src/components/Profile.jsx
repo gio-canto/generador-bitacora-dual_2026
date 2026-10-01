@@ -106,6 +106,7 @@ export function Profile() {
   const [form, setForm] = useState(readProfileData);
   const [profiles, setProfiles] = useState(listProfiles);
   const [activeId, setActiveId] = useState(readActiveProfileId);
+  const [returnProfileId, setReturnProfileId] = useState("");
 
   useEffect(() => {
     const sync = () => {
@@ -294,6 +295,7 @@ export function Profile() {
     const updated = readProfileData();
     setProfile(updated);
     setEditing(false);
+    setReturnProfileId("");
     window.dispatchEvent(
       new CustomEvent("bitacora-apply-profile", { detail: updated }),
     );
@@ -354,8 +356,10 @@ export function Profile() {
                 className="btn profile-add"
                 type="button"
                 onClick={() => {
+                  const previousId = readActiveProfileId();
                   const id = createProfile({});
                   if (!id) return;
+                  setReturnProfileId(previousId);
                   const empty = readProfileData();
                   setForm(editableDefaults(empty));
                   setEditing(true);
@@ -738,7 +742,16 @@ export function Profile() {
               <button
                 className="btn"
                 type="button"
-                onClick={() => setEditing(false)}
+                onClick={() => {
+                  setEditing(false);
+                  if (returnProfileId && switchProfile(returnProfileId)) {
+                    const previous = readProfileData();
+                    window.dispatchEvent(
+                      new CustomEvent("bitacora-apply-profile", { detail: previous }),
+                    );
+                  }
+                  setReturnProfileId("");
+                }}
               >
                 Cancelar
               </button>
