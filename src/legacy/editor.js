@@ -11,6 +11,7 @@ import {
   rememberProfile,
   initializeProfile,
   readActiveProfileId,
+  listProfiles,
 } from "../services/profile.js";
 import companies from "../data/companies.json";
 import schools from "../data/schools.json";
@@ -255,10 +256,18 @@ export function startEditor() {
         const records = Array.isArray(p) ? p : [];
         const activeId = readActiveProfileId();
         const activeName = readProfileData().name.trim().toLowerCase();
+        const validProfileIds = new Set(listProfiles().map((item) => item.id));
         let migrated = false;
         for (const record of records) {
-          if (!record.profileId && activeId && activeName &&
-              String(record.student || "").trim().toLowerCase() === activeName) {
+          const studentName = String(record.student || "").trim().toLowerCase();
+          const ownerMissing =
+            !record.profileId || !validProfileIds.has(record.profileId);
+          if (
+            ownerMissing &&
+            activeId &&
+            activeName &&
+            studentName === activeName
+          ) {
             record.profileId = activeId;
             migrated = true;
           }
@@ -604,7 +613,8 @@ export function startEditor() {
     }
     function collectDraft() {
       return {
-        version: 1,
+        version: 2,
+        profileId: readActiveProfileId(),
         currentId,
         weekDate: $("#weekDate")?.value || "",
         defaultStart: $("#defaultStart")?.value || "10:00",
@@ -640,6 +650,12 @@ export function startEditor() {
         if (!raw) return false;
         const d = JSON.parse(raw);
         if (!d || !d.identity || !Array.isArray(d.entries)) return false;
+        const activeId = readActiveProfileId();
+        const activeName = readProfileData().name.trim().toLowerCase();
+        const draftName = String(d.identity.student || "").trim().toLowerCase();
+        if (d.profileId && d.profileId !== activeId) return false;
+        if (!d.profileId && activeId && activeName && draftName !== activeName)
+          return false;
         currentId = d.currentId || null;
         entries = deepCopy(d.entries).slice(0, MAX_DAYS);
         fillIdentity(d.identity);
@@ -2453,42 +2469,51 @@ export function startEditor() {
         $("#" + id).addEventListener("change", queueProfileDefaults);
       });
       window.addEventListener("bitacora-apply-profile", (event) => {
-        const profile = event.detail || readProfileData();
+        const payload = event.detail || {};
+        const profile = payload.profile || payload || readProfileData();
+        clearTimeout(profileNameTimer);
+        clearTimeout(profileDefaultsTimer);
         currentId = null;
         clearDraft();
         renderRecords();
-        if (profile.name) {
-          $("#student").value = profile.name;
-          $("#elaboroName").value = profile.name;
+
+        if (payload.reason === "switch") {
+          newBlank(false);
+          return;
         }
-        if (profile.school) {
-          savedOption("school", profile.school);
-          $("#school").value = profile.school;
-          configureSchool(true);
-        }
+
+        $("#student").value = profile.name || "";
+        $("#elaboroName").value = profile.name || "";
+
+        const schoolName = profile.school || DEFAULTS.school;
+        savedOption("school", schoolName);
+        $("#school").value = schoolName;
+        configureSchool(true);
+
         for (const id of ["specialty", "semester", "group"]) {
-          if (!profile[id]) continue;
-          savedOption(id, profile[id]);
-          $("#" + id).value = profile[id];
+          const value = profile[id] || DEFAULTS[id] || "";
+          if (value) savedOption(id, value);
+          $("#" + id).value = value;
         }
-        if (profile.company) {
-          savedOption("company", profile.company);
-          $("#company").value = profile.company;
-          syncCompanyContext(false);
-        }
-        if (profile.defaultStart)
-          $("#defaultStart").value = profile.defaultStart;
-        if (profile.defaultEnd) $("#defaultEnd").value = profile.defaultEnd;
+
+        if (profile.company) savedOption("company", profile.company);
+        $("#company").value = profile.company || "";
+        syncCompanyContext(false);
+
+        const preset = companyDefaults($("#company").value);
+        $("#defaultStart").value = profile.defaultStart || preset.start;
+        $("#defaultEnd").value = profile.defaultEnd || preset.end;
 
         const authorities = profile.authorities || {};
-        if (authorities.voboName) $("#voboName").value = authorities.voboName;
-        if (authorities.voboRole) $("#voboRole").value = authorities.voboRole;
+        $("#voboName").value =
+          authorities.voboName || DEFAULTS.authorities.voboName;
+        $("#voboRole").value =
+          authorities.voboRole || DEFAULTS.authorities.voboRole;
         $("#autorizoName").value = authorities.autorizoName || "";
         $("#autorizoRole").value = authorities.autorizoRole || "";
 
         const instructor = profile.instructor || {};
-        if (typeof instructor.enabled === "boolean")
-          $("#instructorEnabled").checked = instructor.enabled;
+        $("#instructorEnabled").checked = instructor.enabled === true;
         populateInstructorSelect();
         $("#instructorPreset").value = instructors().some(
           (person) => person.name === instructor.name,
@@ -2545,11 +2570,16 @@ export function startEditor() {
       $("#resetBtn").onclick = () => {
         if (
           confirm(
-            "Esto dejará únicamente el registro de la Semana 1. ¿Continuar?",
+            "Esto eliminará únicamente las bitácoras guardadas del perfil activo. Los demás perfiles no se modificarán. ¿Continuar?",
           )
         ) {
-          writeStore([SEED]);
-          localStorage.setItem(SEEDED_KEY, "1");
+          const activeIds = new Set(
+            recordsForActiveProfile().map((record) => record.id),
+          );
+          const remaining = readStore().filter(
+            (record) => !activeIds.has(record.id),
+          );
+          writeStore(remaining);
           renderRecords();
           newBlank();
         }
