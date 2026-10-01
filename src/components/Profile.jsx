@@ -340,12 +340,17 @@ export function Profile() {
                     className={"profile-switch-item" + (item.id === activeId ? " active" : "")}
                     onClick={() => {
                       if (item.id === activeId) return;
+                      const previousId = readActiveProfileId();
                       if (switchProfile(item.id)) {
                         const next = readProfileData();
                         setEditing(false);
                         window.dispatchEvent(
                           new CustomEvent("bitacora-apply-profile", {
-                            detail: { profile: next, reason: "switch" },
+                            detail: {
+                              profile: next,
+                              reason: "switch",
+                              fromProfileId: previousId,
+                            },
                           }),
                         );
                         notify("success", "Perfil cambiado", `Ahora estás usando los datos de ${next.name}.`);
@@ -369,7 +374,11 @@ export function Profile() {
                   const empty = readProfileData();
                   window.dispatchEvent(
                     new CustomEvent("bitacora-apply-profile", {
-                      detail: { profile: empty, reason: "switch" },
+                      detail: {
+                        profile: empty,
+                        reason: "switch",
+                        fromProfileId: previousId,
+                      },
                     }),
                   );
                   setForm(editableDefaults(empty));
@@ -455,6 +464,7 @@ export function Profile() {
               type="button"
               onClick={() => {
                 const name = profile.name;
+                const deletedId = readActiveProfileId();
                 if (!window.confirm(`¿Eliminar el perfil de ${name}? Sus bitácoras guardadas se conservarán, pero este perfil dejará de aparecer en el selector.`))
                   return;
                 if (forgetProfile()) {
@@ -462,7 +472,11 @@ export function Profile() {
                   setEditing(false);
                   window.dispatchEvent(
                     new CustomEvent("bitacora-apply-profile", {
-                      detail: { profile: next, reason: "switch" },
+                      detail: {
+                        profile: next,
+                        reason: "delete",
+                        fromProfileId: deletedId,
+                      },
                     }),
                   );
                   notify(
@@ -767,11 +781,16 @@ export function Profile() {
                 type="button"
                 onClick={() => {
                   setEditing(false);
+                  const provisionalId = readActiveProfileId();
                   if (returnProfileId && switchProfile(returnProfileId)) {
                     const previous = readProfileData();
                     window.dispatchEvent(
                       new CustomEvent("bitacora-apply-profile", {
-                        detail: { profile: previous, reason: "switch" },
+                        detail: {
+                          profile: previous,
+                          reason: "switch",
+                          fromProfileId: provisionalId,
+                        },
                       }),
                     );
                   }
