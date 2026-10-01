@@ -42,7 +42,7 @@ function activateUpdate(worker) {
 
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    const serviceWorkerUrl = /\\/registro-entrega\\/?$/i.test(location.pathname)
+    const serviceWorkerUrl = /\/registro-entrega\/?$/i.test(location.pathname)
       ? "../sw.js"
       : "./sw.js";
 
