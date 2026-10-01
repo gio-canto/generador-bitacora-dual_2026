@@ -167,6 +167,11 @@ it("mantiene varios alumnos separados y permite cambiar el perfil activo", () =>
   expect(listProfiles()).toHaveLength(1);
 
   const secondId = createProfile({});
+  expect(readProfileData().name).toBe("Nueva persona");
+  expect(listProfiles()).toHaveLength(2);
+  expect(switchProfile(firstId)).toBe(true);
+  expect(readProfile()).toBe("Alumno Uno");
+  expect(switchProfile(secondId)).toBe(true);
   rememberProfile({ name: "Alumno Dos", company: "Empresa Dos", area: "Área Dos" });
   expect(listProfiles()).toHaveLength(2);
   expect(readActiveProfileId()).toBe(secondId);
