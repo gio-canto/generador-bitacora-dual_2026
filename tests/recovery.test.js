@@ -1,6 +1,10 @@
 import { it, expect } from "vitest";
 import { recoverPreviousVersion } from "../src/services/recover-original.js";
 import { blankRecord } from "../src/domain/records.js";
+import {
+  rememberProfile,
+  readActiveProfileId,
+} from "../src/services/profile.js";
 it("recupera borrador e historial de React una vez sin eliminar el respaldo de origen", () => {
   localStorage.clear();
   const older = { ...blankRecord(), id: "old", student: "Alumno Anterior" };
@@ -25,4 +29,29 @@ it("no escribe si los datos de origen son inválidos", () => {
   localStorage.setItem("bitacora_dual_react_v1", '{"records":[3]}');
   expect(() => recoverPreviousVersion()).toThrow();
   expect(localStorage.getItem("bitacora_dual_clean_v3")).toBeNull();
+});
+
+
+it("recupera el borrador antiguo dentro del perfil activo cuando coincide el alumno", () => {
+  localStorage.clear();
+  rememberProfile({ name: "Alumno de Prueba" });
+  const profileId = readActiveProfileId();
+  const current = {
+    ...blankRecord(),
+    id: "scoped",
+    student: "Alumno de Prueba",
+  };
+  localStorage.setItem(
+    "bitacora_dual_react_v1",
+    JSON.stringify({ records: [current], draft: current }),
+  );
+
+  recoverPreviousVersion();
+
+  expect(localStorage.getItem("bitacora_dual_draft_v1")).toBeNull();
+  const restored = JSON.parse(
+    localStorage.getItem(`bitacora_dual_draft_v1:${profileId}`),
+  );
+  expect(restored.profileId).toBe(profileId);
+  expect(restored.identity.student).toBe("Alumno de Prueba");
 });
