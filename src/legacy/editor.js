@@ -10,6 +10,7 @@ import {
   rememberName,
   rememberProfile,
   initializeProfile,
+  readActiveProfileId,
 } from "../services/profile.js";
 import companies from "../data/companies.json";
 import schools from "../data/schools.json";
@@ -251,10 +252,33 @@ export function startEditor() {
     function readStore() {
       try {
         const p = JSON.parse(localStorage.getItem(STORE_KEY) || "[]");
-        return Array.isArray(p) ? p : [];
+        const records = Array.isArray(p) ? p : [];
+        const activeId = readActiveProfileId();
+        const activeName = readProfileData().name.trim().toLowerCase();
+        let migrated = false;
+        for (const record of records) {
+          if (!record.profileId && activeId && activeName &&
+              String(record.student || "").trim().toLowerCase() === activeName) {
+            record.profileId = activeId;
+            migrated = true;
+          }
+        }
+        if (migrated) localStorage.setItem(STORE_KEY, JSON.stringify(records));
+        return records;
       } catch {
         return [];
       }
+    }
+    function recordsForActiveProfile() {
+      const activeId = readActiveProfileId();
+      const activeName = readProfileData().name.trim().toLowerCase();
+      return readStore().filter((record) =>
+        activeId
+          ? record.profileId === activeId ||
+            (!record.profileId &&
+              String(record.student || "").trim().toLowerCase() === activeName)
+          : !record.profileId,
+      );
     }
     function writeStore(v) {
       try {
@@ -965,6 +989,7 @@ export function startEditor() {
     function collectRecord() {
       return {
         id: currentId || createId(),
+        profileId: readActiveProfileId(),
         title: autoTitle(),
         ...getIdentity(),
         markdown: $("#markdown").checked,
@@ -1326,7 +1351,7 @@ export function startEditor() {
       );
     }
     function renderRecords() {
-      const all = readStore()
+      const all = recordsForActiveProfile()
         .slice()
         .sort((a, b) =>
           String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")),
@@ -1343,7 +1368,7 @@ export function startEditor() {
           : "Cuando guardes una semana, aparecerá aquí.";
     }
     function exportBackup() {
-      const blob = new Blob([JSON.stringify(readStore(), null, 2)], {
+      const blob = new Blob([JSON.stringify(recordsForActiveProfile(), null, 2)], {
           type: "application/json",
         }),
         url = URL.createObjectURL(blob),
@@ -1371,6 +1396,7 @@ export function startEditor() {
           const copy = deepCopy(record);
           if (ids.has(copy.id)) copy.id = createId();
           ids.add(copy.id);
+          copy.profileId = readActiveProfileId();
           all.push(copy);
         }
         if (!writeStore(all)) return;
@@ -2428,6 +2454,9 @@ export function startEditor() {
       });
       window.addEventListener("bitacora-apply-profile", (event) => {
         const profile = event.detail || readProfileData();
+        currentId = null;
+        clearDraft();
+        renderRecords();
         if (profile.name) {
           $("#student").value = profile.name;
           $("#elaboroName").value = profile.name;
