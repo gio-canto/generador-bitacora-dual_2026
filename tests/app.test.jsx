@@ -1,6 +1,7 @@
 import { it, expect, vi } from "vitest";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import App from "../src/App.jsx";
+import { readActiveProfileId } from "../src/services/profile.js";
 vi.stubGlobal(
   "IntersectionObserver",
   class {
@@ -114,7 +115,10 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect($("guardTitle").textContent).toBe("Máximo de 4 días");
   fireEvent.click($("guardConfirm"));
   window.dispatchEvent(new Event("pagehide"));
-  const draft = JSON.parse(localStorage.getItem("bitacora_dual_draft_v1"));
+  const activeProfileId = readActiveProfileId();
+  const draft = JSON.parse(
+    localStorage.getItem(`bitacora_dual_draft_v1:${activeProfileId}`),
+  );
   expect(draft.entries.map((e) => e.date)).toEqual([
     "2026-09-15",
     "2026-09-16",
