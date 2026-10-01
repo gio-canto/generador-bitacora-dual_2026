@@ -200,6 +200,22 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
       .querySelector('.step-panel[data-step="4"]')
       .classList.contains("active"),
   ).toBe(true);
+
+  const beforeProfileEditSave = JSON.parse(
+    localStorage.getItem("bitacora_dual_clean_v3"),
+  ).length;
+  fireEvent.click(document.querySelector(".profile-text-button"));
+  fireEvent.input($("profileArea"), {
+    target: { value: "Área actualizada solo para nuevas bitácoras" },
+  });
+  fireEvent.click($("profileSave"));
+  expect($("student").value).toBe("Alumno de Prueba");
+  fireEvent.click($("saveBtn"));
+  await waitFor(() =>
+    expect(
+      JSON.parse(localStorage.getItem("bitacora_dual_clean_v3")),
+    ).toHaveLength(beforeProfileEditSave),
+  );
 });
 
 it("mantiene plegada y apagada la firma si ya se presentó y no se activó", async () => {
