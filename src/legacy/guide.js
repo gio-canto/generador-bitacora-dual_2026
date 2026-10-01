@@ -1,5 +1,6 @@
 import { notify } from "../services/rare-notification.jsx";
 import { CREDIT_NAMES } from "../domain/presentation.js";
+import { readActiveProfileId } from "../services/profile.js";
 export function startGuide() {
   (() => {
     "use strict";
@@ -251,7 +252,14 @@ export function startGuide() {
           0,
           Math.min(4, Number(localStorage.getItem(STEP_KEY) || 0)),
         );
-        if (localStorage.getItem("bitacora_dual_draft_v1")) {
+        const activeProfileId = readActiveProfileId();
+        const scopedDraftKey = activeProfileId
+          ? `bitacora_dual_draft_v1:${activeProfileId}`
+          : "bitacora_dual_draft_v1";
+        if (
+          localStorage.getItem(scopedDraftKey) ||
+          localStorage.getItem("bitacora_dual_draft_v1")
+        ) {
           highestStep = savedStep;
           requestAnimationFrame(() => showStep(savedStep, true));
         }
