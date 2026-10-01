@@ -291,11 +291,32 @@ const COPY = {
       label: "Lo que dicen quienes lo usan",
       title: "Hecho para resolver una tarea real, semana tras semana.",
       text: "Opiniones de estudiantes que ya han usado el generador dentro de su proceso de Educación Dual.",
-      quote: "Pues me ha ayudado a hacerlos de manera rápida y limpia; también me ha ayudado bastante a corregir mis faltas ortográficas.",
-      name: "Wuendy G.",
-      role: "Alumna del Sistema Dual",
-      institution: "CBTis 134",
-      translated: "",
+      previous: "Testimonio anterior",
+      next: "Siguiente testimonio",
+      goTo: "Ver testimonio",
+      items: [
+        {
+          quote: "Pues me ha ayudado a hacerlos de manera rápida y limpia; también me ha ayudado bastante a corregir mis faltas ortográficas.",
+          name: "Wuendy G.",
+          role: "Alumna del Sistema Dual",
+          institution: "CBTis 134",
+          translated: "",
+        },
+        {
+          quote: "Es más práctico y fácil.",
+          name: "José Emiliano J.",
+          role: "Alumno del Sistema Dual",
+          institution: "CBTis 134",
+          translated: "",
+        },
+        {
+          quote: "Me ha ayudado un buen porque hago las bitácoras bien rápido. Cuando las hacía a mano me tardaba varios minutos.",
+          name: "Ezri M.",
+          role: "Alumno del Sistema Dual",
+          institution: "CBTis 134",
+          translated: "",
+        },
+      ],
     },
     systems: {
       label: "El proyecto",
@@ -434,11 +455,32 @@ const COPY = {
       label: "What users are saying",
       title: "Built to solve a real weekly task.",
       text: "Feedback from students who have already used the generator as part of their Dual Education process.",
-      quote: "It has helped me do them quickly and neatly, and it has also helped me a lot with correcting my spelling mistakes.",
-      name: "Wuendy G.",
-      role: "Dual Education student",
-      institution: "CBTis 134",
-      translated: "Translated from Spanish.",
+      previous: "Previous testimonial",
+      next: "Next testimonial",
+      goTo: "View testimonial",
+      items: [
+        {
+          quote: "It has helped me do them quickly and neatly, and it has also helped me a lot with correcting my spelling mistakes.",
+          name: "Wuendy G.",
+          role: "Dual Education student",
+          institution: "CBTis 134",
+          translated: "Translated from Spanish.",
+        },
+        {
+          quote: "It is more practical and easier.",
+          name: "José Emiliano J.",
+          role: "Dual Education student",
+          institution: "CBTis 134",
+          translated: "Translated from Spanish.",
+        },
+        {
+          quote: "It has helped me a lot because I can finish my logbooks really quickly. When I did them by hand, they took me several minutes.",
+          name: "Ezri M.",
+          role: "Dual Education student",
+          institution: "CBTis 134",
+          translated: "Translated from Spanish.",
+        },
+      ],
     },
     systems: {
       label: "The project",
@@ -577,11 +619,32 @@ const COPY = {
       label: "Was Nutzer sagen",
       title: "Für eine echte Aufgabe entwickelt, die jede Woche wiederkommt.",
       text: "Rückmeldungen von Lernenden, die den Generator bereits in einem dualen Bildungsmodell verwenden. Die deutsche Fassung orientiert sich sprachlich an der dualen Berufsausbildung in Deutschland.",
-      quote: "Es hat mir geholfen, meine Nachweise schnell und ordentlich zu erstellen, und außerdem hilft es mir sehr dabei, meine Rechtschreibfehler zu korrigieren.",
-      name: "Wuendy G.",
-      role: "Teilnehmerin am dualen Bildungsmodell in Mexiko",
-      institution: "CBTis 134",
-      translated: "Aus dem Spanischen übersetzt.",
+      previous: "Vorheriges Testimonial",
+      next: "Nächstes Testimonial",
+      goTo: "Testimonial anzeigen",
+      items: [
+        {
+          quote: "Es hat mir geholfen, meine Nachweise schnell und ordentlich zu erstellen, und außerdem hilft es mir sehr dabei, meine Rechtschreibfehler zu korrigieren.",
+          name: "Wuendy G.",
+          role: "Teilnehmerin am dualen Bildungsmodell in Mexiko",
+          institution: "CBTis 134",
+          translated: "Aus dem Spanischen übersetzt.",
+        },
+        {
+          quote: "Es ist praktischer und einfacher.",
+          name: "José Emiliano J.",
+          role: "Teilnehmer am dualen Bildungsmodell in Mexiko",
+          institution: "CBTis 134",
+          translated: "Aus dem Spanischen übersetzt.",
+        },
+        {
+          quote: "Es hilft mir sehr, weil ich meine Ausbildungsnachweise wirklich schnell fertigstellen kann. Als ich sie von Hand gemacht habe, brauchte ich dafür mehrere Minuten.",
+          name: "Ezri M.",
+          role: "Teilnehmer am dualen Bildungsmodell in Mexiko",
+          institution: "CBTis 134",
+          translated: "Aus dem Spanischen übersetzt.",
+        },
+      ],
     },
     systems: {
       label: "Das Projekt",
@@ -964,6 +1027,20 @@ function TimeSection({ copy }) {
 
 function TestimonialsSection({ copy }) {
   const t = copy.testimonials;
+  const [active, setActive] = useState(0);
+  const items = t.items || [];
+  const current = items[active] || items[0];
+
+  useEffect(() => {
+    if (active >= items.length) setActive(0);
+  }, [active, items.length]);
+
+  if (!current) return null;
+
+  const move = (step) => {
+    setActive((index) => (index + step + items.length) % items.length);
+  };
+
   return (
     <section className="testimonials" id="opiniones">
       <div className="testimonials-inner">
@@ -972,18 +1049,46 @@ function TestimonialsSection({ copy }) {
           <h2>{t.title}</h2>
           <p>{t.text}</p>
         </div>
-        <div className="testimonial-list">
-          <figure className="testimonial reveal">
-            <blockquote>“{t.quote}”</blockquote>
+        <div
+          className="testimonial-carousel reveal"
+          role="region"
+          aria-roledescription="carousel"
+          aria-label={t.label}
+        >
+          <figure className="testimonial" key={current.name}>
+            <blockquote>“{current.quote}”</blockquote>
             <figcaption>
-              <Blobatar name={t.name} size={44} alt="" />
+              <Blobatar name={current.name} size={44} alt="" />
               <span>
-                <strong>{t.name}</strong>
-                <small>{t.role} · {t.institution}</small>
-                {t.translated && <em>{t.translated}</em>}
+                <strong>{current.name}</strong>
+                <small>{current.role} · {current.institution}</small>
+                {current.translated && <em>{current.translated}</em>}
               </span>
             </figcaption>
           </figure>
+          <div className="testimonial-controls">
+            <div className="testimonial-dots" aria-label={t.label}>
+              {items.map((item, index) => (
+                <button
+                  type="button"
+                  className={index === active ? "active" : ""}
+                  key={item.name}
+                  aria-label={`${t.goTo} ${index + 1}: ${item.name}`}
+                  aria-current={index === active ? "true" : undefined}
+                  onClick={() => setActive(index)}
+                />
+              ))}
+            </div>
+            <div className="testimonial-arrows">
+              <button type="button" onClick={() => move(-1)} aria-label={t.previous}>
+                <ArrowRight className="testimonial-arrow-prev" size={20} />
+              </button>
+              <span>{active + 1} / {items.length}</span>
+              <button type="button" onClick={() => move(1)} aria-label={t.next}>
+                <ArrowRight size={20} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
