@@ -277,8 +277,18 @@ export function createProfile(value = {}, storage = localStorage) {
   try {
     const state = readProfilesState(storage);
     const id = "profile-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
+    const usedNames = new Set(
+      Object.values(state.profiles).map((profile) => cleanText(profile?.name, 160)),
+    );
+    let provisionalName = "Nueva persona";
+    let suffix = 2;
+    while (usedNames.has(provisionalName)) provisionalName = `Nueva persona ${suffix++}`;
     state.activeId = id;
-    state.profiles[id] = { ...structuredClone(EMPTY_PROFILE), ...value };
+    state.profiles[id] = {
+      ...structuredClone(EMPTY_PROFILE),
+      name: provisionalName,
+      ...value,
+    };
     writeProfilesState(state, storage);
     storage.setItem(KEY, JSON.stringify(state.profiles[id]));
     emitProfileChange();
