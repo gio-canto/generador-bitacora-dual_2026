@@ -144,8 +144,9 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   fireEvent.click($("instructorEnabled"));
   window.dispatchEvent(new Event("pagehide"));
   expect(
-    JSON.parse(localStorage.getItem("bitacora_dual_draft_v1")).identity
-      .instructor.enabled,
+    JSON.parse(
+      localStorage.getItem(`bitacora_dual_draft_v1:${activeProfileId}`),
+    ).identity.instructor.enabled,
   ).toBe(false);
   fireEvent.input($("student"), { target: { value: "uwu" } });
   expect($("creditsDialog").open).toBe(true);
