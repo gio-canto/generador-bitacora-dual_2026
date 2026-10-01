@@ -164,10 +164,15 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   fireEvent.click($("pdfBtn"));
   await waitFor(()=>expect($("pdfBtn").disabled).toBe(false));
   expect(JSON.parse(localStorage.getItem("bitacora_dual_clean_v3"))).toHaveLength(before+1);
+  const activeRecords = JSON.parse(
+    localStorage.getItem("bitacora_dual_clean_v3"),
+  ).filter((record) => record.profileId === activeProfileId);
   expect(document.querySelectorAll("#homeRecords [data-review]")).toHaveLength(
-    before + 1,
+    activeRecords.length,
   );
-  expect($("homeHistoryState").textContent).toContain(String(before + 1));
+  expect($("#homeHistoryState").textContent).toContain(
+    String(activeRecords.length),
+  );
   expect($("homeHistoryLatest").textContent).toContain("Semana");
   expect($("saveState").textContent).toBe("Guardado");
   expect(
