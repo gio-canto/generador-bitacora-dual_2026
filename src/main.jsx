@@ -30,31 +30,56 @@ let pendingWorker;
 window.addEventListener("bitacora-update", (event) => {
   pendingWorker = event.detail;
   if (document.getElementById("updateNotice")) return;
-  const banner = document.createElement("div");
-  banner.id = "updateNotice";
-  banner.className = "update-notice";
-  banner.setAttribute("role", "status");
-  banner.setAttribute("aria-live", "polite");
 
-  const mark = document.createElement("span");
-  mark.className = "update-notice-mark";
+  const dialog = document.createElement("dialog");
+  dialog.id = "updateNotice";
+  dialog.className = "update-dialog";
+  dialog.setAttribute("aria-labelledby", "updateNoticeTitle");
+  dialog.setAttribute("aria-describedby", "updateNoticeDescription");
+
+  const shell = document.createElement("div");
+  shell.className = "update-dialog-shell";
+
+  const mark = document.createElement("div");
+  mark.className = "update-dialog-mark";
   mark.setAttribute("aria-hidden", "true");
   mark.textContent = "↑";
 
   const copy = document.createElement("div");
-  copy.className = "update-notice-copy";
-  const title = document.createElement("strong");
-  title.textContent = "Nueva versión disponible";
-  const description = document.createElement("span");
-  description.textContent = "Actualiza para usar la versión más reciente.";
-  copy.append(title, description);
+  copy.className = "update-dialog-copy";
+
+  const eyebrow = document.createElement("span");
+  eyebrow.className = "update-dialog-eyebrow";
+  eyebrow.textContent = "Actualización disponible";
+
+  const title = document.createElement("h2");
+  title.id = "updateNoticeTitle";
+  title.textContent = "Hay una nueva versión";
+
+  const description = document.createElement("p");
+  description.id = "updateNoticeDescription";
+  description.textContent =
+    "Actualiza la página para cargar las mejoras y correcciones más recientes. Tus datos guardados se conservarán.";
+
+  copy.append(eyebrow, title, description);
+
+  const actions = document.createElement("div");
+  actions.className = "update-dialog-actions";
+
+  const laterButton = document.createElement("button");
+  laterButton.className = "btn";
+  laterButton.type = "button";
+  laterButton.textContent = "Ahora no";
+  laterButton.onclick = () => dialog.close();
 
   const button = document.createElement("button");
   button.className = "btn primary";
+  button.type = "button";
   button.textContent = "Actualizar ahora";
   button.onclick = () => {
     window.dispatchEvent(new Event("pagehide"));
     button.disabled = true;
+    laterButton.disabled = true;
     button.textContent = "Actualizando…";
     const worker = pendingWorker;
     worker.addEventListener("statechange", () => {
@@ -63,10 +88,18 @@ window.addEventListener("bitacora-update", (event) => {
     if (worker.state === "activated") location.reload();
     else worker.postMessage({ type: "SKIP_WAITING" });
   };
-  banner.append(mark, copy, button);
-  const anchor = document.querySelector(".topbar, .delivery-topbar");
-  if (anchor) anchor.after(banner);
-  else document.body.prepend(banner);
+
+  actions.append(laterButton, button);
+  shell.append(mark, copy, actions);
+  dialog.append(shell);
+  document.body.append(dialog);
+
+  dialog.addEventListener("close", () => {
+    dialog.remove();
+  }, { once: true });
+
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
 });
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
