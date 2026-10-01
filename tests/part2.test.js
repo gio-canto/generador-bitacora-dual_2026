@@ -180,3 +180,33 @@ it("mantiene varios alumnos separados y permite cambiar el perfil activo", () =>
   expect(switchProfile(firstId)).toBe(true);
   expect(readProfileData()).toMatchObject({ name: "Alumno Uno", company: "Empresa Uno", area: "Área Uno" });
 });
+
+
+it("elimina solo el perfil activo y conserva los demás perfiles", () => {
+  localStorage.clear();
+  rememberProfile({ name: "Alumno Uno", company: "Empresa Uno" });
+  const firstId = readActiveProfileId();
+  const secondId = createProfile({});
+  rememberProfile({ name: "Alumno Dos", company: "Empresa Dos" });
+
+  expect(readActiveProfileId()).toBe(secondId);
+  expect(forgetProfile()).toBe(true);
+  expect(listProfiles()).toHaveLength(1);
+  expect(readActiveProfileId()).toBe(firstId);
+  expect(readProfileData()).toMatchObject({
+    name: "Alumno Uno",
+    company: "Empresa Uno",
+  });
+});
+
+it("crea nombres provisionales distintos para varios perfiles nuevos", () => {
+  localStorage.clear();
+  createProfile({});
+  expect(readProfile()).toBe("Nueva persona");
+  createProfile({});
+  expect(readProfile()).toBe("Nueva persona 2");
+  expect(listProfiles().map((profile) => profile.name)).toEqual([
+    "Nueva persona",
+    "Nueva persona 2",
+  ]);
+});
