@@ -11,6 +11,8 @@ import {
   readActiveProfileId,
   switchProfile,
   createProfile,
+  listArchivedProfiles,
+  restoreProfile,
 } from "../services/profile.js";
 import { isSecretName } from "../domain/presentation.js";
 import { notify } from "../services/rare-notification.jsx";
@@ -105,6 +107,7 @@ export function Profile() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(readProfileData);
   const [profiles, setProfiles] = useState(listProfiles);
+  const [archivedProfiles, setArchivedProfiles] = useState(listArchivedProfiles);
   const [activeId, setActiveId] = useState(readActiveProfileId);
   const [returnProfileId, setReturnProfileId] = useState("");
 
@@ -112,6 +115,7 @@ export function Profile() {
     const sync = () => {
       setProfile(readProfileData());
       setProfiles(listProfiles());
+      setArchivedProfiles(listArchivedProfiles());
       setActiveId(readActiveProfileId());
     };
     window.addEventListener("bitacora-profile", sync);
@@ -389,6 +393,46 @@ export function Profile() {
               </button>
             </section>
 
+            {archivedProfiles.length ? (
+              <section className="profile-section profile-switcher">
+                <h3>Perfiles eliminados</h3>
+                <div className="profile-switch-list">
+                  {archivedProfiles.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className="profile-switch-item"
+                      onClick={() => {
+                        const previousId = readActiveProfileId();
+                        if (restoreProfile(item.id)) {
+                          const restored = readProfileData();
+                          setEditing(false);
+                          window.dispatchEvent(
+                            new CustomEvent("bitacora-apply-profile", {
+                              detail: {
+                                profile: restored,
+                                reason: "switch",
+                                fromProfileId: previousId,
+                              },
+                            }),
+                          );
+                          notify(
+                            "success",
+                            "Perfil restaurado",
+                            `Volviste al perfil de ${restored.name} con sus bitácoras y borrador.`,
+                          );
+                        }
+                      }}
+                    >
+                      <Blobatar name={item.name} size={30} alt="" />
+                      <span>{item.name}</span>
+                      <small>Restaurar</small>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
             <section className="profile-section">
               <h3>Escuela</h3>
               <dl className="profile-lines">
@@ -465,7 +509,7 @@ export function Profile() {
               onClick={() => {
                 const name = profile.name;
                 const deletedId = readActiveProfileId();
-                if (!window.confirm(`¿Eliminar el perfil de ${name}? Sus bitácoras guardadas se conservarán, pero este perfil dejará de aparecer en el selector.`))
+                if (!window.confirm(`¿Eliminar el perfil de ${name}? Se quitará del selector activo, pero sus bitácoras y su borrador se conservarán y podrás restaurarlo después.`))
                   return;
                 if (forgetProfile()) {
                   const next = readProfileData();
@@ -484,7 +528,7 @@ export function Profile() {
                     "Perfil eliminado",
                     next.name
                       ? `Ahora está activo el perfil de ${next.name}.`
-                      : "Sus bitácoras guardadas se conservaron.",
+                      : "Se creó un perfil nuevo. El perfil eliminado quedó disponible para restaurarlo.",
                   );
                 } else
                   notify(
