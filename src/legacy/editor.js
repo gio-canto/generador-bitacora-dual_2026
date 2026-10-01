@@ -611,10 +611,13 @@ export function startEditor() {
         "Ese cambio haría que la bitácora dejara de caber en una sola hoja. El máximo de líneas de esta jornada se calcula con base en lo que ya ocupan las otras tres. Reduce texto en otra jornada si necesitas liberar más espacio aquí.",
       );
     }
-    function collectDraft() {
+    function draftStorageKey(profileId = readActiveProfileId()) {
+      return profileId ? `${DRAFT_KEY}:${profileId}` : DRAFT_KEY;
+    }
+    function collectDraft(profileId = readActiveProfileId()) {
       return {
         version: 2,
-        profileId: readActiveProfileId(),
+        profileId,
         currentId,
         weekDate: $("#weekDate")?.value || "",
         defaultStart: $("#defaultStart")?.value || "10:00",
@@ -625,10 +628,13 @@ export function startEditor() {
         savedAt: new Date().toISOString(),
       };
     }
-    function saveDraftNow() {
+    function saveDraftNow(profileId = readActiveProfileId()) {
       clearTimeout(draftTimer);
       try {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraft()));
+        localStorage.setItem(
+          draftStorageKey(profileId),
+          JSON.stringify(collectDraft(profileId)),
+        );
         if (dirty) setSaveState("Borrador guardado", "warn");
       } catch {
         setSaveState("No se pudo guardar el borrador", "bad");
@@ -638,24 +644,35 @@ export function startEditor() {
       clearTimeout(draftTimer);
       draftTimer = setTimeout(saveDraftNow, 180);
     }
-    function clearDraft() {
+    function clearDraft(profileId = readActiveProfileId()) {
       clearTimeout(draftTimer);
       try {
-        localStorage.removeItem(DRAFT_KEY);
+        localStorage.removeItem(draftStorageKey(profileId));
+        if (!profileId) localStorage.removeItem(DRAFT_KEY);
       } catch {}
     }
     function restoreDraft() {
       try {
-        const raw = localStorage.getItem(DRAFT_KEY);
+        const activeId = readActiveProfileId();
+        const scopedKey = draftStorageKey(activeId);
+        let raw = localStorage.getItem(scopedKey);
+        let fromLegacyKey = false;
+        if (!raw && scopedKey !== DRAFT_KEY) {
+          raw = localStorage.getItem(DRAFT_KEY);
+          fromLegacyKey = !!raw;
+        }
         if (!raw) return false;
         const d = JSON.parse(raw);
         if (!d || !d.identity || !Array.isArray(d.entries)) return false;
-        const activeId = readActiveProfileId();
         const activeName = readProfileData().name.trim().toLowerCase();
         const draftName = String(d.identity.student || "").trim().toLowerCase();
         if (d.profileId && d.profileId !== activeId) return false;
         if (!d.profileId && activeId && activeName && draftName !== activeName)
           return false;
+        if (fromLegacyKey) {
+          localStorage.setItem(scopedKey, raw);
+          localStorage.removeItem(DRAFT_KEY);
+        }
         currentId = d.currentId || null;
         entries = deepCopy(d.entries).slice(0, MAX_DAYS);
         fillIdentity(d.identity);
@@ -2473,14 +2490,21 @@ export function startEditor() {
         const profile = payload.profile || payload || readProfileData();
         clearTimeout(profileNameTimer);
         clearTimeout(profileDefaultsTimer);
-        currentId = null;
-        clearDraft();
-        renderRecords();
 
-        if (payload.reason === "switch") {
-          newBlank(false);
+        if (payload.reason === "switch" || payload.reason === "delete") {
+          if (payload.reason === "switch" && payload.fromProfileId)
+            saveDraftNow(payload.fromProfileId);
+          if (payload.reason === "delete" && payload.fromProfileId)
+            clearDraft(payload.fromProfileId);
+          currentId = null;
+          entries = [];
+          renderRecords();
+          if (!restoreDraft()) newBlank(false);
           return;
         }
+
+        currentId = null;
+        renderRecords();
 
         $("#student").value = profile.name || "";
         $("#elaboroName").value = profile.name || "";
