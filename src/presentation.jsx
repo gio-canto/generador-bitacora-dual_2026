@@ -1292,6 +1292,7 @@ function Footer({ copy }) {
       <nav aria-label={copy.footer.links}>
         <a href="../faq/">FAQ</a>
         <a href="../privacy/">{copy.footer.privacy}</a>
+        <a href="../cookies/">Cookies</a>
         <a href="../accessibility/">{copy.footer.accessibility}</a>
         <a href={REPO} target="_blank" rel="noopener noreferrer"><GithubLogo size={14} /> GitHub</a>
       </nav>
