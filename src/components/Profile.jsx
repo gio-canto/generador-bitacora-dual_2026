@@ -365,7 +365,10 @@ export function Profile() {
                     type="button"
                     className={"profile-switch-item" + (item.id === activeId ? " active" : "")}
                     onClick={() => {
-                      if (item.id === activeId) return;
+                      if (item.id === activeId) {
+                        closeMenu();
+                        return;
+                      }
                       const previousId = readActiveProfileId();
                       if (switchProfile(item.id)) {
                         const next = readProfileData();
@@ -864,6 +867,7 @@ export function Profile() {
                     );
                   }
                   setReturnProfileId("");
+                  closeMenu();
                 }}
               >
                 Cancelar
