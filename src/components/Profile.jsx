@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Blobatar } from "blobatar/react";
 import schools from "../data/schools.json";
@@ -110,6 +110,11 @@ export function Profile() {
   const [archivedProfiles, setArchivedProfiles] = useState(listArchivedProfiles);
   const [activeId, setActiveId] = useState(readActiveProfileId);
   const [returnProfileId, setReturnProfileId] = useState("");
+  const menuRef = useRef(null);
+
+  const closeMenu = () => {
+    if (menuRef.current) menuRef.current.open = false;
+  };
 
   useEffect(() => {
     const sync = () => {
@@ -120,6 +125,22 @@ export function Profile() {
     };
     window.addEventListener("bitacora-profile", sync);
     return () => window.removeEventListener("bitacora-profile", sync);
+  }, []);
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      const menu = menuRef.current;
+      if (menu?.open && !menu.contains(event.target)) closeMenu();
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") closeMenu();
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   if (!profile.name) return null;
@@ -305,6 +326,7 @@ export function Profile() {
         detail: { profile: updated, reason: "edit" },
       }),
     );
+    closeMenu();
     notify(
       "success",
       "Predeterminados actualizados",
@@ -313,7 +335,7 @@ export function Profile() {
   };
 
   return (
-    <details className="profile-menu">
+    <details className="profile-menu" ref={menuRef}>
       <summary title={profile.name} aria-label={`Perfil de ${profile.name}`}>
         <Blobatar name={profile.name} size={38} alt="" />
         <span>
@@ -357,6 +379,7 @@ export function Profile() {
                             },
                           }),
                         );
+                        closeMenu();
                         notify("success", "Perfil cambiado", `Ahora estás usando los datos de ${next.name}.`);
                       }
                     }}
@@ -416,6 +439,7 @@ export function Profile() {
                               },
                             }),
                           );
+                          closeMenu();
                           notify(
                             "success",
                             "Perfil restaurado",
@@ -523,6 +547,7 @@ export function Profile() {
                       },
                     }),
                   );
+                  closeMenu();
                   notify(
                     "info",
                     "Perfil eliminado",
