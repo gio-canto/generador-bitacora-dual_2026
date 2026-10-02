@@ -223,6 +223,7 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
   width:390px;
   max-width:min(390px,calc(100vw - 24px));
   max-height:min(76dvh,680px);
+  z-index:90;
   padding:0;
   overflow-x:hidden;
   overflow-y:auto;
