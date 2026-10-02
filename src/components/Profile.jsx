@@ -135,11 +135,17 @@ export function Profile() {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") closeMenu();
     };
+    const history = document.getElementById("homeHistoryDisclosure");
+    const handleHistoryToggle = () => {
+      if (history?.open) closeMenu();
+    };
     document.addEventListener("pointerdown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
+    history?.addEventListener("toggle", handleHistoryToggle);
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
+      history?.removeEventListener("toggle", handleHistoryToggle);
     };
   }, []);
 
@@ -335,7 +341,16 @@ export function Profile() {
   };
 
   return (
-    <details className="profile-menu" ref={menuRef}>
+    <details
+      className="profile-menu"
+      ref={menuRef}
+      onToggle={(event) => {
+        if (event.currentTarget.open) {
+          const history = document.getElementById("homeHistoryDisclosure");
+          if (history) history.open = false;
+        }
+      }}
+    >
       <summary title={profile.name} aria-label={`Perfil de ${profile.name}`}>
         <Blobatar name={profile.name} size={38} alt="" />
         <span>
