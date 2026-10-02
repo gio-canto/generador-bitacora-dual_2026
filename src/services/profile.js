@@ -377,6 +377,30 @@ export function restoreProfile(id, storage = localStorage) {
   }
 }
 
+export function deleteArchivedProfilePermanently(id, storage = localStorage) {
+  try {
+    const state = readProfilesState(storage);
+    if (!id || state.activeId === id || state.profiles[id]) return false;
+    if (!state.archivedProfiles?.[id]) return false;
+
+    const recordsKey = "bitacora_dual_clean_v3";
+    const draftKey = `bitacora_dual_draft_v1:${id}`;
+    const rawRecords = JSON.parse(storage.getItem(recordsKey) || "[]");
+    const records = Array.isArray(rawRecords) ? rawRecords : [];
+    const remainingRecords = records.filter((record) => record?.profileId !== id);
+
+    delete state.archivedProfiles[id];
+
+    storage.setItem(recordsKey, JSON.stringify(remainingRecords));
+    storage.removeItem(draftKey);
+    writeProfilesState(state, storage);
+    emitProfileChange();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function initializeProfile(name, storage = localStorage) {
   try {
     if (storage.getItem(KEY) === null && !readActiveProfileId(storage)) rememberName(name, storage);
