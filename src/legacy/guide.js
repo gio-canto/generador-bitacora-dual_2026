@@ -48,6 +48,16 @@ export function startGuide() {
           return false;
         }
       }
+      if (i === 3) {
+        const check = window.bitacoraValidateAuthorities
+          ? window.bitacoraValidateAuthorities()
+          : { ok: true };
+        if (!check.ok) {
+          window.bitacoraAlert?.(check.title, check.message);
+          document.getElementById(check.field)?.focus();
+          return false;
+        }
+      }
       return true;
     }
     async function advance() {
