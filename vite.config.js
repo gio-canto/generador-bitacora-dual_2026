@@ -10,6 +10,7 @@ export default defineConfig({
         main: "index.html",
         faq: "faq/index.html",
         privacy: "privacy/index.html",
+        cookies: "cookies/index.html",
         terms: "terms/index.html",
         accessibility: "accessibility/index.html",
         acknowledgements: "acknowledgements/index.html",
