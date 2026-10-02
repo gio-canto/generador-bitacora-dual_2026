@@ -19,6 +19,7 @@ import {
   createProfile,
   listArchivedProfiles,
   restoreProfile,
+  deleteArchivedProfilePermanently,
 } from "../src/services/profile.js";
 it("valida el martes y los horarios antes de crear la semana", () => {
   expect(weekSetup("2026-09-15", "14:00", "10:00").field).toBe("defaultEnd");
@@ -248,4 +249,51 @@ it("crea un perfil provisional si se elimina el último perfil", () => {
     name: "Único Alumno",
     company: "Empresa Única",
   });
+});
+
+
+it("elimina para siempre solo un perfil archivado y sus datos asociados", () => {
+  localStorage.clear();
+
+  rememberProfile({ name: "Alumno Uno", company: "Empresa Uno" });
+  const firstId = readActiveProfileId();
+
+  const secondId = createProfile({});
+  rememberProfile({ name: "Alumno Dos", company: "Empresa Dos" });
+
+  localStorage.setItem(
+    "bitacora_dual_clean_v3",
+    JSON.stringify([
+      { id: "r1", profileId: firstId, student: "Alumno Uno" },
+      { id: "r2", profileId: secondId, student: "Alumno Dos" },
+      { id: "legacy", student: "Alumno Dos" },
+    ]),
+  );
+  localStorage.setItem(
+    `bitacora_dual_draft_v1:${secondId}`,
+    JSON.stringify({ profileId: secondId, identity: { student: "Alumno Dos" }, entries: [] }),
+  );
+
+  expect(forgetProfile()).toBe(true);
+  expect(readActiveProfileId()).toBe(firstId);
+  expect(listArchivedProfiles()).toEqual([
+    { id: secondId, name: "Alumno Dos" },
+  ]);
+
+  expect(deleteArchivedProfilePermanently(firstId)).toBe(false);
+  expect(readActiveProfileId()).toBe(firstId);
+  expect(listProfiles().map((profile) => profile.id)).toContain(firstId);
+
+  expect(deleteArchivedProfilePermanently(secondId)).toBe(true);
+  expect(listArchivedProfiles()).toHaveLength(0);
+  expect(readActiveProfileId()).toBe(firstId);
+  expect(
+    JSON.parse(localStorage.getItem("bitacora_dual_clean_v3")),
+  ).toEqual([
+    { id: "r1", profileId: firstId, student: "Alumno Uno" },
+    { id: "legacy", student: "Alumno Dos" },
+  ]);
+  expect(
+    localStorage.getItem(`bitacora_dual_draft_v1:${secondId}`),
+  ).toBeNull();
 });
