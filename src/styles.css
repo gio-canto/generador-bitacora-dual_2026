@@ -222,8 +222,12 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
 .topbar .profile-actions{
   width:390px;
   max-width:min(390px,calc(100vw - 24px));
+  max-height:min(76dvh,680px);
   padding:0;
-  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
   border:1px solid rgba(0,0,0,.10);
   border-radius:18px;
   background:#fff;
@@ -303,9 +307,8 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
   text-align:left;
 }
 .profile-editor{
-  max-height:min(72vh,650px);
-  overflow:auto;
-  overscroll-behavior:contain;
+  max-height:none;
+  overflow:visible;
 }
 .profile-form-section{
   display:grid;
@@ -378,6 +381,7 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
   .topbar .profile-actions{
     width:min(390px,calc(100vw - 16px));
     right:-4px;
+    max-height:calc(100dvh - 126px);
   }
   .profile-lines>div{grid-template-columns:92px minmax(0,1fr)}
   .profile-form-grid{grid-template-columns:1fr 1fr}
