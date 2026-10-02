@@ -13,6 +13,7 @@ import {
   createProfile,
   listArchivedProfiles,
   restoreProfile,
+  deleteArchivedProfilePermanently,
 } from "../services/profile.js";
 import { isSecretName } from "../domain/presentation.js";
 import { notify } from "../services/rare-notification.jsx";
@@ -439,37 +440,81 @@ export function Profile() {
                 <h3>Perfiles eliminados</h3>
                 <div className="profile-switch-list">
                   {archivedProfiles.map((item) => (
-                    <button
+                    <div
                       key={item.id}
-                      type="button"
-                      className="profile-switch-item"
-                      onClick={() => {
-                        const previousId = readActiveProfileId();
-                        if (restoreProfile(item.id)) {
-                          const restored = readProfileData();
-                          setEditing(false);
-                          window.dispatchEvent(
-                            new CustomEvent("bitacora-apply-profile", {
-                              detail: {
-                                profile: restored,
-                                reason: "switch",
-                                fromProfileId: previousId,
-                              },
-                            }),
-                          );
-                          closeMenu();
-                          notify(
-                            "success",
-                            "Perfil restaurado",
-                            `Volviste al perfil de ${restored.name} con sus bitácoras y borrador.`,
-                          );
-                        }
-                      }}
+                      className="profile-switch-item profile-archived-item"
                     >
                       <Blobatar name={item.name} size={30} alt="" />
                       <span>{item.name}</span>
-                      <small>Restaurar</small>
-                    </button>
+                      <div className="profile-archived-actions">
+                        <button
+                          type="button"
+                          className="profile-mini-action"
+                          onClick={() => {
+                            const previousId = readActiveProfileId();
+                            if (restoreProfile(item.id)) {
+                              const restored = readProfileData();
+                              setEditing(false);
+                              window.dispatchEvent(
+                                new CustomEvent("bitacora-apply-profile", {
+                                  detail: {
+                                    profile: restored,
+                                    reason: "switch",
+                                    fromProfileId: previousId,
+                                  },
+                                }),
+                              );
+                              closeMenu();
+                              notify(
+                                "success",
+                                "Perfil restaurado",
+                                `Volviste al perfil de ${restored.name} con sus bitácoras y borrador.`,
+                              );
+                            }
+                          }}
+                        >
+                          Restaurar
+                        </button>
+                        <button
+                          type="button"
+                          className="profile-mini-action profile-mini-danger"
+                          onClick={async () => {
+                            closeMenu();
+                            const firstConfirm = await window.bitacoraConfirm?.(
+                              "¿Eliminar este perfil para siempre?",
+                              `Estás a punto de borrar definitivamente el perfil de ${item.name}. También se eliminarán todas sus bitácoras guardadas y su borrador local. Esta acción no se puede deshacer.`,
+                              "Continuar",
+                              "Cancelar",
+                            );
+                            if (!firstConfirm) return;
+
+                            const finalConfirm = await window.bitacoraConfirm?.(
+                              "Última confirmación",
+                              `Se borrarán para siempre el perfil de ${item.name}, todas sus bitácoras asociadas y su borrador de este navegador.`,
+                              "Eliminar para siempre",
+                              "Volver",
+                            );
+                            if (!finalConfirm) return;
+
+                            if (deleteArchivedProfilePermanently(item.id)) {
+                              notify(
+                                "success",
+                                "Perfil eliminado para siempre",
+                                `Se eliminaron definitivamente los datos locales de ${item.name}.`,
+                              );
+                            } else {
+                              notify(
+                                "error",
+                                "No se pudo eliminar el perfil",
+                                "El perfil no estaba archivado o el almacenamiento del navegador no está disponible.",
+                              );
+                            }
+                          }}
+                        >
+                          Eliminar para siempre
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </section>
