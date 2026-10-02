@@ -138,6 +138,11 @@ export function startEditor() {
     });
     const COUNCIL_AUTHORITY = companies.find((c) => c.name === COUNCIL)
       ?.representatives[0] || { name: "", role: "" };
+    function soleCompanyRepresentative(companyName) {
+      const representatives =
+        companies.find((c) => c.name === companyName)?.representatives || [];
+      return representatives.length === 1 ? representatives[0] : null;
+    }
     const instructors = () =>
       companies.find((c) => c.name === $("#company").value)?.instructors || [];
     const SEED = {
@@ -704,6 +709,7 @@ export function startEditor() {
     window.bitacoraAlert = showGuardAlert;
     window.bitacoraConfirm = showGuardConfirm;
     window.bitacoraValidateWeek = validateWeekEntries;
+    window.bitacoraValidateAuthorities = validateAuthoritiesForReview;
     window.bitacoraConfirmNames = confirmShortNames;
     function renderDays() {
       const host = $("#days");
@@ -960,6 +966,9 @@ export function startEditor() {
       if (signatureToggle) signatureToggle.checked = r.studentGenericSignature === true;
       updateStudentSignaturePreview();
       const a = { ...DEFAULTS.authorities, ...(r.authorities || {}) };
+      const companyRepresentative = soleCompanyRepresentative(
+        $("#company").value,
+      );
       $("#elaboroName").value = $("#student").value.trim();
       $("#elaboroRole").value =
         a.elaboroRole ||
@@ -968,8 +977,10 @@ export function startEditor() {
             .shortName;
       $("#voboName").value = a.voboName || "";
       $("#voboRole").value = a.voboRole || "";
-      $("#autorizoName").value = a.autorizoName || "";
-      $("#autorizoRole").value = a.autorizoRole || "";
+      $("#autorizoName").value =
+        a.autorizoName || companyRepresentative?.name || "";
+      $("#autorizoRole").value =
+        a.autorizoRole || companyRepresentative?.role || "";
       const ins = { ...DEFAULTS.instructor, ...(r.instructor || {}) };
       $("#instructorEnabled").checked =
         r.instructor?.enabled ??
@@ -1094,6 +1105,29 @@ export function startEditor() {
           (e.status === "falta" || e.status === "sin_labores") &&
           !String(e.activity || "").trim(),
       );
+    }
+    function validateAuthoritiesForReview() {
+      const required = [
+        ["elaboroName", "el nombre de quien elabora"],
+        ["elaboroRole", "el cargo de quien elabora"],
+        ["voboName", "el nombre de quien da el visto bueno"],
+        ["voboRole", "el cargo de quien da el visto bueno"],
+        ["autorizoName", "el nombre de quien autoriza"],
+        ["autorizoRole", "el cargo de quien autoriza"],
+      ];
+      const missing = required.find(
+        ([id]) => !String($("#" + id)?.value || "").trim(),
+      );
+      if (!missing) return { ok: true };
+      return {
+        ok: false,
+        field: missing[0],
+        title: "Faltan datos de responsables",
+        message:
+          "Completa " +
+          missing[1] +
+          " antes de pasar a revisión. El instructor formador no es obligatorio en esta verificación.",
+      };
     }
     function checkIdentity() {
       const required = [
