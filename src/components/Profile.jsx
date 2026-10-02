@@ -548,11 +548,17 @@ export function Profile() {
             <button
               className="profile-forget"
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 const name = profile.name;
                 const deletedId = readActiveProfileId();
-                if (!window.confirm(`¿Eliminar el perfil de ${name}? Se quitará del selector activo, pero sus bitácoras y su borrador se conservarán y podrás restaurarlo después.`))
-                  return;
+                closeMenu();
+                const confirmed = await window.bitacoraConfirm?.(
+                  "¿Eliminar este perfil?",
+                  `Se quitará el perfil de ${name} del selector activo. Sus bitácoras y su borrador se conservarán y podrás restaurarlo después.`,
+                  "Eliminar perfil",
+                  "Conservar perfil",
+                );
+                if (!confirmed) return;
                 if (forgetProfile()) {
                   const next = readProfileData();
                   setEditing(false);
