@@ -71,6 +71,11 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   await waitFor(() =>
     expect(document.querySelector(".profile-menu")).toBeTruthy(),
   );
+  const profileMenu = document.querySelector(".profile-menu");
+  profileMenu.open = true;
+  fireEvent.click(document.querySelector(".profile-switch-item.active"));
+  expect(profileMenu.open).toBe(false);
+  profileMenu.open = true;
   fireEvent.click(document.querySelector(".profile-text-button"));
   expect($("profileSchool")).toBeTruthy();
   fireEvent.change($("profileCompany"), {
