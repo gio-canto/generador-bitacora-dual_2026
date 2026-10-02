@@ -100,10 +100,14 @@ export function startGuide() {
       .forEach((b) => (b.onclick = () => showStep(step - 1, true)));
     links.forEach(
       (l, i) =>
-        (l.onclick = () =>
-          i <= highestStep
-            ? showStep(i, true)
-            : announce("Completa primero la etapa actual")),
+        (l.onclick = () => {
+          if (i > highestStep) {
+            announce("Completa primero la etapa actual");
+            return;
+          }
+          if (i === 4 && !valid(3)) return;
+          showStep(i, true);
+        }),
     );
     document.getElementById("newBtn").addEventListener("click", () => {
       highestStep = 0;
