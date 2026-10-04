@@ -499,34 +499,28 @@ function DebugPage() {
     <main className="debug-shell">
       <nav className="debug-topbar">
         <div className="debug-brand">
-          <span>Bitácora Dual 2026</span>
-          <span className="debug-badge">Debug</span>
+          <strong>Bitácora Dual</strong>
+          <span>/</span>
+          <span>Debug</span>
+          <span className="debug-version">{VERSION}</span>
         </div>
-        <a className="debug-link" href="../">
-          Volver al generador
-        </a>
+        <a className="debug-link" href="../">Salir</a>
       </nav>
 
-      <header className="debug-hero hero">
-        <span className="hero-kicker">Herramientas internas · {VERSION}</span>
-        <h1>Área de debug</h1>
-        <p>
-          Prueba funciones del generador, almacenamiento, perfiles, PDF,
-          registro de entregas, escáner, notificaciones, diseño adaptable y
-          efemérides. Las pruebas destructivas se ejecutan en memoria. Esta
-          página no incluye los easter eggs activados por palabras.
-        </p>
+      <header className="debug-hero">
+        <h1>Debug</h1>
+        <p>Pruebas internas del sistema. Las pruebas automáticas usan memoria aislada.</p>
       </header>
 
       <div className="debug-grid">
         <Card
-          title="Prueba automática"
-          description="Ejecuta una verificación rápida de los módulos principales sin modificar tus datos reales."
+          title="Pruebas automáticas"
+          description="Verifica los módulos principales sin modificar datos reales."
           wide
         >
           <div className="debug-row">
             <button className="debug-button primary" onClick={() => setTests(runSmokeTests())}>
-              Ejecutar todo
+              Ejecutar pruebas
             </button>
             <button className="debug-button" onClick={exportReport}>
               Descargar reporte JSON
@@ -549,8 +543,8 @@ function DebugPage() {
         </Card>
 
         <Card
-          title="Efemérides y temporadas"
-          description="Ejecuta el motor real de fechas ignorando el historial de “ya visto”."
+          title="Efemérides"
+          description="Simula una fecha y ejecuta el motor real. Sólo incluye activadores por fecha."
           wide
         >
           <div className="debug-row">
@@ -589,7 +583,7 @@ function DebugPage() {
 
         <Card
           title="Notificaciones"
-          description="Prueba los avisos Sileo y su fallback."
+          description="Ejecuta cada tipo de aviso."
         >
           <div className="debug-row">
             <button className="debug-button" onClick={() => notify("success", "Prueba correcta", "Notificación success.")}>Success</button>
@@ -601,7 +595,7 @@ function DebugPage() {
 
         <Card
           title="PDF"
-          description="Genera archivos reales con datos ficticios para validar el pipeline completo."
+          description="Genera archivos con datos de prueba."
         >
           <div className="debug-row">
             <button className="debug-button primary" onClick={makeTestPdf}>
@@ -616,7 +610,7 @@ function DebugPage() {
 
         <Card
           title="Escáner y cámara"
-          description="Comprueba capacidades del navegador y, sólo al pulsar el botón, solicita acceso a la cámara."
+          description="Comprueba acceso a cámara y diagnóstico del lector."
         >
           <div className="debug-row">
             <button className="debug-button primary" onClick={testCamera}>
@@ -631,7 +625,7 @@ function DebugPage() {
 
         <Card
           title="Entorno"
-          description="Lectura de capacidades; no muestra el contenido de tus registros."
+          description="Capacidades del navegador y estado local."
         >
           <ul className="debug-storage-list">
             <li>Versión: {env.version} · {env.release}</li>
@@ -647,8 +641,8 @@ function DebugPage() {
         </Card>
 
         <Card
-          title="Páginas y flujos reales"
-          description="Abre directamente cada área publicada del sistema."
+          title="Módulos"
+          description="Abre directamente cada área publicada."
           wide
         >
           <div className="debug-row">
@@ -665,8 +659,8 @@ function DebugPage() {
         </Card>
 
         <Card
-          title="Prueba adaptable"
-          description="Carga la aplicación real dentro de un marco con ancho controlado."
+          title="Vista adaptable"
+          description="Carga una página real a un ancho fijo."
           wide
         >
           <div className="debug-row">
@@ -698,7 +692,7 @@ function DebugPage() {
             />
           </div>
           <div className="debug-note">
-            El iframe usa el almacenamiento normal del navegador porque carga la aplicación real. Las pruebas automáticas de esta página usan almacenamiento en memoria.
+            El iframe usa el almacenamiento normal del navegador.
           </div>
         </Card>
       </div>
