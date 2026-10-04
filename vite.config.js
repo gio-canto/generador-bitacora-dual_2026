@@ -16,6 +16,7 @@ export default defineConfig({
         acknowledgements: "acknowledgements/index.html",
         presentation: "presentacion/index.html",
         deliveryRegistry: "registro-entrega/index.html",
+        debug: "debug/index.html",
       },
     },
   },
