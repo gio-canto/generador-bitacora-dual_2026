@@ -7,6 +7,11 @@ export const CALENDAR_FLAGS = Object.freeze({
     "https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Mexico.svg?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original",
 });
 
+export const CALENDAR_IMAGES = Object.freeze({
+  halloween:
+    "https://upload.wikimedia.org/wikipedia/commons/1/16/Balle-%C3%A0-leunettes_11.jpg",
+});
+
 const EVENTS = Object.freeze({
   "01-01": {
     id: "new-year",
@@ -170,19 +175,40 @@ function createMonthDetail(state) {
   return detail;
 }
 
+function createJanuaryConfetti() {
+  if (document.getElementById("calendarConfetti")) return null;
+  const layer = document.createElement("div");
+  layer.id = "calendarConfetti";
+  layer.className = "calendar-confetti";
+  layer.setAttribute("aria-hidden", "true");
+  const positions = Array.from({ length: 28 }, (_, index) => ((index * 37) % 97) + 1);
+  positions.forEach((left, index) => {
+    const piece = document.createElement("span");
+    piece.style.setProperty("--confetti-left", `${left}%`);
+    piece.style.setProperty("--confetti-delay", `${-(index * 0.41)}s`);
+    piece.style.setProperty("--confetti-duration", `${9 + (index % 6) * 1.2}s`);
+    piece.style.setProperty("--confetti-size", `${4 + (index % 4) * 2}px`);
+    piece.style.setProperty("--confetti-tilt", `${(index * 29) % 180}deg`);
+    layer.append(piece);
+  });
+  document.body.append(layer);
+  return layer;
+}
+
 function createDecemberSnow() {
   if (document.getElementById("calendarSnow")) return null;
   const layer = document.createElement("div");
   layer.id = "calendarSnow";
   layer.className = "calendar-snow";
   layer.setAttribute("aria-hidden", "true");
-  const positions = [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95];
+  const positions = Array.from({ length: 30 }, (_, index) => ((index * 37) % 97) + 1);
   positions.forEach((left, index) => {
     const flake = document.createElement("span");
-    flake.textContent = index % 3 === 0 ? "✦" : "·";
+    flake.textContent = index % 4 === 0 ? "❄" : index % 3 === 0 ? "✦" : "·";
     flake.style.setProperty("--snow-left", `${left}%`);
-    flake.style.setProperty("--snow-delay", `${-(index * 0.73)}s`);
-    flake.style.setProperty("--snow-duration", `${8 + (index % 5) * 1.4}s`);
+    flake.style.setProperty("--snow-delay", `${-(index * 0.47)}s`);
+    flake.style.setProperty("--snow-duration", `${8 + (index % 6) * 1.15}s`);
+    flake.style.setProperty("--snow-size", `${12 + (index % 4) * 3}px`);
     layer.append(flake);
   });
   document.body.append(layer);
@@ -207,11 +233,11 @@ function visualMarkup(event, state) {
     case "germany":
       return `<div class="calendar-visual calendar-visual--germany">${flagsMarkup(false)}<div class="dual-nodes" aria-hidden="true"><span>Betrieb</span><i></i><span>Berufsschule</span></div></div>`;
     case "mexico":
-      return '<div class="calendar-visual calendar-visual--mexico" aria-hidden="true"><div class="mexico-ribbon"><i></i><i></i><i></i></div><strong>16 · 09</strong></div>';
+      return `<div class="calendar-visual calendar-visual--mexico"><img class="calendar-mexico-flag" src="${CALENDAR_FLAGS.mexico}" alt="Bandera de México" referrerpolicy="no-referrer"><strong>16 · 09</strong></div>`;
     case "dual":
       return `<div class="calendar-visual calendar-visual--dual">${flagsMarkup(true)}<div class="dual-nodes" aria-hidden="true"><span>Escuela</span><i></i><span>Empresa</span></div></div>`;
     case "halloween":
-      return '<div class="calendar-visual calendar-visual--halloween" aria-hidden="true"><div class="halloween-eyes"><i></i><i></i></div><strong>31 / 10</strong></div>';
+      return `<div class="calendar-visual calendar-visual--halloween" aria-hidden="true"><img class="calendar-halloween-photo" src="${CALENDAR_IMAGES.halloween}" alt="" referrerpolicy="no-referrer"><strong>31 / 10</strong></div>`;
     case "day-of-the-dead":
       return '<div class="calendar-visual calendar-visual--day-of-the-dead" aria-hidden="true"><div class="cempasuchil"><i></i><i></i><i></i><i></i><i></i></div><div class="memorial-candle"><span></span></div><strong>1 · 2 XI</strong></div>';
     case "revolution":
@@ -303,6 +329,10 @@ export function startCalendarEasterEggs(options = {}) {
   const created = [];
   if (state.monthTheme) {
     document.body.classList.add(`calendar-season-${state.monthTheme}`);
+    if (state.monthTheme === "january") {
+      const confetti = createJanuaryConfetti();
+      if (confetti) created.push(confetti);
+    }
     if (state.monthTheme === "december") {
       const snow = createDecemberSnow();
       if (snow) created.push(snow);
