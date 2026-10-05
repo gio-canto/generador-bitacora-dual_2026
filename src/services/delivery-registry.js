@@ -1,14 +1,15 @@
 import companies from "../data/companies.json";
 
-export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v6";
-export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v5";
+export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v7";
+export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v6";
 export const LEGACY_DELIVERY_KEYS = [
+  "bitacora_dual_delivery_registry_v5",
   "bitacora_dual_delivery_registry_v4",
   "bitacora_dual_delivery_registry_v3",
   "bitacora_dual_delivery_registry_v2",
   "bitacora_dual_delivery_registry_v1",
 ];
-export const DELIVERY_SCHEMA = 6;
+export const DELIVERY_SCHEMA = 7;
 
 const uid = () =>
   globalThis.crypto?.randomUUID?.() ||
@@ -207,15 +208,48 @@ export function createDeliveryState() {
 }
 
 export function createStudent(data = {}) {
+  const dualStatus = data.dualStatus === "desisted" ? "desisted" : "active";
   return {
     id: typeof data.id === "string" && data.id ? data.id : uid(),
     name: clean(data.name, 180),
     specialty: clean(data.specialty, 120),
     company: clean(data.company, 220),
+    dualStatus,
+    desistedAt:
+      dualStatus === "desisted" && typeof data.desistedAt === "string"
+        ? clean(data.desistedAt, 40)
+        : "",
     createdAt:
       typeof data.createdAt === "string"
         ? data.createdAt
         : new Date().toISOString(),
+  };
+}
+
+export function studentIsActive(student) {
+  return student?.dualStatus !== "desisted";
+}
+
+export function studentAppliesToWeek(student, week) {
+  if (!student) return false;
+  return studentIsActive(student) || Boolean(week?.deliveries?.[student.id]);
+}
+
+export function markStudentDesisted(student, at = new Date().toISOString()) {
+  if (!student || typeof student !== "object") return student;
+  return {
+    ...student,
+    dualStatus: "desisted",
+    desistedAt: clean(at, 40) || new Date().toISOString(),
+  };
+}
+
+export function reactivateStudent(student) {
+  if (!student || typeof student !== "object") return student;
+  return {
+    ...student,
+    dualStatus: "active",
+    desistedAt: "",
   };
 }
 
@@ -662,14 +696,17 @@ export function matrixPeriodLabel(rawValue) {
 }
 
 export function weekSummary(week, students) {
+  const applicableStudents = (Array.isArray(students) ? students : []).filter(
+    (student) => studentAppliesToWeek(student, week),
+  );
   const summary = {
     entregado: 0,
     entregado_tarde: 0,
     no_entregado: 0,
     no_aplica: 0,
-    total: students.length,
+    total: applicableStudents.length,
   };
-  students.forEach((student) => {
+  applicableStudents.forEach((student) => {
     summary[deliveryStatus(week, student.id)]++;
   });
   summary.registered = summary.entregado + summary.entregado_tarde;
@@ -696,25 +733,36 @@ export function exportWeekCsv(state, weekId) {
   if (!week) return;
   const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`;
   const rows = [
-    ["Alumno", "Especialidad", "Empresa", "Estado", "Fecha y hora", "Origen"],
-    ...state.students.map((student) => {
-      const delivery = week.deliveries?.[student.id];
-      const status = deliveryStatus(week, student.id);
-      return [
-        student.name,
-        student.specialty,
-        student.company,
-        status === "entregado_tarde"
-          ? "Entregado a destiempo"
-          : status === "entregado"
-            ? "Entregado"
-            : status === "no_aplica"
-              ? "No aplica"
-              : "No entregado",
-        delivery?.registeredAt || "",
-        delivery?.source || "",
-      ];
-    }),
+    [
+      "Alumno",
+      "Especialidad",
+      "Empresa",
+      "Situación dual",
+      "Estado",
+      "Fecha y hora",
+      "Origen",
+    ],
+    ...state.students
+      .filter((student) => studentAppliesToWeek(student, week))
+      .map((student) => {
+        const delivery = week.deliveries?.[student.id];
+        const status = deliveryStatus(week, student.id);
+        return [
+          student.name,
+          student.specialty,
+          student.company,
+          studentIsActive(student) ? "Activo" : "Desistido de Dual",
+          status === "entregado_tarde"
+            ? "Entregado a destiempo"
+            : status === "entregado"
+              ? "Entregado"
+              : status === "no_aplica"
+                ? "No aplica"
+                : "No entregado",
+          delivery?.registeredAt || "",
+          delivery?.source || "",
+        ];
+      }),
   ];
   const csv =
     "\ufeff" + rows.map((row) => row.map(escape).join(",")).join("\r\n");
