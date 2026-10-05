@@ -499,17 +499,17 @@ function DebugPage() {
     <main className="debug-shell">
       <nav className="debug-topbar">
         <div className="debug-brand">
-          <strong>Bitácora Dual</strong>
-          <span>/</span>
-          <span>Debug</span>
-          <span className="debug-version">{VERSION}</span>
+          <span>Bitácora Dual 2026</span>
+          <span className="debug-badge">Debug</span>
         </div>
-        <a className="debug-link" href="../">Salir</a>
+        <a className="debug-link" href="../">
+          Volver al generador
+        </a>
       </nav>
 
-      <header className="debug-hero">
-        <h1>Debug</h1>
-        <p>Pruebas internas del sistema. Las pruebas automáticas usan memoria aislada.</p>
+      <header className="debug-hero hero">
+        <span className="hero-kicker">Herramientas internas · {VERSION}</span>
+        <h1>Área de debug</h1>
       </header>
 
       <div className="debug-grid">
@@ -520,7 +520,7 @@ function DebugPage() {
         >
           <div className="debug-row">
             <button className="debug-button primary" onClick={() => setTests(runSmokeTests())}>
-              Ejecutar pruebas
+              Ejecutar todo
             </button>
             <button className="debug-button" onClick={exportReport}>
               Descargar reporte JSON
@@ -690,9 +690,6 @@ function DebugPage() {
               src={iframePage + "?debug-preview=1"}
               style={{ width: iframeWidth + "px" }}
             />
-          </div>
-          <div className="debug-note">
-            El iframe usa el almacenamiento normal del navegador.
           </div>
         </Card>
       </div>
