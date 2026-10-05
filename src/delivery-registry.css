@@ -361,7 +361,64 @@ label.delivery-action-tile:hover{background:#f0f0f3;transform:translateY(-1px)}
 .delivery-base-row span{color:#6e6e73;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .delivery-base-actions{display:flex!important;align-items:center;gap:6px!important;min-width:auto!important}
 .delivery-base-actions .btn{min-width:42px;padding-inline:10px}
+.delivery-base-row.is-desisted{background:#f7f7f9}
+.delivery-base-row.is-desisted>div:not(.delivery-student-actions-panel){opacity:.78}
+.delivery-dual-status{
+  width:max-content;
+  display:inline-flex;
+  align-items:center;
+  margin-top:3px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:rgba(0,113,227,.09);
+  color:#0066cc!important;
+  font-size:10px!important;
+  font-weight:760;
+  line-height:1.2;
+}
+.delivery-student-actions-panel{
+  grid-column:1/-1;
+  display:flex!important;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px!important;
+  min-width:0!important;
+  margin-top:3px;
+  padding:12px 13px;
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:14px;
+  background:#fff;
+  opacity:1!important;
+}
+.delivery-student-actions-panel>div:first-child{
+  display:grid;
+  gap:3px;
+  min-width:180px;
+}
+.delivery-student-actions-panel strong{font-size:12.5px}
+.delivery-student-actions-panel span{
+  color:#6e6e73;
+  font-size:10.8px;
+  line-height:1.4;
+  white-space:normal;
+}
+.delivery-student-action-buttons{
+  display:flex!important;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px!important;
+  min-width:auto!important;
+  flex-wrap:wrap;
+}
 .delivery-danger{color:#b42318!important}
+.delivery-summary-card>small{
+  grid-column:1/-1;
+  margin-top:-48px;
+  align-self:end;
+  color:#6e6e73;
+  font-size:10.5px;
+  font-weight:650;
+}
 
 .delivery-stat-row{
   display:grid;
@@ -1116,6 +1173,12 @@ button.delivery-action-tile{cursor:pointer}
 }
 
 @media(max-width:760px){
+  .delivery-student-actions-panel{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .delivery-student-action-buttons{justify-content:stretch}
+  .delivery-student-action-buttons .btn{flex:1}
   .delivery-welcome{min-height:0;padding-top:28px}
   .delivery-welcome-cards{grid-template-columns:1fr}
   .delivery-entry-card{min-height:235px}
