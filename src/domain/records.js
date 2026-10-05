@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.41";
-export const RELEASE = "Estado de alumnos Dual";
+export const VERSION = "0.50.0-beta.42";
+export const RELEASE = "Confirmación visual del lector";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
