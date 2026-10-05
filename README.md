@@ -4,7 +4,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.41-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.42-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -56,7 +56,7 @@ El proyecto funciona sin cuentas y sin una base de datos central propia. El gene
 - Estados **Entregado a tiempo**, **Entregado a destiempo**, **No entregado** y **No aplica**; este último excluye al alumno del cálculo de cumplimiento de esa semana.
 - La fecha y hora límite de una semana puede editarse después de crearla; las entregas registradas por cámara se reclasifican con el nuevo límite, mientras las correcciones manuales y **No aplica** se conservan.
 - Cada alumno puede quedar como **Activo** o **Desistido de Dual**. Un desistido conserva sus entregas históricas, deja de aparecer y de contarse en semanas donde nunca tuvo entrega, puede reactivarse y sólo pierde su historial si se usa **Eliminar definitivamente**.
-- Coincidencias aproximadas de nombre con confirmación humana cuando un Data Matrix no coincide exactamente.
+- Coincidencias aproximadas de nombre con confirmación humana mediante una alerta visual integrada al sistema cuando un Data Matrix no coincide exactamente; muestra el nombre leído, la persona sugerida, especialidad/empresa y porcentaje aproximado antes de registrar.
 - Filtros, agrupaciones, edición de alumnos, CSV y reportes PDF.
 
 ## Implementar otra escuela
