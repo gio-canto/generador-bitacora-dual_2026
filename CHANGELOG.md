@@ -7,7 +7,7 @@
 - **Halloween** usa como fondo la imagen **Balle-à-leunettes 11.jpg** de Wikimedia Commons con tratamiento oscuro para conservar legibilidad.
 - La temporada de diciembre aumenta la densidad de copos en pantalla.
 - El README incorpora acceso directo al área **Debug**.
-- El área Debug recibe cambios estéticos.
+- El área **Debug** recupera su diseño visual original y elimina textos explicativos redundantes en encabezados y tarjetas; conserva las mismas pruebas, controles, simulador de efemérides, generación de PDF, diagnóstico de cámara y vista adaptable.
 - Se amplían las pruebas del calendario para cubrir confeti de enero, mayor cantidad de copos, la bandera de México y la imagen de Halloween.
 
 
