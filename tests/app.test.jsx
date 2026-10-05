@@ -137,7 +137,16 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect($("statusDialog").open).toBe(true);
   fireEvent.click($("statusClose"));
   expect(firstAbsenceReason()).toBeTruthy();
-  expect(firstAbsenceReason().options.length).toBeGreaterThan(12);
+  expect(firstAbsenceReason().options.length).toBeGreaterThan(15);
+  expect(
+    [...firstAbsenceReason().options].map((option) => option.value),
+  ).toEqual(
+    expect.arrayContaining([
+      "demonstrations",
+      "natural_disaster",
+      "social_unrest",
+    ]),
+  );
 
   fireEvent.change(firstAbsenceReason(), {
     target: { value: "medical_appointment" },
