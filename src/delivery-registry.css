@@ -211,6 +211,32 @@
 }
 .delivery-week-head>div{flex:1}
 .delivery-week-head p{margin:5px 0 0;color:#6e6e73;font-size:13px}
+.delivery-deadline-editor{
+  margin:-6px 0 18px;
+  padding:16px 18px;
+  border:1px solid rgba(0,113,227,.14);
+  border-radius:20px;
+  background:rgba(0,113,227,.045);
+}
+.delivery-deadline-editor form{
+  display:flex;
+  align-items:end;
+  gap:12px;
+}
+.delivery-deadline-editor .delivery-field{flex:1}
+.delivery-deadline-actions{display:flex;gap:8px;flex:0 0 auto}
+.delivery-deadline-editor p{
+  margin:10px 0 0;
+  color:#5f6065;
+  font-size:11.5px;
+  line-height:1.5;
+}
+.delivery-deadline-editor p strong{color:#3a3a3c}
+@media(max-width:620px){
+  .delivery-deadline-editor form{align-items:stretch;flex-direction:column}
+  .delivery-deadline-actions{display:grid;grid-template-columns:1fr 1fr}
+  .delivery-deadline-actions .btn{width:100%}
+}
 
 .delivery-week-list{display:grid;gap:8px}
 .delivery-week-row{
