@@ -106,6 +106,7 @@ Prueba:
 - alta, edición y eliminación de alumnos;
 - importación de Excel/CSV;
 - crear semana;
+- seleccionar una semana existente, editar su fecha límite y comprobar la reclasificación de entregas hechas por cámara sin alterar correcciones manuales ni **No aplica**;
 - cerrar/reabrir;
 - estado manual en **Entregado a tiempo**, **Entregado a destiempo**, **No entregado** y **No aplica**;
 - comprobar que **No aplica** se conserva al recargar/importar y no reduce el porcentaje de cumplimiento;
