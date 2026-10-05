@@ -1,5 +1,12 @@
 # Notas de versión
 
+## 0.50.0-beta.38 · Más motivos frecuentes de falta · 2026-10-04
+
+- Se amplía el selector de **Motivos frecuentes** con **Manifestaciones**, **Desastres naturales** y **Disturbios sociales**.
+- Las tres opciones insertan justificaciones completas y editables, con el mismo control de espacio, guardado y protección contra reemplazo accidental ya utilizado por el resto de motivos.
+- Se actualizan las pruebas de interfaz para comprobar que los tres nuevos motivos estén disponibles en cada jornada marcada como **Falta**.
+
+
 ## 0.50.0-beta.37 · Motivos frecuentes de falta · 2026-10-04
 
 - Al seleccionar **Falta**, cada jornada muestra un selector opcional de motivos frecuentes para agilizar la redacción de la justificación.
