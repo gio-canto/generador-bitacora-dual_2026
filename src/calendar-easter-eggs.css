@@ -14,7 +14,50 @@
   font-weight:760;
   letter-spacing:-.01em;
 }
+body.calendar-season-january{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(212,175,55,.13),transparent 28%),
+    radial-gradient(circle at 90% 18%,rgba(184,134,11,.08),transparent 24%),
+    var(--bg,#f5f5f7);
+}
+body.calendar-season-january .calendar-month-detail{
+  border-color:rgba(184,134,11,.24);
+  background:rgba(212,175,55,.11);
+  color:#8a6508;
+}
 body.calendar-season-january .hero h1{margin-top:10px}
+body.calendar-season-january .topbar{
+  box-shadow:0 8px 30px rgba(0,0,0,.07),0 0 0 1px rgba(184,134,11,.06),0 12px 34px rgba(212,175,55,.06);
+}
+
+.calendar-confetti{
+  position:fixed;
+  inset:0;
+  z-index:44;
+  overflow:hidden;
+  pointer-events:none;
+  contain:layout paint;
+}
+.calendar-confetti span{
+  position:absolute;
+  top:-22px;
+  left:var(--confetti-left);
+  width:var(--confetti-size);
+  height:calc(var(--confetti-size) * 1.8);
+  border-radius:2px;
+  background:linear-gradient(145deg,#f5d77a,#c99a22);
+  box-shadow:0 0 10px rgba(184,134,11,.12);
+  opacity:.55;
+  transform:rotate(var(--confetti-tilt));
+  animation:calendar-confetti-fall var(--confetti-duration) linear infinite;
+  animation-delay:var(--confetti-delay);
+}
+.calendar-confetti span:nth-child(3n){background:#d4af37}
+.calendar-confetti span:nth-child(4n){border-radius:50%;height:var(--confetti-size);background:#efd889}
+@keyframes calendar-confetti-fall{
+  from{transform:translate3d(0,-6vh,0) rotate(var(--confetti-tilt))}
+  to{transform:translate3d(42px,108vh,0) rotate(calc(var(--confetti-tilt) + 420deg))}
+}
 
 .calendar-snow{
   position:fixed;
@@ -29,7 +72,7 @@ body.calendar-season-january .hero h1{margin-top:10px}
   top:-24px;
   left:var(--snow-left);
   color:rgba(90,110,135,.34);
-  font-size:18px;
+  font-size:var(--snow-size,18px);
   line-height:1;
   text-shadow:0 1px 8px rgba(255,255,255,.9);
   animation:calendar-snow-fall var(--snow-duration) linear infinite;
@@ -181,17 +224,46 @@ body.calendar-season-december .topbar{
 }
 
 .calendar-visual--mexico{align-content:center;gap:8px;background:#f7f7f5}
-.mexico-ribbon{display:grid;grid-template-columns:repeat(3,26px);height:46px;overflow:hidden;border-radius:7px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
-.mexico-ribbon i:nth-child(1){background:#006847}
-.mexico-ribbon i:nth-child(2){background:#fff}
-.mexico-ribbon i:nth-child(3){background:#ce1126}
+.calendar-mexico-flag{
+  width:82px;
+  height:48px;
+  object-fit:cover;
+  border-radius:7px;
+  box-shadow:0 4px 14px rgba(0,0,0,.14);
+}
 .calendar-visual--mexico strong{font-size:16px;letter-spacing:.08em}
 
-.calendar-visual--halloween{align-content:center;gap:11px;background:#17171b;color:#f2f0e9}
-.halloween-eyes{display:flex;gap:16px}
-.halloween-eyes i{width:14px;height:7px;border-radius:80% 20%;background:#f3bd47;box-shadow:0 0 14px rgba(243,189,71,.5)}
-.halloween-eyes i+ i{transform:scaleX(-1)}
-.calendar-visual--halloween strong{font-size:19px;letter-spacing:.12em}
+.calendar-visual--halloween{
+  position:relative;
+  isolation:isolate;
+  align-content:end;
+  padding:14px;
+  background:#111;
+  color:#f7f2e7;
+}
+.calendar-halloween-photo{
+  position:absolute;
+  inset:0;
+  z-index:-2;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 48%;
+  filter:brightness(.34) saturate(.72) contrast(1.14);
+  transform:scale(1.02);
+}
+.calendar-visual--halloween::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:linear-gradient(to top,rgba(0,0,0,.68),rgba(0,0,0,.12) 60%,rgba(0,0,0,.3));
+}
+.calendar-visual--halloween strong{
+  font-size:19px;
+  letter-spacing:.12em;
+  text-shadow:0 2px 10px rgba(0,0,0,.75);
+}
 body.calendar-event-halloween .shell{filter:saturate(.78) brightness(.94);transition:filter .4s ease}
 
 .calendar-visual--day-of-the-dead{
@@ -270,7 +342,7 @@ body.calendar-event-day-of-the-dead .topbar{
   .calendar-easter-close{top:8px;right:8px}
 }
 @media(prefers-reduced-motion:reduce){
-  .calendar-snow{display:none}
+  .calendar-snow,.calendar-confetti{display:none}
   .calendar-easter,.calendar-visual--newyear strong{transition:none;animation:none}
   body.calendar-event-halloween .shell{transition:none}
 }
