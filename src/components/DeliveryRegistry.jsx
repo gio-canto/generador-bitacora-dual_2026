@@ -35,15 +35,19 @@ import {
   findStudentByMatrixValue,
   findStudentSuggestionsByMatrixValue,
   findWeekByMatrixValue,
+  markStudentDesisted,
   matrixPeriodLabel,
   mergeStudents,
   parseMatrixPayload,
   parsePortableDeliveryFile,
   readDeliveryState,
+  reactivateStudent,
   registerDelivery,
   removeDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
+  studentAppliesToWeek,
+  studentIsActive,
   updateWeekDueAt,
   weekSummary,
   writeDeliveryState,
@@ -393,6 +397,7 @@ export default function DeliveryRegistry({ onClose }) {
   const [dueAtEditing, setDueAtEditing] = useState(false);
   const [dueAtValue, setDueAtValue] = useState("");
   const [editingStudentId, setEditingStudentId] = useState("");
+  const [studentActionId, setStudentActionId] = useState("");
   const [notice, setNotice] = useState(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -425,6 +430,14 @@ export default function DeliveryRegistry({ onClose }) {
   const activeWeek = useMemo(
     () => state.weeks.find((week) => week.id === activeWeekId) || null,
     [state.weeks, activeWeekId],
+  );
+  const activeStudents = useMemo(
+    () => state.students.filter(studentIsActive),
+    [state.students],
+  );
+  const desistedStudents = useMemo(
+    () => state.students.filter((student) => !studentIsActive(student)),
+    [state.students],
   );
   const activeSummary = useMemo(
     () => (activeWeek ? weekSummary(activeWeek, state.students) : null),
@@ -534,11 +547,22 @@ export default function DeliveryRegistry({ onClose }) {
     const rawKey = String(rawValue || "").trim();
     let student = findStudentByMatrixValue(state.students, rawValue);
 
+    if (student && !studentIsActive(student)) {
+      setScanMessage(
+        student.name +
+          " está marcado como Desistido de Dual y no admite nuevas entregas.",
+      );
+      showDetection("error");
+      return;
+    }
+
     if (!student && rawKey) {
       const rememberedId = fuzzyStudentAliases.current.get(rawKey);
       if (rememberedId)
         student =
-          state.students.find((item) => item.id === rememberedId) || null;
+          state.students.find(
+            (item) => item.id === rememberedId && studentIsActive(item),
+          ) || null;
     }
 
     if (!student) {
@@ -546,7 +570,7 @@ export default function DeliveryRegistry({ onClose }) {
       if (rawKey && rejectedUntil > Date.now()) return;
 
       const suggestions = findStudentSuggestionsByMatrixValue(
-        state.students,
+        activeStudents,
         rawValue,
         3,
       );
@@ -1326,10 +1350,52 @@ export default function DeliveryRegistry({ onClose }) {
     clearNotice();
   };
 
+  const markStudentAsDesisted = (studentId) => {
+    const student = state.students.find((item) => item.id === studentId);
+    if (!student) return;
+    commit({
+      ...state,
+      students: state.students.map((item) =>
+        item.id === studentId ? markStudentDesisted(item) : item,
+      ),
+    });
+    setStudentActionId("");
+    if (editingStudentId === studentId) {
+      setEditingStudentId("");
+      setStudentForm({ name: "", specialty: "", company: "" });
+    }
+    clearNotice();
+    notify(
+      "info",
+      "Desistido de Dual",
+      student.name + " conserva sus entregas anteriores.",
+    );
+  };
+
+  const reactivateDualStudent = (studentId) => {
+    const student = state.students.find((item) => item.id === studentId);
+    if (!student) return;
+    commit({
+      ...state,
+      students: state.students.map((item) =>
+        item.id === studentId ? reactivateStudent(item) : item,
+      ),
+    });
+    setStudentActionId("");
+    clearNotice();
+    notify("success", "Alumno reactivado", student.name);
+  };
+
   const deleteStudent = (studentId) => {
     const studentName =
       state.students.find((student) => student.id === studentId)?.name ||
       "Alumno";
+    const confirmed = window.confirm(
+      "¿Eliminar definitivamente a " +
+        studentName +
+        "?\n\nEsta acción también eliminará todas sus entregas históricas del Registro de entrega y no se puede deshacer.",
+    );
+    if (!confirmed) return;
     const next = {
       ...state,
       students: state.students.filter((student) => student.id !== studentId),
@@ -1340,8 +1406,13 @@ export default function DeliveryRegistry({ onClose }) {
       }),
     };
     commit(next);
+    setStudentActionId("");
+    if (editingStudentId === studentId) {
+      setEditingStudentId("");
+      setStudentForm({ name: "", specialty: "", company: "" });
+    }
     clearNotice();
-    notify("info", "Alumno eliminado", studentName);
+    notify("info", "Alumno eliminado definitivamente", studentName);
   };
 
   const addWeek = (event, downloadAfter = false) => {
@@ -1362,11 +1433,11 @@ export default function DeliveryRegistry({ onClose }) {
       );
       return;
     }
-    if (!state.students.length) {
+    if (!activeStudents.length) {
       showNotice(
         "warning",
-        "No hay alumnos",
-        "Agrega al menos un alumno antes de crear la semana.",
+        "No hay alumnos activos",
+        "Agrega o reactiva al menos un alumno antes de crear la semana.",
       );
       return;
     }
@@ -1635,12 +1706,14 @@ export default function DeliveryRegistry({ onClose }) {
 
   const filteredStudents = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("es-MX");
-    let list = state.students.filter((student) =>
-      [student.name, student.specialty, student.company]
-        .join(" ")
-        .toLocaleLowerCase("es-MX")
-        .includes(term),
-    );
+    let list = state.students
+      .filter((student) => !activeWeek || studentAppliesToWeek(student, activeWeek))
+      .filter((student) =>
+        [student.name, student.specialty, student.company]
+          .join(" ")
+          .toLocaleLowerCase("es-MX")
+          .includes(term),
+      );
 
     if (specialtyFilter !== "all")
       list = list.filter((student) => student.specialty === specialtyFilter);
@@ -2100,11 +2173,25 @@ export default function DeliveryRegistry({ onClose }) {
                 </form>
 
                 <div className="delivery-roster-head">
-                  <strong>{state.students.length} alumnos</strong>
+                  <strong>{activeStudents.length} activos</strong>
+                  <span>
+                    {desistedStudents.length
+                      ? desistedStudents.length +
+                        " desistido" +
+                        (desistedStudents.length === 1 ? "" : "s") +
+                        " de Dual"
+                      : "Sin alumnos desistidos"}
+                  </span>
                 </div>
                 <div className="delivery-student-list compact">
                   {state.students.map((student) => (
-                    <div className="delivery-base-row" key={student.id}>
+                    <div
+                      className={
+                        "delivery-base-row" +
+                        (studentIsActive(student) ? "" : " is-desisted")
+                      }
+                      key={student.id}
+                    >
                       <Blobatar name={student.name} size={44} />
                       <div>
                         <strong>{student.name}</strong>
@@ -2113,6 +2200,11 @@ export default function DeliveryRegistry({ onClose }) {
                             .filter(Boolean)
                             .join(" · ") || "Sin datos"}
                         </span>
+                        {!studentIsActive(student) && (
+                          <span className="delivery-dual-status">
+                            Desistido de Dual
+                          </span>
+                        )}
                       </div>
                       <div className="delivery-base-actions">
                         <button
@@ -2124,14 +2216,62 @@ export default function DeliveryRegistry({ onClose }) {
                           <PencilSimple size={18} />
                         </button>
                         <button
-                          className="btn delivery-danger"
+                          className="btn"
                           type="button"
-                          aria-label={"Eliminar " + student.name}
-                          onClick={() => deleteStudent(student.id)}
+                          aria-label={"Opciones de baja de " + student.name}
+                          onClick={() =>
+                            setStudentActionId((current) =>
+                              current === student.id ? "" : student.id,
+                            )
+                          }
                         >
                           <Trash size={18} />
                         </button>
                       </div>
+                      {studentActionId === student.id && (
+                        <div className="delivery-student-actions-panel">
+                          <div>
+                            <strong>Situación en Educación Dual</strong>
+                            <span>
+                              Desistir conserva sus entregas históricas. Eliminar
+                              definitivamente también borra ese historial.
+                            </span>
+                          </div>
+                          <div className="delivery-student-action-buttons">
+                            {studentIsActive(student) ? (
+                              <button
+                                className="btn"
+                                type="button"
+                                onClick={() => markStudentAsDesisted(student.id)}
+                              >
+                                Desistido de Dual
+                              </button>
+                            ) : (
+                              <button
+                                className="btn"
+                                type="button"
+                                onClick={() => reactivateDualStudent(student.id)}
+                              >
+                                Reactivar
+                              </button>
+                            )}
+                            <button
+                              className="btn delivery-danger"
+                              type="button"
+                              onClick={() => deleteStudent(student.id)}
+                            >
+                              Eliminar definitivamente
+                            </button>
+                            <button
+                              className="btn"
+                              type="button"
+                              onClick={() => setStudentActionId("")}
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -2147,7 +2287,7 @@ export default function DeliveryRegistry({ onClose }) {
                   <button
                     className="btn primary"
                     type="button"
-                    disabled={!state.students.length}
+                    disabled={!activeStudents.length}
                     onClick={() => setSetupStep(2)}
                   >
                     Continuar
@@ -2233,7 +2373,12 @@ export default function DeliveryRegistry({ onClose }) {
               <article className="delivery-summary-card">
                 <Users size={28} />
                 <span>Alumnos</span>
-                <strong>{state.students.length}</strong>
+                <strong>{activeStudents.length}</strong>
+                <small>
+                  {desistedStudents.length
+                    ? desistedStudents.length + " desistido" + (desistedStudents.length === 1 ? "" : "s")
+                    : "Activos"}
+                </small>
                 <button
                   className="btn"
                   type="button"
@@ -2267,7 +2412,7 @@ export default function DeliveryRegistry({ onClose }) {
                 <button
                   className="btn primary"
                   type="button"
-                  disabled={!state.weeks.length || !state.students.length}
+                  disabled={!state.weeks.length || !activeStudents.length}
                   onClick={() => {
                     const week = state.weeks.at(-1);
                     setActiveWeekId(week.id);
@@ -2491,7 +2636,7 @@ export default function DeliveryRegistry({ onClose }) {
                   type="button"
                   aria-label="Escanear entregas"
                   title="Escanear"
-                  disabled={!state.students.length}
+                  disabled={!activeStudents.length}
                   onClick={() => setView("scanner")}
                 >
                   <Camera size={18} />
