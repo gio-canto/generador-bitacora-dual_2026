@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.50.0-beta.37 · Motivos frecuentes de falta · 2026-10-04
+
+- Al seleccionar **Falta**, cada jornada muestra un selector opcional de motivos frecuentes para agilizar la redacción de la justificación.
+- Se incorporan motivos precargados para cita médica, atención médica, enfermedad, accidente en el trayecto, accidente laboral, emergencia y asuntos familiares, examen de ingreso a la universidad, examen extraordinario, actividad o trámite escolar, trámite personal u oficial, problemas de transporte, motivos personales y motivos sociales.
+- Cada motivo inserta una justificación completa y más descriptiva que cumple la validación mínima de texto; el contenido sigue siendo totalmente editable antes de guardar o generar el PDF.
+- Los motivos frecuentes no crean campos nuevos ni cambian el esquema de las bitácoras: la justificación continúa almacenándose en el campo normal de actividad, manteniendo compatibilidad con registros, borradores y respaldos anteriores.
+- Si el alumno ya escribió una justificación personalizada, el sistema pide confirmación antes de reemplazarla con un motivo precargado.
+- La inserción de un motivo respeta el límite dinámico de una sola hoja; si el texto provocara desbordamiento, se conserva el contenido anterior y se muestra el aviso existente de espacio.
+- Elegir un motivo frecuente no implica autorización oficial de la falta; el FAQ mantiene la indicación de avisar a Vinculación, empresa y jefe inmediato según corresponda.
+- Se añaden pruebas de interfaz para selección de motivos, edición manual y protección contra reemplazo accidental de texto personalizado.
+
+
 ## 0.50.0-beta.36 · Efemérides visuales y debug · 2026-10-04
 
 - Enero incorpora detalles dorados y confeti dorado durante todo el mes, manteniendo el año dinámico de **Nuevo año, nueva bitácora**.
