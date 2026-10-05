@@ -418,6 +418,32 @@ export function registerDelivery(week, studentId, timestamp, source = "manual") 
   };
 }
 
+export function updateWeekDueAt(week, dueAt) {
+  if (!week || typeof week !== "object") return week;
+  const nextDueAt = clean(dueAt, 40);
+  const nextWeek = {
+    ...week,
+    dueAt: nextDueAt,
+    deliveries: { ...(week.deliveries || {}) },
+  };
+
+  for (const [studentId, delivery] of Object.entries(nextWeek.deliveries)) {
+    if (
+      !delivery ||
+      delivery.status === "no_aplica" ||
+      delivery.source !== "camera" ||
+      !delivery.registeredAt
+    )
+      continue;
+    nextWeek.deliveries[studentId] = {
+      ...delivery,
+      status: statusFromTimestamp(nextWeek, delivery.registeredAt),
+    };
+  }
+
+  return nextWeek;
+}
+
 export function setDeliveryStatus(
   week,
   studentId,
