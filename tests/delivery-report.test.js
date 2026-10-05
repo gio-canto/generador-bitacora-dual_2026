@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createStudent,
   createWeek,
+  markStudentDesisted,
   registerDelivery,
   setDeliveryStatus,
 } from "../src/services/delivery-registry.js";
@@ -87,6 +88,70 @@ describe("reportes de entrega", () => {
       "no_entregado",
     ]);
     expect(model.weeks[0].rows[0].source).toBe("Cámara");
+  });
+
+  it("conserva entregas de desistidos y los excluye de semanas sin registro", () => {
+    const active = createStudent({
+      id: "active",
+      name: "Alumno activo",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const desisted = markStudentDesisted(
+      createStudent({
+        id: "desisted",
+        name: "Alumno desistido",
+        specialty: "Programación",
+        company: "COCYTIEG",
+      }),
+      "2026-10-05T12:00:00.000Z",
+    );
+
+    let week1 = createWeek({
+      id: "w1",
+      label: "Semana 1",
+      startDate: "2026-09-01",
+      dueAt: "2026-09-05T18:00:00.000Z",
+    });
+    week1 = registerDelivery(
+      week1,
+      desisted.id,
+      "2026-09-05T17:00:00.000Z",
+      "camera",
+    );
+    const week2 = createWeek({
+      id: "w2",
+      label: "Semana 2",
+      startDate: "2026-09-08",
+      dueAt: "2026-09-12T18:00:00.000Z",
+    });
+
+    const weekly = buildDeliveryReportModel(
+      {
+        context: { school: "CBTis 134", generation: "2025-2028" },
+        students: [active, desisted],
+        weeks: [week1, week2],
+      },
+      { mode: "weekly" },
+    );
+
+    expect(weekly.weeks[0].rows.map((row) => row.id)).toContain(desisted.id);
+    expect(weekly.weeks[1].rows.map((row) => row.id)).not.toContain(desisted.id);
+    expect(weekly.weeks[1].summary.no_entregado).toBe(1);
+    expect(weekly.activeStudents).toBe(1);
+    expect(weekly.desistedStudents).toBe(1);
+
+    const global = buildDeliveryReportModel(
+      {
+        context: { school: "CBTis 134", generation: "2025-2028" },
+        students: [active, desisted],
+        weeks: [week1, week2],
+      },
+      { mode: "global" },
+    );
+    const row = global.globalRows.find((item) => item.id === desisted.id);
+    expect(row.weeks[0].status).toBe("entregado");
+    expect(row.weeks[1].status).toBe("desisted");
   });
 
   it("construye una matriz global alumno por semana", () => {
