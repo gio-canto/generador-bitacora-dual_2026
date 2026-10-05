@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.39";
-export const RELEASE = "Motivos frecuentes de falta";
+export const VERSION = "0.50.0-beta.40";
+export const RELEASE = "Edición de fecha límite";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
