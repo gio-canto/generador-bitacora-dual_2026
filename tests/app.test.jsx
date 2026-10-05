@@ -125,6 +125,46 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   fireEvent.change($("weekDate"), { target: { value: "2026-09-15" } });
   fireEvent.click($("weekBtn"));
   expect(document.querySelectorAll("#days .day-card").length).toBe(4);
+
+  const firstStatus = () =>
+    document.querySelector('[data-index="0"][data-key="status"]');
+  const firstActivity = () =>
+    document.querySelector('textarea[data-index="0"][data-key="activity"]');
+  const firstAbsenceReason = () =>
+    document.querySelector('[data-absence-reason="0"]');
+
+  fireEvent.change(firstStatus(), { target: { value: "falta" } });
+  expect($("statusDialog").open).toBe(true);
+  fireEvent.click($("statusClose"));
+  expect(firstAbsenceReason()).toBeTruthy();
+  expect(firstAbsenceReason().options.length).toBeGreaterThan(12);
+
+  fireEvent.change(firstAbsenceReason(), {
+    target: { value: "medical_appointment" },
+  });
+  expect(firstActivity().value).toContain("cita médica previamente programada");
+  expect(firstActivity().value).toContain("jornada de Educación Dual");
+
+  const customAbsenceText =
+    "Inasistencia por una situación particular previamente informada a las personas responsables.";
+  fireEvent.input(firstActivity(), { target: { value: customAbsenceText } });
+  expect(firstAbsenceReason().value).toBe("");
+
+  fireEvent.change(firstAbsenceReason(), { target: { value: "illness" } });
+  expect($("guardDialog").open).toBe(true);
+  expect($("guardTitle").textContent).toBe("¿Reemplazar la justificación?");
+  fireEvent.click($("guardCancel"));
+  await waitFor(() => expect(firstActivity().value).toBe(customAbsenceText));
+
+  fireEvent.change(firstAbsenceReason(), { target: { value: "illness" } });
+  fireEvent.click($("guardConfirm"));
+  await waitFor(() =>
+    expect(firstActivity().value).toContain("enfermedad o malestar de salud"),
+  );
+
+  fireEvent.change(firstStatus(), { target: { value: "laboral" } });
+  expect(firstAbsenceReason()).toBeNull();
+
   fireEvent.click($("addDayBtn"));
   expect($("guardTitle").textContent).toBe("Máximo de 4 días");
   fireEvent.click($("guardConfirm"));
