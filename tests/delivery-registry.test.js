@@ -15,6 +15,7 @@ import {
   registerDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
+  updateWeekDueAt,
   weekSummary,
 } from "../src/services/delivery-registry.js";
 
@@ -244,6 +245,66 @@ describe("subsistema de registro de entrega", () => {
       specialty: "Contabilidad",
       company: "ITCH",
     });
+  });
+
+  it("actualiza la fecha límite y recalcula entregas registradas por cámara", () => {
+    const cameraStudent = createStudent({ name: "Entrega por cámara" });
+    const manualStudent = createStudent({ name: "Corrección manual" });
+    const excludedStudent = createStudent({ name: "No aplica" });
+    let week = createWeek({
+      dueAt: "2026-09-30T20:00:00.000Z",
+    });
+
+    week = registerDelivery(
+      week,
+      cameraStudent.id,
+      "2026-09-30T21:00:00.000Z",
+      "camera",
+    );
+    week = setDeliveryStatus(
+      week,
+      manualStudent.id,
+      "entregado_tarde",
+      "2026-09-30T19:00:00.000Z",
+      "manual",
+    );
+    week = setDeliveryStatus(
+      week,
+      excludedStudent.id,
+      "no_aplica",
+      "2026-09-30T19:10:00.000Z",
+      "manual",
+    );
+
+    const updated = updateWeekDueAt(
+      week,
+      "2026-09-30T22:00:00.000Z",
+    );
+
+    expect(updated.dueAt).toBe("2026-09-30T22:00:00.000Z");
+    expect(deliveryStatus(updated, cameraStudent.id)).toBe("entregado");
+    expect(deliveryStatus(updated, manualStudent.id)).toBe("entregado_tarde");
+    expect(deliveryStatus(updated, excludedStudent.id)).toBe("no_aplica");
+    expect(updated.deliveries[manualStudent.id].source).toBe("manual");
+  });
+
+  it("también puede volver tardía una entrega automática al adelantar el límite", () => {
+    const student = createStudent({ name: "Alumno cámara" });
+    let week = createWeek({
+      dueAt: "2026-09-30T22:00:00.000Z",
+    });
+    week = registerDelivery(
+      week,
+      student.id,
+      "2026-09-30T21:00:00.000Z",
+      "camera",
+    );
+
+    const updated = updateWeekDueAt(
+      week,
+      "2026-09-30T20:00:00.000Z",
+    );
+    expect(deliveryStatus(updated, student.id)).toBe("entregado_tarde");
   });
 
   it("permite fijar manualmente cualquiera de los cuatro estados", () => {
