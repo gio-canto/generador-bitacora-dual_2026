@@ -57,10 +57,10 @@ No sustituye al historial y no debe contener actividades semanales como fuente c
 Clave actual:
 
 ```text
-bitacora_dual_delivery_registry_v6
+bitacora_dual_delivery_registry_v7
 ```
 
-Las claves `v1` a `v5` pueden leerse para migración.
+Las claves `v1` a `v6` pueden leerse para migración.
 
 El estado contiene, entre otros:
 
@@ -72,6 +72,7 @@ El estado contiene, entre otros:
 - periodo;
 - fecha límite;
 - estado de cierre;
+- estado del alumno en Dual (activo o desistido) y fecha de desistimiento;
 - entregas por alumno;
 - fecha/hora;
 - origen de registro;
