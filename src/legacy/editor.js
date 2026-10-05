@@ -46,12 +46,98 @@ export function startEditor() {
       "Falta de acuerdo con el calendario escolar vigente";
     const STATUS_NOTICES = {
       falta:
-        "No olvides avisar a la directora de Vinculación sobre tu falta y a tu jefe inmediato.",
+        "No olvides avisar a la directora de Vinculación sobre tu falta y a tu jefe inmediato. Puedes elegir un motivo frecuente como base y editarlo, o escribir tu propia justificación.",
       sin_labores:
         "No olvides avisar a la directora de Vinculación que en tu empresa no laborarán.",
       inhabil:
         "Esta opción es exclusiva para los días contemplados como inhábiles o feriados en los calendarios oficiales vigentes de la DGETI, CBTis, SEP y el calendario interno propio aplicable a Educación Dual.",
     };
+    const ABSENCE_REASON_PRESETS = Object.freeze([
+      {
+        id: "medical_appointment",
+        label: "Cita médica",
+        text: "Inasistencia debido a una cita médica previamente programada que coincidió con el horario de la jornada de Educación Dual.",
+      },
+      {
+        id: "medical_attention",
+        label: "Atención médica",
+        text: "Inasistencia por motivos médicos que requirieron recibir atención de salud durante el horario correspondiente a la jornada de Educación Dual.",
+      },
+      {
+        id: "illness",
+        label: "Enfermedad",
+        text: "Inasistencia debido a una enfermedad o malestar de salud que impidió asistir normalmente a la jornada de Educación Dual.",
+      },
+      {
+        id: "commute_accident",
+        label: "Accidente en el camino",
+        text: "Inasistencia debido a un accidente ocurrido durante el trayecto hacia la empresa, lo que impidió llegar a la jornada de Educación Dual.",
+      },
+      {
+        id: "work_accident",
+        label: "Accidente laboral",
+        text: "Inasistencia relacionada con un accidente laboral que requirió atención y evitó continuar con las actividades programadas de la jornada de Educación Dual.",
+      },
+      {
+        id: "family_emergency",
+        label: "Emergencia familiar",
+        text: "Inasistencia debido a una emergencia familiar que requirió atención inmediata y me impidió asistir a la jornada de Educación Dual.",
+      },
+      {
+        id: "family_matters",
+        label: "Asuntos familiares",
+        text: "Inasistencia debido a asuntos familiares que requirieron mi atención personal y me impidieron asistir a la jornada de Educación Dual.",
+      },
+      {
+        id: "university_admission_exam",
+        label: "Examen de ingreso a la universidad",
+        text: "Inasistencia por la presentación de un examen de ingreso a la universidad programado durante el horario correspondiente a la jornada de Educación Dual.",
+      },
+      {
+        id: "extraordinary_exam",
+        label: "Examen extraordinario",
+        text: "Inasistencia por la presentación de un examen extraordinario escolar programado durante el horario correspondiente a la jornada de Educación Dual.",
+      },
+      {
+        id: "school_activity",
+        label: "Actividad escolar",
+        text: "Inasistencia por participación en una actividad escolar que coincidió con el horario establecido para la jornada de Educación Dual.",
+      },
+      {
+        id: "school_procedure",
+        label: "Trámite escolar",
+        text: "Inasistencia por la realización de un trámite escolar necesario que coincidió con el horario establecido para la jornada de Educación Dual.",
+      },
+      {
+        id: "personal_procedure",
+        label: "Trámite personal u oficial",
+        text: "Inasistencia por la realización de un trámite personal u oficial que no fue posible efectuar fuera del horario de la jornada de Educación Dual.",
+      },
+      {
+        id: "transport",
+        label: "Problemas de transporte",
+        text: "Inasistencia debido a problemas de transporte durante el traslado que impidieron llegar a tiempo a la jornada de Educación Dual.",
+      },
+      {
+        id: "personal",
+        label: "Motivos personales",
+        text: "Inasistencia por motivos personales que requirieron mi atención y me impidieron asistir a la jornada de Educación Dual programada.",
+      },
+      {
+        id: "social",
+        label: "Motivos sociales",
+        text: "Inasistencia por un compromiso de carácter social que coincidió con el horario previsto para la jornada de Educación Dual.",
+      },
+    ]);
+    function absenceReasonForId(id) {
+      return ABSENCE_REASON_PRESETS.find((item) => item.id === id) || null;
+    }
+    function absenceReasonIdForText(text) {
+      const normalized = String(text || "").trim();
+      return (
+        ABSENCE_REASON_PRESETS.find((item) => item.text === normalized)?.id || ""
+      );
+    }
     function showStatusNotice(status) {
       const message = STATUS_NOTICES[status];
       if (!message) return;
@@ -734,13 +820,22 @@ export function startEditor() {
                 : "Actividad";
         const activityPlaceholder =
           e.status === "falta"
-            ? "Explica brevemente el motivo"
+            ? "Explica el motivo de la inasistencia; puedes usar un motivo frecuente como base."
             : e.status === "sin_labores"
               ? "Explica por qué no hubo labores en la empresa"
               : e.status === "inhabil"
                 ? INHABIL_JUSTIFICATION
                 : "Puedes usar **negritas**, *cursivas* y listas con -";
-        card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Área</label><input data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" ${e.status !== "laboral" ? "disabled" : ""}></div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px"><label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
+        const absenceReasonId = absenceReasonIdForText(e.activity);
+        const absenceReasonOptions = ABSENCE_REASON_PRESETS.map(
+          (item) =>
+            `<option value="${escapeHtml(item.id)}" ${item.id === absenceReasonId ? "selected" : ""}>${escapeHtml(item.label)}</option>`,
+        ).join("");
+        const absenceReasonControl =
+          e.status === "falta"
+            ? `<div class="absence-reason"><div class="absence-reason-head"><label for="absenceReason-${i}">Motivo frecuente</label><span>Opcional</span></div><select id="absenceReason-${i}" data-absence-reason="${i}"><option value="">Selecciona un motivo para usarlo como base…</option>${absenceReasonOptions}</select><small>El texto se colocará en la justificación y podrás modificarlo libremente.</small></div>`
+            : "";
+        card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Área</label><input data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" ${e.status !== "laboral" ? "disabled" : ""}></div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
         host.appendChild(card);
       });
       host.querySelectorAll("[data-key]").forEach((input) => {
@@ -795,6 +890,11 @@ export function startEditor() {
           if (k === "activity") {
             const c = host.querySelector(`[data-count="${i}"]`);
             if (c) c.textContent = input.value.length;
+            const reasonSelect = host.querySelector(
+              `[data-absence-reason="${i}"]`,
+            );
+            if (reasonSelect)
+              reasonSelect.value = absenceReasonIdForText(input.value);
           }
           if (k === "area") {
             const commonAreas = [
@@ -816,6 +916,47 @@ export function startEditor() {
           input.addEventListener("change", handler);
         else input.addEventListener("input", handler);
       });
+      host.querySelectorAll("[data-absence-reason]").forEach((select) =>
+        select.addEventListener("change", async () => {
+          const i = +select.dataset.absenceReason,
+            preset = absenceReasonForId(select.value);
+          if (!preset || entries[i]?.status !== "falta") return;
+          const current = String(entries[i].activity || "").trim(),
+            currentPresetId = absenceReasonIdForText(current);
+          if (current && !currentPresetId && current !== preset.text) {
+            const replace = await openGuardDialog(
+              "¿Reemplazar la justificación?",
+              "Ya escribiste una justificación personalizada. Si continúas, el motivo frecuente reemplazará ese texto; después podrás editarlo libremente.",
+              {
+                confirm: true,
+                confirmText: "Usar motivo",
+                cancelText: "Conservar mi texto",
+              },
+            );
+            if (!replace) {
+              select.value = "";
+              return;
+            }
+          }
+          const previous = entries[i].activity,
+            before = buildPageModel();
+          entries[i].activity = preset.text;
+          const after = buildPageModel();
+          if (!after.fits && after.bottom >= before.bottom - 0.01) {
+            entries[i].activity = previous;
+            select.value = absenceReasonIdForText(previous);
+            notifySpaceLimit();
+            return;
+          }
+          const textarea = host.querySelector(
+            `textarea[data-index="${i}"][data-key="activity"]`,
+          );
+          if (textarea) textarea.value = preset.text;
+          markDirty();
+          updatePreview();
+          refreshLineLimits();
+        }),
+      );
       host.querySelectorAll("[data-delete]").forEach((b) =>
         b.addEventListener("click", () => {
           entries.splice(+b.dataset.delete, 1);
