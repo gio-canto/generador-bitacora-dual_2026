@@ -6,6 +6,7 @@
 - Las justificaciones conservan suficiente contexto para ser claras y válidas, pero ahora usan expresiones más naturales como “horario de actividades”, “asistir con normalidad” o “traslado hacia la empresa”.
 - No cambia el funcionamiento del selector, el almacenamiento, la validación, el PDF ni la compatibilidad con registros anteriores.
 - Se actualiza la prueba de interfaz para confirmar que la redacción nueva se inserta correctamente.
+- El área **Debug** recupera el diseño visual de las páginas principales del proyecto: barra superior flotante con logotipo, fondo con gradientes suaves, hero amplio, tarjetas redondeadas y footer común, sin modificar sus herramientas ni pruebas.
 
 
 ## 0.50.0-beta.38 · Más motivos frecuentes de falta · 2026-10-04
