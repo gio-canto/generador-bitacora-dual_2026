@@ -1803,6 +1803,9 @@ export default function DeliveryRegistry({ onClose }) {
               .filter(Boolean)
               .join(" · ") || "Sin datos"}
           </span>
+          {!studentIsActive(student) && (
+            <span className="delivery-dual-status">Desistido de Dual</span>
+          )}
           <div className={`delivery-status delivery-status-${status}`}>
             <Icon size={17} weight="fill" />
             {meta.label}
