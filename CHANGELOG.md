@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.40 · Edición de fecha límite · 2026-10-05
+
+- En **Registro de entrega**, una semana existente puede seleccionarse desde el historial y después modificar su **fecha y hora límite**.
+- La vista de la semana incorpora el botón **Editar límite** con controles de Guardar y Cancelar.
+- Al cambiar el límite, las entregas registradas automáticamente por cámara se reclasifican como **Entregado a tiempo** o **Entregado a destiempo** usando su fecha real de registro.
+- Las correcciones realizadas manualmente y el estado **No aplica** no se sobrescriben al modificar la fecha límite.
+- Las semanas cerradas deben reabrirse antes de editar el límite, para evitar cambios accidentales sobre un periodo finalizado.
+- Se añaden pruebas de dominio para mover el límite hacia adelante y hacia atrás y verificar la reclasificación automática.
+
+
 ## 0.50.0-beta.39 · Redacción de justificaciones · 2026-10-04
 
 - Se simplifican los textos de los motivos frecuentes de **Falta** para evitar repetir innecesariamente la frase “jornada de Educación Dual”.
