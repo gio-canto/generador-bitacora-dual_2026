@@ -119,6 +119,21 @@ export function startEditor() {
         text: "Inasistencia debido a problemas de transporte durante el traslado que impidieron llegar a tiempo a la jornada de Educación Dual.",
       },
       {
+        id: "demonstrations",
+        label: "Manifestaciones",
+        text: "Inasistencia debido a manifestaciones o bloqueos en la vía pública que impidieron realizar con normalidad el traslado hacia la empresa durante la jornada de Educación Dual.",
+      },
+      {
+        id: "natural_disaster",
+        label: "Desastres naturales",
+        text: "Inasistencia debido a condiciones derivadas de un desastre natural que afectaron la seguridad, el traslado o la posibilidad de asistir a la jornada de Educación Dual.",
+      },
+      {
+        id: "social_unrest",
+        label: "Disturbios sociales",
+        text: "Inasistencia debido a disturbios sociales o situaciones de riesgo en la zona que hicieron inseguro o imposible el traslado hacia la jornada de Educación Dual.",
+      },
+      {
         id: "personal",
         label: "Motivos personales",
         text: "Inasistencia por motivos personales que requirieron mi atención y me impidieron asistir a la jornada de Educación Dual programada.",
