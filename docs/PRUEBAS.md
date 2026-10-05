@@ -142,8 +142,11 @@ Cubre al menos:
 - nombre suficientemente distinto: no sugerir;
 - nombre parecido con especialidad diferente: no sugerir en payload actual;
 - nombre parecido con empresa diferente: no sugerir;
-- rechazo de candidato;
-- confirmación de candidato;
+- mostrar el **modal visual del sistema** en lugar de una confirmación nativa del navegador;
+- comprobar que el modal muestre nombre leído, candidato, especialidad/empresa y porcentaje aproximado de similitud;
+- rechazo de candidato y avance a la siguiente sugerencia cuando exista;
+- confirmación de candidato mediante **Sí, registrar**;
+- mientras el modal esté abierto, una nueva lectura de cámara no debe abrir otra confirmación;
 - una coincidencia confirmada no debe requerir confirmación repetida durante la misma sesión.
 
 La coincidencia exacta siempre tiene prioridad.
