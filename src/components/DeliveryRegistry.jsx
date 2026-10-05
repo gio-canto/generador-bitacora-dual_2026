@@ -44,6 +44,7 @@ import {
   removeDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
+  updateWeekDueAt,
   weekSummary,
   writeDeliveryState,
 } from "../services/delivery-registry.js";
@@ -150,6 +151,24 @@ function formatDateTime(value) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
+}
+
+function toDateTimeLocalValue(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (!Number.isFinite(+date)) return "";
+  const pad = (number) => String(number).padStart(2, "0");
+  return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth() + 1) +
+    "-" +
+    pad(date.getDate()) +
+    "T" +
+    pad(date.getHours()) +
+    ":" +
+    pad(date.getMinutes())
+  );
 }
 
 function formatDate(value) {
@@ -371,6 +390,8 @@ export default function DeliveryRegistry({ onClose }) {
     startDate: "",
     dueAt: "",
   });
+  const [dueAtEditing, setDueAtEditing] = useState(false);
+  const [dueAtValue, setDueAtValue] = useState("");
   const [editingStudentId, setEditingStudentId] = useState("");
   const [notice, setNotice] = useState(null);
   const [search, setSearch] = useState("");
@@ -479,6 +500,11 @@ export default function DeliveryRegistry({ onClose }) {
   useEffect(() => {
     tutorialOpenRef.current = tutorialOpen;
   }, [tutorialOpen]);
+
+  useEffect(() => {
+    setDueAtEditing(false);
+    setDueAtValue("");
+  }, [activeWeekId]);
 
   useEffect(() => {
     const theme = document.querySelector('meta[name="theme-color"]');
@@ -1398,6 +1424,71 @@ export default function DeliveryRegistry({ onClose }) {
       ["no_entregado", "no_aplica"].includes(status) ? "info" : "success",
       label,
       student?.name || "",
+    );
+  };
+
+  const startDueAtEdit = () => {
+    if (!activeWeek) return;
+    if (activeWeek.closedAt) {
+      showNotice(
+        "info",
+        "La semana está cerrada",
+        "Reabre la semana antes de modificar su fecha límite.",
+      );
+      return;
+    }
+    setDueAtValue(toDateTimeLocalValue(activeWeek.dueAt));
+    setDueAtEditing(true);
+    clearNotice();
+  };
+
+  const saveDueAt = (event) => {
+    event?.preventDefault?.();
+    if (!activeWeek || activeWeek.closedAt) return;
+    if (!dueAtValue) {
+      showNotice(
+        "warning",
+        "Falta la fecha límite",
+        "Selecciona una fecha y hora antes de guardar.",
+      );
+      return;
+    }
+
+    const parsed = new Date(dueAtValue);
+    if (!Number.isFinite(+parsed)) {
+      showNotice(
+        "warning",
+        "Fecha límite inválida",
+        "Revisa la fecha y hora seleccionadas.",
+      );
+      return;
+    }
+
+    const nextDueAt = parsed.toISOString();
+    const beforeDeliveries = activeWeek.deliveries || {};
+    const updatedWeek = updateWeekDueAt(activeWeek, nextDueAt);
+    const reclassified = Object.keys(updatedWeek.deliveries || {}).filter(
+      (studentId) =>
+        beforeDeliveries[studentId]?.status !==
+        updatedWeek.deliveries[studentId]?.status,
+    ).length;
+
+    commit({
+      ...state,
+      weeks: state.weeks.map((week) =>
+        week.id === activeWeek.id ? updatedWeek : week,
+      ),
+    });
+    setDueAtEditing(false);
+    setDueAtValue("");
+    clearNotice();
+    notify(
+      "success",
+      "Fecha límite actualizada",
+      activeWeek.label +
+        (reclassified
+          ? " · " + reclassified + " entrega" + (reclassified === 1 ? "" : "s") + " reclasificada" + (reclassified === 1 ? "" : "s")
+          : ""),
     );
   };
 
@@ -2349,6 +2440,21 @@ export default function DeliveryRegistry({ onClose }) {
                 <button
                   className="btn delivery-nav-button"
                   type="button"
+                  aria-label="Editar fecha límite"
+                  title={
+                    activeWeek.closedAt
+                      ? "Reabre la semana para editar la fecha límite"
+                      : "Editar fecha límite"
+                  }
+                  disabled={Boolean(activeWeek.closedAt)}
+                  onClick={startDueAtEdit}
+                >
+                  <PencilSimple size={18} />
+                  <span>Editar límite</span>
+                </button>
+                <button
+                  className="btn delivery-nav-button"
+                  type="button"
                   aria-label="Descargar reporte PDF"
                   title="Reporte PDF"
                   onClick={() => openReport(activeWeek.id)}
@@ -2393,6 +2499,43 @@ export default function DeliveryRegistry({ onClose }) {
                 </button>
               </div>
             </section>
+
+            {dueAtEditing && (
+              <section className="delivery-deadline-editor">
+                <form onSubmit={saveDueAt}>
+                  <label className="delivery-field">
+                    <span>Nueva fecha y hora límite</span>
+                    <input
+                      required
+                      autoFocus
+                      type="datetime-local"
+                      value={dueAtValue}
+                      onChange={(event) => setDueAtValue(event.target.value)}
+                    />
+                  </label>
+                  <div className="delivery-deadline-actions">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => {
+                        setDueAtEditing(false);
+                        setDueAtValue("");
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                    <button className="btn primary" type="submit">
+                      Guardar límite
+                    </button>
+                  </div>
+                </form>
+                <p>
+                  Las entregas registradas por cámara se vuelven a calcular con
+                  la nueva fecha. Los estados corregidos manualmente y
+                  <strong> No aplica</strong> se conservan.
+                </p>
+              </section>
+            )}
 
             <section className="delivery-stat-row">
               {["entregado", "entregado_tarde", "no_entregado", "no_aplica"].map(
