@@ -42,6 +42,7 @@ Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regl
 - crear una bitácora desde cero;
 - generar jornadas;
 - estados Falta, Sin labores e Inhábil;
+- en **Falta**, probar motivos frecuentes, edición libre del texto y confirmación antes de reemplazar una justificación personalizada;
 - editar actividades;
 - ejecutar el corrector con un término institucional y vocabulario técnico conocido; confirmar que no los marque como error y que siga detectando faltas reales;
 - revisar contador/espacio;
