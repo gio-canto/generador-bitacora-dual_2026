@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.50.0-beta.39 · Redacción de justificaciones · 2026-10-04
+
+- Se simplifican los textos de los motivos frecuentes de **Falta** para evitar repetir innecesariamente la frase “jornada de Educación Dual”.
+- Las justificaciones conservan suficiente contexto para ser claras y válidas, pero ahora usan expresiones más naturales como “horario de actividades”, “asistir con normalidad” o “traslado hacia la empresa”.
+- No cambia el funcionamiento del selector, el almacenamiento, la validación, el PDF ni la compatibilidad con registros anteriores.
+- Se actualiza la prueba de interfaz para confirmar que la redacción nueva se inserta correctamente.
+
+
 ## 0.50.0-beta.38 · Más motivos frecuentes de falta · 2026-10-04
 
 - Se amplía el selector de **Motivos frecuentes** con **Manifestaciones**, **Desastres naturales** y **Disturbios sociales**.
