@@ -1,5 +1,20 @@
 # Notas de versión
 
+## 0.50.0-beta.41 · Estado de alumnos Dual · 2026-10-05
+
+- El Registro de entrega incorpora el estado de alumno **Desistido de Dual** para personas que se retiraron, fueron suspendidas o dejaron de participar en la modalidad.
+- La acción de baja deja de ser exclusivamente destructiva: desde **Administrar base** se puede elegir entre **Desistido de Dual** y **Eliminar definitivamente**.
+- Marcar a un alumno como desistido conserva su ficha y todas las entregas históricas ya registradas.
+- Un alumno desistido deja de aparecer en semanas donde nunca tuvo entrega y deja de contarse como **No entregado** o dentro del porcentaje de cumplimiento de esas semanas.
+- El escáner bloquea nuevas entregas de alumnos desistidos y muestra un aviso específico.
+- Se incorpora **Reactivar** para devolver a un alumno desistido al estado activo sin perder su historial.
+- **Eliminar definitivamente** mantiene el comportamiento destructivo, pero ahora exige confirmación explícita y advierte que también eliminará las entregas históricas.
+- Los reportes semanales conservan al desistido únicamente en las semanas donde sí tiene una entrega. El reporte global conserva su fila histórica y usa **D = Desistido** en semanas sin entrega, mientras las entregas anteriores mantienen ✓, ! o el estado que corresponda.
+- El CSV añade la columna **Situación dual** y excluye a desistidos de semanas donde no tenían registro.
+- El almacenamiento del Registro migra al esquema **v7**; los archivos y datos anteriores se migran como alumnos activos de forma compatible.
+- Se añaden pruebas para desistimiento, reactivación, conservación de entregas, exclusión de semanas sin registro y representación en reportes.
+
+
 ## 0.50.0-beta.40 · Edición de fecha límite · 2026-10-05
 
 - En **Registro de entrega**, una semana existente puede seleccionarse desde el historial y después modificar su **fecha y hora límite**.
