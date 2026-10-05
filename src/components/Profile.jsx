@@ -654,7 +654,11 @@ export function Profile() {
                   onChange={update("name")}
                   maxLength={160}
                   autoComplete="name"
+                  aria-describedby="profileNameOrderHint"
                 />
+                <small className="profile-field-hint" id="profileNameOrderHint">
+                  Escribe primero tu(s) nombre(s) y después tus apellidos.
+                </small>
               </label>
               <label>
                 Institución / plantel
