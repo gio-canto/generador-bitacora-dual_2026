@@ -4,7 +4,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.35-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.50.0--beta.36-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -14,6 +14,7 @@
 [Generador](https://gio-canto.github.io/generador-bitacora-dual_2026/) ·
 [Registro de entrega](https://gio-canto.github.io/generador-bitacora-dual_2026/registro-entrega/) ·
 [FAQ](https://gio-canto.github.io/generador-bitacora-dual_2026/faq/) ·
+[Debug](https://gio-canto.github.io/generador-bitacora-dual_2026/debug/) ·
 [Contribuir](CONTRIBUTING.md)
 
 </div>
@@ -36,6 +37,7 @@ El proyecto funciona sin cuentas y sin una base de datos central propia. El gene
 | **Data Matrix** | Relaciona la bitácora con alumno, especialidad, empresa y periodo. |
 | **Reportes** | Genera listados por semana, historial y matriz global de entregas. |
 | **Presentación** | Landing ES/EN/DE que explica el proyecto, muestra testimonios reales en carrusel y las rutas para adoptarlo o colaborar. |
+| **Debug** | Área interna para probar módulos, efemérides, cámara, PDF, notificaciones y vistas adaptables. |
 
 ## Funciones principales
 
@@ -124,6 +126,7 @@ npm run check
 ├─ registro-entrega/     # Entrada del subsistema de recepción
 ├─ presentacion/         # Landing pública
 ├─ faq/                  # Preguntas frecuentes
+├─ debug/                # Entrada del área de pruebas internas
 ├─ docs/                 # Documentación técnica e institucional
 ├─ tests/                # Pruebas automatizadas
 └─ .github/workflows/    # Verificación y despliegue
