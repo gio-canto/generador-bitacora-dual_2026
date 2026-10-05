@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.50.0-beta.36 · Efemérides visuales y debug · 2026-10-04
+
+- Enero incorpora detalles dorados y confeti dorado durante todo el mes, manteniendo el año dinámico de **Nuevo año, nueva bitácora**.
+- La efeméride de **Independencia de México** utiliza la bandera real de México ya configurada por el proyecto.
+- **Halloween** usa como fondo la imagen **Balle-à-leunettes 11.jpg** de Wikimedia Commons con tratamiento oscuro para conservar legibilidad.
+- La temporada de diciembre aumenta la densidad de copos en pantalla.
+- El README incorpora acceso directo al área **Debug**.
+- El área Debug recibe cambios estéticos.
+- Se amplían las pruebas del calendario para cubrir confeti de enero, mayor cantidad de copos, la bandera de México y la imagen de Halloween.
+
+
 ## 0.50.0-beta.35 · Carrusel de testimonios · 2026-09-30
 
 - La sección **Lo que dicen quienes lo usan** pasa de una sola opinión a un carrusel accesible de testimonios reales.
