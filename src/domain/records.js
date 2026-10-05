@@ -1,5 +1,5 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.37";
+export const VERSION = "0.50.0-beta.38";
 export const RELEASE = "Motivos frecuentes de falta";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
