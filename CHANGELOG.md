@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.50.0-beta.43 · Orden del nombre del alumno · 2026-10-05
+
+- El campo **Nombre completo del alumno** incorpora un recordatorio visible para escribir primero el o los nombres y después los apellidos.
+- El aviso incluye un ejemplo correcto e incorrecto para evitar capturas en formato “apellidos, nombres”.
+- El mismo recordatorio aparece al editar el nombre dentro del perfil local, ya que ese dato puede reutilizarse automáticamente en nuevas bitácoras.
+- La indicación es informativa y accesible mediante `aria-describedby`; no bloquea nombres compuestos ni intenta adivinar automáticamente el orden del nombre.
+- Se añade una prueba de interfaz para comprobar que el recordatorio y su relación accesible con el campo estén presentes.
+
+
 ## 0.50.0-beta.42 · Confirmación visual del lector · 2026-10-05
 
 - El lector Data Matrix deja de usar la confirmación nativa del navegador cuando encuentra un nombre parecido pero no una coincidencia exacta.
