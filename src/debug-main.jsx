@@ -497,20 +497,21 @@ function DebugPage() {
 
   return (
     <main className="debug-shell">
-      <nav className="debug-topbar">
-        <div className="debug-brand">
-          <span>Bitácora Dual 2026</span>
-          <span className="debug-badge">Debug</span>
-        </div>
-        <a className="debug-link" href="../">
-          Volver al generador
+      <header className="debug-topbar">
+        <a className="debug-brand" href="../" aria-label="Volver al Generador de Bitácora Dual">
+          <img src="../Assets/Edu.png" alt="Educación Dual" />
         </a>
-      </nav>
-
-      <header className="debug-hero hero">
-        <span className="hero-kicker">Herramientas internas · {VERSION}</span>
-        <h1>Área de debug</h1>
+        <div className="debug-actions">
+          <a className="debug-link" href="../faq/">Dudas</a>
+          <a className="debug-link primary" href="../">Abrir generador</a>
+        </div>
       </header>
+
+      <section className="debug-hero">
+        <span className="hero-kicker">Herramientas internas</span>
+        <h1>Área de debug</h1>
+        <span className="debug-version-chip">{VERSION} · {RELEASE}</span>
+      </section>
 
       <div className="debug-grid">
         <Card
@@ -693,6 +694,17 @@ function DebugPage() {
           </div>
         </Card>
       </div>
+
+      <footer className="debug-footer">
+        <span>Generador de Bitácora Dual 2026</span>
+        <nav aria-label="Información legal y del proyecto">
+          <a href="../privacy/">Aviso de privacidad</a>
+          <a href="../cookies/">Cookies</a>
+          <a href="../terms/">Condiciones de uso</a>
+          <a href="../accessibility/">Accesibilidad</a>
+          <a href="../acknowledgements/">Agradecimientos</a>
+        </nav>
+      </footer>
     </main>
   );
 }
