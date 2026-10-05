@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   CALENDAR_FLAGS,
+  CALENDAR_IMAGES,
   getCalendarState,
   startCalendarEasterEggs,
 } from "../src/services/calendar-easter-eggs.js";
@@ -88,6 +89,12 @@ describe("efemérides del calendario", () => {
     );
   });
 
+  it("usa la imagen indicada para Halloween", () => {
+    expect(CALENDAR_IMAGES.halloween).toContain(
+      "upload.wikimedia.org/wikipedia/commons/1/16/Balle-%C3%A0-leunettes_11.jpg",
+    );
+  });
+
   it("inserta el detalle discreto de enero sin modificar el contenido de la bitácora", () => {
     document.body.innerHTML =
       '<div class="shell"><header class="topbar"></header><section class="hero"><div class="hero-kicker">Bitácora semanal</div><h1>Crea tu bitácora dual.</h1></section></div>';
@@ -101,7 +108,43 @@ describe("efemérides del calendario", () => {
     expect(document.querySelector(".hero h1")?.textContent).toBe(
       "Crea tu bitácora dual.",
     );
+    expect(document.querySelectorAll("#calendarConfetti span").length).toBeGreaterThanOrEqual(24);
     cleanup();
     expect(document.getElementById("calendarMonthDetail")).toBeNull();
+    expect(document.getElementById("calendarConfetti")).toBeNull();
+  });
+
+  it("aumenta los copos durante diciembre", () => {
+    document.body.innerHTML =
+      '<div class="shell"><header class="topbar"></header><section class="hero"><div class="hero-kicker">Bitácora semanal</div><h1>Crea tu bitácora dual.</h1></section></div>';
+    const cleanup = startCalendarEasterEggs({
+      now: midday("2027-12-10"),
+      storage: null,
+    });
+    expect(document.querySelectorAll("#calendarSnow span").length).toBeGreaterThanOrEqual(28);
+    cleanup();
+    expect(document.getElementById("calendarSnow")).toBeNull();
+  });
+
+  it("muestra la bandera real de México en Independencia y la foto indicada en Halloween", () => {
+    document.body.innerHTML =
+      '<div class="shell"><header class="topbar"></header><section class="hero"><div class="hero-kicker">Bitácora semanal</div><h1>Crea tu bitácora dual.</h1></section></div>';
+    const independenceCleanup = startCalendarEasterEggs({
+      now: midday("2027-09-16"),
+      storage: null,
+    });
+    expect(document.querySelector(".calendar-mexico-flag")?.getAttribute("src")).toBe(
+      CALENDAR_FLAGS.mexico,
+    );
+    independenceCleanup();
+
+    const halloweenCleanup = startCalendarEasterEggs({
+      now: midday("2027-10-31"),
+      storage: null,
+    });
+    expect(document.querySelector(".calendar-halloween-photo")?.getAttribute("src")).toBe(
+      CALENDAR_IMAGES.halloween,
+    );
+    halloweenCleanup();
   });
 });
