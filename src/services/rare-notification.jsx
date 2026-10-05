@@ -3,6 +3,15 @@ let loaded;
 let last = "",
   lastAt = 0;
 export async function notify(kind, title, description = "") {
+  // Vitest/jsdom destruye window al terminar cada archivo; Sileo conserva
+  // temporizadores internos y puede intentar actualizar después del teardown.
+  // En pruebas no necesitamos renderizar notificaciones visuales.
+  if (
+    typeof navigator !== "undefined" &&
+    /jsdom/i.test(String(navigator.userAgent || ""))
+  )
+    return;
+
   const key = kind + title + description;
   if (key === last && Date.now() - lastAt < 1500) return;
   last = key;
