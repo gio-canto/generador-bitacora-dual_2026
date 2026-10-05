@@ -103,7 +103,9 @@ En móvil verifica:
 Prueba:
 
 - crear plantel/base;
-- alta, edición y eliminación de alumnos;
+- alta y edición de alumnos;
+- marcar un alumno como **Desistido de Dual**, comprobar que conserva entregas históricas, desaparece de semanas sin registro, no reduce el cumplimiento y puede reactivarse;
+- **Eliminar definitivamente** y comprobar que sólo esta acción borra también sus entregas históricas;
 - importación de Excel/CSV;
 - crear semana;
 - seleccionar una semana existente, editar su fecha límite y comprobar la reclasificación de entregas hechas por cámara sin alterar correcciones manuales ni **No aplica**;
