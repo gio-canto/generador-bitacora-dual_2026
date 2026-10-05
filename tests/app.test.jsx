@@ -152,7 +152,8 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     target: { value: "medical_appointment" },
   });
   expect(firstActivity().value).toContain("cita médica previamente programada");
-  expect(firstActivity().value).toContain("jornada de Educación Dual");
+  expect(firstActivity().value).toContain("horario de actividades");
+  expect(firstActivity().value).not.toContain("jornada de Educación Dual");
 
   const customAbsenceText =
     "Inasistencia por una situación particular previamente informada a las personas responsables.";
