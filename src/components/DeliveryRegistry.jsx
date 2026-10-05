@@ -411,6 +411,7 @@ export default function DeliveryRegistry({ onClose }) {
   );
   const [reportBusy, setReportBusy] = useState(false);
   const [scanQueue, setScanQueue] = useState([]);
+  const [fuzzyPrompt, setFuzzyPrompt] = useState(null);
   const [scanMessage, setScanMessage] = useState("Apunta la cámara al Data Matrix.");
   const [scanTone, setScanTone] = useState("");
   const [scanBox, setScanBox] = useState(null);
@@ -424,6 +425,7 @@ export default function DeliveryRegistry({ onClose }) {
   const scanBoxTimer = useRef(null);
   const tutorialOpenRef = useRef(false);
   const scanProcessorRef = useRef(null);
+  const fuzzyPromptRef = useRef(null);
   const fuzzyStudentAliases = useRef(new Map());
   const rejectedFuzzyScans = useRef(new Map());
 
@@ -451,6 +453,9 @@ export default function DeliveryRegistry({ onClose }) {
     schools.find((school) => school.name === state.context.school) ||
     schools[0] ||
     {};
+  const fuzzySuggestion =
+    fuzzyPrompt?.suggestions?.[fuzzyPrompt.index] || null;
+  const fuzzyCandidate = fuzzySuggestion?.student || null;
 
   const commit = (producer) => {
     const next =
@@ -541,80 +546,14 @@ export default function DeliveryRegistry({ onClose }) {
     }, 900);
   };
 
-  const processScanValue = (rawValue, points) => {
-    if (tutorialOpenRef.current) return;
-    const payload = parseMatrixPayload(rawValue);
-    const rawKey = String(rawValue || "").trim();
-    let student = findStudentByMatrixValue(state.students, rawValue);
-
-    if (student && !studentIsActive(student)) {
-      setScanMessage(
-        student.name +
-          " está marcado como Desistido de Dual y no admite nuevas entregas.",
-      );
-      showDetection("error");
-      return;
-    }
-
-    if (!student && rawKey) {
-      const rememberedId = fuzzyStudentAliases.current.get(rawKey);
-      if (rememberedId)
-        student =
-          state.students.find(
-            (item) => item.id === rememberedId && studentIsActive(item),
-          ) || null;
-    }
-
-    if (!student) {
-      const rejectedUntil = rejectedFuzzyScans.current.get(rawKey) || 0;
-      if (rawKey && rejectedUntil > Date.now()) return;
-
-      const suggestions = findStudentSuggestionsByMatrixValue(
-        activeStudents,
-        rawValue,
-        3,
-      );
-
-      if (suggestions.length) {
-        for (const suggestion of suggestions) {
-          const candidate = suggestion.student;
-          const details = [candidate.specialty, shortCompany(candidate.company)]
-            .filter(Boolean)
-            .join(" · ");
-          const confirmed = window.confirm(
-            "No encontré una coincidencia exacta.\n\n" +
-              'El Data Matrix indica: "' +
-              (payload.name || "Nombre no disponible") +
-              '"\n\n' +
-              "Posible persona: " +
-              candidate.name +
-              (details ? "\n" + details : "") +
-              "\n\n¿Es esta persona?",
-          );
-          if (confirmed) {
-            student = candidate;
-            if (rawKey) fuzzyStudentAliases.current.set(rawKey, candidate.id);
-            break;
-          }
-        }
-
-        if (!student) {
-          if (rawKey)
-            rejectedFuzzyScans.current.set(rawKey, Date.now() + 4000);
-          setScanMessage(
-            "Código leído, pero no se confirmó ninguna coincidencia sugerida.",
-          );
-          showDetection("error");
-          return;
-        }
-      }
-    }
-
-    if (!student) {
-      setScanMessage("Código leído, pero el alumno no coincide con la base.");
-      showDetection("error");
-      return;
-    }
+  const completeScanForStudent = (
+    student,
+    rawValue,
+    payload,
+    rawKey,
+    points,
+  ) => {
+    if (!student || !studentIsActive(student)) return;
 
     const targetWeek = findWeekByMatrixValue(
       state.weeks,
@@ -666,6 +605,7 @@ export default function DeliveryRegistry({ onClose }) {
         matrixVersion: payload.version,
       },
     ]);
+    if (rawKey) fuzzyStudentAliases.current.set(rawKey, student.id);
     setScanMessage(
       student.name +
         " → " +
@@ -675,6 +615,115 @@ export default function DeliveryRegistry({ onClose }) {
 
     const box = resultBoxFromPoints(videoRef.current, points);
     showDetection("ok", box);
+  };
+
+  const closeFuzzyPrompt = () => {
+    fuzzyPromptRef.current = null;
+    setFuzzyPrompt(null);
+  };
+
+  const confirmFuzzyStudent = () => {
+    const prompt = fuzzyPromptRef.current || fuzzyPrompt;
+    const suggestion = prompt?.suggestions?.[prompt.index];
+    const candidate = suggestion?.student;
+    if (!prompt || !candidate) {
+      closeFuzzyPrompt();
+      return;
+    }
+
+    closeFuzzyPrompt();
+    completeScanForStudent(
+      candidate,
+      prompt.rawValue,
+      prompt.payload,
+      prompt.rawKey,
+      prompt.points,
+    );
+  };
+
+  const rejectFuzzyStudent = () => {
+    const prompt = fuzzyPromptRef.current || fuzzyPrompt;
+    if (!prompt) return;
+    const nextIndex = prompt.index + 1;
+
+    if (nextIndex < prompt.suggestions.length) {
+      const nextPrompt = { ...prompt, index: nextIndex };
+      fuzzyPromptRef.current = nextPrompt;
+      setFuzzyPrompt(nextPrompt);
+      setScanMessage("Revisa la siguiente coincidencia posible.");
+      return;
+    }
+
+    if (prompt.rawKey)
+      rejectedFuzzyScans.current.set(prompt.rawKey, Date.now() + 4000);
+    closeFuzzyPrompt();
+    setScanMessage(
+      "Código leído, pero no se confirmó ninguna coincidencia sugerida.",
+    );
+    showDetection("error");
+  };
+
+  const processScanValue = (rawValue, points) => {
+    if (tutorialOpenRef.current || fuzzyPromptRef.current) return;
+    const payload = parseMatrixPayload(rawValue);
+    const rawKey = String(rawValue || "").trim();
+    let student = findStudentByMatrixValue(state.students, rawValue);
+
+    if (student && !studentIsActive(student)) {
+      setScanMessage(
+        student.name +
+          " está marcado como Desistido de Dual y no admite nuevas entregas.",
+      );
+      showDetection("error");
+      return;
+    }
+
+    if (!student && rawKey) {
+      const rememberedId = fuzzyStudentAliases.current.get(rawKey);
+      if (rememberedId)
+        student =
+          state.students.find(
+            (item) => item.id === rememberedId && studentIsActive(item),
+          ) || null;
+    }
+
+    if (!student) {
+      const rejectedUntil = rejectedFuzzyScans.current.get(rawKey) || 0;
+      if (rawKey && rejectedUntil > Date.now()) return;
+
+      const suggestions = findStudentSuggestionsByMatrixValue(
+        activeStudents,
+        rawValue,
+        3,
+      );
+
+      if (suggestions.length) {
+        const prompt = {
+          rawValue,
+          payload,
+          rawKey,
+          points: Array.isArray(points) ? points : [],
+          suggestions,
+          index: 0,
+        };
+        fuzzyPromptRef.current = prompt;
+        setFuzzyPrompt(prompt);
+        setScanMessage("Coincidencia aproximada encontrada. Confirma la persona.");
+        showDetection(
+          "seen",
+          resultBoxFromPoints(videoRef.current, points),
+        );
+        return;
+      }
+    }
+
+    if (!student) {
+      setScanMessage("Código leído, pero el alumno no coincide con la base.");
+      showDetection("error");
+      return;
+    }
+
+    completeScanForStudent(student, rawValue, payload, rawKey, points);
   };
 
   scanProcessorRef.current =
@@ -1109,12 +1158,16 @@ export default function DeliveryRegistry({ onClose }) {
 
   useEffect(() => {
     if (view !== "scanner") {
+      fuzzyPromptRef.current = null;
+      setFuzzyPrompt(null);
       stopCamera();
       setCameraState("idle");
       return;
     }
 
     pendingIds.current = new Set();
+    fuzzyPromptRef.current = null;
+    setFuzzyPrompt(null);
     setScanQueue([]);
     clearScannerIssue();
     setScanMessage("Toca Activar cámara para comenzar.");
@@ -3073,6 +3126,74 @@ export default function DeliveryRegistry({ onClose }) {
           </section>
         )}
       </main>
+
+      {fuzzyPrompt && fuzzyCandidate && (
+        <div
+          className="delivery-match-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delivery-match-title"
+        >
+          <div className="delivery-match-stage">
+            <article className="delivery-match-card">
+              <div className="delivery-match-mark" aria-hidden="true">
+                <WarningCircle size={24} weight="fill" />
+              </div>
+              <span className="delivery-kicker">Lector Data Matrix</span>
+              <h2 id="delivery-match-title">¿Es esta persona?</h2>
+              <p>
+                No encontré una coincidencia exacta. Revisa la sugerencia antes
+                de registrar la entrega.
+              </p>
+
+              <div className="delivery-match-read">
+                <span>Nombre leído</span>
+                <strong>
+                  {fuzzyPrompt.payload?.name || "Nombre no disponible"}
+                </strong>
+              </div>
+
+              <div className="delivery-match-candidate">
+                <Blobatar name={fuzzyCandidate.name || "Alumno"} size={58} />
+                <div>
+                  <span>
+                    Posible coincidencia · {fuzzyPrompt.index + 1} de{" "}
+                    {fuzzyPrompt.suggestions.length}
+                  </span>
+                  <strong>{fuzzyCandidate.name}</strong>
+                  <small>
+                    {[
+                      fuzzyCandidate.specialty,
+                      shortCompany(fuzzyCandidate.company),
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") || "Sin datos"}
+                  </small>
+                </div>
+                <b>
+                  {Math.round((fuzzySuggestion?.similarity || 0) * 100)}%
+                </b>
+              </div>
+
+              <div className="delivery-match-actions">
+                <button className="btn" type="button" onClick={rejectFuzzyStudent}>
+                  {fuzzyPrompt.index < fuzzyPrompt.suggestions.length - 1
+                    ? "No, siguiente"
+                    : "No corresponde"}
+                </button>
+                <button
+                  className="btn primary"
+                  type="button"
+                  onClick={confirmFuzzyStudent}
+                >
+                  <CheckCircle size={18} />
+                  Sí, registrar
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+      )}
 
       {reportOpen && (
         <div
