@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.50.0-beta.42 · Confirmación visual del lector · 2026-10-05
+
+- El lector Data Matrix deja de usar la confirmación nativa del navegador cuando encuentra un nombre parecido pero no una coincidencia exacta.
+- La confirmación se reemplaza por una **alerta visual integrada al Registro de entrega**, consistente con el diseño del resto del sistema.
+- El modal muestra el nombre leído desde el Data Matrix, la posible persona encontrada, especialidad, empresa, porcentaje aproximado de similitud y la posición de la sugerencia cuando existen varias.
+- Las acciones ahora son **Sí, registrar**, **No, siguiente** y **No corresponde**, según el número de coincidencias disponibles.
+- Mientras la confirmación está abierta, el lector ignora nuevas lecturas para evitar alertas duplicadas causadas por la cámara continua.
+- Al aceptar una coincidencia se conserva el comportamiento existente: se recuerda durante la sesión y la entrega continúa hacia la semana identificada por el Data Matrix.
+- Al rechazar todas las sugerencias se mantiene el enfriamiento temporal para evitar que el mismo código vuelva a abrir la alerta inmediatamente.
+- Se corrige el entorno de pruebas para que Sileo no deje temporizadores activos después del desmontaje de jsdom; este ajuste no cambia las notificaciones en el navegador real.
+
+
 ## 0.50.0-beta.41 · Estado de alumnos Dual · 2026-10-05
 
 - El Registro de entrega incorpora el estado de alumno **Desistido de Dual** para personas que se retiraron, fueron suspendidas o dejaron de participar en la modalidad.
