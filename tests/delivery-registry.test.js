@@ -9,12 +9,16 @@ import {
   findStudentByMatrixValue,
   findStudentSuggestionsByMatrixValue,
   findWeekByMatrixValue,
+  markStudentDesisted,
   mergeStudents,
   parseMatrixPayload,
   parsePortableDeliveryFile,
   registerDelivery,
+  reactivateStudent,
   setDeliveryStatus,
   statusFromTimestamp,
+  studentAppliesToWeek,
+  studentIsActive,
   updateWeekDueAt,
   weekSummary,
 } from "../src/services/delivery-registry.js";
@@ -350,6 +354,64 @@ describe("subsistema de registro de entrega", () => {
     expect(week.deliveries[student.id]).toBeUndefined();
   });
 
+  it("marca un alumno como Desistido de Dual sin borrar sus datos", () => {
+    const active = createStudent({
+      id: "student-dual-1",
+      name: "Alumno Dual",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const desisted = markStudentDesisted(
+      active,
+      "2026-10-05T12:00:00.000Z",
+    );
+
+    expect(studentIsActive(active)).toBe(true);
+    expect(studentIsActive(desisted)).toBe(false);
+    expect(desisted).toMatchObject({
+      id: active.id,
+      name: active.name,
+      dualStatus: "desisted",
+      desistedAt: "2026-10-05T12:00:00.000Z",
+    });
+
+    const reactivated = reactivateStudent(desisted);
+    expect(studentIsActive(reactivated)).toBe(true);
+    expect(reactivated.desistedAt).toBe("");
+  });
+
+  it("un desistido sólo aplica a semanas donde ya conserva una entrega", () => {
+    const student = markStudentDesisted(
+      createStudent({ id: "student-left", name: "Alumno desistido" }),
+      "2026-10-05T12:00:00.000Z",
+    );
+    const emptyWeek = createWeek({ id: "week-empty", label: "Semana vacía" });
+    let deliveredWeek = createWeek({
+      id: "week-delivered",
+      label: "Semana entregada",
+      dueAt: "2026-10-01T20:00:00.000Z",
+    });
+    deliveredWeek = registerDelivery(
+      deliveredWeek,
+      student.id,
+      "2026-10-01T19:00:00.000Z",
+      "camera",
+    );
+
+    expect(studentAppliesToWeek(student, emptyWeek)).toBe(false);
+    expect(studentAppliesToWeek(student, deliveredWeek)).toBe(true);
+    expect(weekSummary(emptyWeek, [student])).toMatchObject({
+      total: 0,
+      applicable: 0,
+      no_entregado: 0,
+    });
+    expect(weekSummary(deliveredWeek, [student])).toMatchObject({
+      total: 1,
+      applicable: 1,
+      entregado: 1,
+    });
+  });
+
   it("resume el avance de una semana", () => {
     const students = [
       createStudent({ name: "Uno" }),
@@ -417,7 +479,7 @@ describe("subsistema de registro de entrega", () => {
         ],
       }),
     );
-    expect(parsed.schemaVersion).toBe(6);
+    expect(parsed.schemaVersion).toBe(7);
     expect(parsed.context).toEqual({
       school: "CBTis 134",
       generation: "",
