@@ -1,6 +1,11 @@
 import { blobatarUri } from "blobatar/uri";
 import { VERSION } from "../domain/records.js";
-import { deliveryStatus, weekSummary } from "./delivery-registry.js";
+import {
+  deliveryStatus,
+  studentAppliesToWeek,
+  studentIsActive,
+  weekSummary,
+} from "./delivery-registry.js";
 
 const PAGE_W = 1240;
 const PAGE_H = 1754;
@@ -53,6 +58,12 @@ const STATUS_META = {
     color: COLORS.red,
     background: COLORS.redSoft,
     order: 3,
+  },
+  desisted: {
+    label: "Desistido de Dual",
+    color: COLORS.blue,
+    background: COLORS.blueSoft,
+    order: 4,
   },
 };
 
@@ -133,6 +144,7 @@ export function buildDeliveryReportModel(
 
   const mappedWeeks = weeks.map((week) => {
     const rows = students
+      .filter((student) => studentAppliesToWeek(student, week))
       .map((student) => {
         const status = deliveryStatus(week, student.id);
         const delivery = week.deliveries?.[student.id];
@@ -141,6 +153,7 @@ export function buildDeliveryReportModel(
           name: clean(student.name, 180),
           specialty: clean(student.specialty, 120),
           company: clean(student.company, 220),
+          dualStatus: studentIsActive(student) ? "active" : "desisted",
           status,
           statusLabel: STATUS_META[status].label,
           registeredAt: delivery?.registeredAt || "",
@@ -182,11 +195,15 @@ export function buildDeliveryReportModel(
             name: clean(student.name, 180),
             specialty: clean(student.specialty, 120),
             company: clean(student.company, 220),
+            dualStatus: studentIsActive(student) ? "active" : "desisted",
+            desistedAt: student.desistedAt || "",
             weeks: mappedWeeks.map((week) => {
               const delivery = week.rows.find((row) => row.id === student.id);
               return {
                 weekId: week.id,
-                status: delivery?.status || "no_entregado",
+                status:
+                  delivery?.status ||
+                  (studentIsActive(student) ? "no_entregado" : "desisted"),
                 registeredAt: delivery?.registeredAt || "",
               };
             }),
@@ -201,6 +218,8 @@ export function buildDeliveryReportModel(
     generation:
       clean(state?.context?.generation, 100) || "No especificada",
     students: students.length,
+    activeStudents: students.filter(studentIsActive).length,
+    desistedStudents: students.filter((student) => !studentIsActive(student)).length,
     weeks: mappedWeeks,
     globalRows,
   };
@@ -343,7 +362,13 @@ async function drawStudentRow(ctx, row, x, y, width) {
 
   ctx.fillStyle = COLORS.muted;
   ctx.font = "500 15px Arial, Helvetica, sans-serif";
-  const detail = [row.specialty, row.company].filter(Boolean).join(" · ");
+  const detail = [
+    row.specialty,
+    row.company,
+    row.dualStatus === "desisted" ? "Desistido de Dual" : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   ctx.fillText(trimToWidth(ctx, detail || "Sin datos", mainW), mainX, y + 52);
 
   const badgeX = x + width - statusW;
@@ -505,8 +530,10 @@ async function renderReportPage(model, spec, pageNumber, pageCount) {
   ctx.font = "500 13px Arial, Helvetica, sans-serif";
   ctx.fillText(
     "Documento generado desde el Registro de entrega · " +
-      model.students +
-      " alumnos en la base",
+      model.activeStudents +
+      " activos · " +
+      model.desistedStudents +
+      " desistidos",
     left,
     PAGE_H - 43,
   );
@@ -525,6 +552,7 @@ function statusSymbol(status) {
   if (status === "entregado") return "✓";
   if (status === "entregado_tarde") return "!";
   if (status === "no_aplica") return "—";
+  if (status === "desisted") return "D";
   return "×";
 }
 
@@ -614,7 +642,13 @@ async function drawGlobalStudentCell(ctx, row, x, y, width, height) {
   ctx.fillText(
     trimToWidth(
       ctx,
-      [row.specialty, row.company].filter(Boolean).join(" · ") || "Sin datos",
+      [
+        row.specialty,
+        row.company,
+        row.dualStatus === "desisted" ? "Desistido de Dual" : "",
+      ]
+        .filter(Boolean)
+        .join(" · ") || "Sin datos",
       textW,
     ),
     textX,
@@ -671,16 +705,17 @@ async function renderGlobalReportPage(model, spec, pageNumber, pageCount) {
     ["!", "A destiempo", COLORS.amber, COLORS.amberSoft],
     ["×", "No entregado", COLORS.red, COLORS.redSoft],
     ["—", "No aplica", COLORS.gray, COLORS.graySoft],
+    ["D", "Desistido", COLORS.blue, COLORS.blueSoft],
   ];
   let legendX = left;
   for (const [symbol, label, color, background] of legend) {
-    roundedRect(ctx, legendX, legendY, 150, 34, 17, background);
+    roundedRect(ctx, legendX, legendY, 140, 34, 17, background);
     ctx.fillStyle = color;
     ctx.font = "800 16px Arial, Helvetica, sans-serif";
     ctx.fillText(symbol, legendX + 12, legendY + 22);
     ctx.font = "700 13px Arial, Helvetica, sans-serif";
     ctx.fillText(label, legendX + 34, legendY + 22);
-    legendX += 162;
+    legendX += 150;
   }
 
   ctx.textAlign = "right";
@@ -806,8 +841,10 @@ async function renderGlobalReportPage(model, spec, pageNumber, pageCount) {
   ctx.font = "500 12px Arial, Helvetica, sans-serif";
   ctx.fillText(
     "Matriz global · " +
-      model.students +
-      " alumnos · " +
+      model.activeStudents +
+      " activos · " +
+      model.desistedStudents +
+      " desistidos · " +
       model.weeks.length +
       " semanas",
     left,
