@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.45 · Nueva identidad de navegación · 2026-10-05
+
+- Se incorpora **`public/Assets/Asset_logo.png`** como nuevo logotipo de navegación.
+- El nuevo logotipo aparece en la barra superior del generador, Registro de entrega, Debug, FAQ y páginas legales.
+- Se reutiliza el espacio que la beta anterior había dejado reservado, por lo que no cambia la distribución de las barras.
+- El logotipo del formato de bitácora/PDF continúa usando **`Edu.png`** y no se modifica.
+- `Asset_logo.png` se añade al precaché y al hash del service worker para que los clientes reciban correctamente la nueva identidad y pueda mostrarse sin conexión.
+- Se actualizan las pruebas de interfaz para comprobar que la navegación use específicamente `Asset_logo.png`.
+
+
 ## 0.50.0-beta.44 · Navegación y estabilidad de Pages · 2026-10-05
 
 - Se retira temporalmente el logotipo de **Educación Dual** de todas las barras de navegación por cumplimiento de la **Ley Federal de Protección a la Propiedad Industrial**.
