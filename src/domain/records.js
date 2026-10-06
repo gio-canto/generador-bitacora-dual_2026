@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.43";
-export const RELEASE = "Orden del nombre del alumno";
+export const VERSION = "0.50.0-beta.44";
+export const RELEASE = "Navegación y estabilidad de Pages";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
