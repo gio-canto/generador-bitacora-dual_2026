@@ -28,6 +28,8 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   expect(localStorage.getItem("bitacora_dual_onboarding_v3")).toBe("skipped");
   expect($("profileSlot").closest(".topbar")).toBeTruthy();
   expect(document.body.textContent).toContain("Crea tu bitácora");
+  expect(document.querySelector(".topbar .brand-slot")).toBeTruthy();
+  expect(document.querySelector(".topbar .brand-logo")).toBeNull();
   expect($("studentNameOrderHint")?.textContent).toContain(
     "primero tu(s) nombre(s) y después tus apellidos",
   );
