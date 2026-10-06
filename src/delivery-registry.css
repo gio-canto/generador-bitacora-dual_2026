@@ -46,6 +46,12 @@
   object-fit:contain;
   object-position:left center;
 }
+.delivery-brand-slot{
+  width:clamp(158px,23vw,230px);
+  height:36px;
+  flex:0 0 auto;
+  cursor:default;
+}
 .delivery-top-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 .delivery-top-actions .btn{gap:7px}
 .delivery-file-button{cursor:pointer}
@@ -708,7 +714,7 @@ label.delivery-action-tile:hover{background:#f0f0f3;transform:translateY(-1px)}
   .delivery-registry-entry-long{display:none}
   .delivery-registry-entry-short{display:inline}
   .delivery-topbar{top:7px;width:calc(100vw - 16px);align-items:flex-start;flex-direction:column}
-  .delivery-brand img{width:145px}
+  .delivery-brand img,.delivery-brand-slot{width:145px}
   .delivery-top-actions{width:100%;justify-content:flex-start}
   .delivery-top-actions .btn{flex:1 1 auto}
   .delivery-shell{width:calc(100% - 16px);padding-top:28px}
@@ -1322,7 +1328,7 @@ button.delivery-action-tile{cursor:pointer}
     border-radius:18px;
   }
   .delivery-brand{flex:1 1 auto;min-width:0}
-  .delivery-brand img{width:min(136px,35vw);max-height:31px}
+  .delivery-brand img,.delivery-brand-slot{width:min(136px,35vw);height:31px;max-height:31px}
   .delivery-top-actions{
     flex:0 0 auto;
     width:auto;
@@ -1527,7 +1533,7 @@ button.delivery-action-tile{cursor:pointer}
     width:calc(100% - 12px);
     border-radius:17px;
   }
-  .delivery-brand img{width:116px}
+  .delivery-brand img,.delivery-brand-slot{width:116px}
   .delivery-top-actions .btn{
     width:42px;
     min-width:42px;
