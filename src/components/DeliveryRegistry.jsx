@@ -1912,10 +1912,16 @@ export default function DeliveryRegistry({ onClose }) {
     <div className={"delivery-app" + (view === "scanner" ? " scanner-active" : "")}>
       <ScanSound tone={scanTone} />
       <header className="delivery-topbar">
-        <div
-          className="delivery-brand delivery-brand-slot"
-          aria-hidden="true"
-        />
+        <button className="delivery-brand" type="button" onClick={onClose}>
+          <img
+            src={
+              location.pathname.includes("/registro-entrega/")
+                ? "../Assets/Asset_logo.png"
+                : "Assets/Asset_logo.png"
+            }
+            alt="Generador de Bitácora Dual"
+          />
+        </button>
         <div className="delivery-top-actions">
           <button
             className="btn"
