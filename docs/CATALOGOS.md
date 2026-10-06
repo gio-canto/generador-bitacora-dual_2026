@@ -138,6 +138,6 @@ No agregues:
 
 ## Logo y formato
 
-El logotipo general utilizado por el proyecto está en `public/Assets/Edu.png`. Cambiarlo globalmente afecta a todas las instituciones.
+El recurso `public/Assets/Edu.png` se conserva para el formato de la bitácora/PDF. Las barras de navegación mantienen por ahora un espacio de identidad vacío y no muestran ese logotipo.
 
 Si necesitas identidad por plantel o un formato diferente, no lo resuelvas añadiendo campos arbitrarios al JSON sin diseñar primero la compatibilidad. Sigue [IMPLEMENTAR_INSTITUCION.md](IMPLEMENTAR_INSTITUCION.md).
