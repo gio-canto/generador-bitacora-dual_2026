@@ -56,6 +56,11 @@ a{color:var(--blue)}
   object-fit:contain;
   object-position:left center;
 }
+.debug-brand-slot{
+  width:clamp(158px,23vw,230px);
+  height:36px;
+  flex:0 0 auto;
+}
 .debug-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 .debug-link,.debug-button{
   display:inline-flex;
@@ -223,7 +228,7 @@ a{color:var(--blue)}
 @media(max-width:620px){
   .debug-shell{width:min(100% - 16px,1000px);padding-top:8px}
   .debug-topbar{top:7px;border-radius:19px;align-items:flex-start}
-  .debug-brand img{width:145px}
+  .debug-brand img,.debug-brand-slot{width:145px}
   .debug-actions{gap:5px}
   .debug-actions .debug-link{min-height:38px;padding:8px 10px;font-size:12px}
   .debug-hero{padding:40px 5px 23px}
