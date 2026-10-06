@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.44 · Navegación y estabilidad de Pages · 2026-10-05
+
+- Se retira temporalmente el logotipo de **Educación Dual** de todas las barras de navegación por cumplimiento de la **Ley Federal de Protección a la Propiedad Industrial**.
+- El espacio visual que ocupaba el logotipo se mantiene reservado y vacío para una futura identidad gráfica; no se compacta ni se redistribuye la barra.
+- El logotipo empleado dentro del formato de la bitácora/PDF se conserva sin cambios; este ajuste afecta únicamente a navegación.
+- Se corrige una condición de carrera del workflow de GitHub Pages: un evento atrasado de un commit anterior podía iniciar después y cancelar la ejecución correspondiente al `main` más reciente debido a `cancel-in-progress: true`.
+- Cada SHA usa ahora una ejecución independiente y, en pushes a `main`, el workflow compara `GITHUB_SHA` contra la referencia remota antes de instalar dependencias, ejecutar pruebas, compilar o desplegar.
+- Si el commit ya fue sustituido, la ejecución termina limpiamente como obsoleta y no puede publicar una versión anterior.
+
+
 ## 0.50.0-beta.43 · Orden del nombre del alumno · 2026-10-05
 
 - El campo **Nombre completo del alumno** incorpora un recordatorio visible para escribir primero el o los nombres y después los apellidos.
