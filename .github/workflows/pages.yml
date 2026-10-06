@@ -10,28 +10,55 @@ on:
 permissions:
   contents: read
 
+# Un evento atrasado de un commit anterior no debe cancelar al SHA vigente.
 concurrency:
-  group: pages-${{ github.ref }}
-  cancel-in-progress: true
+  group: pages-${{ github.ref }}-${{ github.sha }}
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      stale: ${{ steps.fresh.outputs.stale }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verificar que el commit siga siendo el actual
+        id: fresh
+        shell: bash
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "push" && "$GITHUB_REF" == "refs/heads/main" ]]; then
+            latest="$(git ls-remote origin refs/heads/main | cut -f1)"
+            if [[ "$latest" != "$GITHUB_SHA" ]]; then
+              echo "stale=true" >> "$GITHUB_OUTPUT"
+              echo "Commit sustituido por una versión más reciente de main; se omiten pruebas, build y deploy."
+              exit 0
+            fi
+          fi
+          echo "stale=false" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-node@v4
+        if: steps.fresh.outputs.stale == 'false'
         with:
           node-version: '24'
           cache: npm
+
       - run: npm ci
+        if: steps.fresh.outputs.stale == 'false'
+
       - run: npm test
+        if: steps.fresh.outputs.stale == 'false'
+
       - run: npm run build
+        if: steps.fresh.outputs.stale == 'false'
+
       - uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && steps.fresh.outputs.stale == 'false'
         with:
           path: dist
+
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && needs.build.outputs.stale == 'false'
     needs: build
     permissions:
       pages: write
