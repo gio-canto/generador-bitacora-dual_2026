@@ -222,6 +222,8 @@ También deben revisarse:
 
 El workflow de GitHub ejecuta instalación, pruebas y build antes de publicar GitHub Pages.
 
+En pushes a `main`, verifica además que un **commit obsoleto** detectado después de un push más reciente omita pruebas/build/deploy y no cancele la ejecución del SHA vigente.
+
 Una ejecución verde confirma la suite automatizada y la compilación, no la validación institucional del contenido.
 
 ## Registro de evidencia
