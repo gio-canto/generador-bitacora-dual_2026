@@ -498,9 +498,7 @@ function DebugPage() {
   return (
     <main className="debug-shell">
       <header className="debug-topbar">
-        <a className="debug-brand" href="../" aria-label="Volver al Generador de Bitácora Dual">
-          <img src="../Assets/Edu.png" alt="Educación Dual" />
-        </a>
+        <div className="debug-brand debug-brand-slot" aria-hidden="true" />
         <div className="debug-actions">
           <a className="debug-link" href="../faq/">Dudas</a>
           <a className="debug-link primary" href="../">Abrir generador</a>
