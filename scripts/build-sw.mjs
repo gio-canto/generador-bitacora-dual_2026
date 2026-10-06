@@ -10,6 +10,7 @@ const core = [
   "./",
   "./index.html",
   "./Assets/Edu.png",
+  "./Assets/Asset_logo.png",
   "./Assets/asset_chime.mp3",
   "./Assets/asset_landing.png",
   "./Assets/Asset_cont_matrix.png",
@@ -23,6 +24,7 @@ const core = [
 const hash = createHash("sha256");
 for (const f of [
   "dist/index.html",
+  "dist/Assets/Asset_logo.png",
   "dist/Assets/asset_chime.mp3",
   "dist/Assets/asset_landing.png",
   "dist/Assets/Asset_cont_matrix.png",
