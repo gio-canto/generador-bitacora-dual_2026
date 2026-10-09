@@ -1,0 +1,92 @@
+[
+  {
+    "id": "medical_appointment",
+    "label": "Cita médica",
+    "text": "Inasistencia debida a una cita médica previamente programada que coincidió con el horario de actividades."
+  },
+  {
+    "id": "medical_attention",
+    "label": "Atención médica",
+    "text": "Inasistencia por motivos médicos que requirieron recibir atención de salud durante el horario de actividades."
+  },
+  {
+    "id": "illness",
+    "label": "Enfermedad",
+    "text": "Inasistencia debida a una enfermedad o malestar de salud que impidió asistir con normalidad."
+  },
+  {
+    "id": "commute_accident",
+    "label": "Accidente en el camino",
+    "text": "Inasistencia debida a un accidente ocurrido durante el trayecto hacia la empresa, lo que impidió llegar con normalidad."
+  },
+  {
+    "id": "work_accident",
+    "label": "Accidente laboral",
+    "text": "Inasistencia relacionada con un accidente laboral que requirió atención y evitó continuar con las actividades programadas."
+  },
+  {
+    "id": "family_emergency",
+    "label": "Emergencia familiar",
+    "text": "Inasistencia debida a una emergencia familiar que requirió atención inmediata y me impidió asistir con normalidad."
+  },
+  {
+    "id": "family_matters",
+    "label": "Asuntos familiares",
+    "text": "Inasistencia debida a asuntos familiares que requirieron mi atención personal y me impidieron asistir con normalidad."
+  },
+  {
+    "id": "university_admission_exam",
+    "label": "Examen de ingreso a la universidad",
+    "text": "Inasistencia por la presentación de un examen de ingreso a la universidad programado durante el horario de actividades."
+  },
+  {
+    "id": "extraordinary_exam",
+    "label": "Examen extraordinario",
+    "text": "Inasistencia por la presentación de un examen extraordinario escolar programado durante el horario de actividades."
+  },
+  {
+    "id": "school_activity",
+    "label": "Actividad escolar",
+    "text": "Inasistencia por participación en una actividad escolar que coincidió con el horario establecido."
+  },
+  {
+    "id": "school_procedure",
+    "label": "Trámite escolar",
+    "text": "Inasistencia por la realización de un trámite escolar necesario que coincidió con el horario establecido."
+  },
+  {
+    "id": "personal_procedure",
+    "label": "Trámite personal u oficial",
+    "text": "Inasistencia por la realización de un trámite personal u oficial que no fue posible efectuar fuera del horario correspondiente."
+  },
+  {
+    "id": "transport",
+    "label": "Problemas de transporte",
+    "text": "Inasistencia debida a problemas de transporte durante el traslado que impidieron llegar a tiempo a la empresa."
+  },
+  {
+    "id": "demonstrations",
+    "label": "Manifestaciones",
+    "text": "Inasistencia debida a manifestaciones o bloqueos en la vía pública que impidieron realizar con normalidad el traslado hacia la empresa."
+  },
+  {
+    "id": "natural_disaster",
+    "label": "Desastres naturales",
+    "text": "Inasistencia debida a condiciones derivadas de un desastre natural que afectaron la seguridad, el traslado o la posibilidad de asistir."
+  },
+  {
+    "id": "social_unrest",
+    "label": "Disturbios sociales",
+    "text": "Inasistencia debida a disturbios sociales o situaciones de riesgo en la zona que hicieron inseguro o imposible el traslado hacia la empresa."
+  },
+  {
+    "id": "personal",
+    "label": "Motivos personales",
+    "text": "Inasistencia por motivos personales que requirieron mi atención y me impidieron asistir con normalidad."
+  },
+  {
+    "id": "social",
+    "label": "Motivos sociales",
+    "text": "Inasistencia por un compromiso de carácter social que coincidió con el horario previsto de actividades."
+  }
+]
