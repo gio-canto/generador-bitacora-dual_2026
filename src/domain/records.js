@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.46";
-export const RELEASE = "Catálogo de motivos de falta";
+export const VERSION = "0.50.0-beta.47";
+export const RELEASE = "Motivos frecuentes para Sin labores";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
