@@ -1,0 +1,122 @@
+[
+  {
+    "id": "facility_maintenance",
+    "label": "Mantenimiento de instalaciones",
+    "text": "La empresa suspendió las actividades por trabajos de mantenimiento en sus instalaciones durante el horario previsto."
+  },
+  {
+    "id": "equipment_maintenance",
+    "label": "Mantenimiento de equipo o maquinaria",
+    "text": "No se realizaron labores debido a trabajos de mantenimiento de equipos o maquinaria de la empresa."
+  },
+  {
+    "id": "labor_stoppage",
+    "label": "Paro laboral",
+    "text": "Las actividades de la empresa fueron suspendidas debido a un paro laboral durante la jornada prevista."
+  },
+  {
+    "id": "operational_suspension",
+    "label": "Suspensión temporal de operaciones",
+    "text": "La empresa suspendió temporalmente sus operaciones, por lo que no se realizaron las actividades programadas."
+  },
+  {
+    "id": "natural_disaster",
+    "label": "Desastres naturales",
+    "text": "Las actividades fueron suspendidas por afectaciones relacionadas con un desastre natural en la zona."
+  },
+  {
+    "id": "hurricane",
+    "label": "Huracán o tormenta tropical",
+    "text": "La empresa suspendió sus actividades de manera preventiva debido a un huracán o una tormenta tropical."
+  },
+  {
+    "id": "earthquake",
+    "label": "Sismo",
+    "text": "Las actividades fueron suspendidas debido a un sismo y a las medidas de seguridad correspondientes."
+  },
+  {
+    "id": "heavy_rain_flood",
+    "label": "Lluvias intensas o inundaciones",
+    "text": "La empresa suspendió las actividades debido a lluvias intensas o inundaciones que afectaron sus instalaciones u operaciones."
+  },
+  {
+    "id": "company_event",
+    "label": "Evento de la empresa",
+    "text": "No se realizaron las labores habituales porque la empresa destinó la jornada a un evento interno."
+  },
+  {
+    "id": "institutional_event",
+    "label": "Evento institucional",
+    "text": "Las actividades habituales fueron suspendidas debido a un evento institucional organizado por la empresa u organismo receptor."
+  },
+  {
+    "id": "company_holiday",
+    "label": "Día festivo interno de la empresa",
+    "text": "La empresa no realizó actividades por una fecha festiva contemplada en su calendario interno de trabajo."
+  },
+  {
+    "id": "work_calendar_rest",
+    "label": "Descanso del calendario laboral de la empresa",
+    "text": "No hubo labores por un día de descanso previsto en el calendario laboral de la empresa, distinto del calendario escolar aplicable."
+  },
+  {
+    "id": "collective_agreement_rest",
+    "label": "Descanso por contrato colectivo o acuerdo laboral",
+    "text": "La empresa suspendió actividades por un descanso establecido en su contrato colectivo o en un acuerdo laboral interno."
+  },
+  {
+    "id": "sector_union_holiday",
+    "label": "Festividad sectorial o sindical",
+    "text": "La empresa no realizó actividades por una conmemoración sectorial o sindical contemplada en su organización laboral."
+  },
+  {
+    "id": "local_company_holiday",
+    "label": "Conmemoración local aplicada por la empresa",
+    "text": "La empresa suspendió sus actividades por una conmemoración local reconocida en su calendario de trabajo."
+  },
+  {
+    "id": "statutory_labor_holiday",
+    "label": "Descanso obligatorio del calendario laboral",
+    "text": "La empresa suspendió sus operaciones por un día de descanso obligatorio aplicable a su calendario laboral."
+  },
+  {
+    "id": "collective_vacation",
+    "label": "Vacaciones colectivas de la empresa",
+    "text": "La empresa permaneció cerrada por un periodo de vacaciones colectivas establecido en su calendario interno."
+  },
+  {
+    "id": "administrative_inventory",
+    "label": "Inventario o cierre administrativo",
+    "text": "La empresa suspendió las labores habituales para realizar inventario, cierre administrativo u otras tareas internas."
+  },
+  {
+    "id": "power_services",
+    "label": "Interrupción de energía o servicios",
+    "text": "Las actividades fueron suspendidas por una interrupción del suministro eléctrico o de otros servicios esenciales."
+  },
+  {
+    "id": "technical_failure",
+    "label": "Falla de sistemas o infraestructura",
+    "text": "La empresa suspendió temporalmente las actividades por una falla técnica que impidió continuar con las labores."
+  },
+  {
+    "id": "civil_protection",
+    "label": "Revisión o medidas de protección civil",
+    "text": "Las actividades fueron suspendidas por una revisión de instalaciones o por medidas de protección civil."
+  },
+  {
+    "id": "security_closure",
+    "label": "Cierre preventivo por seguridad",
+    "text": "La empresa suspendió las labores como medida preventiva ante una situación de seguridad en la zona."
+  },
+  {
+    "id": "sanitary_contingency",
+    "label": "Contingencia sanitaria",
+    "text": "Las actividades fueron suspendidas debido a medidas preventivas o restricciones por una contingencia sanitaria."
+  },
+  {
+    "id": "internal_training",
+    "label": "Capacitación interna sin actividades para el alumno",
+    "text": "La empresa destinó la jornada a una capacitación interna y no programó labores para el alumno en formación dual."
+  }
+]
