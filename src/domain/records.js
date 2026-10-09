@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.50.0-beta.45";
-export const RELEASE = "Nueva identidad de navegación";
+export const VERSION = "0.50.0-beta.46";
+export const RELEASE = "Catálogo de motivos de falta";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
