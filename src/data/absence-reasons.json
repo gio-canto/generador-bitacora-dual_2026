@@ -74,6 +74,11 @@
     "label": "Desastres naturales",
     "text": "Inasistencia debida a condiciones derivadas de un desastre natural que afectaron la seguridad, el traslado o la posibilidad de asistir."
   },
+    {
+    "id": "bad_weather",
+    "label": "Huracán",
+    "text": "Inasistencia debida a condiciones derivadas del mal clima."
+  },
   {
     "id": "social_unrest",
     "label": "Disturbios sociales",
