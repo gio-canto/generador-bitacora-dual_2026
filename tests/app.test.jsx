@@ -197,10 +197,15 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
       "statutory_labor_holiday",
     ]),
   );
+  expect(firstActivity().value).toContain("enfermedad o malestar de salud");
   fireEvent.change(firstAbsenceReason(), {
     target: { value: "facility_maintenance" },
   });
-  expect(firstActivity().value).toContain("trabajos de mantenimiento");
+  expect($("guardDialog").open).toBe(true);
+  fireEvent.click($("guardConfirm"));
+  await waitFor(() =>
+    expect(firstActivity().value).toContain("trabajos de mantenimiento"),
+  );
   expect(firstAbsenceReason().value).toBe("facility_maintenance");
 
   const customNonWorkingText =
