@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.50.0-beta.47 · Motivos frecuentes para Sin labores · 2026-10-09
+
+- **Sin labores** incorpora motivos frecuentes opcionales con justificaciones editables y confirmación antes de reemplazar texto personalizado.
+- Los 24 motivos se administran en `src/data/non-working-reasons.json`, independiente de los motivos de **Falta**. Incluyen mantenimiento, paro laboral, desastres naturales, huracanes, sismos, eventos y descansos propios de las empresas.
+- Se agrega la guía `docs/MOTIVOS_FRECUENTES_SIN_LABORES.md`, se actualizan las preguntas frecuentes y se amplían las pruebas del catálogo y el editor.
+- La información de las bitácoras existentes y el PDF no cambia.
+
+
 ## 0.50.0-beta.46 · Catálogo de motivos de falta · 2026-10-08
 
 - Los motivos frecuentes de **Falta** dejan de estar incrustados dentro de `src/legacy/editor.js` y pasan a un catálogo independiente: **`src/data/absence-reasons.json`**.
