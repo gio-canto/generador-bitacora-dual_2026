@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.50.0-beta.46 · Catálogo de motivos de falta · 2026-10-08
+
+- Los motivos frecuentes de **Falta** dejan de estar incrustados dentro de `src/legacy/editor.js` y pasan a un catálogo independiente: **`src/data/absence-reasons.json`**.
+- Agregar, cambiar, ordenar o retirar un motivo ya no requiere modificar la lógica del editor; el selector consume automáticamente el catálogo.
+- Cada entrada mantiene sólo tres datos: `id`, `label` y `text`.
+- Se crea **`docs/MOTIVOS_FRECUENTES_FALTA.md`** con instrucciones paso a paso, ejemplos y reglas para IDs, etiquetas, textos, orden y eliminación.
+- Se añade una prueba específica del catálogo para detectar IDs duplicados, formatos inválidos, etiquetas vacías y justificaciones demasiado cortas.
+- README, índice documental y plan de pruebas enlazan ahora la nueva guía.
+
+
 ## 0.50.0-beta.45 · Nueva identidad de navegación · 2026-10-05
 
 - Se incorpora **`public/Assets/Asset_logo.png`** como nuevo logotipo de navegación.
