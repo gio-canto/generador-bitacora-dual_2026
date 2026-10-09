@@ -181,6 +181,45 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     expect(firstActivity().value).toContain("enfermedad o malestar de salud"),
   );
 
+  fireEvent.change(firstStatus(), { target: { value: "sin_labores" } });
+  expect($("statusDialog").open).toBe(true);
+  fireEvent.click($("statusClose"));
+  expect(firstAbsenceReason()).toBeTruthy();
+  expect([...firstAbsenceReason().options].map((option) => option.value)).toEqual(
+    expect.arrayContaining([
+      "facility_maintenance",
+      "labor_stoppage",
+      "natural_disaster",
+      "hurricane",
+      "earthquake",
+      "work_calendar_rest",
+      "collective_agreement_rest",
+      "statutory_labor_holiday",
+    ]),
+  );
+  fireEvent.change(firstAbsenceReason(), {
+    target: { value: "facility_maintenance" },
+  });
+  expect(firstActivity().value).toContain("trabajos de mantenimiento");
+  expect(firstAbsenceReason().value).toBe("facility_maintenance");
+
+  const customNonWorkingText =
+    "La empresa suspendió sus operaciones por una circunstancia extraordinaria informada por el responsable.";
+  fireEvent.input(firstActivity(), { target: { value: customNonWorkingText } });
+  expect(firstAbsenceReason().value).toBe("");
+  fireEvent.change(firstAbsenceReason(), {
+    target: { value: "labor_stoppage" },
+  });
+  expect($("guardDialog").open).toBe(true);
+  fireEvent.click($("guardCancel"));
+  await waitFor(() => expect(firstActivity().value).toBe(customNonWorkingText));
+  fireEvent.change(firstAbsenceReason(), {
+    target: { value: "labor_stoppage" },
+  });
+  fireEvent.click($("guardConfirm"));
+  await waitFor(() => expect(firstActivity().value).toContain("paro laboral"));
+  expect(firstAbsenceReason().value).toBe("labor_stoppage");
+
   fireEvent.change(firstStatus(), { target: { value: "laboral" } });
   expect(firstAbsenceReason()).toBeNull();
 
