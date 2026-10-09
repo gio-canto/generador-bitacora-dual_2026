@@ -17,6 +17,7 @@ import {
 import companies from "../data/companies.json";
 import schools from "../data/schools.json";
 import absenceReasons from "../data/absence-reasons.json";
+import nonWorkingReasons from "../data/non-working-reasons.json";
 import { parseBackup } from "../services/storage.js";
 import { notify, notifyImported } from "../services/rare-notification.jsx";
 import { createMatrixPayload } from "../services/delivery-registry.js";
@@ -49,19 +50,23 @@ export function startEditor() {
       falta:
         "No olvides avisar a la directora de Vinculación sobre tu falta y a tu jefe inmediato. Puedes elegir un motivo frecuente como base y editarlo, o escribir tu propia justificación.",
       sin_labores:
-        "No olvides avisar a la directora de Vinculación que en tu empresa no laborarán.",
+        "No olvides avisar a la directora de Vinculación que en tu empresa no laborarán. Puedes elegir un motivo frecuente como base o escribir tu propia justificación.",
       inhabil:
         "Esta opción es exclusiva para los días contemplados como inhábiles o feriados en los calendarios oficiales vigentes de la DGETI, CBTis, SEP y el calendario interno propio aplicable a Educación Dual.",
     };
-    const ABSENCE_REASON_PRESETS = absenceReasons;
-        function absenceReasonForId(id) {
-      return ABSENCE_REASON_PRESETS.find((item) => item.id === id) || null;
+    const REASON_PRESETS = {
+      falta: absenceReasons,
+      sin_labores: nonWorkingReasons,
+    };
+    function reasonsForStatus(status) {
+      return REASON_PRESETS[status] || [];
     }
-    function absenceReasonIdForText(text) {
+    function reasonForId(status, id) {
+      return reasonsForStatus(status).find((item) => item.id === id) || null;
+    }
+    function reasonIdForText(status, text) {
       const normalized = String(text || "").trim();
-      return (
-        ABSENCE_REASON_PRESETS.find((item) => item.text === normalized)?.id || ""
-      );
+      return reasonsForStatus(status).find((item) => item.text === normalized)?.id || "";
     }
     function showStatusNotice(status) {
       const message = STATUS_NOTICES[status];
@@ -747,17 +752,17 @@ export function startEditor() {
           e.status === "falta"
             ? "Explica el motivo de la inasistencia; puedes usar un motivo frecuente como base."
             : e.status === "sin_labores"
-              ? "Explica por qué no hubo labores en la empresa"
+              ? "Explica por qué no hubo labores en la empresa; puedes usar un motivo frecuente como base."
               : e.status === "inhabil"
                 ? INHABIL_JUSTIFICATION
                 : "Puedes usar **negritas**, *cursivas* y listas con -";
-        const absenceReasonId = absenceReasonIdForText(e.activity);
-        const absenceReasonOptions = ABSENCE_REASON_PRESETS.map(
+        const absenceReasonId = reasonIdForText(e.status, e.activity);
+        const absenceReasonOptions = reasonsForStatus(e.status).map(
           (item) =>
             `<option value="${escapeHtml(item.id)}" ${item.id === absenceReasonId ? "selected" : ""}>${escapeHtml(item.label)}</option>`,
         ).join("");
         const absenceReasonControl =
-          e.status === "falta"
+          ["falta", "sin_labores"].includes(e.status)
             ? `<div class="absence-reason"><div class="absence-reason-head"><label for="absenceReason-${i}">Motivo frecuente</label><span>Opcional</span></div><select id="absenceReason-${i}" data-absence-reason="${i}"><option value="">Selecciona un motivo para usarlo como base…</option>${absenceReasonOptions}</select><small>El texto se colocará en la justificación y podrás modificarlo libremente.</small></div>`
             : "";
         card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Área</label><input data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" ${e.status !== "laboral" ? "disabled" : ""}></div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
@@ -819,7 +824,7 @@ export function startEditor() {
               `[data-absence-reason="${i}"]`,
             );
             if (reasonSelect)
-              reasonSelect.value = absenceReasonIdForText(input.value);
+              reasonSelect.value = reasonIdForText(entries[i].status, input.value);
           }
           if (k === "area") {
             const commonAreas = [
@@ -844,10 +849,10 @@ export function startEditor() {
       host.querySelectorAll("[data-absence-reason]").forEach((select) =>
         select.addEventListener("change", async () => {
           const i = +select.dataset.absenceReason,
-            preset = absenceReasonForId(select.value);
-          if (!preset || entries[i]?.status !== "falta") return;
+            preset = reasonForId(entries[i]?.status, select.value);
+          if (!preset || !["falta", "sin_labores"].includes(entries[i]?.status)) return;
           const current = String(entries[i].activity || "").trim(),
-            currentPresetId = absenceReasonIdForText(current);
+            currentPresetId = reasonIdForText(entries[i].status, current);
           if (current && !currentPresetId && current !== preset.text) {
             const replace = await openGuardDialog(
               "¿Reemplazar la justificación?",
@@ -859,7 +864,7 @@ export function startEditor() {
               },
             );
             if (!replace) {
-              select.value = "";
+              select.value = reasonIdForText(entries[i].status, current);
               return;
             }
           }
@@ -869,7 +874,7 @@ export function startEditor() {
           const after = buildPageModel();
           if (!after.fits && after.bottom >= before.bottom - 0.01) {
             entries[i].activity = previous;
-            select.value = absenceReasonIdForText(previous);
+            select.value = reasonIdForText(entries[i].status, previous);
             notifySpaceLimit();
             return;
           }
