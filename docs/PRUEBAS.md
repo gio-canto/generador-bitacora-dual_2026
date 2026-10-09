@@ -43,7 +43,8 @@ Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regl
 - generar jornadas;
 - estados Falta, Sin labores e Inhábil;
 - en **Falta** y **Sin labores**, probar motivos frecuentes, edición libre del texto y confirmación antes de reemplazar una justificación personalizada;
-- al modificar `src/data/absence-reasons.json`, comprobar IDs únicos, etiquetas/textos válidos y que el orden del selector coincida con el orden del catálogo;
+- al modificar `src/data/absence-reasons.json` o `src/data/non-working-reasons.json`, comprobar IDs únicos, etiquetas/textos válidos y que el orden del selector coincida con el orden del catálogo;
+- al pasar de **Falta** a **Sin labores**, comprobar que no se borre el texto anterior y que se solicite confirmación para sustituirlo con un motivo del nuevo estado;
 - editar actividades;
 - ejecutar el corrector con un término institucional y vocabulario técnico conocido; confirmar que no los marque como error y que siga detectando faltas reales;
 - revisar contador/espacio;
