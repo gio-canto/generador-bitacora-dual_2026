@@ -9,6 +9,7 @@ Este directorio contiene la documentación mantenible del proyecto. Las notas hi
 | Quiero usar el proyecto en otra escuela | [IMPLEMENTAR_INSTITUCION.md](IMPLEMENTAR_INSTITUCION.md) |
 | Sólo necesito agregar plantel o empresa | [CATALOGOS.md](CATALOGOS.md) |
 | Quiero agregar o cambiar un motivo frecuente de falta | [MOTIVOS_FRECUENTES_FALTA.md](MOTIVOS_FRECUENTES_FALTA.md) |
+| Quiero agregar o cambiar un motivo de Sin labores | [MOTIVOS_FRECUENTES_SIN_LABORES.md](MOTIVOS_FRECUENTES_SIN_LABORES.md) |
 | Voy a modificar código | [ARQUITECTURA.md](ARQUITECTURA.md) |
 | Necesito entender almacenamiento o respaldos | [DATOS_Y_CACHE.md](DATOS_Y_CACHE.md) |
 | Voy a probar una modificación | [PRUEBAS.md](PRUEBAS.md) |
