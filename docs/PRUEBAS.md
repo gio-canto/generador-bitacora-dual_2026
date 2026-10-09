@@ -42,7 +42,7 @@ Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regl
 - crear una bitácora desde cero;
 - generar jornadas;
 - estados Falta, Sin labores e Inhábil;
-- en **Falta**, probar motivos frecuentes, edición libre del texto y confirmación antes de reemplazar una justificación personalizada;
+- en **Falta** y **Sin labores**, probar motivos frecuentes, edición libre del texto y confirmación antes de reemplazar una justificación personalizada;
 - al modificar `src/data/absence-reasons.json`, comprobar IDs únicos, etiquetas/textos válidos y que el orden del selector coincida con el orden del catálogo;
 - editar actividades;
 - ejecutar el corrector con un término institucional y vocabulario técnico conocido; confirmar que no los marque como error y que siga detectando faltas reales;
