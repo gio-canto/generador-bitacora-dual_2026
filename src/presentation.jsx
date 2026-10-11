@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Blobatar } from "blobatar/react";
 function SvgIcon({
@@ -294,6 +294,9 @@ const COPY = {
       previous: "Testimonio anterior",
       next: "Siguiente testimonio",
       goTo: "Ver testimonio",
+      autoAdvance: "Cambio automático",
+      pause: "Pausar",
+      resume: "Reanudar",
       items: [
         {
           quote: "Pues me ha ayudado a hacerlos de manera rápida y limpia; también me ha ayudado bastante a corregir mis faltas ortográficas.",
@@ -458,6 +461,9 @@ const COPY = {
       previous: "Previous testimonial",
       next: "Next testimonial",
       goTo: "View testimonial",
+      autoAdvance: "Automatic change",
+      pause: "Pause",
+      resume: "Resume",
       items: [
         {
           quote: "It has helped me do them quickly and neatly, and it has also helped me a lot with correcting my spelling mistakes.",
@@ -622,6 +628,9 @@ const COPY = {
       previous: "Vorheriges Testimonial",
       next: "Nächstes Testimonial",
       goTo: "Testimonial anzeigen",
+      autoAdvance: "Automatischer Wechsel",
+      pause: "Pausieren",
+      resume: "Fortsetzen",
       items: [
         {
           quote: "Es hat mir geholfen, meine Nachweise schnell und ordentlich zu erstellen, und außerdem hilft es mir sehr dabei, meine Rechtschreibfehler zu korrigieren.",
@@ -1025,20 +1034,82 @@ function TimeSection({ copy }) {
   );
 }
 
+
+const TESTIMONIAL_INTERVAL_SECONDS = 8;
+
 function TestimonialsSection({ copy }) {
   const t = copy.testimonials;
-  const [active, setActive] = useState(0);
   const items = t.items || [];
+  const [active, setActive] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(TESTIMONIAL_INTERVAL_SECONDS);
+  const [resetCount, setResetCount] = useState(0);
+  const [isInView, setIsInView] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
+  const [userPaused, setUserPaused] = useState(false);
+  const [focusPaused, setFocusPaused] = useState(false);
+  const [allowReducedMotion, setAllowReducedMotion] = useState(false);
+  const reducedMotion = useReducedMotion();
+  const carouselRef = useRef(null);
+  const isPaused = userPaused || (reducedMotion && !allowReducedMotion);
+  const isRunning = items.length > 1 && isInView && isPageVisible && !isPaused && !focusPaused;
   const current = items[active] || items[0];
 
   useEffect(() => {
-    if (active >= items.length) setActive(0);
+    if (active >= items.length) {
+      setActive(0);
+      setSecondsLeft(TESTIMONIAL_INTERVAL_SECONDS);
+    }
   }, [active, items.length]);
+
+  useEffect(() => {
+    const node = carouselRef.current;
+    if (!node) return undefined;
+    if (!("IntersectionObserver" in window)) {
+      setIsInView(true);
+      return undefined;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.2 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const onVisibilityChange = () => setIsPageVisible(!document.hidden);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
+
+  useEffect(() => {
+    if (!isRunning) return undefined;
+    const timeout = window.setTimeout(() => {
+      if (secondsLeft <= 1) {
+        setActive((index) => (index + 1) % items.length);
+        setSecondsLeft(TESTIMONIAL_INTERVAL_SECONDS);
+      } else {
+        setSecondsLeft(secondsLeft - 1);
+      }
+    }, 1000);
+    return () => window.clearTimeout(timeout);
+  }, [isRunning, secondsLeft, items.length]);
 
   if (!current) return null;
 
-  const move = (step) => {
-    setActive((index) => (index + step + items.length) % items.length);
+  const goTo = (index) => {
+    setActive(index);
+    setSecondsLeft(TESTIMONIAL_INTERVAL_SECONDS);
+    setResetCount((count) => count + 1);
+  };
+  const move = (step) => goTo((active + step + items.length) % items.length);
+  const togglePause = () => {
+    if (reducedMotion && !allowReducedMotion) {
+      setAllowReducedMotion(true);
+      setUserPaused(false);
+    } else {
+      setUserPaused((paused) => !paused);
+    }
   };
 
   return (
@@ -1050,12 +1121,19 @@ function TestimonialsSection({ copy }) {
           <p>{t.text}</p>
         </div>
         <div
+          ref={carouselRef}
           className="testimonial-carousel reveal"
           role="region"
           aria-roledescription="carousel"
           aria-label={t.label}
+          onFocusCapture={(event) => {
+            if (event.target.matches?.(":focus-visible")) setFocusPaused(true);
+          }}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) setFocusPaused(false);
+          }}
         >
-          <figure className="testimonial" key={current.name}>
+          <figure className="testimonial" key={current.name} aria-live="off">
             <blockquote>“{current.quote}”</blockquote>
             <figcaption>
               <Blobatar name={current.name} size={44} alt="" />
@@ -1066,6 +1144,32 @@ function TestimonialsSection({ copy }) {
               </span>
             </figcaption>
           </figure>
+          {items.length > 1 && (
+            <div className="testimonial-timer">
+              <span className="testimonial-timer-label">{t.autoAdvance}</span>
+              <div className="testimonial-timer-track" aria-hidden="true">
+                <span
+                  key={active + "-" + resetCount}
+                  className="testimonial-timer-fill"
+                  style={{
+                    transform:
+                      "scaleX(" +
+                      (TESTIMONIAL_INTERVAL_SECONDS - secondsLeft) / TESTIMONIAL_INTERVAL_SECONDS +
+                      ")",
+                  }}
+                />
+              </div>
+              <span className="testimonial-timer-count" aria-live="off">{secondsLeft} s</span>
+              <button
+                type="button"
+                className="testimonial-timer-toggle"
+                onClick={togglePause}
+                aria-pressed={isPaused}
+              >
+                {isPaused ? t.resume : t.pause}
+              </button>
+            </div>
+          )}
           <div className="testimonial-controls">
             <div className="testimonial-dots" aria-label={t.label}>
               {items.map((item, index) => (
@@ -1073,9 +1177,9 @@ function TestimonialsSection({ copy }) {
                   type="button"
                   className={index === active ? "active" : ""}
                   key={item.name}
-                  aria-label={`${t.goTo} ${index + 1}: ${item.name}`}
+                  aria-label={t.goTo + " " + (index + 1) + ": " + item.name}
                   aria-current={index === active ? "true" : undefined}
-                  onClick={() => setActive(index)}
+                  onClick={() => goTo(index)}
                 />
               ))}
             </div>
