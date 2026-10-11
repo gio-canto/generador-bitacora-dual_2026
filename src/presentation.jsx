@@ -294,9 +294,6 @@ const COPY = {
       previous: "Testimonio anterior",
       next: "Siguiente testimonio",
       goTo: "Ver testimonio",
-      autoAdvance: "Cambio automático",
-      pause: "Pausar",
-      resume: "Reanudar",
       items: [
         {
           quote: "Pues me ha ayudado a hacerlos de manera rápida y limpia; también me ha ayudado bastante a corregir mis faltas ortográficas.",
@@ -461,9 +458,6 @@ const COPY = {
       previous: "Previous testimonial",
       next: "Next testimonial",
       goTo: "View testimonial",
-      autoAdvance: "Automatic change",
-      pause: "Pause",
-      resume: "Resume",
       items: [
         {
           quote: "It has helped me do them quickly and neatly, and it has also helped me a lot with correcting my spelling mistakes.",
@@ -628,9 +622,6 @@ const COPY = {
       previous: "Vorheriges Testimonial",
       next: "Nächstes Testimonial",
       goTo: "Testimonial anzeigen",
-      autoAdvance: "Automatischer Wechsel",
-      pause: "Pausieren",
-      resume: "Fortsetzen",
       items: [
         {
           quote: "Es hat mir geholfen, meine Nachweise schnell und ordentlich zu erstellen, und außerdem hilft es mir sehr dabei, meine Rechtschreibfehler zu korrigieren.",
@@ -1041,24 +1032,16 @@ function TestimonialsSection({ copy }) {
   const t = copy.testimonials;
   const items = t.items || [];
   const [active, setActive] = useState(0);
-  const [secondsLeft, setSecondsLeft] = useState(TESTIMONIAL_INTERVAL_SECONDS);
-  const [resetCount, setResetCount] = useState(0);
+  const [timerRestart, setTimerRestart] = useState(0);
   const [isInView, setIsInView] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
-  const [userPaused, setUserPaused] = useState(false);
   const [focusPaused, setFocusPaused] = useState(false);
-  const [allowReducedMotion, setAllowReducedMotion] = useState(false);
-  const reducedMotion = useReducedMotion();
   const carouselRef = useRef(null);
-  const isPaused = userPaused || (reducedMotion && !allowReducedMotion);
-  const isRunning = items.length > 1 && isInView && isPageVisible && !isPaused && !focusPaused;
+  const isRunning = items.length > 1 && isInView && isPageVisible && !focusPaused;
   const current = items[active] || items[0];
 
   useEffect(() => {
-    if (active >= items.length) {
-      setActive(0);
-      setSecondsLeft(TESTIMONIAL_INTERVAL_SECONDS);
-    }
+    if (active >= items.length) setActive(0);
   }, [active, items.length]);
 
   useEffect(() => {
@@ -1085,32 +1068,18 @@ function TestimonialsSection({ copy }) {
   useEffect(() => {
     if (!isRunning) return undefined;
     const timeout = window.setTimeout(() => {
-      if (secondsLeft <= 1) {
-        setActive((index) => (index + 1) % items.length);
-        setSecondsLeft(TESTIMONIAL_INTERVAL_SECONDS);
-      } else {
-        setSecondsLeft(secondsLeft - 1);
-      }
-    }, 1000);
+      setActive((index) => (index + 1) % items.length);
+    }, TESTIMONIAL_INTERVAL_SECONDS * 1000);
     return () => window.clearTimeout(timeout);
-  }, [isRunning, secondsLeft, items.length]);
+  }, [isRunning, active, items.length, timerRestart]);
 
   if (!current) return null;
 
   const goTo = (index) => {
     setActive(index);
-    setSecondsLeft(TESTIMONIAL_INTERVAL_SECONDS);
-    setResetCount((count) => count + 1);
+    setTimerRestart((count) => count + 1);
   };
   const move = (step) => goTo((active + step + items.length) % items.length);
-  const togglePause = () => {
-    if (reducedMotion && !allowReducedMotion) {
-      setAllowReducedMotion(true);
-      setUserPaused(false);
-    } else {
-      setUserPaused((paused) => !paused);
-    }
-  };
 
   return (
     <section className="testimonials" id="opiniones">
@@ -1144,32 +1113,6 @@ function TestimonialsSection({ copy }) {
               </span>
             </figcaption>
           </figure>
-          {items.length > 1 && (
-            <div className="testimonial-timer">
-              <span className="testimonial-timer-label">{t.autoAdvance}</span>
-              <div className="testimonial-timer-track" aria-hidden="true">
-                <span
-                  key={active + "-" + resetCount}
-                  className="testimonial-timer-fill"
-                  style={{
-                    transform:
-                      "scaleX(" +
-                      (TESTIMONIAL_INTERVAL_SECONDS - secondsLeft) / TESTIMONIAL_INTERVAL_SECONDS +
-                      ")",
-                  }}
-                />
-              </div>
-              <span className="testimonial-timer-count" aria-live="off">{secondsLeft} s</span>
-              <button
-                type="button"
-                className="testimonial-timer-toggle"
-                onClick={togglePause}
-                aria-pressed={isPaused}
-              >
-                {isPaused ? t.resume : t.pause}
-              </button>
-            </div>
-          )}
           <div className="testimonial-controls">
             <div className="testimonial-dots" aria-label={t.label}>
               {items.map((item, index) => (
