@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/Assets/publicAssetsAsset_logo.png" alt="Logotipo del Generador de Bitácora Dual" width="320" />
+<img src="public/Assets/publicAssetsAsset_logo.png" alt="Logotipo del Generador de Bitácora Dual" width="420" />
 
 # Generador de Bitácora Dual 2026
 
