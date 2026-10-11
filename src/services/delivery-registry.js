@@ -28,6 +28,27 @@ export function normalizeName(value) {
     .toLocaleLowerCase("es-MX");
 }
 
+// Detecta el intercambio de grupos completos de nombres y apellidos,
+// preservando el orden interno de las palabras de cada grupo.
+export function isNameOrderInverted(scannedName, registeredName) {
+  const parts = (value) =>
+    normalizeName(value)
+      .replace(/[.,;]+/g, " ")
+      .split(/\s+/)
+      .filter(Boolean);
+  const scanned = parts(scannedName);
+  const registered = parts(registeredName);
+  if (scanned.length < 2 || scanned.length !== registered.length)
+    return false;
+  if (scanned.every((word, index) => word === registered[index]))
+    return false;
+  for (let split = 1; split < registered.length; split++) {
+    const rotated = [...registered.slice(split), ...registered.slice(0, split)];
+    if (scanned.every((word, index) => word === rotated[index])) return true;
+  }
+  return false;
+}
+
 function normalizeMatrixText(value, max = 180) {
   return clean(value, max)
     .normalize("NFD")
@@ -611,6 +632,9 @@ export function findStudentSuggestionsByMatrixValue(
       if (!storedName || storedName === scannedName) return null;
       if (!matrixMetadataMatchesStudent(student, payload)) return null;
 
+      if (isNameOrderInverted(scannedName, storedName))
+        return { student, distance: 0, similarity: 1, nameOrderInverted: true };
+
       const distance = editDistance(scannedName, storedName);
       const longest = Math.max(scannedName.length, storedName.length);
       const similarity = longest ? 1 - distance / longest : 0;
@@ -643,34 +667,26 @@ export function findStudentByMatrixValue(students, rawValue) {
   const byName = students.filter(
     (student) => normalizeName(student.name) === nameKey,
   );
-
-  if (payload.version >= 4) {
-    const specialtyKey = normalizeName(payload.specialty);
-    const companyKey = normalizeMatrixText(payload.company, 80);
-    return (
-      byName.find(
-        (student) =>
-          normalizeName(student.specialty) === specialtyKey &&
-          companyMatrixValue(student.company) === companyKey,
-      ) || null
-    );
+  // Siempre se prefiere el nombre tal como aparece en la base.
+  if (byName.length) {
+    if (payload.version >= 3) {
+      return (
+        byName.find((student) => matrixMetadataMatchesStudent(student, payload)) ||
+        null
+      );
+    }
+    return byName.length === 1 ? byName[0] : null;
   }
 
-  if (payload.version === 3) {
-    const specialtyKey = normalizeName(payload.specialty);
-    const companyKey = normalizeName(payload.company);
-    return (
-      byName.find(
-        (student) =>
-          normalizeName(student.specialty) === specialtyKey &&
-          normalizeName(student.company) === companyKey,
-      ) || null
-    );
-  }
-
-  // Los códigos anteriores sólo tenían el nombre. Se aceptan únicamente
-  // cuando ese nombre identifica a una sola persona en la base.
-  return byName.length === 1 ? byName[0] : null;
+  // Las inversiones deben ser únicas y corroborarse por especialidad y empresa.
+  // Los códigos antiguos pasan a sugerencias para confirmación manual.
+  if (payload.version < 3) return null;
+  const inverted = students.filter(
+    (student) =>
+      isNameOrderInverted(payload.name, student?.name) &&
+      matrixMetadataMatchesStudent(student, payload),
+  );
+  return inverted.length === 1 ? inverted[0] : null;
 }
 
 export function findWeekByMatrixValue(weeks, rawValue, fallbackWeekId = "") {
