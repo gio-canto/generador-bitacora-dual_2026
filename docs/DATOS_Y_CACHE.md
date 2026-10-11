@@ -122,9 +122,7 @@ El contenido del Data Matrix no debe incluir secretos ni información innecesari
 
 ## Coincidencias aproximadas
 
-El registro intenta primero coincidencia exacta. Si el nombre contiene una diferencia pequeña, puede proponer candidatos.
-
-En los payloads actuales, la especialidad y empresa siguen funcionando como restricciones adicionales.
+El registro prioriza el nombre exacto y acepta la inversión entre grupos de nombres y apellidos (por ejemplo, «Gio Antonio Canto Gómez» y «Canto Gómez Gio Antonio»), sin modificar el alumno o el Data Matrix. Para asociar automáticamente un código de versión 3 o 4 se exige una coincidencia única que también corresponda en especialidad y empresa. Si hay más de un candidato, o si el código es antiguo y sólo contiene el nombre, el lector pide confirmación. Las diferencias pequeñas de ortografía siguen generando sugerencias.
 
 La sugerencia:
 
