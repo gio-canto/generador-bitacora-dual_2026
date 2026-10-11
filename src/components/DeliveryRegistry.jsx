@@ -35,6 +35,7 @@ import {
   findStudentByMatrixValue,
   findStudentSuggestionsByMatrixValue,
   findWeekByMatrixValue,
+  isNameOrderInverted,
   markStudentDesisted,
   matrixPeriodLabel,
   mergeStudents,
@@ -610,6 +611,9 @@ export default function DeliveryRegistry({ onClose }) {
       student.name +
         " → " +
         targetWeek.label +
+        (isNameOrderInverted(payload.name, student.name)
+          ? " · Apellidos primero"
+          : "") +
         (status === "entregado_tarde" ? " · A destiempo" : ""),
     );
 
@@ -708,7 +712,11 @@ export default function DeliveryRegistry({ onClose }) {
         };
         fuzzyPromptRef.current = prompt;
         setFuzzyPrompt(prompt);
-        setScanMessage("Coincidencia aproximada encontrada. Confirma la persona.");
+        setScanMessage(
+          suggestions[0].nameOrderInverted
+            ? "Nombre con apellidos primero. Confirma la persona."
+            : "Coincidencia aproximada encontrada. Confirma la persona.",
+        );
         showDetection(
           "seen",
           resultBoxFromPoints(videoRef.current, points),
@@ -3142,8 +3150,9 @@ export default function DeliveryRegistry({ onClose }) {
               <span className="delivery-kicker">Lector Data Matrix</span>
               <h2 id="delivery-match-title">¿Es esta persona?</h2>
               <p>
-                No encontré una coincidencia exacta. Revisa la sugerencia antes
-                de registrar la entrega.
+                {fuzzySuggestion?.nameOrderInverted
+                  ? "Los apellidos aparecen primero. Confirma la persona antes de registrar."
+                  : "No encontré una coincidencia exacta. Revisa la sugerencia antes de registrar la entrega."}
               </p>
 
               <div className="delivery-match-read">
@@ -3171,7 +3180,9 @@ export default function DeliveryRegistry({ onClose }) {
                   </small>
                 </div>
                 <b>
-                  {Math.round((fuzzySuggestion?.similarity || 0) * 100)}%
+                  {fuzzySuggestion?.nameOrderInverted
+                    ? "Orden invertido"
+                    : Math.round((fuzzySuggestion?.similarity || 0) * 100) + "%"}
                 </b>
               </div>
 
