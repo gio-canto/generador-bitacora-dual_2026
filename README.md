@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="public/Assets/publicAssetsAsset_logo.png" alt="Logotipo del Generador de Bitácora Dual" width="120" />
+
 # Generador de Bitácora Dual 2026
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
