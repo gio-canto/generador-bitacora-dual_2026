@@ -9,6 +9,7 @@ import {
   findStudentByMatrixValue,
   findStudentSuggestionsByMatrixValue,
   findWeekByMatrixValue,
+  isNameOrderInverted,
   markStudentDesisted,
   mergeStudents,
   parseMatrixPayload,
@@ -68,6 +69,117 @@ describe("subsistema de registro de entrega", () => {
     expect(
       findStudentByMatrixValue([student], "BD26|Jose Angel Nunez")?.id,
     ).toBe(student.id);
+  });
+
+
+  it("acepta en el receptor apellidos primero en un Data Matrix moderno", () => {
+    const student = createStudent({
+      name: "Gio Antonio Canto Gómez",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const code = createMatrixPayload({
+      student: "Canto Gómez, Gio Antonio",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    expect(isNameOrderInverted("Canto Gómez, Gio Antonio", student.name)).toBe(true);
+    expect(isNameOrderInverted(student.name, student.name)).toBe(false);
+    expect(findStudentByMatrixValue([student], code)?.id).toBe(student.id);
+    expect(student.name).toBe("Gio Antonio Canto Gómez");
+    expect(findStudentSuggestionsByMatrixValue([student], code)).toEqual([
+      expect.objectContaining({ student, nameOrderInverted: true, similarity: 1 }),
+    ]);
+  });
+
+  it("reconoce nombres y apellidos compuestos en ambos órdenes", () => {
+    const pairs = [
+      ["Juan Pérez Gómez", "Pérez Gómez Juan"],
+      ["Juan Carlos Pérez", "Pérez Juan Carlos"],
+      ["José Luis de la Cruz Pérez", "de la Cruz Pérez José Luis"],
+      ["Canto Gómez Gio Antonio", "Gio Antonio Canto Gómez"],
+    ];
+    for (const [name, reversed] of pairs) {
+      const student = createStudent({
+        name,
+        specialty: "Programación",
+        company: "COCYTIEG",
+      });
+      const code = createMatrixPayload({
+        student: reversed,
+        specialty: student.specialty,
+        company: student.company,
+      });
+      expect(findStudentByMatrixValue([student], code)?.id).toBe(student.id);
+    }
+  });
+
+  it("no asigna el alumno si los metadatos no coinciden", () => {
+    const student = createStudent({
+      name: "Gio Antonio Canto Gómez",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const code = createMatrixPayload({
+      student: "Canto Gómez Gio Antonio",
+      specialty: "Contabilidad",
+      company: "ITCH",
+    });
+    expect(findStudentByMatrixValue([student], code)).toBeNull();
+    expect(findStudentSuggestionsByMatrixValue([student], code)).toEqual([]);
+  });
+
+  it("mantiene prioridad para el orden exacto registrado", () => {
+    const a = createStudent({
+      name: "Gio Antonio Canto Gómez",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const b = createStudent({
+      name: "Canto Gómez Gio Antonio",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const code = createMatrixPayload({
+      student: b.name,
+      specialty: b.specialty,
+      company: b.company,
+    });
+    expect(findStudentByMatrixValue([a, b], code)?.id).toBe(b.id);
+  });
+
+  it("requiere confirmación cuando hay varias inversiones posibles", () => {
+    const a = createStudent({
+      name: "Gio Antonio Canto Gómez",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const b = createStudent({
+      name: "Antonio Canto Gómez Gio",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    const code = createMatrixPayload({
+      student: "Canto Gómez Gio Antonio",
+      specialty: "Programación",
+      company: "COCYTIEG",
+    });
+    expect(findStudentByMatrixValue([a, b], code)).toBeNull();
+    expect(findStudentSuggestionsByMatrixValue([a, b], code)).toHaveLength(2);
+  });
+
+  it("sugiere con confirmación los códigos antiguos con apellido primero", () => {
+    const student = createStudent({ name: "Juan Carlos Pérez López" });
+    const code = "Pérez López Juan Carlos";
+    expect(findStudentByMatrixValue([student], code)).toBeNull();
+    expect(findStudentByMatrixValue([student], "BD26|" + code)).toBeNull();
+    expect(findStudentSuggestionsByMatrixValue([student], code)).toEqual([
+      expect.objectContaining({ student, nameOrderInverted: true }),
+    ]);
+  });
+
+  it("no confunde cambios de orden que no sean intercambio de grupos", () => {
+    expect(isNameOrderInverted("Juan Pérez Carlos Gómez", "Juan Carlos Pérez Gómez")).toBe(false);
   });
 
   it("sugiere una persona cuando el nombre cambia por una diferencia pequeña", () => {
