@@ -51,6 +51,14 @@ describe("landing de presentación", () => {
     expect(jsx).toContain("testimonial-carousel");
     expect(jsx).toContain("testimonial-dots");
     expect(jsx).toContain("testimonial-arrows");
+    expect(jsx).toContain("TESTIMONIAL_INTERVAL_SECONDS = 8");
+    expect(jsx).toContain("setTimeout");
+    expect(jsx).toContain("visibilitychange");
+    expect(jsx).toContain("testimonial-timer-fill");
+    expect(jsx).toContain("Cambio automático");
+    expect(jsx).toContain("Automatic change");
+    expect(jsx).toContain("Automatischer Wechsel");
+    expect(jsx).toContain("togglePause");
     expect(jsx).toContain("setActive((index)");
     expect(jsx).toContain("<TestimonialsSection copy={copy} />");
     expect(jsx).toContain("Tu escuela puede agregarse al proyecto.");
@@ -96,6 +104,8 @@ describe("landing de presentación", () => {
     expect(css).toContain(".testimonial figcaption>svg");
     expect(css).toContain(".testimonial-carousel");
     expect(css).toContain(".testimonial-dots");
+    expect(css).toContain(".testimonial-timer-track");
+    expect(css).toContain(".testimonial-timer-fill");
     expect(css).toContain("@keyframes testimonial-enter");
     expect(jsx).toContain("IntersectionObserver");
     expect(jsx).toContain("requestAnimationFrame");
