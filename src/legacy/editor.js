@@ -48,11 +48,11 @@ export function startEditor() {
       "Falta de acuerdo con el calendario escolar vigente";
     const STATUS_NOTICES = {
       falta:
-        "No olvides avisar a la directora de Vinculación sobre tu falta y a tu jefe inmediato. Puedes elegir un motivo frecuente como base y editarlo, o escribir tu propia justificación.",
+        "Selecciona «Falta» solo cuando tú no asististe, aunque en la empresa sí hubo labores. Avisa a la directora de Vinculación y a tu jefe inmediato, y escribe el motivo de tu inasistencia.",
       sin_labores:
-        "No olvides avisar a la directora de Vinculación que en tu empresa no laborarán. Puedes elegir un motivo frecuente como base o escribir tu propia justificación.",
+        "Selecciona «Sin labores» cuando por algún motivo no se realizaron actividades en tu empresa. No se usa cuando únicamente tú faltaste. Avisa a la directora de Vinculación y escribe la justificación correspondiente.",
       inhabil:
-        "Esta opción es exclusiva para los días contemplados como inhábiles o feriados en los calendarios oficiales vigentes de la DGETI, CBTis, SEP y el calendario interno propio aplicable a Educación Dual.",
+        "Selecciona «Día inhábil» única y exclusivamente cuando la suspensión de actividades esté contemplada en el calendario escolar oficial aplicable a Educación Dual (DGETI, CBTis, SEP o su calendario interno). Si la empresa no trabajó por otro motivo, utiliza «Sin labores».",
     };
     const REASON_PRESETS = {
       falta: absenceReasons,
