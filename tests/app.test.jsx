@@ -144,6 +144,8 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
 
   fireEvent.change(firstStatus(), { target: { value: "falta" } });
   expect($("statusDialog").open).toBe(true);
+  expect($("statusMessage").textContent).toContain("solo cuando tú no asististe");
+  expect($("statusMessage").textContent).toContain("en la empresa sí hubo labores");
   fireEvent.click($("statusClose"));
   expect(firstAbsenceReason()).toBeTruthy();
   expect(firstAbsenceReason().options.length).toBeGreaterThan(15);
@@ -183,6 +185,8 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
 
   fireEvent.change(firstStatus(), { target: { value: "sin_labores" } });
   expect($("statusDialog").open).toBe(true);
+  expect($("statusMessage").textContent).toContain("no se realizaron actividades en tu empresa");
+  expect($("statusMessage").textContent).toContain("únicamente tú faltaste");
   fireEvent.click($("statusClose"));
   expect(firstAbsenceReason()).toBeTruthy();
   expect([...firstAbsenceReason().options].map((option) => option.value)).toEqual(
@@ -224,6 +228,13 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   fireEvent.click($("guardConfirm"));
   await waitFor(() => expect(firstActivity().value).toContain("paro laboral"));
   expect(firstAbsenceReason().value).toBe("labor_stoppage");
+
+  fireEvent.change(firstStatus(), { target: { value: "inhabil" } });
+  expect($("statusDialog").open).toBe(true);
+  expect($("statusMessage").textContent).toContain("única y exclusivamente");
+  expect($("statusMessage").textContent).toContain("calendario escolar oficial");
+  expect($("statusHelp").hidden).toBe(false);
+  fireEvent.click($("statusClose"));
 
   fireEvent.change(firstStatus(), { target: { value: "laboral" } });
   expect(firstAbsenceReason()).toBeNull();
