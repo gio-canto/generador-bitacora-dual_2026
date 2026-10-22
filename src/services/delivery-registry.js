@@ -328,13 +328,13 @@ function normalizeStudent(value, fallback = {}) {
 
 function normalizeDelivery(value) {
   if (!value || typeof value !== "object") return null;
-  const status = ["entregado", "entregado_tarde", "no_aplica"].includes(
+  const status = ["entregado", "entregado_tarde", "no_entregado", "no_aplica"].includes(
     value.status,
   )
     ? value.status
     : "entregado";
   const registeredAt = clean(value.registeredAt, 40);
-  if (!registeredAt && status !== "no_aplica") return null;
+  if (!registeredAt && status !== "no_aplica" && status !== "no_entregado") return null;
   return {
     status,
     registeredAt,
@@ -476,6 +476,7 @@ export function deliveryStatus(week, studentId) {
   const delivery = week?.deliveries?.[studentId];
   if (!delivery) return "no_entregado";
   if (delivery.status === "no_aplica") return "no_aplica";
+  if (delivery.status === "no_entregado") return "no_entregado";
   return delivery.status === "entregado_tarde"
     ? "entregado_tarde"
     : "entregado";
@@ -841,23 +842,26 @@ function downloadText(text, filename, type) {
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 
-// Registro manual: los datos estadísticos y el método pertenecen a la entrega,
-// no al padrón general del estudiante.
+// Los estados distintos de "No aplica" permiten capturar jornadas, incluso si
+// la bitácora está pendiente de entrega. Eso no convierte la entrega en recibida.
 export function saveManualDelivery(week, studentId, status, { statistics = null, usageSource = "unknown", timestamp = "" } = {}) {
-  if (!["entregado", "entregado_tarde"].includes(status))
-    return setDeliveryStatus(week, studentId, status, timestamp, "manual");
+  if (status === "no_aplica") return setDeliveryStatus(week, studentId, status, timestamp, "manual");
+  if (!["entregado", "entregado_tarde", "no_entregado"].includes(status))
+    throw new Error("Selecciona un estado de entrega válido.");
   if (!["generator", "other", "unknown"].includes(usageSource))
     throw new Error("Selecciona el método de elaboración de la bitácora.");
-  const updated = setDeliveryStatus(week, studentId, status, timestamp || new Date().toISOString(), "manual");
-  const original = updated.deliveries[studentId];
+
+  const registeredAt = timestamp || week.deliveries?.[studentId]?.registeredAt || new Date().toISOString();
   return {
-    ...updated,
+    ...week,
     deliveries: {
-      ...updated.deliveries,
+      ...week.deliveries,
       [studentId]: {
-        ...original,
+        status,
+        registeredAt,
+        source: "manual",
         usageSource,
-        ...(statistics ? { statistics } : { statistics: undefined }),
+        ...(statistics ? {statistics} : {}),
       },
     },
   };
