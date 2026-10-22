@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.52.3-beta.1 · Movimiento en Estadísticas · 2026-10-22
+
+- La pantalla Estadísticas incorpora entrada suave del encabezado y los filtros, revelado escalonado de las tarjetas y paneles al aparecer en el área visible.
+- Los indicadores numéricos hacen un conteo progresivo hasta el valor verdadero, conservando los decimales, unidades y porcentajes. El valor exacto permanece disponible mediante etiquetas accesibles.
+- Gráficas de horas, barras de causas, distribuciones y proporciones se despliegan con transiciones; los cambios de filtros reconstruyen los resultados con una animación discreta.
+- Las vistas Horas/Jornadas cambian con una transición corta, sin alterar estados ni recargar datos; los paneles largos se revelan al desplazarse.
+- Se respeta la configuración `prefers-reduced-motion`, con presentación estática automática. No se añaden dependencias, se preserva el diseño para teléfono y la generación PDF queda sin cambios.
+- Nuevas pruebas verifican el formato exacto de los contadores, la precisión de cifras con unidades y su accesibilidad.
+
+
 ## 0.52.2-beta.1 · Captura móvil y estadísticas consistentes · 2026-10-22
 
 - Se corrigen las tarjetas de alumnos en teléfonos: el botón «Horas y jornadas» deja de ser un icono aislado, las acciones y el selector de estado se acomodan sin desbordamiento y muestran si existen jornadas capturadas.
