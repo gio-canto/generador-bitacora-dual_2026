@@ -1,5 +1,5 @@
 import { canvasToJpeg, createPdfFromJpegs, downloadPdf } from "./delivery-report.js";
-import { calculateDeliveryStatistics, genderLabels, percent } from "./statistics.js";
+import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLabels, percent } from "./statistics.js";
 import { VERSION } from "../domain/records.js";
 
 const W = 1240;
@@ -227,7 +227,7 @@ function pageBase(report, pageNumber, logo) {
   separator(ctx, 54, 317, W - 108);
   separator(ctx, 54, 1658, W - 108);
   label(ctx, "GENERACIÓN  " + report.generation, 54, 1694, 16, C.muted, 600, 550);
-  label(ctx, "Emitido " + report.date + "  ·  " + pageNumber + "/3  ·  " + VERSION,
+  label(ctx, "Emitido " + report.date + "  ·  " + pageNumber + "/4  ·  " + VERSION,
     W - 435, 1694, 15, C.muted, 500, 430);
   return { ctx, canvas };
 }
@@ -240,7 +240,7 @@ export function statisticsReportModel(state, filters = {}) {
     filters.specialty, filters.company,
   ].filter(Boolean).join(" · ");
   return {
-    data, scope,
+    data, lifetime: calculateDualLifetimeStatistics(state, filters), scope,
     school: state.context?.school || "Registro de entrega",
     generation: state.context?.generation || "No especificada",
     date: new Date().toLocaleDateString("es-MX", {day:"2-digit", month:"long", year:"numeric"}),
@@ -343,6 +343,50 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       {label:"Cobertura estadística",value:r.coverage,color:C.purple},
     ],{x:93,y:1035,w:1054,h:495});
     label(ctx,"Promedio de horas por bitácora con datos: "+fmt(r.avgHours,1)+" h",82,1559,18,C.secondary,600);
+    images.push(canvasToJpeg(canvas));
+  }
+
+  // Página 4: proporción de especialidades y horas históricas de todo el Dual.
+  // Es independiente del intervalo elegido (respeta filtros de empresa y especialidad).
+  {
+    const {ctx,canvas}=pageBase(report,4,logo);
+    const h=report.lifetime;
+    panel(ctx,54,345,1132,355,"Acumulado de Educación Dual","Todas las semanas con datos, sin duplicar alumno-periodo");
+    const value=v=>v == null?"—":fmt(v,1)+" h";
+    [
+      ["Horas totales",value(h.totalHours)],
+      ["Promedio por alumno",value(h.averageHours)],
+      ["Mínimo",value(h.minHours)],
+      ["Máximo",value(h.maxHours)],
+      ["Rango",value(h.rangeHours)],
+      ["Mediana",value(h.medianHours)],
+    ].forEach(([name,v],i)=>{
+      const xx=84+(i%3)*362,yy=466+Math.floor(i/3)*122;
+      label(ctx,v,xx,yy,33,C.ink,750,340);
+      label(ctx,name,xx,yy+28,17,C.muted,550,340);
+    });
+    panel(ctx,54,722,551,543,"Proporción por especialidad","Alumnos activos · "+fmt(h.activeStudents)+" en total");
+    const proportions=h.bySpecialty.filter(item=>item.students>0).map(item=>({
+      label:item.label+" ("+fmt(item.students)+")",value:item.proportion,
+    }));
+    bars(ctx,proportions,{x:82,y:839,w:490,h:391,unit:"%",maxRows:6});
+    panel(ctx,623,722,563,543,"Horas por especialidad","Acumulado histórico");
+    bars(ctx,h.bySpecialty.filter(item=>item.minutes>0).map(item=>({
+      label:item.label,value:item.hours,
+    })),{x:651,y:839,w:505,h:391,unit:" h",maxRows:6});
+    panel(ctx,54,1286,1132,312,"Base estadística");
+    const details=[
+      ["Alumnos con datos",fmt(h.studentsWithData)],
+      ["Semanas-alumno válidas",fmt(h.periodsWithData)],
+      ["Alumnos activos",fmt(h.activeStudents)]
+    ];
+    details.forEach(([name,value],i)=>{
+      const xx=85+i*363;
+      label(ctx,value,xx,1398,31,C.ink,700);
+      label(ctx,name,xx,1432,17,C.muted,500,330);
+    });
+    label(ctx,"Los códigos sin horas se excluyen del promedio, mínimo, máximo y rango.",85,1512,17,C.secondary,400,1060);
+    label(ctx,"Las entregas históricas de alumnos desistidos sí aportan horas verificadas.",85,1544,17,C.secondary,400,1060);
     images.push(canvasToJpeg(canvas));
   }
 
