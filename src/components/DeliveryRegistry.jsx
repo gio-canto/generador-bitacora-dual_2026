@@ -24,6 +24,7 @@ import {
   MinusCircle,
   WarningCircle,
   XCircle,
+  ChartBar,
 } from "@phosphor-icons/react";
 import {
   contextIsComplete,
@@ -54,6 +55,7 @@ import {
   writeDeliveryState,
 } from "../services/delivery-registry.js";
 import { VERSION } from "../domain/records.js";
+import DeliveryStatistics from "./DeliveryStatistics.jsx";
 import { generateDeliveryReportPdf } from "../services/delivery-report.js";
 import {
   createScannerIssue,
@@ -289,6 +291,16 @@ function pickColumn(row, aliases) {
   return "";
 }
 
+function normalizeImportedGender(value) {
+  const gender = normalizeHeader(value);
+  if (["hombre","masculino","male","m"].includes(gender)) return "male";
+  if (["mujer","femenino","female","f"].includes(gender)) return "female";
+  if (["nobinario","nonbinary","nb"].includes(gender)) return "nonbinary";
+  if (["otro","other"].includes(gender)) return "other";
+  if (["prefieronodecir","noresponde","undisclosed"].includes(gender)) return "undisclosed";
+  return "";
+}
+
 function spreadsheetRowsToStudents(rows) {
   return rows
     .map((row) => {
@@ -306,6 +318,7 @@ function spreadsheetRowsToStudents(rows) {
         name,
         specialty: pickColumn(row, ["especialidad", "carrera"]),
         company: pickColumn(row, ["empresa", "organismo", "empresa u organismo"]),
+        gender: normalizeImportedGender(pickColumn(row, ["género", "genero", "sexo"])),
       };
     })
     .filter((student) => student.name);
@@ -389,6 +402,8 @@ export default function DeliveryRegistry({ onClose }) {
     name: "",
     specialty: "",
     company: "",
+    gender: "",
+    usageMode: "unknown",
   });
   const [weekForm, setWeekForm] = useState({
     label: "",
@@ -604,6 +619,7 @@ export default function DeliveryRegistry({ onClose }) {
         endDate: targetWeek.endDate,
         status,
         matrixVersion: payload.version,
+        statistics: payload.statistics || null,
       },
     ]);
     if (rawKey) fuzzyStudentAliases.current.set(rawKey, student.id);
@@ -1343,6 +1359,8 @@ export default function DeliveryRegistry({ onClose }) {
       name: String(studentForm.name || "").replace(/\s+/g, " ").trim(),
       specialty: String(studentForm.specialty || "").trim(),
       company: String(studentForm.company || "").trim(),
+      gender: studentForm.gender || "",
+      usageMode: studentForm.usageMode || "unknown",
     };
     if (!nextStudent.name || !nextStudent.specialty || !nextStudent.company) {
       showNotice(
@@ -1378,7 +1396,7 @@ export default function DeliveryRegistry({ onClose }) {
         ),
       });
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "" });
+      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
       clearNotice();
       notify("success", "Alumno actualizado", nextStudent.name);
       return;
@@ -1386,7 +1404,7 @@ export default function DeliveryRegistry({ onClose }) {
 
     const merged = mergeStudents(state.students, [nextStudent]);
     commit({ ...state, students: merged.students });
-    setStudentForm({ name: "", specialty: "", company: "" });
+    setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
     clearNotice();
     if (merged.added)
       notify("success", "Alumno agregado", nextStudent.name);
@@ -1404,6 +1422,8 @@ export default function DeliveryRegistry({ onClose }) {
       name: student.name || "",
       specialty: student.specialty || "",
       company: student.company || "",
+      gender: student.gender || "",
+      usageMode: student.usageMode || "unknown",
     });
     setContextForm(state.context);
     setSetupStep(1);
@@ -1423,7 +1443,7 @@ export default function DeliveryRegistry({ onClose }) {
     setStudentActionId("");
     if (editingStudentId === studentId) {
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "" });
+      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
     }
     clearNotice();
     notify(
@@ -1470,7 +1490,7 @@ export default function DeliveryRegistry({ onClose }) {
     setStudentActionId("");
     if (editingStudentId === studentId) {
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "" });
+      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
     }
     clearNotice();
     notify("info", "Alumno eliminado definitivamente", studentName);
@@ -1659,6 +1679,7 @@ export default function DeliveryRegistry({ onClose }) {
             item.studentId,
             item.at,
             "camera",
+            { matrixVersion: item.matrixVersion, statistics: item.statistics },
           );
         return updatedWeek;
       });
@@ -2210,6 +2231,30 @@ export default function DeliveryRegistry({ onClose }) {
                       ))}
                     </select>
                   </label>
+                  <label className="delivery-field">
+                    <span>Género</span>
+                    <select
+                      value={studentForm.gender || ""}
+                      onChange={(event) => setStudentForm({ ...studentForm, gender: event.target.value })}
+                    >
+                      <option value="">Sin dato</option>
+                      <option value="male">Hombre</option>
+                      <option value="female">Mujer</option>
+                      <option value="nonbinary">No binario</option>
+                      <option value="other">Otro</option>
+                      <option value="undisclosed">Prefiero no responder</option>
+                    </select>
+                  </label>
+                  <label className="delivery-field">
+                    <span>Uso del generador</span>
+                    <select
+                      value={studentForm.usageMode || "unknown"}
+                      onChange={(event) => setStudentForm({ ...studentForm, usageMode: event.target.value })}
+                    >
+                      <option value="unknown">Sin información</option>
+                      <option value="other">Otro método</option>
+                    </select>
+                  </label>
                   <button className="btn primary delivery-form-submit" type="submit">
                     {editingStudentId ? (
                       <PencilSimple size={17} />
@@ -2228,6 +2273,8 @@ export default function DeliveryRegistry({ onClose }) {
                           name: "",
                           specialty: "",
                           company: "",
+                          gender: "",
+                          usageMode: "unknown",
                         });
                       }}
                     >
@@ -2431,6 +2478,9 @@ export default function DeliveryRegistry({ onClose }) {
               <p>
                 Generación dual: {state.context.generation || "No especificada"}
               </p>
+              <button type="button" className="btn primary" style={{ marginTop: 18 }} onClick={() => setView("statistics")}>
+                <ChartBar size={18} /> Estadísticas
+              </button>
             </section>
 
             <section className="delivery-summary-grid">
@@ -2561,6 +2611,10 @@ export default function DeliveryRegistry({ onClose }) {
           </>
         )}
 
+        {view === "statistics" && (
+          <DeliveryStatistics state={state} onBack={() => setView("home")} />
+        )}
+
         {view === "new-week" && (
           <section className="delivery-panel delivery-narrow-panel">
             <div className="delivery-panel-head">
@@ -2646,6 +2700,9 @@ export default function DeliveryRegistry({ onClose }) {
                 </p>
               </div>
               <div className="delivery-week-head-actions">
+                <button className="btn delivery-nav-button" type="button" onClick={() => setView("statistics")}>
+                  <ChartBar size={18} /><span>Estadísticas</span>
+                </button>
                 <button
                   className="btn delivery-nav-button"
                   type="button"
