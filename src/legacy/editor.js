@@ -852,7 +852,14 @@ export function startEditor() {
         select.addEventListener("change", async () => {
           const i = +select.dataset.absenceReason,
             preset = reasonForId(entries[i]?.status, select.value);
-          if (!preset || !["falta", "sin_labores"].includes(entries[i]?.status)) return;
+          if (!["falta", "sin_labores"].includes(entries[i]?.status)) return;
+          if (!preset) {
+            if (!select.value) {
+              entries[i].reasonId = "";
+              markDirty();
+            }
+            return;
+          }
           const current = String(entries[i].activity || "").trim(),
             currentPresetId = reasonIdForText(entries[i].status, current);
           if (current && !currentPresetId && current !== preset.text) {
