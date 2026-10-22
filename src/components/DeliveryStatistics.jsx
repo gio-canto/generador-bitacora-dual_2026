@@ -1,332 +1,217 @@
 import { useMemo, useState } from "react";
-import { summarizeWeekStatistics, causeLabel } from "../services/matrix-statistics.js";
-import { calculateDeliveryStatistics, calculateDualLifetimeStatistics } from "../services/statistics.js";
+import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLabels, percent } from "../services/statistics.js";
 import { generateStatisticsReportPdf } from "../services/statistics-report.js";
-import { studentIsActive } from "../services/delivery-registry.js";
 import "../delivery-statistics.css";
 
-const number = (value) => Number(value || 0).toLocaleString("es-MX");
-const genderLabels = {
-  male: "Hombres", female: "Mujeres", nonbinary: "No binario",
-  other: "Otro", undisclosed: "Prefiero no responder", "": "Sin dato",
-};
-const percent = (value, total) => total ? Math.round(value / total * 100) : 0;
+const fmt = (n, digits = 0) => Number(n || 0).toLocaleString("es-MX", { maximumFractionDigits:digits });
+const hours = value => value == null ? "—" : fmt(value, 1) + " h";
+const COLORS = ["#0071e3","#d97979","#e3a244","#929aa6","#8b75c3","#2a9e92","#cf7ea5"];
 
-function downloadCsv(rows) {
-  const escape = (value) => {
-    let text = String(value ?? "");
-    if (/^[=+@-]/.test(text)) text = "'" + text;
-    return '"' + text.replaceAll('"', '""') + '"';
-  };
-  const content = "\uFEFF" + rows.map((row) => row.map(escape).join(",")).join("\r\n");
-  const url = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "estadisticas-dual-" + new Date().toISOString().slice(0, 10) + ".csv";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-}
-
-function Breakdown({ items, empty = "Sin datos" }) {
-  const total = items.reduce((a, b) => a + b.value, 0);
-  return (
-    <>
-      {total ? (
-        <div className="ds-stack" aria-label="Distribución">
-          {items.filter(item => item.value).map(item => (
-            <span key={item.label} style={{ width: (item.value / total * 100) + "%", background: item.color }} title={item.label + ": " + item.value} />
-          ))}
-        </div>
-      ) : <p className="ds-empty">{empty}</p>}
-      <div className="ds-legend">
-        {items.map(item => (
-          <div key={item.label} className="ds-legend-row">
-            <span className="ds-color-dot" style={{ background: item.color }} />
-            <span>{item.label}</span><strong>{number(item.value)}</strong>
-          </div>
-        ))}
+function Breakdown({ items, empty = "Sin datos en el periodo" }) {
+  const total = items.reduce((acc, item) => acc + item.value, 0);
+  return <>
+    {total ? (
+      <div className="ds-stack" role="img" aria-label={items.map(item=>item.label+": "+item.value).join(", ")}>
+        {items.filter(item => item.value > 0).map(item =>
+          <span key={item.label} style={{ width:100 * item.value / total + "%", background:item.color }} title={item.label+": "+item.value}/>)}
       </div>
-    </>
-  );
+    ) : <p className="ds-empty">{empty}</p>}
+    <div className="ds-legend">
+      {items.map(item => <div className="ds-legend-row" key={item.label}>
+        <span className="ds-color-dot" style={{ background:item.color }} />
+        <span>{item.label}</span><strong>{fmt(item.value)}</strong>
+      </div>)}
+    </div>
+  </>;
 }
-
-function CauseBars({ title, rows }) {
-  const total = rows.reduce((acc, row) => acc + row.value, 0);
-  const top = [...rows].sort((a,b) => b.value - a.value).slice(0, 6);
-  return (
-    <section className="ds-panel">
-      <h2>{title}</h2>
-      {total ? top.map(row => (
-        <div className="ds-cause" key={row.key}>
-          <div className="ds-cause-label"><span>{row.label}</span><strong>{number(row.value)}</strong></div>
-          <div className="ds-track"><i style={{ width: percent(row.value, top[0].value) + "%" }} /></div>
-        </div>
-      )) : <p className="ds-empty">Sin registros en el periodo.</p>}
-    </section>
-  );
+function Bars({ title, rows, unit = "", max = 7 }) {
+  const items = rows.filter(row => Number.isFinite(row.value) && row.value >= 0).sort((a,b)=>b.value-a.value).slice(0,max);
+  const high = Math.max(1, ...items.map(row=>row.value));
+  return <section className="ds-panel">
+    <h2>{title}</h2>
+    {items.some(item => item.value > 0) ? items.map(row => <div className="ds-cause" key={row.label}>
+      <div className="ds-cause-label"><span>{row.label}</span><strong>{fmt(row.value, unit ? 1 : 0)}{unit}</strong></div>
+      <div className="ds-track"><i style={{width:100*row.value/high+"%"}}/></div>
+    </div>) : <p className="ds-empty">Sin registros en el periodo.</p>}
+  </section>;
 }
-
+function Metric({name,value}) {
+  return <article className="ds-kpi"><strong>{value}</strong><span>{name}</span></article>;
+}
 export default function DeliveryStatistics({ state, onBack }) {
-  const [period, setPeriod] = useState("weekly");
-  const [weekId, setWeekId] = useState(state.weeks.at(-1)?.id || "");
-  const [month, setMonth] = useState(state.weeks.at(-1)?.startDate?.slice(0,7) || new Date().toISOString().slice(0,7));
-  const [specialty, setSpecialty] = useState("");
-  const [company, setCompany] = useState("");
-  const [metric, setMetric] = useState("hours");
+  const [period,setPeriod] = useState("weekly");
+  const [weekId,setWeekId] = useState(state.weeks.at(-1)?.id || "");
+  const [month,setMonth] = useState(state.weeks.at(-1)?.startDate?.slice(0,7) || new Date().toISOString().slice(0,7));
+  const [specialty,setSpecialty] = useState("");
+  const [company,setCompany] = useState("");
+  const [metric,setMetric] = useState("hours");
   const [pdfBusy,setPdfBusy] = useState(false);
   const [pdfError,setPdfError] = useState("");
-  const specialties = [...new Set(state.students.map(s => s.specialty).filter(Boolean))].sort();
-  const companies = [...new Set(state.students.map(s => s.company).filter(Boolean))].sort();
-  const display = useMemo(() => {
-    const students = state.students.filter(s =>
-      (!specialty || s.specialty === specialty) && (!company || s.company === company)
-    );
-    const byId = new Map(students.map(s => [s.id, s]));
-    const weeks = state.weeks.filter(w =>
-      period === "all" || (period === "monthly" ? w.startDate?.startsWith(month) : w.id === weekId)
-    ).sort((a,b) => a.startDate.localeCompare(b.startDate));
-    const daily = { laboral: 0, falta: 0, sin_labores: 0, inhabil: 0 };
-    const causes = { falta: new Map(), sin_labores: new Map() };
-    const people = new Map(students.map(s => [s.id, { student: s, minutes: 0, absences: 0, reportedWeeks: 0 }]));
-    const knownUsers = new Set();
-    let totalMinutes = 0;
-    let scannedWeeks = 0;
-    const detail = [];
-    const trend = [];
-    for (const week of weeks) {
-      let weekMinutes = 0, weekDays = 0;
-      for (const [id, delivery] of Object.entries(week.deliveries || {})) {
-        const person = byId.get(id);
-        if (!person || !delivery || delivery.status === "no_aplica") continue;
-        if (delivery.matrixVersion > 0 || delivery.usageSource === "generator") knownUsers.add(id);
-        const summary = summarizeWeekStatistics(delivery.statistics);
-        if (!summary) continue;
-        scannedWeeks++;
-        const individual = people.get(id);
-        individual.minutes += summary.minutes;
-        individual.absences += summary.absent;
-        individual.reportedWeeks++;
-        totalMinutes += summary.minutes;
-        weekMinutes += summary.minutes;
-        weekDays += 4;
-        for (const day of delivery.statistics.entries) {
-          daily[day.status]++;
-          if (day.status === "falta" || day.status === "sin_labores") {
-            const map = causes[day.status];
-            const key = day.reasonCode;
-            map.set(key, (map.get(key) || 0) + 1);
-          }
-        }
-        detail.push({
-          student: person, week: week.label, startDate: week.startDate,
-          minutes: summary.minutes, absences: summary.absent,
-          nonWorking: summary.nonWorking, holidays: summary.holidays,
-          delivery: delivery.status,
-        });
-      }
-      trend.push({ label: week.label, minutes: weekMinutes, days: weekDays });
-    }
-    const population = students.filter(studentIsActive);
-    const used = population.filter(s => knownUsers.has(s.id)).length;
-    const other = population.filter(s => !knownUsers.has(s.id) && weeks.some(w => w.deliveries?.[s.id]?.usageSource === "other")).length;
-    const genderCounts = new Map();
-    for (const student of population) {
-      const key = student.gender || "";
-      genderCounts.set(key, (genderCounts.get(key) || 0) + 1);
-    }
-    const causeRows = type => [...causes[type]].map(([key,value])=>({
-      key, value, label: causeLabel(type, key)
-    }));
-    return {
-      population, daily, totalMinutes, scannedWeeks, trend, detail, people,
-      used, other, unknown: population.length - used - other,
-      genderCounts, causeAbsence: causeRows("falta"), causeNonWorking: causeRows("sin_labores"),
-    };
-  }, [state, period, weekId, month, specialty, company]);
+  const specialties = [...new Set(state.students.map(student=>student.specialty).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+  const companies = [...new Set(state.students.map(student=>student.company).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+  const filters = {period,weekId,month,specialty,company};
 
-  const advanced = useMemo(() => calculateDeliveryStatistics(state,{period,weekId,month,specialty,company}), [state,period,weekId,month,specialty,company]);
-  const lifetime = useMemo(() => calculateDualLifetimeStatistics(state,{specialty,company}), [state,specialty,company]);
-  const fmtHours = value => value == null ? "—" : value.toLocaleString("es-MX",{maximumFractionDigits:1})+" h";
-  async function downloadStatistics(){setPdfBusy(true);setPdfError("");try{await generateStatisticsReportPdf(state,{period,weekId,month,specialty,company});}catch(error){setPdfError(error?.message||"No se pudo generar el PDF.");}finally{setPdfBusy(false);}}
-  const dayItems = [
-    {label:"Con labores",value:display.daily.laboral,color:"#0071e3"},
-    {label:"Faltas",value:display.daily.falta,color:"#e76b6b"},
-    {label:"Sin labores",value:display.daily.sin_labores,color:"#e5a547"},
-    {label:"Días inhábiles",value:display.daily.inhabil,color:"#969eac"},
+  // El panel y el PDF comparten exactamente la misma fuente de estadísticas.
+  const data = useMemo(() => calculateDeliveryStatistics(state,filters),[state,period,weekId,month,specialty,company]);
+  const lifetime = useMemo(() => calculateDualLifetimeStatistics(state,{specialty,company}),[state,specialty,company]);
+  const daily = [
+    {label:"Con labores",value:data.daily.laboral,color:COLORS[0]},
+    {label:"Faltas",value:data.daily.falta,color:COLORS[1]},
+    {label:"Sin labores",value:data.daily.sin_labores,color:COLORS[2]},
+    {label:"Días inhábiles",value:data.daily.inhabil,color:COLORS[3]},
   ];
-  const genders = [
-    {label:genderLabels.male,value:display.genderCounts.get("male") || 0,color:"#0071e3"},
-    {label:genderLabels.female,value:display.genderCounts.get("female") || 0,color:"#e78da1"},
-    {label:genderLabels.nonbinary,value:display.genderCounts.get("nonbinary") || 0,color:"#9a7bdd"},
-    {label:genderLabels.other,value:display.genderCounts.get("other") || 0,color:"#26a69a"},
-    {label:genderLabels.undisclosed,value:display.genderCounts.get("undisclosed") || 0,color:"#c2b6ab"},
-    {label:genderLabels[""],value:display.genderCounts.get("") || 0,color:"#a3a8b0"},
+  const deliveries = [
+    {label:"A tiempo",value:data.delivered,color:COLORS[0]},
+    {label:"A destiempo",value:data.late,color:COLORS[2]},
+    {label:"No entregadas",value:data.notDelivered,color:COLORS[1]},
+    {label:"No aplica",value:data.notApplicable,color:COLORS[3]},
   ];
-  const uses = [
-    {label:"Uso identificado",value:display.used,color:"#0071e3"},
-    {label:"Otro método",value:display.other,color:"#96a7bf"},
-    {label:"Sin información",value:display.unknown,color:"#d9dce2"},
+  const usage = [
+    {label:"Generador",value:data.usage.used,color:COLORS[0]},
+    {label:"Otro método",value:data.usage.other,color:COLORS[5]},
+    {label:"Sin información",value:data.usage.unknown,color:COLORS[3]},
   ];
-  const trend = period === "weekly"
-    ? [
-      ...["Martes","Miércoles","Jueves","Viernes"].map((label, index) => {
-        let minutes = 0;
-        for (const d of display.detail) {
-          const week = state.weeks.find(w => w.label === d.week && w.startDate === d.startDate);
-          const delivery = week?.deliveries?.[state.students.find(s => s.id === d.student.id)?.id];
-          minutes += delivery?.statistics?.entries?.[index]?.minutes || 0;
-        }
-        return {label, minutes};
-      })
-    ]
-    : display.trend;
-  const maxTrend = Math.max(1, ...trend.map(v => v.minutes));
-  const exportStatistics = () => {
-    const rows = [["Alumno","Especialidad","Empresa","Género","Semana","Inicio","Horas","Faltas","Sin labores","Días inhábiles","Entrega"]];
-    for (const row of display.detail) rows.push([
-      row.student.name,row.student.specialty,row.student.company,
-      genderLabels[row.student.gender || ""],row.week,row.startDate,
-      (row.minutes / 60).toFixed(2),row.absences,row.nonWorking,row.holidays,row.delivery,
-    ]);
-    downloadCsv(rows);
+  const genders = Object.entries(data.genderCounts).map(([key,value],index)=>({
+    label:genderLabels[key]||"Sin dato",value,color:COLORS[index%COLORS.length],
+  }));
+  const trend = period==="weekly"
+    ? ["Martes","Miércoles","Jueves","Viernes"].map((label,i)=>({label,minutes:data.dayTrend[i]}))
+    : data.trend.map(row=>({label:row.label,minutes:row.minutes}));
+  const highest = Math.max(1,...trend.map(item=>item.minutes));
+
+  const exportPdf = async () => {
+    if(pdfBusy)return;
+    setPdfError("");setPdfBusy(true);
+    try {await generateStatisticsReportPdf(state,filters);}
+    catch(error){setPdfError(error?.message||"No se pudo generar el PDF.");}
+    finally{setPdfBusy(false);}
   };
-  return (
-    <div className="delivery-analytics-container">
-      <div className="ds-header">
-        <button type="button" className="btn" onClick={onBack}>← Volver</button>
-        <span className="delivery-kicker">Registro de entrega</span>
-        <div className="ds-panel-head"><h1>Estadísticas</h1><button className="btn primary" disabled={pdfBusy||!advanced.weeks.length} type="button" onClick={downloadStatistics}>{pdfBusy?"Generando PDF…":"Descargar PDF"}</button></div>
-        {pdfError&&<p role="alert" className="ds-error">{pdfError}</p>}
+
+  return <div className="delivery-analytics-container">
+    <div className="ds-header">
+      <button className="btn" type="button" onClick={onBack}>← Volver</button>
+      <span className="delivery-kicker">Registro de entrega</span>
+      <div className="ds-panel-head">
+        <h1>Estadísticas</h1>
+        <button className="btn primary" disabled={pdfBusy||!data.weeks.length}
+          type="button" onClick={exportPdf}>{pdfBusy?"Generando PDF…":"Descargar PDF"}</button>
       </div>
-      <div className="ds-controls">
-        <div className="ds-tabs" role="group" aria-label="Periodo">
-          {[["weekly","Semanal"],["monthly","Mensual"],["all","General"]].map(([value,label]) =>
-            <button type="button" key={value} className={period === value ? "active" : ""} onClick={() => setPeriod(value)}>{label}</button>
-          )}
-        </div>
-        {period === "weekly" && <label>Semana
-          <select value={weekId} onChange={e => setWeekId(e.target.value)}>
-            {state.weeks.map(w => <option key={w.id} value={w.id}>{w.label} · {w.startDate}</option>)}
-          </select></label>}
-        {period === "monthly" && <label>Mes <input type="month" value={month} onChange={e=>setMonth(e.target.value)}/></label>}
-        <label>Especialidad
-          <select value={specialty} onChange={e=>setSpecialty(e.target.value)}>
-            <option value="">Todas</option>
-            {specialties.map(x=><option key={x} value={x}>{x}</option>)}
-          </select></label>
-        <label>Empresa
-          <select value={company} onChange={e=>setCompany(e.target.value)}>
-            <option value="">Todas</option>
-            {companies.map(x=><option key={x} value={x}>{x}</option>)}
-          </select></label>
-      </div>
-      <div className="ds-kpis">
-        {[
-          ["Alumnos activos",number(display.population.length)],
-          ["Horas realizadas",number((display.totalMinutes / 60).toFixed(1)) + " h"],
-          ["Jornadas con falta",number(display.daily.falta)],
-          ["Uso identificado",percent(display.used,display.population.length) + "%"],
-        ].map(([label,value]) =>
-          <article className="ds-kpi" key={label}><strong>{value}</strong><span>{label}</span></article>)}
-      </div>
-      <section className="ds-panel">
-        <div className="ds-panel-head">
-          <h2>Actividad de formación</h2>
-          <div className="ds-tabs small">
-            <button type="button" onClick={() => setMetric("hours")} className={metric==="hours"?"active":""}>Horas</button>
-            <button type="button" onClick={() => setMetric("days")} className={metric==="days"?"active":""}>Jornadas</button>
-          </div>
-        </div>
-        {metric === "hours" ? (
-          <>
-            <div className="ds-feature-number">{number((display.totalMinutes/60).toFixed(1))} h</div>
-            <div className="ds-columns">
-              {trend.map((item,i) => (
-                <div className="ds-column" key={i}>
-                  <strong>{item.minutes ? number((item.minutes / 60).toFixed(1))+" h" : "0"}</strong>
-                  <div className="ds-column-track"><span style={{height: percent(item.minutes,maxTrend) + "%"}} /></div>
-                  <small>{item.label}</small>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : <Breakdown items={dayItems}/>}
-        {!display.scannedWeeks && <p className="ds-empty">Aún no hay jornadas con datos estadísticos para este periodo.</p>}
-      </section>
-      <div className="ds-two-column">
-        <section className="ds-panel"><h2>Asistencia y jornadas</h2><Breakdown items={dayItems}/></section>
-        <CauseBars title="Motivos de inasistencia" rows={display.causeAbsence}/>
-        <CauseBars title="Días sin labores" rows={display.causeNonWorking}/>
-        <section className="ds-panel"><h2>Utilización del sistema</h2><Breakdown items={uses}/></section>
-        <section className="ds-panel"><h2>Género del alumnado</h2><Breakdown items={genders}/></section>
-      </div>
-      <div className="ds-two-column">
-        <section className="ds-panel"><h2>Entregas</h2>
-          <div className="ds-legend">
-            {[
-              ["A tiempo",advanced.delivered],
-              ["A destiempo",advanced.late],
-              ["No entregadas",advanced.notDelivered],
-              ["No aplica",advanced.notApplicable],
-            ].map(([label,value])=><div key={label} className="ds-legend-row"><span>{label}</span><strong>{number(value)}</strong></div>)}
-          </div>
-        </section>
-        <CauseBars title="Horas por especialidad" rows={advanced.bySpecialty.map(x=>({key:x.label,label:x.label,value:Number((x.minutes/60).toFixed(1))}))}/>
-        <CauseBars title="Horas por empresa" rows={advanced.byCompany.map(x=>({key:x.label,label:x.label,value:Number((x.minutes/60).toFixed(1))}))}/>
-      </div>
-      <div className="ds-kpis ds-small-kpis">
-        {[
-          ["Cumplimiento",advanced.deliveryRate+"%"],
-          ["Entregas puntuales",advanced.onTimeRate+"%"],
-          ["Asistencia",advanced.attendanceRate+"%"],
-          ["Cobertura de datos",advanced.coverage+"%"],
-          ["Horas por bitácora",number(advanced.avgHours.toFixed(1))+" h"],
-          ["Bitácoras con datos",number(advanced.weeksWithStatistics)]
-        ].map(([label,value])=><article className="ds-kpi" key={label}><strong>{value}</strong><span>{label}</span></article>)}
-      </div>
-      <section className="ds-lifetime" aria-label="Acumulado de Educación Dual">
-        <div className="ds-lifetime-heading">
-          <div><span className="delivery-kicker">Histórico · todas las semanas</span><h2>Acumulado de Educación Dual</h2></div>
-          <span className="ds-lifetime-caption">{lifetime.studentsWithData} alumnos con horas registradas</span>
-        </div>
-        <div className="ds-kpis ds-lifetime-kpis">
-          {[
-            ["Horas totales",fmtHours(lifetime.totalHours)],
-            ["Promedio por alumno",fmtHours(lifetime.averageHours)],
-            ["Mínimo",fmtHours(lifetime.minHours)],
-            ["Máximo",fmtHours(lifetime.maxHours)],
-            ["Rango",fmtHours(lifetime.rangeHours)],
-            ["Mediana",fmtHours(lifetime.medianHours)]
-          ].map(([label,value])=><article className="ds-kpi" key={label}><strong>{value}</strong><span>{label}</span></article>)}
-        </div>
-        <div className="ds-two-column">
-          <section className="ds-panel">
-            <h2>Proporción por especialidad</h2>
-            <p className="ds-lifetime-caption">Alumnos activos · {lifetime.activeStudents} en total</p>
-            {lifetime.bySpecialty.filter(item => item.students > 0).length ?
-              lifetime.bySpecialty.filter(item => item.students > 0).map(item=>
-                <div className="ds-specialty-row" key={item.label}>
-                  <div className="ds-specialty-heading"><span>{item.label}</span><strong>{item.proportion.toLocaleString("es-MX",{maximumFractionDigits:1})}%</strong></div>
-                  <div className="ds-track"><i style={{width:item.proportion+"%"}}/></div>
-                  <span className="ds-lifetime-caption">{item.students} alumnos</span>
-                </div>) : <p className="ds-empty">Sin alumnos activos en esta selección.</p>}
-          </section>
-          <section className="ds-panel">
-            <h2>Horas acumuladas por especialidad</h2>
-            <p className="ds-lifetime-caption">Todas las entregas con jornadas registradas</p>
-            {lifetime.bySpecialty.filter(item => item.minutes > 0).length ?
-              lifetime.bySpecialty.filter(item => item.minutes > 0).map(item=>
-                <div className="ds-specialty-row" key={item.label}>
-                  <div className="ds-specialty-heading"><span>{item.label}</span><strong>{fmtHours(item.hours)}</strong></div>
-                  <div className="ds-track"><i style={{width:item.hoursProportion+"%"}}/></div>
-                  <span className="ds-lifetime-caption">{item.hoursProportion.toLocaleString("es-MX",{maximumFractionDigits:1})}% de las horas</span>
-                </div>) : <p className="ds-empty">Sin horas registradas en esta selección.</p>}
-          </section>
-        </div>
-        <p className="ds-lifetime-caption">El promedio, mínimo, máximo, rango y mediana se calculan sobre los alumnos con al menos una semana de datos. Los códigos antiguos sin horas no se consideran como cero. El histórico no cambia al elegir un mes o una semana.</p>
-      </section>
+      {pdfError && <p className="ds-error" role="alert">{pdfError}</p>}
     </div>
-  );
+
+    <div className="ds-controls">
+      <div className="ds-tabs" role="group" aria-label="Periodo">
+        {[["weekly","Semanal"],["monthly","Mensual"],["all","General"]].map(([value,label])=>
+          <button type="button" key={value} className={period===value?"active":""}
+            aria-pressed={period===value} onClick={()=>setPeriod(value)}>{label}</button>)}
+      </div>
+      {period==="weekly" && <label>Semana
+        <select value={weekId} onChange={event=>setWeekId(event.target.value)}>
+          {state.weeks.map(week=><option key={week.id} value={week.id}>{week.label} · {week.startDate}</option>)}
+        </select></label>}
+      {period==="monthly" && <label>Mes
+        <input type="month" value={month} onChange={event=>setMonth(event.target.value)}/>
+      </label>}
+      <label>Especialidad
+        <select value={specialty} onChange={event=>setSpecialty(event.target.value)}>
+          <option value="">Todas</option>{specialties.map(value=><option key={value}>{value}</option>)}
+        </select>
+      </label>
+      <label>Empresa
+        <select value={company} onChange={event=>setCompany(event.target.value)}>
+          <option value="">Todas</option>{companies.map(value=><option key={value}>{value}</option>)}
+        </select>
+      </label>
+    </div>
+
+    <div className="ds-kpis">
+      <Metric name="Alumnos activos" value={fmt(data.students.length)}/>
+      <Metric name="Horas registradas" value={hours(data.totalMinutes/60)}/>
+      <Metric name="Jornadas con falta" value={fmt(data.daily.falta)}/>
+      <Metric name="Uso identificado" value={percent(data.usage.used,data.students.length)+"%"}/>
+    </div>
+    <section className="ds-panel">
+      <div className="ds-panel-head">
+        <h2>Actividad de formación</h2>
+        <div className="ds-tabs small" role="group" aria-label="Visualización">
+          <button type="button" className={metric==="hours"?"active":""} aria-pressed={metric==="hours"} onClick={()=>setMetric("hours")}>Horas</button>
+          <button type="button" className={metric==="days"?"active":""} aria-pressed={metric==="days"} onClick={()=>setMetric("days")}>Jornadas</button>
+        </div>
+      </div>
+      {metric==="hours" ? <>
+        <div className="ds-feature-number">{hours(data.totalMinutes/60)}</div>
+        <div className="ds-columns">
+          {trend.map((row,i)=><div className="ds-column" key={row.label+i}>
+            <strong>{hours(row.minutes/60)}</strong>
+            <div className="ds-column-track"><span style={{height:100*row.minutes/highest+"%"}}/></div>
+            <small>{row.label}</small>
+          </div>)}
+        </div>
+      </> : <Breakdown items={daily}/>}
+      {!data.weeksWithStatistics && <p className="ds-empty">Sin jornadas capturadas en este periodo.</p>}
+    </section>
+
+    <div className="ds-two-column">
+      <section className="ds-panel"><h2>Asistencia y jornadas</h2><Breakdown items={daily}/></section>
+      <section className="ds-panel"><h2>Entregas</h2><Breakdown items={deliveries}/></section>
+      <Bars title="Motivos de inasistencia" rows={data.causesAbsence.map(item=>({label:item.label,value:item.count}))}/>
+      <Bars title="Días sin labores" rows={data.causesNonWorking.map(item=>({label:item.label,value:item.count}))}/>
+      <section className="ds-panel"><h2>Utilización del generador</h2><Breakdown items={usage}/></section>
+      <section className="ds-panel"><h2>Género del alumnado</h2><Breakdown items={genders}/></section>
+      <Bars title="Horas por especialidad" unit=" h" rows={data.bySpecialty.map(item=>({label:item.label,value:item.minutes/60}))}/>
+      <Bars title="Horas por empresa" unit=" h" rows={data.byCompany.map(item=>({label:item.label,value:item.minutes/60}))}/>
+    </div>
+    <div className="ds-kpis ds-small-kpis">
+      <Metric name="Cumplimiento de entrega" value={data.deliveryRate+"%"}/>
+      <Metric name="Entregas puntuales" value={data.onTimeRate+"%"}/>
+      <Metric name="Asistencia" value={data.attendanceRate+"%"}/>
+      <Metric name="Cobertura de jornadas" value={data.coverage+"%"}/>
+      <Metric name="Horas por registro con datos" value={hours(data.avgHours)}/>
+      <Metric name="Registros con jornadas" value={fmt(data.weeksWithStatistics)}/>
+    </div>
+    {data.pendingWithStatistics>0 && <section className="ds-panel ds-pending-hours">
+      <h2>Jornadas pendientes de entrega</h2>
+      <p>{fmt(data.pendingWithStatistics)} registros «No entregado» tienen horas capturadas ({hours(data.pendingMinutes/60)}). Las bitácoras siguen contando como pendientes.</p>
+    </section>}
+
+    <section className="ds-lifetime" aria-label="Acumulado de Educación Dual">
+      <div className="ds-lifetime-heading">
+        <div><span className="delivery-kicker">Histórico · todas las semanas</span><h2>Acumulado de Educación Dual</h2></div>
+        <span className="ds-lifetime-caption">{fmt(lifetime.studentsWithData)} alumnos con datos</span>
+      </div>
+      <div className="ds-kpis ds-lifetime-kpis">
+        {[
+          ["Horas totales",hours(lifetime.totalHours)],
+          ["Promedio por alumno",hours(lifetime.averageHours)],
+          ["Mínimo",hours(lifetime.minHours)],
+          ["Máximo",hours(lifetime.maxHours)],
+          ["Rango",hours(lifetime.rangeHours)],
+          ["Mediana",hours(lifetime.medianHours)],
+        ].map(([name,value])=><Metric name={name} value={value} key={name}/>)}
+      </div>
+      <div className="ds-two-column">
+        <section className="ds-panel">
+          <h2>Proporción por especialidad</h2>
+          <p className="ds-lifetime-caption">{fmt(lifetime.activeStudents)} alumnos activos</p>
+          {lifetime.bySpecialty.filter(item=>item.students>0).length ?
+            lifetime.bySpecialty.filter(item=>item.students>0).map(item=><div className="ds-specialty-row" key={item.label}>
+              <div className="ds-specialty-heading"><span>{item.label}</span><strong>{fmt(item.proportion,1)}%</strong></div>
+              <div className="ds-track"><i style={{width:item.proportion+"%"}}/></div>
+              <span className="ds-lifetime-caption">{fmt(item.students)} alumnos</span>
+            </div>) : <p className="ds-empty">Sin alumnos activos en esta selección.</p>}
+        </section>
+        <section className="ds-panel">
+          <h2>Horas por especialidad · histórico</h2>
+          <p className="ds-lifetime-caption">Todas las jornadas capturadas</p>
+          {lifetime.bySpecialty.filter(item=>item.minutes>0).length ?
+            lifetime.bySpecialty.filter(item=>item.minutes>0).map(item=><div className="ds-specialty-row" key={item.label}>
+              <div className="ds-specialty-heading"><span>{item.label}</span><strong>{hours(item.hours)}</strong></div>
+              <div className="ds-track"><i style={{width:item.hoursProportion+"%"}}/></div>
+              <span className="ds-lifetime-caption">{fmt(item.hoursProportion,1)}% de las horas</span>
+            </div>) : <p className="ds-empty">Sin horas capturadas en esta selección.</p>}
+        </section>
+      </div>
+      <p className="ds-lifetime-caption">Los códigos antiguos sin horas no se cuentan como cero. El histórico incluye las jornadas registradas de alumnos desistidos y de entregas pendientes; cambiar semana o mes no altera este acumulado.</p>
+    </section>
+  </div>;
 }
