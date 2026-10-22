@@ -24,7 +24,7 @@ README.md
 Durante la etapa beta se utiliza:
 
 ```text
-0.50.0-beta.N
+0.51.0-beta.N
 ```
 
 `N` aumenta de forma consecutiva con cada publicación integrada a `main`.
@@ -56,7 +56,7 @@ Cada entrada debe indicar:
 Ejemplo:
 
 ```md
-## 0.50.0-beta.XX · Registro de entrega · 2026-10-01
+## 0.51.0-beta.XX · Registro de entrega · 2026-10-01
 
 - Se añade ...
 - Se corrige ...
