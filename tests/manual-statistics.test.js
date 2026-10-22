@@ -26,7 +26,7 @@ describe("captura manual de estadísticas",()=>{
     const saved=sanitizeDeliveryState({schemaVersion:8,students:[st],weeks:[week]});
     const delivery=saved.weeks[0].deliveries[st.id];
     expect(saved.schemaVersion).toBe(9);
-    expect(saved.students[0].semesterGroup).toBe("5°A");
+    expect(saved.students[0].group).toBe("A");
     expect(delivery.usageSource).toBe("other");
     expect(delivery.statistics.entries[1].status).toBe("falta");
   });
