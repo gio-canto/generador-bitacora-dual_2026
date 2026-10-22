@@ -1,4 +1,4 @@
-import {studentIsActive,studentAppliesToWeek} from "./delivery-registry.js";
+import {studentIsActive,studentAppliesToWeek,deliveryStatus} from "./delivery-registry.js";
 import {summarizeWeekStatistics,causeLabel} from "./matrix-statistics.js";
 export const percent = (value,total) => total ? Math.round(value/total*100) : 0;
 const makeCounts=()=>({laboral:0,falta:0,sin_labores:0,inhabil:0});
@@ -22,6 +22,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
   const daily=makeCounts(),causes={falta:new Map(),sin_labores:new Map()};
   const methods=new Map(), trend=[];
   let totalMinutes=0, weeksWithStatistics=0,delivered=0,late=0,notDelivered=0,notApplicable=0,applicable=0;
+  let pendingWithStatistics=0, pendingMinutes=0;
   let reportCount=0;
   const dayTrend=[0,0,0,0];
   const receivedCompanies=[],receivedSpecialties=[];
@@ -30,11 +31,15 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
     for(const student of roster){
       if(!studentAppliesToWeek(student,week))continue;
       const delivery=week.deliveries?.[student.id];
-      if(delivery?.status==="no_aplica"){notApplicable++;continue;}
+      const status=deliveryStatus(week,student.id);
+      if(status==="no_aplica"){notApplicable++;continue;}
       applicable++;
-      if(!delivery){notDelivered++;continue;}
-      if(delivery.status==="entregado_tarde")late++;
-      else if(delivery.status==="entregado")delivered++;
+      if(status==="no_entregado")notDelivered++;
+      else if(status==="entregado_tarde")late++;
+      else if(status==="entregado")delivered++;
+      // Un alumno sin entrega sigue sin bitácora; solamente jornadas
+      // capturadas explícitamente pueden aportar horas estadísticas.
+      if(!delivery)continue;
       const scanned=delivery.source==="camera" && Number.isInteger(delivery.matrixVersion) && delivery.matrixVersion>0;
       const source=scanned||delivery.usageSource==="generator"||delivery.matrixVersion>0?"generator"
         :delivery.usageSource==="other"?"other":"unknown";
@@ -44,6 +49,10 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
       if(!summary)continue;
       weeksWithStatistics++;reportCount++;weekReports++;
       totalMinutes+=summary.minutes;weekMinutes+=summary.minutes;
+      if(status==="no_entregado"){
+        pendingWithStatistics++;
+        pendingMinutes+=summary.minutes;
+      }
       for(let index=0;index<4;index++){
         const day=delivery.statistics.entries[index];
         daily[day.status]++;
@@ -68,11 +77,12 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
   return {
     roster,students,weeks,trend,dayTrend,daily,totalMinutes,
     weeksWithStatistics,reportCount,applicable,delivered,late,notDelivered,notApplicable,
+    pendingWithStatistics,pendingMinutes,
     usage:{used,other,unknown:students.length-used-other},
     genderCounts, causesAbsence:breakdown(causes.falta,"falta"),causesNonWorking:breakdown(causes.sin_labores,"sin_labores"),
     byCompany:groupMinutes("company",receivedCompanies),
     bySpecialty:groupMinutes("specialty",receivedSpecialties),
-    coverage:percent(weeksWithStatistics,delivered+late),
+    coverage:percent(weeksWithStatistics,applicable),
     onTimeRate:percent(delivered,applicable),
     deliveryRate:percent(delivered+late,applicable),
     attendanceRate:percent(daily.laboral,daily.laboral+daily.falta),
@@ -107,7 +117,7 @@ export function calculateDualLifetimeStatistics(state, {specialty = "", company 
   for (const week of state.weeks || []) {
     for (const [studentId, delivery] of Object.entries(week.deliveries || {})) {
       if (!byId.has(studentId) || !delivery || delivery.status === "no_aplica" ||
-          !["entregado", "entregado_tarde"].includes(delivery.status)) continue;
+          !["entregado", "entregado_tarde", "no_entregado"].includes(delivery.status)) continue;
       const stats = summarizeWeekStatistics(delivery.statistics);
       if (!stats) continue;
       const period = week.startDate || week.id;
