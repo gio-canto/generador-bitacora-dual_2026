@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.52.0-beta.1 · Registro manual, importación y PDF estadístico · 2026-10-22
+
+- Se corrige el regreso indebido a la configuración inicial al gestionar alumnos; la administración ofrece regreso directo a la sección anterior, sin reiniciar el asistente.
+- Las entregas manuales permiten registrar método de elaboración (Generador de Bitácora Dual u otro), estados diarios, horas y códigos de causas; se pueden corregir sin inventar estadísticas de códigos antiguos.
+- La utilización del generador se calcula con Data Matrix identificados o confirmación del método al registrar manualmente la entrega. Se descarta la inferencia por datos del padrón.
+- Se elimina el apartado individual de Alumnos del panel de estadísticas y se añaden cumplimiento, puntualidad, asistencia, cobertura de datos, promedio de horas y desgloses por especialidad y empresa.
+- Las estadísticas generan PDF institucional descargable usando Blob, JPEG y el generador PDF existente. Se elimina la acción Imprimir / PDF.
+- Se amplía la importación Excel/CSV para detectar encabezados escolares precedidos por portada, título y celdas combinadas; incluye revisión previa de altas, actualizaciones, duplicados y filas omitidas.
+- El padrón almacena semestre y grupo. El esquema local migra de v8 a v9 sin borrar registros históricos; se añaden pruebas de migración y cálculos manuales.
+- Se actualizan referencias de versión, documentación y pruebas.
+
+
 ## 0.51.0-beta.1 · Estadísticas de Educación Dual · 2026-10-22
 
 - El Data Matrix conserva BD26|4 y añade un bloque S5 de 10 bytes con los cuatro estados de jornada, minutos y códigos de causas, sin textos de justificaciones ni género.

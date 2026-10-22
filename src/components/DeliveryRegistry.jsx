@@ -45,6 +45,7 @@ import {
   readDeliveryState,
   reactivateStudent,
   registerDelivery,
+  saveManualDelivery,
   removeDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
@@ -56,6 +57,8 @@ import {
 } from "../services/delivery-registry.js";
 import { VERSION } from "../domain/records.js";
 import DeliveryStatistics from "./DeliveryStatistics.jsx";
+import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
+import { parseStudentSpreadsheet } from "../services/student-spreadsheet.js";
 import { generateDeliveryReportPdf } from "../services/delivery-report.js";
 import {
   createScannerIssue,
@@ -396,12 +399,17 @@ export default function DeliveryRegistry({ onClose }) {
     createRegistryContext(initialState.context),
   );
   const [setupStep, setSetupStep] = useState(0);
+  const [setupIntent,setSetupIntent] = useState(initiallyStarted ? "manage" : "onboarding");
+  const [setupReturnView,setSetupReturnView] = useState("home");
+  const [importPreview,setImportPreview] = useState(null);
+  const [manualTarget,setManualTarget] = useState(null);
   const [tutorialStep, setTutorialStep] = useState(0);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [studentForm, setStudentForm] = useState({
     name: "",
     specialty: "",
     company: "",
+    semesterGroup: "",
     gender: "",
     usageMode: "unknown",
   });
@@ -1275,6 +1283,8 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const startSetup = () => {
+    setSetupIntent("onboarding");
+    setSetupReturnView("home");
     setContextForm(createRegistryContext(state.context));
     setSetupStep(0);
     setView("setup");
@@ -1328,29 +1338,25 @@ export default function DeliveryRegistry({ onClose }) {
     try {
       if (!window.XLSX) throw new Error("No se pudo cargar el lector de Excel.");
       const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = window.XLSX.utils.sheet_to_json(sheet, { defval: "" });
-      const incoming = spreadsheetRowsToStudents(rows);
-      if (!incoming.length)
-        throw new Error("No se encontraron nombres de alumnos en la primera hoja.");
-      const merged = mergeStudents(state.students, incoming);
-      commit({ ...state, students: merged.students });
+      const sheets = workbook.SheetNames.map(name =>
+        window.XLSX.utils.sheet_to_json(workbook.Sheets[name], {header:1,defval:"",raw:false,blankrows:false})
+      );
+      let parsed=null;
+      for(const rows of sheets){try{parsed=parseStudentSpreadsheet(rows);break;}catch{}}
+      if(!parsed)throw Error("No se encontró una tabla con Nombre del alumno, Especialidad y Dependencia.");
+      setImportPreview({parsed,result:mergeStudents(state.students,parsed.students)});
       clearNotice();
-      notify(
-        "success",
-        "Alumnos importados",
-        merged.added +
-          " nuevos · " +
-          merged.updated +
-          " actualizados",
-      );
-    } catch (error) {
-      showNotice(
-        "error",
-        "No se pudo importar la lista",
-        error?.message || "Revisa el archivo e inténtalo otra vez.",
-      );
+    } catch(error){
+      showNotice("error","No se pudo importar la lista",error?.message||"Revisa el archivo.");
     }
+  };
+  const confirmSpreadsheetImport = () => {
+    if(!importPreview)return;
+    const {parsed,result}=importPreview;
+    commit({...state,students:result.students});
+    setImportPreview(null);
+    notify("success","Alumnos importados",result.added+" nuevos · "+result.updated+" actualizados");
+    if(parsed.warnings.length)showNotice("info","Alumnos importados",parsed.warnings.length+" filas omitidas.");
   };
 
   const addStudent = (event) => {
@@ -1359,6 +1365,7 @@ export default function DeliveryRegistry({ onClose }) {
       name: String(studentForm.name || "").replace(/\s+/g, " ").trim(),
       specialty: String(studentForm.specialty || "").trim(),
       company: String(studentForm.company || "").trim(),
+      semesterGroup: String(studentForm.semesterGroup || "").trim(),
       gender: studentForm.gender || "",
       usageMode: studentForm.usageMode || "unknown",
     };
@@ -1396,7 +1403,7 @@ export default function DeliveryRegistry({ onClose }) {
         ),
       });
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
       clearNotice();
       notify("success", "Alumno actualizado", nextStudent.name);
       return;
@@ -1404,7 +1411,7 @@ export default function DeliveryRegistry({ onClose }) {
 
     const merged = mergeStudents(state.students, [nextStudent]);
     commit({ ...state, students: merged.students });
-    setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
+    setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
     clearNotice();
     if (merged.added)
       notify("success", "Alumno agregado", nextStudent.name);
@@ -1417,11 +1424,14 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const editStudent = (student) => {
+    setSetupReturnView(view === "week" ? "week" : "home");
+    setSetupIntent("manage");
     setEditingStudentId(student.id);
     setStudentForm({
       name: student.name || "",
       specialty: student.specialty || "",
       company: student.company || "",
+      semesterGroup: student.semesterGroup || "",
       gender: student.gender || "",
       usageMode: student.usageMode || "unknown",
     });
@@ -1443,7 +1453,7 @@ export default function DeliveryRegistry({ onClose }) {
     setStudentActionId("");
     if (editingStudentId === studentId) {
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
     }
     clearNotice();
     notify(
@@ -1490,7 +1500,7 @@ export default function DeliveryRegistry({ onClose }) {
     setStudentActionId("");
     if (editingStudentId === studentId) {
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
     }
     clearNotice();
     notify("info", "Alumno eliminado definitivamente", studentName);
@@ -1555,6 +1565,10 @@ export default function DeliveryRegistry({ onClose }) {
 
   const setManualStatus = (studentId, status) => {
     if (!activeWeek || activeWeek.closedAt) return;
+    if (status === "entregado" || status === "entregado_tarde") {
+      setManualTarget({studentId,status});
+      return;
+    }
     const student = state.students.find((item) => item.id === studentId);
     commit({
       ...state,
@@ -1579,6 +1593,15 @@ export default function DeliveryRegistry({ onClose }) {
     );
   };
 
+  const commitManualEntry = ({status,usageSource,statistics}) => {
+    if(!manualTarget||!activeWeek||activeWeek.closedAt)return;
+    const next=state.weeks.map(week=>week.id===activeWeek.id
+      ?saveManualDelivery(week,manualTarget.studentId,status,{usageSource,statistics})
+      :week);
+    commit({...state,weeks:next});
+    notify("success","Registro manual guardado",state.students.find(student=>student.id===manualTarget.studentId)?.name||"");
+    setManualTarget(null);
+  };
   const startDueAtEdit = () => {
     if (!activeWeek) return;
     if (activeWeek.closedAt) {
@@ -1907,6 +1930,7 @@ export default function DeliveryRegistry({ onClose }) {
           )}
         </div>
         <div className="delivery-row-actions">
+          <button className="btn" type="button" title="Horas y método" aria-label={"Editar estadísticas de " + student.name} disabled={Boolean(week.closedAt)} onClick={() => setManualTarget({studentId:student.id})}><ChartBar size={18}/></button>
           <button
             className="btn"
             type="button"
@@ -2004,6 +2028,7 @@ export default function DeliveryRegistry({ onClose }) {
       </header>
 
       <main className="delivery-shell">
+        {started && !["home","welcome","scanner","setup"].includes(view) && <div className="delivery-backline"><button type="button" className="btn" onClick={()=>setView("home")}><ArrowLeft size={17}/> Inicio</button></div>}
         {view === "welcome" && (
           <section className="delivery-welcome">
             <div className="delivery-welcome-copy">
@@ -2064,10 +2089,11 @@ export default function DeliveryRegistry({ onClose }) {
 
         {view === "setup" && (
           <section className="delivery-setup">
+            {setupIntent==="manage" && <div className="delivery-backline"><button type="button" className="btn" onClick={()=>{setEditingStudentId("");setView(setupReturnView);}}><ArrowLeft size={17}/> {setupReturnView==="week"?"Volver a semana":"Inicio"}</button></div>}
             <div className="delivery-setup-head">
               <div>
                 <span className="delivery-kicker">
-                  Configuración · {setupStep + 1} de 3
+                  {setupIntent==="onboarding"?"Configuración · "+(setupStep+1)+" de 3":"Administración"}
                 </span>
                 <h1>
                   {setupStep === 0
@@ -2077,11 +2103,11 @@ export default function DeliveryRegistry({ onClose }) {
                       : "Semana"}
                 </h1>
               </div>
-              <div className="delivery-setup-progress">
+              {setupIntent==="onboarding" && <div className="delivery-setup-progress">
                 <i className="active" />
                 <i className={setupStep >= 1 ? "active" : ""} />
                 <i className={setupStep >= 2 ? "active" : ""} />
-              </div>
+              </div>}
             </div>
 
             {setupStep === 0 && (
@@ -2167,7 +2193,7 @@ export default function DeliveryRegistry({ onClose }) {
 
                 <label className="delivery-action-tile delivery-import-single">
                   <FileXls size={34} />
-                  <strong>Importar Excel o CSV</strong>
+                  <strong>Importar lista de alumnos</strong>
                   <input
                     hidden
                     type="file"
@@ -2231,6 +2257,7 @@ export default function DeliveryRegistry({ onClose }) {
                       ))}
                     </select>
                   </label>
+                  <label className="delivery-field"><span>Semestre y grupo</span><input value={studentForm.semesterGroup || ""} maxLength={30} placeholder="5°A" onChange={event=>setStudentForm({...studentForm,semesterGroup:event.target.value})}/></label>
                   <label className="delivery-field">
                     <span>Género</span>
                     <select
@@ -2243,16 +2270,6 @@ export default function DeliveryRegistry({ onClose }) {
                       <option value="nonbinary">No binario</option>
                       <option value="other">Otro</option>
                       <option value="undisclosed">Prefiero no responder</option>
-                    </select>
-                  </label>
-                  <label className="delivery-field">
-                    <span>Uso del generador</span>
-                    <select
-                      value={studentForm.usageMode || "unknown"}
-                      onChange={(event) => setStudentForm({ ...studentForm, usageMode: event.target.value })}
-                    >
-                      <option value="unknown">Sin información</option>
-                      <option value="other">Otro método</option>
                     </select>
                   </label>
                   <button className="btn primary delivery-form-submit" type="submit">
@@ -2273,6 +2290,7 @@ export default function DeliveryRegistry({ onClose }) {
                           name: "",
                           specialty: "",
                           company: "",
+                          semesterGroup: "",
                           gender: "",
                           usageMode: "unknown",
                         });
@@ -2391,17 +2409,17 @@ export default function DeliveryRegistry({ onClose }) {
                   <button
                     className="btn"
                     type="button"
-                    onClick={() => setSetupStep(0)}
+                    onClick={() => setupIntent==="manage" ? setView(setupReturnView) : setSetupStep(0)}
                   >
-                    Atrás
+                    {setupIntent==="manage"?"Volver":"Atrás"}
                   </button>
                   <button
                     className="btn primary"
                     type="button"
-                    disabled={!activeStudents.length}
-                    onClick={() => setSetupStep(2)}
+                    disabled={setupIntent==="onboarding" && !activeStudents.length}
+                    onClick={() => setupIntent==="manage" ? setView(setupReturnView) : setSetupStep(2)}
                   >
-                    Continuar
+                    {setupIntent==="manage"?"Listo":"Continuar"}
                     <ArrowRight size={17} />
                   </button>
                 </div>
@@ -2497,6 +2515,8 @@ export default function DeliveryRegistry({ onClose }) {
                   className="btn"
                   type="button"
                   onClick={() => {
+                    setSetupIntent("manage");
+                    setSetupReturnView("home");
                     setContextForm(state.context);
                     setSetupStep(1);
                     setView("setup");
@@ -3263,6 +3283,32 @@ export default function DeliveryRegistry({ onClose }) {
         </div>
       )}
 
+      {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
+        <ManualDeliveryDialog
+          key={activeWeek.id+":"+manualTarget.studentId}
+          week={activeWeek}
+          student={state.students.find(student=>student.id===manualTarget.studentId)}
+          previous={activeWeek.deliveries?.[manualTarget.studentId]}
+          initialStatus={manualTarget.status}
+          onCancel={()=>setManualTarget(null)}
+          onSave={commitManualEntry}
+        />
+      )}
+      {importPreview && (
+        <div className="delivery-manual-overlay" role="presentation">
+          <section className="delivery-manual-card" role="dialog" aria-modal="true" aria-label="Revisar importación">
+            <div className="delivery-manual-heading"><div><span className="delivery-kicker">Importación</span><h2>Revisar lista</h2></div></div>
+            <div className="delivery-import-summary"><strong>{importPreview.parsed.students.length} alumnos encontrados</strong>
+              <span>{importPreview.result.added} nuevos · {importPreview.result.updated} actualizados · {importPreview.parsed.warnings.length} filas omitidas</span>
+            </div>
+            <div className="delivery-import-preview">
+              {importPreview.parsed.students.slice(0,8).map((item,i)=><div key={i}><strong>{item.name}</strong><span>{[item.semesterGroup,item.specialty,item.company].filter(Boolean).join(" · ")}</span></div>)}
+            </div>
+            {importPreview.parsed.warnings.length>0 && <p className="ds-error">{importPreview.parsed.warnings.length} filas se omitirán por duplicados o datos incompletos.</p>}
+            <div className="delivery-manual-actions"><button className="btn" type="button" onClick={()=>setImportPreview(null)}>Cancelar</button><button className="btn primary" type="button" onClick={confirmSpreadsheetImport}>Importar alumnos</button></div>
+          </section>
+        </div>
+      )}
       {reportOpen && (
         <div
           className="delivery-report-overlay"

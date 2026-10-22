@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { summarizeWeekStatistics, causeLabel } from "../services/matrix-statistics.js";
+import { calculateDeliveryStatistics } from "../services/statistics.js";
+import { generateStatisticsReportPdf } from "../services/statistics-report.js";
 import { studentIsActive } from "../services/delivery-registry.js";
 import "../delivery-statistics.css";
 
@@ -73,6 +75,8 @@ export default function DeliveryStatistics({ state, onBack }) {
   const [specialty, setSpecialty] = useState("");
   const [company, setCompany] = useState("");
   const [metric, setMetric] = useState("hours");
+  const [pdfBusy,setPdfBusy] = useState(false);
+  const [pdfError,setPdfError] = useState("");
   const specialties = [...new Set(state.students.map(s => s.specialty).filter(Boolean))].sort();
   const companies = [...new Set(state.students.map(s => s.company).filter(Boolean))].sort();
   const display = useMemo(() => {
@@ -96,7 +100,7 @@ export default function DeliveryStatistics({ state, onBack }) {
       for (const [id, delivery] of Object.entries(week.deliveries || {})) {
         const person = byId.get(id);
         if (!person || !delivery || delivery.status === "no_aplica") continue;
-        if (delivery.matrixVersion > 0) knownUsers.add(id);
+        if (delivery.matrixVersion > 0 || delivery.usageSource === "generator") knownUsers.add(id);
         const summary = summarizeWeekStatistics(delivery.statistics);
         if (!summary) continue;
         scannedWeeks++;
@@ -126,7 +130,7 @@ export default function DeliveryStatistics({ state, onBack }) {
     }
     const population = students.filter(studentIsActive);
     const used = population.filter(s => knownUsers.has(s.id)).length;
-    const other = population.filter(s => s.usageMode === "other" && !knownUsers.has(s.id)).length;
+    const other = population.filter(s => !knownUsers.has(s.id) && weeks.some(w => w.deliveries?.[s.id]?.usageSource === "other")).length;
     const genderCounts = new Map();
     for (const student of population) {
       const key = student.gender || "";
@@ -142,6 +146,8 @@ export default function DeliveryStatistics({ state, onBack }) {
     };
   }, [state, period, weekId, month, specialty, company]);
 
+  const advanced = useMemo(() => calculateDeliveryStatistics(state,{period,weekId,month,specialty,company}), [state,period,weekId,month,specialty,company]);
+  async function downloadStatistics(){setPdfBusy(true);setPdfError("");try{await generateStatisticsReportPdf(state,{period,weekId,month,specialty,company});}catch(error){setPdfError(error?.message||"No se pudo generar el PDF.");}finally{setPdfBusy(false);}}
   const dayItems = [
     {label:"Con labores",value:display.daily.laboral,color:"#0071e3"},
     {label:"Faltas",value:display.daily.falta,color:"#e76b6b"},
@@ -189,7 +195,8 @@ export default function DeliveryStatistics({ state, onBack }) {
       <div className="ds-header">
         <button type="button" className="btn" onClick={onBack}>← Volver</button>
         <span className="delivery-kicker">Registro de entrega</span>
-        <h1>Estadísticas</h1>
+        <div className="ds-panel-head"><h1>Estadísticas</h1><button className="btn primary" disabled={pdfBusy||!advanced.weeks.length} type="button" onClick={downloadStatistics}>{pdfBusy?"Generando PDF…":"Descargar PDF"}</button></div>
+        {pdfError&&<p role="alert" className="ds-error">{pdfError}</p>}
       </div>
       <div className="ds-controls">
         <div className="ds-tabs" role="group" aria-label="Periodo">
@@ -253,28 +260,30 @@ export default function DeliveryStatistics({ state, onBack }) {
         <section className="ds-panel"><h2>Utilización del sistema</h2><Breakdown items={uses}/></section>
         <section className="ds-panel"><h2>Género del alumnado</h2><Breakdown items={genders}/></section>
       </div>
-      <section className="ds-panel">
-        <div className="ds-panel-head">
-          <h2>Alumnos</h2>
-          <div className="ds-export">
-            <button className="btn" type="button" onClick={exportStatistics}>Descargar CSV</button>
-            <button className="btn" type="button" onClick={() => window.print()}>Imprimir / PDF</button>
+      <div className="ds-two-column">
+        <section className="ds-panel"><h2>Entregas</h2>
+          <div className="ds-legend">
+            {[
+              ["A tiempo",advanced.delivered],
+              ["A destiempo",advanced.late],
+              ["No entregadas",advanced.notDelivered],
+              ["No aplica",advanced.notApplicable],
+            ].map(([label,value])=><div key={label} className="ds-legend-row"><span>{label}</span><strong>{number(value)}</strong></div>)}
           </div>
-        </div>
-        <div className="ds-table-scroll">
-          <table className="ds-table">
-            <thead><tr><th>Alumno</th><th>Empresa</th><th>Horas</th><th>Faltas</th><th>Semanas con datos</th></tr></thead>
-            <tbody>{[...display.people.values()].filter(v=>studentIsActive(v.student)||v.reportedWeeks)
-              .sort((a,b)=>a.student.name.localeCompare(b.student.name,"es"))
-              .map(v=><tr key={v.student.id}>
-                <td>{v.student.name}</td><td>{v.student.company}</td>
-                <td>{number((v.minutes/60).toFixed(1))} h</td><td>{v.absences}</td>
-                <td>{v.reportedWeeks}</td>
-              </tr>)}</tbody>
-          </table>
-        </div>
-        {!display.population.length && <p className="ds-empty">No hay alumnos en el filtro seleccionado.</p>}
-      </section>
+        </section>
+        <CauseBars title="Horas por especialidad" rows={advanced.bySpecialty.map(x=>({key:x.label,label:x.label,value:Number((x.minutes/60).toFixed(1))}))}/>
+        <CauseBars title="Horas por empresa" rows={advanced.byCompany.map(x=>({key:x.label,label:x.label,value:Number((x.minutes/60).toFixed(1))}))}/>
+      </div>
+      <div className="ds-kpis ds-small-kpis">
+        {[
+          ["Cumplimiento",advanced.deliveryRate+"%"],
+          ["Entregas puntuales",advanced.onTimeRate+"%"],
+          ["Asistencia",advanced.attendanceRate+"%"],
+          ["Cobertura de datos",advanced.coverage+"%"],
+          ["Horas por bitácora",number(advanced.avgHours.toFixed(1))+" h"],
+          ["Bitácoras con datos",number(advanced.weeksWithStatistics)]
+        ].map(([label,value])=><article className="ds-kpi" key={label}><strong>{value}</strong><span>{label}</span></article>)}
+      </div>
     </div>
   );
 }

@@ -57,10 +57,10 @@ No sustituye al historial y no debe contener actividades semanales como fuente c
 Clave actual:
 
 ```text
-bitacora_dual_delivery_registry_v8
+bitacora_dual_delivery_registry_v9
 ```
 
-Las claves `v1` a `v7` pueden leerse para migración.
+Las claves `v1` a `v8` pueden leerse para migración.
 
 El estado contiene, entre otros:
 
@@ -77,7 +77,10 @@ El estado contiene, entre otros:
 - fecha/hora;
 - origen de registro;
 - versión de código y resumen opcional de jornadas en las entregas;
-- género opcional y modalidad registrada de uso del generador, editables desde el padrón;
+- género opcional y semestre/grupo desde el padrón;
+- método de elaboración para cada entrega manual (`generator` u `other`);
+- estadísticas diarias capturadas manualmente o procedentes del Data Matrix;
+- campos heredados de utilización sin atribución automática desde el padrón;
 - estado de entrega: a tiempo, a destiempo, no entregado o **No aplica**.
 
 **No aplica** se conserva como un estado explícito por alumno y semana. Indica que esa persona no tenía obligación de entregar en ese periodo, por lo que se excluye del denominador utilizado para calcular el porcentaje de cumplimiento.
