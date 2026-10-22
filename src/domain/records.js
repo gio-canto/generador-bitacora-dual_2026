@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.52.0-beta.1";
-export const RELEASE = "Registro manual y reportes estadísticos";
+export const VERSION = "0.52.1-beta.1";
+export const RELEASE = "Gráficas PDF y grupo del alumnado";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {

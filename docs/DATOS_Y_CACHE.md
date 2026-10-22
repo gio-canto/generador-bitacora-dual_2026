@@ -77,7 +77,7 @@ El estado contiene, entre otros:
 - fecha/hora;
 - origen de registro;
 - versión de código y resumen opcional de jornadas en las entregas;
-- género opcional y semestre/grupo desde el padrón;
+- género opcional y grupo desde el padrón;
 - método de elaboración para cada entrega manual (`generator` u `other`);
 - estadísticas diarias capturadas manualmente o procedentes del Data Matrix;
 - campos heredados de utilización sin atribución automática desde el padrón;

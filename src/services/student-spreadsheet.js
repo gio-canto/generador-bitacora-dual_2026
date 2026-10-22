@@ -1,3 +1,4 @@
+import { normalizeGroup } from "./delivery-registry.js";
 // Importación tolerante a formatos escolares con portadas, celdas combinadas y encabezados desplazados.
 const clean = v => String(v ?? "").replace(/\s+/g, " ").trim();
 const normalized = v => clean(v).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g,"");
@@ -34,7 +35,7 @@ export function parseStudentSpreadsheet(rows) {
     const n=column(values,PERSON), s=column(values,SPECIALTY),c=column(values,COMPANY);
     if(n>=0&&s>=0&&c>=0){
       head=row;
-      indices={name:n,specialty:s,company:c,semesterGroup:column(values,GROUP),gender:column(values,GENDER)};
+      indices={name:n,specialty:s,company:c,group:column(values,GROUP),gender:column(values,GENDER)};
       break;
     }
   }
@@ -64,7 +65,7 @@ export function parseStudentSpreadsheet(rows) {
       name,
       specialty,
       company,
-      semesterGroup: indices.semesterGroup>=0?clean(data[indices.semesterGroup]).slice(0,30):"",
+      group: indices.group>=0?normalizeGroup(data[indices.group]):"",
       gender:indices.gender>=0?parseImportedGender(data[indices.gender]):"",
     });
   }
