@@ -96,7 +96,7 @@ export default function DeliveryStatistics({ state, onBack }) {
       for (const [id, delivery] of Object.entries(week.deliveries || {})) {
         const person = byId.get(id);
         if (!person || !delivery || delivery.status === "no_aplica") continue;
-        if (delivery.matrixVersion > 0 && delivery.source === "camera") knownUsers.add(id);
+        if (delivery.matrixVersion > 0) knownUsers.add(id);
         const summary = summarizeWeekStatistics(delivery.statistics);
         if (!summary) continue;
         scannedWeeks++;
