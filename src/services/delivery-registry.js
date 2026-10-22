@@ -1,9 +1,10 @@
 import companies from "../data/companies.json";
 import { decodeWeekStatistics, encodeWeekStatistics } from "./matrix-statistics.js";
 
-export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v8";
-export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v7";
+export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v9";
+export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v8";
 export const LEGACY_DELIVERY_KEYS = [
+  "bitacora_dual_delivery_registry_v7",
   "bitacora_dual_delivery_registry_v6",
   "bitacora_dual_delivery_registry_v5",
   "bitacora_dual_delivery_registry_v4",
@@ -11,7 +12,7 @@ export const LEGACY_DELIVERY_KEYS = [
   "bitacora_dual_delivery_registry_v2",
   "bitacora_dual_delivery_registry_v1",
 ];
-export const DELIVERY_SCHEMA = 8;
+export const DELIVERY_SCHEMA = 9;
 
 const uid = () =>
   globalThis.crypto?.randomUUID?.() ||
@@ -241,6 +242,7 @@ export function createStudent(data = {}) {
     name: clean(data.name, 180),
     specialty: clean(data.specialty, 120),
     company: clean(data.company, 220),
+    semesterGroup: clean(data.semesterGroup, 30),
     gender: ["male", "female", "nonbinary", "other", "undisclosed"].includes(data.gender)
       ? data.gender : "",
     usageMode: ["other", "unknown"].includes(data.usageMode) ? data.usageMode : "unknown",
@@ -332,6 +334,8 @@ function normalizeDelivery(value) {
     source: ["camera", "manual", "import"].includes(value.source)
       ? value.source
       : "manual",
+    ...( ["generator", "other", "unknown"].includes(value.usageSource)
+      ? { usageSource: value.usageSource } : {}),
     ...(Number.isInteger(value.matrixVersion) && value.matrixVersion > 0
       ? { matrixVersion: value.matrixVersion } : {}),
     ...(value.statistics && value.statistics.version === 5 &&
@@ -491,6 +495,7 @@ export function registerDelivery(week, studentId, timestamp, source = "manual", 
         source,
         ...(Number.isInteger(metadata.matrixVersion) ? { matrixVersion: metadata.matrixVersion } : {}),
         ...(metadata.statistics ? { statistics: metadata.statistics } : {}),
+        ...( ["generator","other","unknown"].includes(metadata.usageSource) ? { usageSource: metadata.usageSource } : {}),
       },
     },
   };
@@ -547,6 +552,7 @@ export function setDeliveryStatus(
         source,
         ...(status !== "no_aplica" && previous?.statistics ? { statistics: previous.statistics } : {}),
         ...(status !== "no_aplica" && previous?.matrixVersion ? { matrixVersion: previous.matrixVersion } : {}),
+        ...(status !== "no_aplica" && previous?.usageSource ? { usageSource: previous.usageSource } : {}),
       },
     },
   };
@@ -582,6 +588,7 @@ export function mergeStudents(current, incoming) {
         specialty:
           clean(item?.specialty, 120) || result[index].specialty || "",
         company: clean(item?.company, 220) || result[index].company || "",
+        semesterGroup: clean(item?.semesterGroup, 30) || result[index].semesterGroup || "",
         gender: item?.gender || result[index].gender || "",
         usageMode: item?.usageMode || result[index].usageMode || "unknown",
       };
@@ -825,4 +832,26 @@ function downloadText(text, filename, type) {
   anchor.click();
   anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+// Registro manual: los datos estadísticos y el método pertenecen a la entrega,
+// no al padrón general del estudiante.
+export function saveManualDelivery(week, studentId, status, { statistics = null, usageSource = "unknown", timestamp = "" } = {}) {
+  if (!["entregado", "entregado_tarde"].includes(status))
+    return setDeliveryStatus(week, studentId, status, timestamp, "manual");
+  if (!["generator", "other", "unknown"].includes(usageSource))
+    throw new Error("Selecciona el método de elaboración de la bitácora.");
+  const updated = setDeliveryStatus(week, studentId, status, timestamp || new Date().toISOString(), "manual");
+  const original = updated.deliveries[studentId];
+  return {
+    ...updated,
+    deliveries: {
+      ...updated.deliveries,
+      [studentId]: {
+        ...original,
+        usageSource,
+        ...(statistics ? { statistics } : { statistics: undefined }),
+      },
+    },
+  };
 }
