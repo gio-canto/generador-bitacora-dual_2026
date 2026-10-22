@@ -16,6 +16,8 @@ describe("catálogo de motivos frecuentes de falta", () => {
         }),
       );
       expect(reason.id).toMatch(/^[a-z0-9_]+$/);
+      expect(reason.code).toBeGreaterThan(0);
+      expect(reason.code).toBeLessThan(63);
       expect(ids.has(reason.id)).toBe(false);
       ids.add(reason.id);
 
