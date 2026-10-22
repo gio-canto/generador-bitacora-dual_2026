@@ -1,7 +1,7 @@
 import {useState} from "react";
 import { MANUAL_DAYS, blankManualDays, manualDaysFromStatistics, reasonsForStatus, buildManualStatistics } from "../services/manual-statistics.js";
-export default function ManualDeliveryDialog({student,week,previous,onCancel,onSave}){
-  const [status,setStatus]=useState(previous?.status==="entregado_tarde"?"entregado_tarde":"entregado");
+export default function ManualDeliveryDialog({student,week,previous,initialStatus,onCancel,onSave}){
+  const [status,setStatus]=useState(initialStatus || (previous?.status==="entregado_tarde"?"entregado_tarde":"entregado"));
   const [usageSource,setUsageSource]=useState(previous?.usageSource || (previous?.matrixVersion>0 ? "generator" : ""));
   const [days,setDays]=useState(()=>previous?.statistics?manualDaysFromStatistics(previous.statistics):blankManualDays());
   const [error,setError]=useState("");
