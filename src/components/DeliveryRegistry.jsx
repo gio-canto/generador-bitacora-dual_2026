@@ -45,6 +45,7 @@ import {
   readDeliveryState,
   reactivateStudent,
   registerDelivery,
+  saveManualDelivery,
   removeDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
@@ -56,6 +57,8 @@ import {
 } from "../services/delivery-registry.js";
 import { VERSION } from "../domain/records.js";
 import DeliveryStatistics from "./DeliveryStatistics.jsx";
+import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
+import { parseStudentSpreadsheet } from "../services/student-spreadsheet.js";
 import { generateDeliveryReportPdf } from "../services/delivery-report.js";
 import {
   createScannerIssue,
@@ -396,12 +399,17 @@ export default function DeliveryRegistry({ onClose }) {
     createRegistryContext(initialState.context),
   );
   const [setupStep, setSetupStep] = useState(0);
+  const [setupIntent,setSetupIntent] = useState(initiallyStarted ? "manage" : "onboarding");
+  const [setupReturnView,setSetupReturnView] = useState("home");
+  const [importPreview,setImportPreview] = useState(null);
+  const [manualTarget,setManualTarget] = useState(null);
   const [tutorialStep, setTutorialStep] = useState(0);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [studentForm, setStudentForm] = useState({
     name: "",
     specialty: "",
     company: "",
+    semesterGroup: "",
     gender: "",
     usageMode: "unknown",
   });
@@ -1275,6 +1283,8 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const startSetup = () => {
+    setSetupIntent("onboarding");
+    setSetupReturnView("home");
     setContextForm(createRegistryContext(state.context));
     setSetupStep(0);
     setView("setup");
@@ -1328,29 +1338,25 @@ export default function DeliveryRegistry({ onClose }) {
     try {
       if (!window.XLSX) throw new Error("No se pudo cargar el lector de Excel.");
       const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = window.XLSX.utils.sheet_to_json(sheet, { defval: "" });
-      const incoming = spreadsheetRowsToStudents(rows);
-      if (!incoming.length)
-        throw new Error("No se encontraron nombres de alumnos en la primera hoja.");
-      const merged = mergeStudents(state.students, incoming);
-      commit({ ...state, students: merged.students });
+      const sheets = workbook.SheetNames.map(name =>
+        window.XLSX.utils.sheet_to_json(workbook.Sheets[name], {header:1,defval:"",raw:false,blankrows:false})
+      );
+      let parsed=null;
+      for(const rows of sheets){try{parsed=parseStudentSpreadsheet(rows);break;}catch{}}
+      if(!parsed)throw Error("No se encontró una tabla con Nombre del alumno, Especialidad y Dependencia.");
+      setImportPreview({parsed,result:mergeStudents(state.students,parsed.students)});
       clearNotice();
-      notify(
-        "success",
-        "Alumnos importados",
-        merged.added +
-          " nuevos · " +
-          merged.updated +
-          " actualizados",
-      );
-    } catch (error) {
-      showNotice(
-        "error",
-        "No se pudo importar la lista",
-        error?.message || "Revisa el archivo e inténtalo otra vez.",
-      );
+    } catch(error){
+      showNotice("error","No se pudo importar la lista",error?.message||"Revisa el archivo.");
     }
+  };
+  const confirmSpreadsheetImport = () => {
+    if(!importPreview)return;
+    const {parsed,result}=importPreview;
+    commit({...state,students:result.students});
+    setImportPreview(null);
+    notify("success","Alumnos importados",result.added+" nuevos · "+result.updated+" actualizados");
+    if(parsed.warnings.length)showNotice("info","Alumnos importados",parsed.warnings.length+" filas omitidas.");
   };
 
   const addStudent = (event) => {
@@ -1359,6 +1365,7 @@ export default function DeliveryRegistry({ onClose }) {
       name: String(studentForm.name || "").replace(/\s+/g, " ").trim(),
       specialty: String(studentForm.specialty || "").trim(),
       company: String(studentForm.company || "").trim(),
+      semesterGroup: String(studentForm.semesterGroup || "").trim(),
       gender: studentForm.gender || "",
       usageMode: studentForm.usageMode || "unknown",
     };
@@ -1396,7 +1403,7 @@ export default function DeliveryRegistry({ onClose }) {
         ),
       });
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
       clearNotice();
       notify("success", "Alumno actualizado", nextStudent.name);
       return;
@@ -1404,7 +1411,7 @@ export default function DeliveryRegistry({ onClose }) {
 
     const merged = mergeStudents(state.students, [nextStudent]);
     commit({ ...state, students: merged.students });
-    setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
+    setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
     clearNotice();
     if (merged.added)
       notify("success", "Alumno agregado", nextStudent.name);
@@ -1417,11 +1424,14 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const editStudent = (student) => {
+    setSetupReturnView(view === "week" ? "week" : "home");
+    setSetupIntent("manage");
     setEditingStudentId(student.id);
     setStudentForm({
       name: student.name || "",
       specialty: student.specialty || "",
       company: student.company || "",
+      semesterGroup: student.semesterGroup || "",
       gender: student.gender || "",
       usageMode: student.usageMode || "unknown",
     });
@@ -1443,7 +1453,7 @@ export default function DeliveryRegistry({ onClose }) {
     setStudentActionId("");
     if (editingStudentId === studentId) {
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
     }
     clearNotice();
     notify(
@@ -1490,7 +1500,7 @@ export default function DeliveryRegistry({ onClose }) {
     setStudentActionId("");
     if (editingStudentId === studentId) {
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
     }
     clearNotice();
     notify("info", "Alumno eliminado definitivamente", studentName);
@@ -1555,6 +1565,10 @@ export default function DeliveryRegistry({ onClose }) {
 
   const setManualStatus = (studentId, status) => {
     if (!activeWeek || activeWeek.closedAt) return;
+    if (status === "entregado" || status === "entregado_tarde") {
+      setManualTarget({studentId});
+      return;
+    }
     const student = state.students.find((item) => item.id === studentId);
     commit({
       ...state,
@@ -1579,6 +1593,15 @@ export default function DeliveryRegistry({ onClose }) {
     );
   };
 
+  const commitManualEntry = ({status,usageSource,statistics}) => {
+    if(!manualTarget||!activeWeek||activeWeek.closedAt)return;
+    const next=state.weeks.map(week=>week.id===activeWeek.id
+      ?saveManualDelivery(week,manualTarget.studentId,status,{usageSource,statistics})
+      :week);
+    commit({...state,weeks:next});
+    notify("success","Registro manual guardado",state.students.find(student=>student.id===manualTarget.studentId)?.name||"");
+    setManualTarget(null);
+  };
   const startDueAtEdit = () => {
     if (!activeWeek) return;
     if (activeWeek.closedAt) {
@@ -2273,6 +2296,7 @@ export default function DeliveryRegistry({ onClose }) {
                           name: "",
                           specialty: "",
                           company: "",
+                          semesterGroup: "",
                           gender: "",
                           usageMode: "unknown",
                         });
