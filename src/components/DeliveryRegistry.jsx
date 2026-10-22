@@ -1566,7 +1566,7 @@ export default function DeliveryRegistry({ onClose }) {
   const setManualStatus = (studentId, status) => {
     if (!activeWeek || activeWeek.closedAt) return;
     if (status === "entregado" || status === "entregado_tarde") {
-      setManualTarget({studentId});
+      setManualTarget({studentId,status});
       return;
     }
     const student = state.students.find((item) => item.id === studentId);
