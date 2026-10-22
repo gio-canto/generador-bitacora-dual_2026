@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.52.2-beta.1 · Captura móvil y estadísticas consistentes · 2026-10-22
+
+- Se corrigen las tarjetas de alumnos en teléfonos: el botón «Horas y jornadas» deja de ser un icono aislado, las acciones y el selector de estado se acomodan sin desbordamiento y muestran si existen jornadas capturadas.
+- La captura manual se ofrece al elegir Entregado a tiempo, Entregado a destiempo o No entregado. «No aplica» sigue sin estadística y solicita confirmación antes de eliminar horas existentes.
+- El formulario de jornadas funciona como panel móvil desplazable, con encabezado, campos accesibles, selector de método, teclado numérico para horas y botones de guardado siempre visibles; contempla áreas seguras en iOS y Android.
+- Los registros «No entregado» pueden conservar jornadas y horas sin figurar como entregas recibidas. Se admite la lectura de estos registros en respaldos y migraciones sin subir el esquema local v9.
+- Se unifican los cálculos del panel y del PDF para horas, jornadas, motivos, utilización y periodos. La cobertura de jornadas utiliza todas las entregas aplicables, y el panel distingue horas registradas de bitácoras no entregadas.
+- Se mejora la presentación móvil de filtros, tarjetas, barras, gráficas y métricas históricas, evitando desbordamientos con nombres y valores largos.
+- El PDF conserva sus cuatro páginas y etiqueta correctamente las horas pendientes; incluye pruebas del diálogo de captura, persistencia y cálculos.
+
+
 ## 0.51.2-beta.1 · Proporciones y acumulados históricos del Dual · 2026-10-22
 
 - El panel Estadísticas incorpora la proporción de alumnos activos por especialidad y su representación porcentual, incluyendo filtros de especialidad y empresa.
