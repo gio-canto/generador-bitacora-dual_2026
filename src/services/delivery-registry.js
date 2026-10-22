@@ -134,6 +134,7 @@ export function createMatrixPayload(data = {}) {
   const name = normalizeMatrixText(data.name ?? data.student, 180);
   if (!name) return "";
   const { startDate, endDate } = matrixPeriodFromData(data);
+  const compactStatistics = encodeWeekStatistics(data.entries);
   return [
     "BD26",
     "4",
@@ -142,7 +143,7 @@ export function createMatrixPayload(data = {}) {
     companyMatrixValue(data.company),
     compactDate(startDate),
     compactDate(endDate),
-    ...(encodeWeekStatistics(data.entries) ? [encodeWeekStatistics(data.entries)] : []),
+    ...(compactStatistics ? [compactStatistics] : []),
   ].join("|");
 }
 
@@ -164,6 +165,7 @@ export function parseMatrixPayload(rawValue) {
     parts[1] === "4" &&
     parts.length >= 7
   ) {
+    const statistics = decodeWeekStatistics(parts[7]);
     return {
       version: 4,
       name: clean(parts[2], 180),
@@ -171,7 +173,7 @@ export function parseMatrixPayload(rawValue) {
       company: clean(parts[4], 80),
       startDate: expandCompactDate(parts[5]),
       endDate: expandCompactDate(parts[6]),
-      ...(decodeWeekStatistics(parts[7]) ? { statistics: decodeWeekStatistics(parts[7]) } : {}),
+      ...(statistics ? { statistics } : {}),
     };
   }
 
