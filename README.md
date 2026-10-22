@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.52.0--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.52.1--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -54,7 +54,7 @@ El proyecto funciona sin cuentas y sin una base de datos central propia. El gene
 - Corrector ortográfico opcional procesado localmente, con diccionario adicional para catálogos institucionales y vocabulario técnico de programación, contabilidad, RH, IA, e-commerce, ciberseguridad, datos, diseño y gestión.
 - Firma genérica opcional del alumno.
 - Data Matrix versionado en las bitácoras, con bloque estadístico compacto S5 y lectura compatible con códigos anteriores.
-- Estadísticas semanales, mensuales y generales desde Registro de entrega, con filtros y PDF de descarga directa.
+- Estadísticas semanales, mensuales y generales desde Registro de entrega, con filtros y PDF de tres páginas, con logotipo oficial y gráficas de descarga directa.
 - Captura manual de las jornadas, las horas, las causas y el método de elaboración de cada entrega.
 - Importación masiva de listados Excel o CSV institucionales con encabezados desplazados, revisión previa y control de duplicados.
 - Navegación directa entre Inicio, Alumnos, Semanas y Estadísticas. El género sólo se edita en el registro institucional.
