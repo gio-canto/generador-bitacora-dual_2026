@@ -1225,7 +1225,7 @@ button.delivery-action-tile{cursor:pointer}
 }
 .delivery-import-single svg{flex:0 0 auto}
 .delivery-student-form{
-  grid-template-columns:1.25fr 1fr 1fr;
+  grid-template-columns:repeat(3,minmax(0,1fr));
 }
 @media(max-width:760px){
   .delivery-student-form{grid-template-columns:1fr}
