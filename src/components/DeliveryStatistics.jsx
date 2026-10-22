@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import AnimatedValue from "./AnimatedValue.jsx";
 import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLabels, percent } from "../services/statistics.js";
 import { generateStatisticsReportPdf } from "../services/statistics-report.js";
 import "../delivery-statistics.css";
@@ -36,9 +37,10 @@ function Bars({ title, rows, unit = "", max = 7 }) {
   </section>;
 }
 function Metric({name,value}) {
-  return <article className="ds-kpi"><strong>{value}</strong><span>{name}</span></article>;
+  return <article className="ds-kpi"><strong><AnimatedValue value={value}/></strong><span>{name}</span></article>;
 }
 export default function DeliveryStatistics({ state, onBack }) {
+  const rootRef = useRef(null);
   const [period,setPeriod] = useState("weekly");
   const [weekId,setWeekId] = useState(state.weeks.at(-1)?.id || "");
   const [month,setMonth] = useState(state.weeks.at(-1)?.startDate?.slice(0,7) || new Date().toISOString().slice(0,7));
@@ -78,6 +80,35 @@ export default function DeliveryStatistics({ state, onBack }) {
     ? ["Martes","Miércoles","Jueves","Viernes"].map((label,i)=>({label,minutes:data.dayTrend[i]}))
     : data.trend.map(row=>({label:row.label,minutes:row.minutes}));
   const highest = Math.max(1,...trend.map(item=>item.minutes));
+  const viewKey = [period,weekId,month,specialty,company,state.updatedAt || ""].join("|");
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ||
+        typeof IntersectionObserver === "undefined") return;
+    const elements = Array.from(root.querySelectorAll(
+      ".ds-results .ds-kpi, .ds-results .ds-panel, .ds-results .ds-lifetime-heading"
+    ));
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("ds-revealed");
+          observer.unobserve(entry.target);
+        }
+      }
+    }, {threshold:0.07,rootMargin:"0px 0px -12px 0px"});
+    elements.forEach((element, index) => {
+      if (element.classList.contains("ds-revealed")) return;
+      element.style.setProperty("--ds-stagger", String(index % 4));
+      element.classList.add("ds-reveal-ready");
+      observer.observe(element);
+    });
+    return () => {
+      observer.disconnect();
+      // Ensure nothing stays invisible when switching modes before an item enters view.
+      elements.forEach(element => element.classList.remove("ds-reveal-ready"));
+    };
+  }, [viewKey,metric]);
 
   const exportPdf = async () => {
     if(pdfBusy)return;
@@ -87,7 +118,7 @@ export default function DeliveryStatistics({ state, onBack }) {
     finally{setPdfBusy(false);}
   };
 
-  return <div className="delivery-analytics-container">
+  return <div className="delivery-analytics-container" ref={rootRef}>
     <div className="ds-header">
       <button className="btn" type="button" onClick={onBack}>← Volver</button>
       <span className="delivery-kicker">Registro de entrega</span>
@@ -124,6 +155,7 @@ export default function DeliveryStatistics({ state, onBack }) {
       </label>
     </div>
 
+    <div className="ds-results" key={viewKey}>
     <div className="ds-kpis">
       <Metric name="Alumnos activos" value={fmt(data.students.length)}/>
       <Metric name="Horas registradas" value={hours(data.totalMinutes/60)}/>
@@ -138,16 +170,18 @@ export default function DeliveryStatistics({ state, onBack }) {
           <button type="button" className={metric==="days"?"active":""} aria-pressed={metric==="days"} onClick={()=>setMetric("days")}>Jornadas</button>
         </div>
       </div>
+      <div className="ds-chart-in" key={metric}>
       {metric==="hours" ? <>
-        <div className="ds-feature-number">{hours(data.totalMinutes/60)}</div>
+        <div className="ds-feature-number"><AnimatedValue value={hours(data.totalMinutes/60)}/></div>
         <div className="ds-columns">
           {trend.map((row,i)=><div className="ds-column" key={row.label+i}>
-            <strong>{hours(row.minutes/60)}</strong>
+            <strong><AnimatedValue value={hours(row.minutes/60)} duration={720}/></strong>
             <div className="ds-column-track"><span style={{height:100*row.minutes/highest+"%"}}/></div>
             <small>{row.label}</small>
           </div>)}
         </div>
       </> : <Breakdown items={daily}/>}
+      </div>
       {!data.weeksWithStatistics && <p className="ds-empty">Sin jornadas capturadas en este periodo.</p>}
     </section>
 
@@ -213,5 +247,6 @@ export default function DeliveryStatistics({ state, onBack }) {
       </div>
       <p className="ds-lifetime-caption">Los códigos antiguos sin horas no se cuentan como cero. El histórico incluye las jornadas registradas de alumnos desistidos y de entregas pendientes; cambiar semana o mes no altera este acumulado.</p>
     </section>
+    </div>
   </div>;
 }
