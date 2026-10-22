@@ -79,3 +79,92 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
     avgHours:weeksWithStatistics?totalMinutes/60/weeksWithStatistics:0,
   };
 }
+
+
+/**
+ * Consolidado histórico del Dual: todas las semanas, incluso si el panel
+ * está filtrado por una semana o mes. Respeta especialidad y empresa.
+ *
+ * La proporción de especialidades usa el padrón activo. Las horas incluyen
+ * también entregas históricas válidas de alumnos posteriormente desistidos.
+ * Sin estadísticas registradas significa "sin dato", nunca cero horas.
+ */
+export function calculateDualLifetimeStatistics(state, {specialty = "", company = ""} = {}) {
+  const roster = (state.students || []).filter(student =>
+    (!specialty || student.specialty === specialty) &&
+    (!company || student.company === company)
+  );
+  const active = roster.filter(studentIsActive);
+  const byId = new Map(roster.map(student => [student.id, student]));
+  const enrolled = new Map();
+  for (const student of active) {
+    const key = student.specialty || "Sin especificar";
+    enrolled.set(key, (enrolled.get(key) || 0) + 1);
+  }
+
+  // No contar dos veces un mismo alumno-periodo si hay semanas duplicadas.
+  const uniquePeriods = new Map();
+  for (const week of state.weeks || []) {
+    for (const [studentId, delivery] of Object.entries(week.deliveries || {})) {
+      if (!byId.has(studentId) || !delivery || delivery.status === "no_aplica" ||
+          !["entregado", "entregado_tarde"].includes(delivery.status)) continue;
+      const stats = summarizeWeekStatistics(delivery.statistics);
+      if (!stats) continue;
+      const period = week.startDate || week.id;
+      const key = studentId + "::" + period;
+      const candidate = {
+        studentId,
+        minutes: stats.minutes,
+        order: String(delivery.registeredAt || week.createdAt || ""),
+      };
+      const prior = uniquePeriods.get(key);
+      if (!prior || candidate.order >= prior.order) uniquePeriods.set(key, candidate);
+    }
+  }
+
+  const perStudent = new Map();
+  const specialtyMinutes = new Map();
+  let totalMinutes = 0;
+  for (const record of uniquePeriods.values()) {
+    totalMinutes += record.minutes;
+    perStudent.set(record.studentId, (perStudent.get(record.studentId) || 0) + record.minutes);
+    const name = byId.get(record.studentId)?.specialty || "Sin especificar";
+    specialtyMinutes.set(name, (specialtyMinutes.get(name) || 0) + record.minutes);
+  }
+  const ordered = [...perStudent.values()].sort((a, b) => a - b);
+  const sampleCount = ordered.length;
+  const minMinutes = sampleCount ? ordered[0] : null;
+  const maxMinutes = sampleCount ? ordered[sampleCount - 1] : null;
+  const averageMinutes = sampleCount ? totalMinutes / sampleCount : null;
+  const medianMinutes = sampleCount
+    ? sampleCount % 2 ? ordered[Math.floor(sampleCount / 2)] :
+      (ordered[sampleCount / 2 - 1] + ordered[sampleCount / 2]) / 2
+    : null;
+  const names = new Set([...enrolled.keys(), ...specialtyMinutes.keys()]);
+  const bySpecialty = [...names].map(label => {
+    const students = enrolled.get(label) || 0;
+    const minutes = specialtyMinutes.get(label) || 0;
+    return {
+      label,
+      students,
+      proportion: active.length ? students / active.length * 100 : 0,
+      minutes,
+      hours: minutes / 60,
+      hoursProportion: totalMinutes ? minutes / totalMinutes * 100 : 0,
+    };
+  }).sort((a, b) => b.students - a.students || b.minutes - a.minutes || a.label.localeCompare(b.label, "es"));
+  return {
+    activeStudents: active.length,
+    studentsWithData: sampleCount,
+    periodsWithData: uniquePeriods.size,
+    studentsWithoutData: roster.length - sampleCount,
+    totalMinutes,
+    totalHours: totalMinutes / 60,
+    averageHours: averageMinutes === null ? null : averageMinutes / 60,
+    medianHours: medianMinutes === null ? null : medianMinutes / 60,
+    minHours: minMinutes === null ? null : minMinutes / 60,
+    maxHours: maxMinutes === null ? null : maxMinutes / 60,
+    rangeHours: minMinutes === null ? null : (maxMinutes - minMinutes) / 60,
+    bySpecialty,
+  };
+}
