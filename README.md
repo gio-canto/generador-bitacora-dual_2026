@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.52.2--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.52.3--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -184,3 +184,7 @@ Código distribuido bajo [MIT](LICENSE). Dependencias y recursos de terceros con
 ### Registro móvil de jornadas
 
 Desde **Registro de entrega**, selecciona el estado **A tiempo**, **A destiempo** o **No entregado**, o utiliza el botón visible **Horas y jornadas** de cada alumno. Se abre una captura adaptada a teléfono para indicar el método de elaboración, los estados de martes a viernes y las horas o motivos. **No aplica** excluye la jornada de las estadísticas y requiere confirmar la eliminación si ya había horas guardadas. Se pueden guardar entregas sin jornadas cuando aún no se dispone de datos; nunca se presupone que faltan cero horas. Las horas de registros «No entregado» capturadas se muestran de forma independiente y no mejoran el porcentaje de cumplimiento.
+
+### Estadísticas animadas
+
+Al abrir **Estadísticas**, las tarjetas aparecen progresivamente, las cifras muestran un conteo hasta su valor real y las gráficas se dibujan al entrar en pantalla. Al cambiar periodo, semana, especialidad o empresa, los resultados se actualizan con una transición breve. Si el dispositivo tiene activado **Reducir movimiento**, las cifras y las gráficas se muestran de inmediato sin animaciones. Estas mejoras no afectan los datos guardados ni los reportes PDF.
