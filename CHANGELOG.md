@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.52.1-beta.1 · PDF con gráficas y grupo único · 2026-10-22
+
+- El reporte estadístico pasa a tres páginas y utiliza el logotipo oficial del sistema `Asset_logo.png`; desaparece el bloque provisional «BD».
+- Nuevas gráficas: barras de entrega, donas de utilización y tipos de jornada, evolución de horas, motivos de faltas y de suspensión, distribución por género, horas diarias, comparativas por empresa y especialidad y medidores de cumplimiento, puntualidad, asistencia y cobertura.
+- Los reportes siguen descargándose directamente como PDF mediante Blob, sin abrir impresión.
+- En el padrón el campo pasa de «Semestre y grupo» a «Grupo». La importación interpreta valores históricos como `5°A` y conserva solamente `A` sin solicitar el semestre; la migración de registros previos preserva el grupo.
+- Pruebas ampliadas de importación, migración y creación del PDF de tres páginas con logo.
+
+
 ## 0.52.0-beta.1 · Registro manual, importación y PDF estadístico · 2026-10-22
 
 - Se corrige el regreso indebido a la configuración inicial al gestionar alumnos; la administración ofrece regreso directo a la sección anterior, sin reiniciar el asistente.
