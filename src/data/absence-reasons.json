@@ -2,96 +2,115 @@
   {
     "id": "medical_appointment",
     "label": "Cita médica",
-    "text": "Inasistencia debida a una cita médica previamente programada que coincidió con el horario de actividades."
+    "text": "Inasistencia debida a una cita médica previamente programada que coincidió con el horario de actividades.",
+    "code": 1
   },
   {
     "id": "medical_attention",
     "label": "Atención médica",
-    "text": "Inasistencia por motivos médicos que requirieron recibir atención de salud durante el horario de actividades."
+    "text": "Inasistencia por motivos médicos que requirieron recibir atención de salud durante el horario de actividades.",
+    "code": 2
   },
   {
     "id": "illness",
     "label": "Enfermedad",
-    "text": "Inasistencia debida a una enfermedad o malestar de salud que impidió asistir con normalidad."
+    "text": "Inasistencia debida a una enfermedad o malestar de salud que impidió asistir con normalidad.",
+    "code": 3
   },
   {
     "id": "commute_accident",
     "label": "Accidente en el camino",
-    "text": "Inasistencia debida a un accidente ocurrido durante el trayecto hacia la empresa, lo que impidió llegar con normalidad."
+    "text": "Inasistencia debida a un accidente ocurrido durante el trayecto hacia la empresa, lo que impidió llegar con normalidad.",
+    "code": 4
   },
   {
     "id": "work_accident",
     "label": "Accidente laboral",
-    "text": "Inasistencia relacionada con un accidente laboral que requirió atención y evitó continuar con las actividades programadas."
+    "text": "Inasistencia relacionada con un accidente laboral que requirió atención y evitó continuar con las actividades programadas.",
+    "code": 5
   },
   {
     "id": "family_emergency",
     "label": "Emergencia familiar",
-    "text": "Inasistencia debida a una emergencia familiar que requirió atención inmediata y me impidió asistir con normalidad."
+    "text": "Inasistencia debida a una emergencia familiar que requirió atención inmediata y me impidió asistir con normalidad.",
+    "code": 6
   },
   {
     "id": "family_matters",
     "label": "Asuntos familiares",
-    "text": "Inasistencia debida a asuntos familiares que requirieron mi atención personal y me impidieron asistir con normalidad."
+    "text": "Inasistencia debida a asuntos familiares que requirieron mi atención personal y me impidieron asistir con normalidad.",
+    "code": 7
   },
   {
     "id": "university_admission_exam",
     "label": "Examen de ingreso a la universidad",
-    "text": "Inasistencia por la presentación de un examen de ingreso a la universidad programado durante el horario de actividades."
+    "text": "Inasistencia por la presentación de un examen de ingreso a la universidad programado durante el horario de actividades.",
+    "code": 8
   },
   {
     "id": "extraordinary_exam",
     "label": "Examen extraordinario",
-    "text": "Inasistencia por la presentación de un examen extraordinario escolar programado durante el horario de actividades."
+    "text": "Inasistencia por la presentación de un examen extraordinario escolar programado durante el horario de actividades.",
+    "code": 9
   },
   {
     "id": "school_activity",
     "label": "Actividad escolar",
-    "text": "Inasistencia por participación en una actividad escolar que coincidió con el horario establecido."
+    "text": "Inasistencia por participación en una actividad escolar que coincidió con el horario establecido.",
+    "code": 10
   },
   {
     "id": "school_procedure",
     "label": "Trámite escolar",
-    "text": "Inasistencia por la realización de un trámite escolar necesario que coincidió con el horario establecido."
+    "text": "Inasistencia por la realización de un trámite escolar necesario que coincidió con el horario establecido.",
+    "code": 11
   },
   {
     "id": "personal_procedure",
     "label": "Trámite personal u oficial",
-    "text": "Inasistencia por la realización de un trámite personal u oficial que no fue posible efectuar fuera del horario correspondiente."
+    "text": "Inasistencia por la realización de un trámite personal u oficial que no fue posible efectuar fuera del horario correspondiente.",
+    "code": 12
   },
   {
     "id": "transport",
     "label": "Problemas de transporte",
-    "text": "Inasistencia debida a problemas de transporte durante el traslado que impidieron llegar a tiempo a la empresa."
+    "text": "Inasistencia debida a problemas de transporte durante el traslado que impidieron llegar a tiempo a la empresa.",
+    "code": 13
   },
   {
     "id": "demonstrations",
     "label": "Manifestaciones",
-    "text": "Inasistencia debida a manifestaciones o bloqueos en la vía pública que impidieron realizar con normalidad el traslado hacia la empresa."
+    "text": "Inasistencia debida a manifestaciones o bloqueos en la vía pública que impidieron realizar con normalidad el traslado hacia la empresa.",
+    "code": 14
   },
   {
     "id": "natural_disaster",
     "label": "Desastres naturales",
-    "text": "Inasistencia debida a condiciones derivadas de un desastre natural que afectaron la seguridad, el traslado o la posibilidad de asistir."
+    "text": "Inasistencia debida a condiciones derivadas de un desastre natural que afectaron la seguridad, el traslado o la posibilidad de asistir.",
+    "code": 15
   },
-    {
+  {
     "id": "bad_weather",
     "label": "Huracán",
-    "text": "Inasistencia debida a condiciones derivadas del mal clima."
+    "text": "Inasistencia debida a condiciones derivadas del mal clima.",
+    "code": 16
   },
   {
     "id": "social_unrest",
     "label": "Disturbios sociales",
-    "text": "Inasistencia debida a disturbios sociales o situaciones de riesgo en la zona que hicieron inseguro o imposible el traslado hacia la empresa."
+    "text": "Inasistencia debida a disturbios sociales o situaciones de riesgo en la zona que hicieron inseguro o imposible el traslado hacia la empresa.",
+    "code": 17
   },
   {
     "id": "personal",
     "label": "Motivos personales",
-    "text": "Inasistencia por motivos personales que requirieron mi atención y me impidieron asistir con normalidad."
+    "text": "Inasistencia por motivos personales que requirieron mi atención y me impidieron asistir con normalidad.",
+    "code": 18
   },
   {
     "id": "social",
     "label": "Motivos sociales",
-    "text": "Inasistencia por un compromiso de carácter social que coincidió con el horario previsto de actividades."
+    "text": "Inasistencia por un compromiso de carácter social que coincidió con el horario previsto de actividades.",
+    "code": 19
   }
 ]
