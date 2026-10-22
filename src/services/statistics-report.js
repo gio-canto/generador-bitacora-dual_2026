@@ -251,7 +251,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
   const report = statisticsReportModel(state, filters);
   const r = report.data;
   if (!r.weeks.length) throw new Error("Selecciona un periodo con semanas registradas.");
-  // Un solo logotipo por reporte: se incorpora en las tres páginas.
+  // El logotipo oficial se incorpora en cada página.
   const logo = options.logoImage || await loadLogo();
   const images = [];
   const deliveryItems = [
@@ -281,7 +281,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     const cardW=(1132 - 42)/4;
     [
       ["Alumnos activos",fmt(r.students.length)],
-      ["Horas realizadas",fmt(r.totalMinutes/60,1)+" h"],
+      ["Horas registradas",fmt(r.totalMinutes/60,1)+" h"],
       ["Faltas",fmt(r.daily.falta)],
       ["Utilización",percent(r.usage.used,r.students.length)+"%"],
     ].forEach(([name,value],i)=>kpi(ctx,54+i*(cardW+14),344,cardW,name,value));
@@ -342,7 +342,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       {label:"Asistencia",value:r.attendanceRate,color:C.green},
       {label:"Cobertura estadística",value:r.coverage,color:C.purple},
     ],{x:93,y:1035,w:1054,h:495});
-    label(ctx,"Promedio de horas por bitácora con datos: "+fmt(r.avgHours,1)+" h",82,1559,18,C.secondary,600);
+    label(ctx,"Promedio de horas por registro con datos: "+fmt(r.avgHours,1)+" h",82,1559,18,C.secondary,600);
     images.push(canvasToJpeg(canvas));
   }
 
@@ -378,7 +378,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     const details=[
       ["Alumnos con datos",fmt(h.studentsWithData)],
       ["Semanas-alumno válidas",fmt(h.periodsWithData)],
-      ["Alumnos activos",fmt(h.activeStudents)]
+      ["Pendientes con horas",fmt(r.pendingWithStatistics)]
     ];
     details.forEach(([name,value],i)=>{
       const xx=85+i*363;
@@ -386,7 +386,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       label(ctx,name,xx,1432,17,C.muted,500,330);
     });
     label(ctx,"Los códigos sin horas se excluyen del promedio, mínimo, máximo y rango.",85,1512,17,C.secondary,400,1060);
-    label(ctx,"Las entregas históricas de alumnos desistidos sí aportan horas verificadas.",85,1544,17,C.secondary,400,1060);
+    label(ctx,"Las horas capturadas de una bitácora pendiente no cambian su estado de entrega.",85,1544,17,C.secondary,400,1060);
     images.push(canvasToJpeg(canvas));
   }
 
