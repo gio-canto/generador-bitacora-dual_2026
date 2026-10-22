@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.52.2-beta.1";
-export const RELEASE = "Registro y estadísticas móviles";
+export const VERSION = "0.52.3-beta.1";
+export const RELEASE = "Estadísticas animadas";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
