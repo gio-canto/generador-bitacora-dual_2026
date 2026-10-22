@@ -58,7 +58,7 @@ describe("Data Matrix estadístico v0.51", () => {
       matrixVersion:4,statistics:stats,
     });
     const restored = sanitizeDeliveryState({schemaVersion:7,students:[student],weeks:[week]});
-    expect(restored.schemaVersion).toBe(8);
+    expect(restored.schemaVersion).toBe(9);
     expect(restored.students[0].gender).toBe("female");
     expect(restored.weeks[0].deliveries[student.id].statistics.entries[1].reasonId).toBe("illness");
   });
