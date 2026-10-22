@@ -3289,6 +3289,7 @@ export default function DeliveryRegistry({ onClose }) {
           week={activeWeek}
           student={state.students.find(student=>student.id===manualTarget.studentId)}
           previous={activeWeek.deliveries?.[manualTarget.studentId]}
+          initialStatus={manualTarget.status}
           onCancel={()=>setManualTarget(null)}
           onSave={commitManualEntry}
         />
