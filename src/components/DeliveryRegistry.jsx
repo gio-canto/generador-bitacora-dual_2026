@@ -1930,6 +1930,7 @@ export default function DeliveryRegistry({ onClose }) {
           )}
         </div>
         <div className="delivery-row-actions">
+          <button className="btn" type="button" title="Horas y método" aria-label={"Editar estadísticas de " + student.name} disabled={Boolean(week.closedAt)} onClick={() => setManualTarget({studentId:student.id})}><ChartBar size={18}/></button>
           <button
             className="btn"
             type="button"
@@ -2027,6 +2028,7 @@ export default function DeliveryRegistry({ onClose }) {
       </header>
 
       <main className="delivery-shell">
+        {started && !["home","welcome","scanner","setup"].includes(view) && <div className="delivery-backline"><button type="button" className="btn" onClick={()=>setView("home")}><ArrowLeft size={17}/> Inicio</button></div>}
         {view === "welcome" && (
           <section className="delivery-welcome">
             <div className="delivery-welcome-copy">
@@ -2087,10 +2089,11 @@ export default function DeliveryRegistry({ onClose }) {
 
         {view === "setup" && (
           <section className="delivery-setup">
+            {setupIntent==="manage" && <div className="delivery-backline"><button type="button" className="btn" onClick={()=>{setEditingStudentId("");setView(setupReturnView);}}><ArrowLeft size={17}/> {setupReturnView==="week"?"Volver a semana":"Inicio"}</button></div>}
             <div className="delivery-setup-head">
               <div>
                 <span className="delivery-kicker">
-                  Configuración · {setupStep + 1} de 3
+                  {setupIntent==="onboarding"?"Configuración · "+(setupStep+1)+" de 3":"Administración"}
                 </span>
                 <h1>
                   {setupStep === 0
@@ -2100,11 +2103,11 @@ export default function DeliveryRegistry({ onClose }) {
                       : "Semana"}
                 </h1>
               </div>
-              <div className="delivery-setup-progress">
+              {setupIntent==="onboarding" && <div className="delivery-setup-progress">
                 <i className="active" />
                 <i className={setupStep >= 1 ? "active" : ""} />
                 <i className={setupStep >= 2 ? "active" : ""} />
-              </div>
+              </div>}
             </div>
 
             {setupStep === 0 && (
@@ -2190,7 +2193,7 @@ export default function DeliveryRegistry({ onClose }) {
 
                 <label className="delivery-action-tile delivery-import-single">
                   <FileXls size={34} />
-                  <strong>Importar Excel o CSV</strong>
+                  <strong>Importar lista de alumnos</strong>
                   <input
                     hidden
                     type="file"
@@ -2254,6 +2257,7 @@ export default function DeliveryRegistry({ onClose }) {
                       ))}
                     </select>
                   </label>
+                  <label className="delivery-field"><span>Semestre y grupo</span><input value={studentForm.semesterGroup || ""} maxLength={30} placeholder="5°A" onChange={event=>setStudentForm({...studentForm,semesterGroup:event.target.value})}/></label>
                   <label className="delivery-field">
                     <span>Género</span>
                     <select
@@ -2266,16 +2270,6 @@ export default function DeliveryRegistry({ onClose }) {
                       <option value="nonbinary">No binario</option>
                       <option value="other">Otro</option>
                       <option value="undisclosed">Prefiero no responder</option>
-                    </select>
-                  </label>
-                  <label className="delivery-field">
-                    <span>Uso del generador</span>
-                    <select
-                      value={studentForm.usageMode || "unknown"}
-                      onChange={(event) => setStudentForm({ ...studentForm, usageMode: event.target.value })}
-                    >
-                      <option value="unknown">Sin información</option>
-                      <option value="other">Otro método</option>
                     </select>
                   </label>
                   <button className="btn primary delivery-form-submit" type="submit">
@@ -2415,17 +2409,17 @@ export default function DeliveryRegistry({ onClose }) {
                   <button
                     className="btn"
                     type="button"
-                    onClick={() => setSetupStep(0)}
+                    onClick={() => setupIntent==="manage" ? setView(setupReturnView) : setSetupStep(0)}
                   >
-                    Atrás
+                    {setupIntent==="manage"?"Volver":"Atrás"}
                   </button>
                   <button
                     className="btn primary"
                     type="button"
-                    disabled={!activeStudents.length}
-                    onClick={() => setSetupStep(2)}
+                    disabled={setupIntent==="onboarding" && !activeStudents.length}
+                    onClick={() => setupIntent==="manage" ? setView(setupReturnView) : setSetupStep(2)}
                   >
-                    Continuar
+                    {setupIntent==="manage"?"Listo":"Continuar"}
                     <ArrowRight size={17} />
                   </button>
                 </div>
@@ -2521,6 +2515,8 @@ export default function DeliveryRegistry({ onClose }) {
                   className="btn"
                   type="button"
                   onClick={() => {
+                    setSetupIntent("manage");
+                    setSetupReturnView("home");
                     setContextForm(state.context);
                     setSetupStep(1);
                     setView("setup");
@@ -3287,6 +3283,31 @@ export default function DeliveryRegistry({ onClose }) {
         </div>
       )}
 
+      {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
+        <ManualDeliveryDialog
+          key={activeWeek.id+":"+manualTarget.studentId}
+          week={activeWeek}
+          student={state.students.find(student=>student.id===manualTarget.studentId)}
+          previous={activeWeek.deliveries?.[manualTarget.studentId]}
+          onCancel={()=>setManualTarget(null)}
+          onSave={commitManualEntry}
+        />
+      )}
+      {importPreview && (
+        <div className="delivery-manual-overlay" role="presentation">
+          <section className="delivery-manual-card" role="dialog" aria-modal="true" aria-label="Revisar importación">
+            <div className="delivery-manual-heading"><div><span className="delivery-kicker">Importación</span><h2>Revisar lista</h2></div></div>
+            <div className="delivery-import-summary"><strong>{importPreview.parsed.students.length} alumnos encontrados</strong>
+              <span>{importPreview.result.added} nuevos · {importPreview.result.updated} actualizados · {importPreview.parsed.warnings.length} filas omitidas</span>
+            </div>
+            <div className="delivery-import-preview">
+              {importPreview.parsed.students.slice(0,8).map((item,i)=><div key={i}><strong>{item.name}</strong><span>{[item.semesterGroup,item.specialty,item.company].filter(Boolean).join(" · ")}</span></div>)}
+            </div>
+            {importPreview.parsed.warnings.length>0 && <p className="ds-error">{importPreview.parsed.warnings.length} filas se omitirán por duplicados o datos incompletos.</p>}
+            <div className="delivery-manual-actions"><button className="btn" type="button" onClick={()=>setImportPreview(null)}>Cancelar</button><button className="btn primary" type="button" onClick={confirmSpreadsheetImport}>Importar alumnos</button></div>
+          </section>
+        </div>
+      )}
       {reportOpen && (
         <div
           className="delivery-report-overlay"
