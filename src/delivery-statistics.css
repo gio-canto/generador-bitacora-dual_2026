@@ -86,3 +86,73 @@
 .ds-specialty-heading strong{font-variant-numeric:tabular-nums;white-space:nowrap}
 @media(max-width:780px){.ds-lifetime-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.ds-lifetime-kpis{grid-template-columns:1fr}}
+
+
+/* v0.52.2: captura de jornadas visible en iOS y Android, incluso con teclado. */
+.delivery-manual-overlay{
+  box-sizing:border-box;
+  padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right))
+          max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  overscroll-behavior:contain;
+}
+.delivery-manual-card{box-sizing:border-box;min-width:0;max-height:calc(100dvh - 24px)}
+.delivery-manual-form{display:flex;flex-direction:column;min-width:0;min-height:0}
+.delivery-manual-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 1px 12px}
+.delivery-manual-section-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin:8px 0 14px}
+.delivery-manual-section-heading h3{font-size:20px;letter-spacing:-.03em;margin:0 0 6px}
+.delivery-manual-section-heading p{font-size:13px;line-height:1.5;color:#666770;max-width:460px;margin:0}
+.delivery-manual-day,.delivery-manual-main .delivery-field,.delivery-manual-day .delivery-field{min-width:0}
+.delivery-manual-day{align-content:start}
+.delivery-manual-day .delivery-field{display:grid;gap:6px}
+.delivery-manual-day select,.delivery-manual-main select,.delivery-manual-day input{font-size:16px!important;max-width:100%;min-width:0}
+.delivery-manual-note{margin:14px 0 0;padding:11px 13px;background:#f5f7fa;border-radius:12px;font-size:12px;color:#5e6674;line-height:1.5}
+.delivery-manual-card:focus{outline:none}
+.delivery-manual-actions{position:sticky;bottom:0;z-index:2;margin:0 -26px -26px;padding:15px 26px max(18px,env(safe-area-inset-bottom));background:rgba(255,255,255,.96);border-top:1px solid #e9e9ee;backdrop-filter:blur(14px)}
+/* Panel: no forzar el ancho con nombres de empresa, métricas ni barras largas. */
+.delivery-analytics-container,.ds-panel,.ds-controls,.ds-kpi,.ds-lifetime{min-width:0;max-width:100%}
+.ds-panel-head>h1{overflow-wrap:anywhere}
+.ds-legend-row span:nth-child(2),.ds-cause-label span,.ds-specialty-heading span{overflow-wrap:anywhere}
+.ds-cause-label strong,.ds-legend-row strong{flex-shrink:0;white-space:nowrap}
+.ds-columns{max-width:100%;overflow-x:auto;padding-bottom:4px}
+.ds-column{min-width:54px}
+.ds-controls{box-sizing:border-box}
+.ds-controls .ds-tabs{max-width:100%}
+.ds-controls select,.ds-controls input{box-sizing:border-box;max-width:100%}
+.ds-lifetime-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:760px), (pointer:coarse){
+  .delivery-manual-overlay{align-items:flex-end;padding:0}
+  .delivery-manual-card{width:100%;max-width:none;max-height:calc(100dvh - max(8px,env(safe-area-inset-top)));border-radius:25px 25px 0 0;padding:18px 18px 0;display:flex;flex-direction:column}
+  .delivery-manual-heading{flex:0 0 auto;min-width:0}
+  .delivery-manual-heading h2{font-size:clamp(22px,6vw,31px);overflow-wrap:anywhere}
+  .delivery-manual-heading>div{min-width:0}
+  .delivery-manual-form{flex:1 1 auto;overflow:hidden}
+  .delivery-manual-scroll{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .delivery-manual-days,.delivery-manual-main{grid-template-columns:1fr;gap:10px}
+  .delivery-manual-actions{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 -18px;padding:12px 18px calc(13px + env(safe-area-inset-bottom))}
+  .delivery-manual-actions .btn{min-width:0;width:100%;justify-content:center;white-space:normal}
+  .delivery-analytics-container{gap:13px}
+  .ds-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:13px}
+  .ds-controls>.ds-tabs{grid-column:1/-1;min-width:0;width:100%;justify-content:stretch}
+  .ds-controls>.ds-tabs button{min-width:0;flex:1;padding:10px 5px;font-size:12px}
+  .ds-controls label{min-width:0;width:100%}
+  .ds-panel-head{align-items:stretch}
+  .ds-panel-head>.btn{min-height:44px}
+  .ds-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ds-lifetime-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ds-legend{grid-template-columns:1fr}
+  .ds-panel{padding:17px}
+}
+@media(max-width:430px){
+  .ds-controls{grid-template-columns:1fr}
+  .ds-controls>.ds-tabs{grid-column:1}
+  .ds-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ds-small-kpis,.ds-lifetime-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ds-kpi{padding:14px;gap:8px}
+  .ds-kpi strong{font-size:clamp(20px,6vw,29px)}
+  .ds-kpi span{font-size:11px}
+  .ds-panel h2{font-size:19px}
+  .ds-manual-card{min-width:0}
+}
+@media(max-width:340px){
+  .ds-kpis,.ds-small-kpis,.ds-lifetime-kpis{grid-template-columns:1fr}
+}
