@@ -869,7 +869,7 @@ function base64ToBytes(value) {
   return bytes;
 }
 
-function canvasToJpeg(
+export function canvasToJpeg(
   canvas,
   pdfWidth = PDF_W,
   pdfHeight = PDF_H,
@@ -899,7 +899,7 @@ function concatBytes(chunks) {
   return result;
 }
 
-function createPdfFromJpegs(images) {
+export function createPdfFromJpegs(images) {
   const objectCount = 2 + images.length * 3;
   const objects = new Array(objectCount + 1);
   const pageRefs = [];
@@ -1000,7 +1000,7 @@ function createPdfFromJpegs(images) {
   return concatBytes(chunks);
 }
 
-function downloadPdf(bytes, filename) {
+export function downloadPdf(bytes, filename) {
   const url = URL.createObjectURL(
     new Blob([bytes], { type: "application/pdf" }),
   );
