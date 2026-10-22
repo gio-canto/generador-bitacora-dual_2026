@@ -12,7 +12,7 @@ const catalogFor = (status) =>
   status === "sin_labores" ? nonWorkingReasons : [];
 
 function minutesBetween(start, end) {
-  const valid = /^([01]\\d|2[0-3]):[0-5]\\d$/;
+  const valid = /^([01]\d|2[0-3]):[0-5]\d$/;
   if (!valid.test(start || "") || !valid.test(end || "")) return null;
   const [h1, m1] = start.split(":").map(Number);
   const [h2, m2] = end.split(":").map(Number);
@@ -51,7 +51,7 @@ export function encodeWeekStatistics(entries) {
     binary += String.fromCharCode(Number((packed >> BigInt(n * 8)) & 255n));
   }
   const encoded = globalThis.btoa(binary)
-    .replace(/\\+/g, "-").replace(/\\//g, "_").replace(/=+$/g, "");
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
   return "S5:" + encoded;
 }
 
