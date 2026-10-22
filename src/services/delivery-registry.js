@@ -1,15 +1,17 @@
 import companies from "../data/companies.json";
+import { decodeWeekStatistics, encodeWeekStatistics } from "./matrix-statistics.js";
 
-export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v7";
-export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v6";
+export const DELIVERY_KEY = "bitacora_dual_delivery_registry_v8";
+export const PREVIOUS_DELIVERY_KEY = "bitacora_dual_delivery_registry_v7";
 export const LEGACY_DELIVERY_KEYS = [
+  "bitacora_dual_delivery_registry_v6",
   "bitacora_dual_delivery_registry_v5",
   "bitacora_dual_delivery_registry_v4",
   "bitacora_dual_delivery_registry_v3",
   "bitacora_dual_delivery_registry_v2",
   "bitacora_dual_delivery_registry_v1",
 ];
-export const DELIVERY_SCHEMA = 7;
+export const DELIVERY_SCHEMA = 8;
 
 const uid = () =>
   globalThis.crypto?.randomUUID?.() ||
@@ -140,6 +142,7 @@ export function createMatrixPayload(data = {}) {
     companyMatrixValue(data.company),
     compactDate(startDate),
     compactDate(endDate),
+    ...(encodeWeekStatistics(data.entries) ? [encodeWeekStatistics(data.entries)] : []),
   ].join("|");
 }
 
@@ -168,6 +171,7 @@ export function parseMatrixPayload(rawValue) {
       company: clean(parts[4], 80),
       startDate: expandCompactDate(parts[5]),
       endDate: expandCompactDate(parts[6]),
+      ...(decodeWeekStatistics(parts[7]) ? { statistics: decodeWeekStatistics(parts[7]) } : {}),
     };
   }
 
@@ -235,6 +239,9 @@ export function createStudent(data = {}) {
     name: clean(data.name, 180),
     specialty: clean(data.specialty, 120),
     company: clean(data.company, 220),
+    gender: ["male", "female", "nonbinary", "other", "undisclosed"].includes(data.gender)
+      ? data.gender : "",
+    usageMode: ["other", "unknown"].includes(data.usageMode) ? data.usageMode : "unknown",
     dualStatus,
     desistedAt:
       dualStatus === "desisted" && typeof data.desistedAt === "string"
@@ -323,6 +330,18 @@ function normalizeDelivery(value) {
     source: ["camera", "manual", "import"].includes(value.source)
       ? value.source
       : "manual",
+    ...(Number.isInteger(value.matrixVersion) && value.matrixVersion > 0
+      ? { matrixVersion: value.matrixVersion } : {}),
+    ...(value.statistics && value.statistics.version === 5 &&
+      Array.isArray(value.statistics.entries) && value.statistics.entries.length === 4 &&
+      value.statistics.entries.every((day) =>
+        ["laboral", "falta", "sin_labores", "inhabil"].includes(day?.status) &&
+        Number.isInteger(day.minutes) && day.minutes >= 0 && day.minutes <= 2046 &&
+        Number.isInteger(day.reasonCode) && day.reasonCode >= 0 && day.reasonCode <= 63)
+      ? { statistics: { version: 5, entries: value.statistics.entries.map((day) => ({
+          status: day.status, minutes: day.minutes, reasonCode: day.reasonCode,
+          reasonId: clean(day.reasonId, 80),
+        })) } } : {}),
   };
 }
 
@@ -458,7 +477,7 @@ export function statusFromTimestamp(week, timestamp) {
   return delivered > due ? "entregado_tarde" : "entregado";
 }
 
-export function registerDelivery(week, studentId, timestamp, source = "manual") {
+export function registerDelivery(week, studentId, timestamp, source = "manual", metadata = {}) {
   const registeredAt = timestamp || new Date().toISOString();
   return {
     ...week,
@@ -468,6 +487,8 @@ export function registerDelivery(week, studentId, timestamp, source = "manual") 
         status: statusFromTimestamp(week, registeredAt),
         registeredAt,
         source,
+        ...(Number.isInteger(metadata.matrixVersion) ? { matrixVersion: metadata.matrixVersion } : {}),
+        ...(metadata.statistics ? { statistics: metadata.statistics } : {}),
       },
     },
   };
@@ -522,6 +543,8 @@ export function setDeliveryStatus(
         status,
         registeredAt,
         source,
+        ...(status !== "no_aplica" && previous?.statistics ? { statistics: previous.statistics } : {}),
+        ...(status !== "no_aplica" && previous?.matrixVersion ? { matrixVersion: previous.matrixVersion } : {}),
       },
     },
   };
@@ -557,6 +580,8 @@ export function mergeStudents(current, incoming) {
         specialty:
           clean(item?.specialty, 120) || result[index].specialty || "",
         company: clean(item?.company, 220) || result[index].company || "",
+        gender: item?.gender || result[index].gender || "",
+        usageMode: item?.usageMode || result[index].usageMode || "unknown",
       };
       updated++;
     } else {
