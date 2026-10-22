@@ -22,6 +22,7 @@ describe("reporte PDF estadístico",()=>{
       {status:"falta",hours:"",reasonCode:"3"},
     ]);
     const week=saveManualDelivery(createWeek({startDate:"2026-10-20",label:"Semana 1"}),student.id,"entregado",{usageSource:"generator",statistics});
+    vi.spyOn(globalThis,"setTimeout").mockImplementation(()=>0);
     const output=await generateStatisticsReportPdf({context:{school:"Plantel de prueba",generation:"2025–2028"},students:[student],weeks:[week]},{period:"weekly",weekId:week.id});
     expect(output.pages).toBe(2);
     expect(output.filename).toMatch(/^estadisticas-dual-.*\.pdf$/);
