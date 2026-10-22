@@ -337,8 +337,8 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       x:650,y:453,w:505,h:407,unit:" h",maxRows:6});
     panel(ctx,54,916,1132,682,"Indicadores del periodo","Porcentaje de registros aplicables");
     gauges(ctx,[
-      {label:"Cumplimiento\nde entrega",value:r.deliveryRate,color:C.blue},
-      {label:"Puntualidad\nde entrega",value:r.onTimeRate,color:C.teal},
+      {label:"Cumplimiento de entrega",value:r.deliveryRate,color:C.blue},
+      {label:"Puntualidad de entrega",value:r.onTimeRate,color:C.teal},
       {label:"Asistencia",value:r.attendanceRate,color:C.green},
       {label:"Cobertura estadística",value:r.coverage,color:C.purple},
     ],{x:93,y:1035,w:1054,h:495});
