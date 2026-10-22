@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.51.2-beta.1 · Proporciones y acumulados históricos del Dual · 2026-10-22
+
+- El panel Estadísticas incorpora la proporción de alumnos activos por especialidad y su representación porcentual, incluyendo filtros de especialidad y empresa.
+- Nuevo apartado independiente «Acumulado de Educación Dual»: suma de horas de todas las semanas, promedio por alumno con datos, mínimo, máximo, rango y mediana, además de horas históricas por especialidad.
+- Las horas de entregas registradas anteriormente se incluyen aunque el alumno haya desistido, siempre que existan estadísticas de jornadas; las semanas repetidas de un mismo alumno no se suman dos veces.
+- Las entregas sin dato estadístico no se interpretan como cero horas. Un registro confirmado con cero horas sí se considera al calcular promedio, mínimo, máximo y rango.
+- El PDF institucional incorpora una cuarta página con gráficas de proporción por especialidad y horas acumuladas, estadísticas descriptivas y base de cálculo. Las tres páginas anteriores se conservan.
+- Se añaden pruebas de acumulación histórica, filtros, deduplicación, datos desconocidos y las cuatro páginas del PDF.
+- Numeración solicitada: 0.51.2; se conserva el historial de cambios posterior de las ramas 0.52.x en este archivo.
+
+
 ## 0.52.1-beta.1 · PDF con gráficas y grupo único · 2026-10-22
 
 - El reporte estadístico pasa a tres páginas y utiliza el logotipo oficial del sistema `Asset_logo.png`; desaparece el bloque provisional «BD».

@@ -1,6 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
-export const VERSION = "0.52.1-beta.1";
-export const RELEASE = "Gráficas PDF y grupo del alumnado";
+export const VERSION = "0.51.2-beta.1";
+export const RELEASE = "Acumulados y proporciones de Educación Dual";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {

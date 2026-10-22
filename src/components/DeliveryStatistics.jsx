@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { summarizeWeekStatistics, causeLabel } from "../services/matrix-statistics.js";
-import { calculateDeliveryStatistics } from "../services/statistics.js";
+import { calculateDeliveryStatistics, calculateDualLifetimeStatistics } from "../services/statistics.js";
 import { generateStatisticsReportPdf } from "../services/statistics-report.js";
 import { studentIsActive } from "../services/delivery-registry.js";
 import "../delivery-statistics.css";
@@ -147,6 +147,8 @@ export default function DeliveryStatistics({ state, onBack }) {
   }, [state, period, weekId, month, specialty, company]);
 
   const advanced = useMemo(() => calculateDeliveryStatistics(state,{period,weekId,month,specialty,company}), [state,period,weekId,month,specialty,company]);
+  const lifetime = useMemo(() => calculateDualLifetimeStatistics(state,{specialty,company}), [state,specialty,company]);
+  const fmtHours = value => value == null ? "—" : value.toLocaleString("es-MX",{maximumFractionDigits:1})+" h";
   async function downloadStatistics(){setPdfBusy(true);setPdfError("");try{await generateStatisticsReportPdf(state,{period,weekId,month,specialty,company});}catch(error){setPdfError(error?.message||"No se pudo generar el PDF.");}finally{setPdfBusy(false);}}
   const dayItems = [
     {label:"Con labores",value:display.daily.laboral,color:"#0071e3"},
@@ -284,6 +286,47 @@ export default function DeliveryStatistics({ state, onBack }) {
           ["Bitácoras con datos",number(advanced.weeksWithStatistics)]
         ].map(([label,value])=><article className="ds-kpi" key={label}><strong>{value}</strong><span>{label}</span></article>)}
       </div>
+      <section className="ds-lifetime" aria-label="Acumulado de Educación Dual">
+        <div className="ds-lifetime-heading">
+          <div><span className="delivery-kicker">Histórico · todas las semanas</span><h2>Acumulado de Educación Dual</h2></div>
+          <span className="ds-lifetime-caption">{lifetime.studentsWithData} alumnos con horas registradas</span>
+        </div>
+        <div className="ds-kpis ds-lifetime-kpis">
+          {[
+            ["Horas totales",fmtHours(lifetime.totalHours)],
+            ["Promedio por alumno",fmtHours(lifetime.averageHours)],
+            ["Mínimo",fmtHours(lifetime.minHours)],
+            ["Máximo",fmtHours(lifetime.maxHours)],
+            ["Rango",fmtHours(lifetime.rangeHours)],
+            ["Mediana",fmtHours(lifetime.medianHours)]
+          ].map(([label,value])=><article className="ds-kpi" key={label}><strong>{value}</strong><span>{label}</span></article>)}
+        </div>
+        <div className="ds-two-column">
+          <section className="ds-panel">
+            <h2>Proporción por especialidad</h2>
+            <p className="ds-lifetime-caption">Alumnos activos · {lifetime.activeStudents} en total</p>
+            {lifetime.bySpecialty.filter(item => item.students > 0).length ?
+              lifetime.bySpecialty.filter(item => item.students > 0).map(item=>
+                <div className="ds-specialty-row" key={item.label}>
+                  <div className="ds-specialty-heading"><span>{item.label}</span><strong>{item.proportion.toLocaleString("es-MX",{maximumFractionDigits:1})}%</strong></div>
+                  <div className="ds-track"><i style={{width:item.proportion+"%"}}/></div>
+                  <span className="ds-lifetime-caption">{item.students} alumnos</span>
+                </div>) : <p className="ds-empty">Sin alumnos activos en esta selección.</p>}
+          </section>
+          <section className="ds-panel">
+            <h2>Horas acumuladas por especialidad</h2>
+            <p className="ds-lifetime-caption">Todas las entregas con jornadas registradas</p>
+            {lifetime.bySpecialty.filter(item => item.minutes > 0).length ?
+              lifetime.bySpecialty.filter(item => item.minutes > 0).map(item=>
+                <div className="ds-specialty-row" key={item.label}>
+                  <div className="ds-specialty-heading"><span>{item.label}</span><strong>{fmtHours(item.hours)}</strong></div>
+                  <div className="ds-track"><i style={{width:item.hoursProportion+"%"}}/></div>
+                  <span className="ds-lifetime-caption">{item.hoursProportion.toLocaleString("es-MX",{maximumFractionDigits:1})}% de las horas</span>
+                </div>) : <p className="ds-empty">Sin horas registradas en esta selección.</p>}
+          </section>
+        </div>
+        <p className="ds-lifetime-caption">El promedio, mínimo, máximo, rango y mediana se calculan sobre los alumnos con al menos una semana de datos. Los códigos antiguos sin horas no se consideran como cero. El histórico no cambia al elegir un mes o una semana.</p>
+      </section>
     </div>
   );
 }

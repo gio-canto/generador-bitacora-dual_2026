@@ -155,3 +155,9 @@ exporta el respaldo correspondiente.
 Los archivos descargados quedan bajo control de quien los conserva. No subas respaldos ni bitácoras reales al repositorio.
 
 Consulta [../SECURITY.md](../SECURITY.md).
+
+## Acumulado histórico de Educación Dual
+
+El panel y el PDF calculan las horas históricas a partir de las entregas con estadísticas válidas de jornada. El consolidado incluye todas las semanas almacenadas del alumno, incluso si ha desistido. Si existen varias semanas con la misma fecha inicial y entrega para un mismo alumno, se conserva únicamente el registro válido más reciente. Los códigos anteriores que no contienen estadísticas de jornada no se convierten en cero horas.
+
+La proporción por especialidad usa el padrón de alumnos activos. El promedio, mediana, mínimo, máximo y rango de horas se calculan por alumno sobre quienes tienen al menos una semana con estadísticas registradas. Las jornadas con cero horas efectivamente registradas permanecen en el cálculo. Los filtros de especialidad y empresa también afectan el consolidado, pero los filtros de mes o semana no limitan su acumulación histórica.
