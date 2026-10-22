@@ -1565,10 +1565,12 @@ export default function DeliveryRegistry({ onClose }) {
 
   const setManualStatus = (studentId, status) => {
     if (!activeWeek || activeWeek.closedAt) return;
-    if (status === "entregado" || status === "entregado_tarde") {
+    if (status !== "no_aplica") {
       setManualTarget({studentId,status});
       return;
     }
+    const previous = activeWeek.deliveries?.[studentId];
+    if (previous?.statistics && !window.confirm("¿Cambiar a «No aplica»? Se eliminarán las jornadas y horas de esta semana.")) return;
     const student = state.students.find((item) => item.id === studentId);
     commit({
       ...state,
@@ -1915,6 +1917,13 @@ export default function DeliveryRegistry({ onClose }) {
             <Icon size={17} weight="fill" />
             {meta.label}
           </div>
+          {status !== "no_aplica" && (
+            <span className="delivery-data-status">
+              {delivery?.statistics?.entries?.length === 4
+                ? "Jornadas registradas"
+                : "Sin horas capturadas"}
+            </span>
+          )}
         </div>
         <div className="delivery-student-time">
           <span>Registro</span>
@@ -1930,7 +1939,16 @@ export default function DeliveryRegistry({ onClose }) {
           )}
         </div>
         <div className="delivery-row-actions">
-          <button className="btn" type="button" title="Horas y método" aria-label={"Editar estadísticas de " + student.name} disabled={Boolean(week.closedAt)} onClick={() => setManualTarget({studentId:student.id})}><ChartBar size={18}/></button>
+          {status !== "no_aplica" && (
+            <button className="btn delivery-stats-trigger" type="button"
+              title="Capturar o corregir horas y jornadas"
+              aria-label={"Horas y jornadas de " + student.name}
+              disabled={Boolean(week.closedAt)}
+              onClick={() => setManualTarget({studentId:student.id,status})}>
+              <ChartBar size={18} />
+              <span>Horas y jornadas</span>
+            </button>
+          )}
           <button
             className="btn"
             type="button"
@@ -1939,6 +1957,7 @@ export default function DeliveryRegistry({ onClose }) {
             onClick={() => editStudent(student)}
           >
             <PencilSimple size={18} />
+            <span className="delivery-edit-label">Editar alumno</span>
           </button>
           <label className="delivery-manual-status">
             <span>Estado manual</span>
