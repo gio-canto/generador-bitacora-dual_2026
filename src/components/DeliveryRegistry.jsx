@@ -409,7 +409,7 @@ export default function DeliveryRegistry({ onClose }) {
     name: "",
     specialty: "",
     company: "",
-    semesterGroup: "",
+    group: "",
     gender: "",
     usageMode: "unknown",
   });
@@ -1365,7 +1365,7 @@ export default function DeliveryRegistry({ onClose }) {
       name: String(studentForm.name || "").replace(/\s+/g, " ").trim(),
       specialty: String(studentForm.specialty || "").trim(),
       company: String(studentForm.company || "").trim(),
-      semesterGroup: String(studentForm.semesterGroup || "").trim(),
+      group: String(studentForm.group || "").trim(),
       gender: studentForm.gender || "",
       usageMode: studentForm.usageMode || "unknown",
     };
@@ -1403,7 +1403,7 @@ export default function DeliveryRegistry({ onClose }) {
         ),
       });
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", group: "", gender: "", usageMode: "unknown" });
       clearNotice();
       notify("success", "Alumno actualizado", nextStudent.name);
       return;
@@ -1411,7 +1411,7 @@ export default function DeliveryRegistry({ onClose }) {
 
     const merged = mergeStudents(state.students, [nextStudent]);
     commit({ ...state, students: merged.students });
-    setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
+    setStudentForm({ name: "", specialty: "", company: "", group: "", gender: "", usageMode: "unknown" });
     clearNotice();
     if (merged.added)
       notify("success", "Alumno agregado", nextStudent.name);
@@ -1431,7 +1431,7 @@ export default function DeliveryRegistry({ onClose }) {
       name: student.name || "",
       specialty: student.specialty || "",
       company: student.company || "",
-      semesterGroup: student.semesterGroup || "",
+      group: student.group || "",
       gender: student.gender || "",
       usageMode: student.usageMode || "unknown",
     });
@@ -1453,7 +1453,7 @@ export default function DeliveryRegistry({ onClose }) {
     setStudentActionId("");
     if (editingStudentId === studentId) {
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", group: "", gender: "", usageMode: "unknown" });
     }
     clearNotice();
     notify(
@@ -1500,7 +1500,7 @@ export default function DeliveryRegistry({ onClose }) {
     setStudentActionId("");
     if (editingStudentId === studentId) {
       setEditingStudentId("");
-      setStudentForm({ name: "", specialty: "", company: "", semesterGroup: "", gender: "", usageMode: "unknown" });
+      setStudentForm({ name: "", specialty: "", company: "", group: "", gender: "", usageMode: "unknown" });
     }
     clearNotice();
     notify("info", "Alumno eliminado definitivamente", studentName);
@@ -2257,7 +2257,7 @@ export default function DeliveryRegistry({ onClose }) {
                       ))}
                     </select>
                   </label>
-                  <label className="delivery-field"><span>Semestre y grupo</span><input value={studentForm.semesterGroup || ""} maxLength={30} placeholder="5°A" onChange={event=>setStudentForm({...studentForm,semesterGroup:event.target.value})}/></label>
+                  <label className="delivery-field"><span>Grupo</span><input value={studentForm.group || ""} maxLength={30} placeholder="A" onChange={event=>setStudentForm({...studentForm,group:event.target.value})}/></label>
                   <label className="delivery-field">
                     <span>Género</span>
                     <select
@@ -2290,7 +2290,7 @@ export default function DeliveryRegistry({ onClose }) {
                           name: "",
                           specialty: "",
                           company: "",
-                          semesterGroup: "",
+                          group: "",
                           gender: "",
                           usageMode: "unknown",
                         });
@@ -3302,7 +3302,7 @@ export default function DeliveryRegistry({ onClose }) {
               <span>{importPreview.result.added} nuevos · {importPreview.result.updated} actualizados · {importPreview.parsed.warnings.length} filas omitidas</span>
             </div>
             <div className="delivery-import-preview">
-              {importPreview.parsed.students.slice(0,8).map((item,i)=><div key={i}><strong>{item.name}</strong><span>{[item.semesterGroup,item.specialty,item.company].filter(Boolean).join(" · ")}</span></div>)}
+              {importPreview.parsed.students.slice(0,8).map((item,i)=><div key={i}><strong>{item.name}</strong><span>{[item.group,item.specialty,item.company].filter(Boolean).join(" · ")}</span></div>)}
             </div>
             {importPreview.parsed.warnings.length>0 && <p className="ds-error">{importPreview.parsed.warnings.length} filas se omitirán por duplicados o datos incompletos.</p>}
             <div className="delivery-manual-actions"><button className="btn" type="button" onClick={()=>setImportPreview(null)}>Cancelar</button><button className="btn primary" type="button" onClick={confirmSpreadsheetImport}>Importar alumnos</button></div>
