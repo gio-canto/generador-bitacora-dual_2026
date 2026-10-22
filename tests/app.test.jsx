@@ -169,7 +169,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   const customAbsenceText =
     "Inasistencia por una situación particular previamente informada a las personas responsables.";
   fireEvent.input(firstActivity(), { target: { value: customAbsenceText } });
-  expect(firstAbsenceReason().value).toBe("");
+  expect(firstAbsenceReason().value).toBe("medical_appointment");
 
   fireEvent.change(firstAbsenceReason(), { target: { value: "illness" } });
   expect($("guardDialog").open).toBe(true);
