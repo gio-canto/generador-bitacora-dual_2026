@@ -15,8 +15,9 @@ describe("carga de alumnos desde formatos escolares",()=>{
     const result=parseStudentSpreadsheet(sample);
     expect(result.headerRow).toBe(3);
     expect(result.students).toHaveLength(2);
-    expect(result.students[0]).toMatchObject({name:"Ana López",specialty:"Programación",company:"UAGRO",semesterGroup:"5°A"});
+    expect(result.students[0]).toMatchObject({name:"Ana López",specialty:"Programación",company:"UAGRO",group:"A"});
     expect(result.students[1].specialty).toBe("Administración de Recursos Humanos");
+    expect(result.students[1].group).toBe("B");
     expect(result.warnings).toHaveLength(1);
   });
   it("ignora pies de firma y no inventa género",()=>{
