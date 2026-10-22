@@ -390,6 +390,7 @@ export function startEditor() {
       return {
         date,
         status: "laboral",
+        reasonId: "",
         start: $("#defaultStart").value || preset.start,
         end: $("#defaultEnd").value || preset.end,
         area: readProfileData().area || preset.area,
@@ -756,7 +757,7 @@ export function startEditor() {
               : e.status === "inhabil"
                 ? INHABIL_JUSTIFICATION
                 : "Puedes usar **negritas**, *cursivas* y listas con -";
-        const absenceReasonId = reasonIdForText(e.status, e.activity);
+        const absenceReasonId = e.reasonId || reasonIdForText(e.status, e.activity);
         const absenceReasonOptions = reasonsForStatus(e.status).map(
           (item) =>
             `<option value="${escapeHtml(item.id)}" ${item.id === absenceReasonId ? "selected" : ""}>${escapeHtml(item.label)}</option>`,
@@ -778,6 +779,7 @@ export function startEditor() {
               previous = entries[i].status,
               next = input.value;
             entries[i].status = next;
+            if (previous !== next) entries[i].reasonId = "";
             if (next === "inhabil") entries[i].activity = INHABIL_JUSTIFICATION;
             else if (
               previous === "inhabil" &&
@@ -824,7 +826,7 @@ export function startEditor() {
               `[data-absence-reason="${i}"]`,
             );
             if (reasonSelect)
-              reasonSelect.value = reasonIdForText(entries[i].status, input.value);
+              reasonSelect.value = entries[i].reasonId || reasonIdForText(entries[i].status, input.value);
           }
           if (k === "area") {
             const commonAreas = [
@@ -871,10 +873,12 @@ export function startEditor() {
           const previous = entries[i].activity,
             before = buildPageModel();
           entries[i].activity = preset.text;
+          entries[i].reasonId = preset.id;
           const after = buildPageModel();
           if (!after.fits && after.bottom >= before.bottom - 0.01) {
             entries[i].activity = previous;
-            select.value = reasonIdForText(entries[i].status, previous);
+            entries[i].reasonId = currentPresetId;
+            select.value = currentPresetId;
             notifySpaceLimit();
             return;
           }
