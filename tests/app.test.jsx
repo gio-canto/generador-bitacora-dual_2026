@@ -169,7 +169,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   const customAbsenceText =
     "Inasistencia por una situación particular previamente informada a las personas responsables.";
   fireEvent.input(firstActivity(), { target: { value: customAbsenceText } });
-  expect(firstAbsenceReason().value).toBe("");
+  expect(firstAbsenceReason().value).toBe("medical_appointment");
 
   fireEvent.change(firstAbsenceReason(), { target: { value: "illness" } });
   expect($("guardDialog").open).toBe(true);
@@ -215,7 +215,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   const customNonWorkingText =
     "La empresa suspendió sus operaciones por una circunstancia extraordinaria informada por el responsable.";
   fireEvent.input(firstActivity(), { target: { value: customNonWorkingText } });
-  expect(firstAbsenceReason().value).toBe("");
+  expect(firstAbsenceReason().value).toBe("facility_maintenance");
   fireEvent.change(firstAbsenceReason(), {
     target: { value: "labor_stoppage" },
   });

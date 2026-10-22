@@ -591,7 +591,7 @@ describe("subsistema de registro de entrega", () => {
         ],
       }),
     );
-    expect(parsed.schemaVersion).toBe(7);
+    expect(parsed.schemaVersion).toBe(8);
     expect(parsed.context).toEqual({
       school: "CBTis 134",
       generation: "",

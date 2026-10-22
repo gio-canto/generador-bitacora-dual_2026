@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.51.0-beta.1 · Estadísticas de Educación Dual · 2026-10-22
+
+- El Data Matrix conserva BD26|4 y añade un bloque S5 de 10 bytes con los cuatro estados de jornada, minutos y códigos de causas, sin textos de justificaciones ni género.
+- Se guardan los identificadores de causas por separado del texto. Los catálogos incorporan códigos numéricos estables.
+- El registro acepta Data Matrix anteriores; sus entregas se conservan aunque no tengan estadísticas de jornadas.
+- El registro de entrega migra sus datos de v7 a v8 y conserva estadísticas por alumno y semana.
+- Nuevo panel de estadísticas con periodos, filtros, jornadas, motivos, distribución de género, uso identificado, CSV e impresión/PDF.
+- Género y modalidad de utilización se editan exclusivamente en el padrón del registro; se permite importar género desde Excel.
+- Se incluyen pruebas del bloque compacto, retrocompatibilidad y migración.
+
 ## 0.50.0-beta.47 · Motivos frecuentes para Sin labores · 2026-10-09
 
 - **Sin labores** incorpora motivos frecuentes opcionales con justificaciones editables y confirmación antes de reemplazar texto personalizado.

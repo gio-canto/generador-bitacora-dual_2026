@@ -1,0 +1,49 @@
+.delivery-analytics-container{display:grid;gap:18px}
+.ds-header{padding:15px 2px 5px;display:grid;gap:9px}
+.ds-header>.btn{justify-self:start}
+.ds-header h1{font-size:clamp(38px,5vw,58px);letter-spacing:-.055em;line-height:1.05;margin:0}
+.ds-controls{display:flex;align-items:end;gap:11px;flex-wrap:wrap;background:#fff;padding:16px;border:1px solid rgba(0,0,0,.06);border-radius:21px}
+.ds-controls label{display:grid;gap:5px;color:#6e6e73;font-size:12px;font-weight:600;min-width:145px;flex:1}
+.ds-controls select,.ds-controls input{min-height:39px;max-width:100%;min-width:0;padding:8px 10px;border:1px solid #dedee2;border-radius:12px;background:#f9f9fb;color:#1d1d1f;font:inherit;font-size:13px}
+.ds-tabs{display:flex;flex-wrap:nowrap;align-items:center;background:#ededf0;padding:4px;border-radius:13px;gap:2px}
+.ds-tabs button{border:0;background:transparent;color:#5e5e65;padding:10px 12px;border-radius:10px;font:inherit;font-weight:650;font-size:13px;cursor:pointer;white-space:nowrap}
+.ds-tabs button.active{background:#fff;color:#1d1d1f;box-shadow:0 2px 7px rgba(0,0,0,.075)}
+.ds-tabs.small button{font-size:12px;padding:8px 11px}
+.ds-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.ds-kpi,.ds-panel{background:#fff;border:1px solid rgba(0,0,0,.055);border-radius:22px;box-shadow:0 9px 26px rgba(0,0,0,.04)}
+.ds-kpi{padding:23px;display:grid;gap:12px}
+.ds-kpi strong{font-size:clamp(23px,3.3vw,39px);font-weight:750;letter-spacing:-.045em;line-height:1;overflow-wrap:anywhere}
+.ds-kpi span{font-size:13px;color:#6e6e73;font-weight:600}
+.ds-panel{padding:24px;display:grid;gap:17px;align-content:start;min-width:0}
+.ds-panel h2{font-size:22px;letter-spacing:-.035em;margin:0}
+.ds-panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.ds-feature-number{font-size:32px;letter-spacing:-.045em;font-weight:750}
+.ds-columns{display:flex;gap:12px;align-items:stretch;justify-content:space-around;min-height:216px}
+.ds-column{flex:1;min-width:0;display:flex;align-items:center;flex-direction:column;gap:9px;text-align:center}
+.ds-column strong{font-size:12px;font-weight:700}
+.ds-column-track{width:100%;max-width:105px;flex:1;min-height:130px;border-radius:10px 10px 3px 3px;background:#f0f3f8;display:flex;align-items:end;overflow:hidden}
+.ds-column-track span{display:block;width:100%;background:#0071e3;border-radius:9px 9px 2px 2px;min-height:0}
+.ds-column small{font-size:11px;color:#6e6e73;overflow-wrap:anywhere}
+.ds-stack{height:14px;display:flex;overflow:hidden;gap:2px;border-radius:100px;background:#eceef1}
+.ds-stack>span{display:block;min-width:0}
+.ds-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+.ds-legend-row{display:flex;align-items:center;min-width:0;gap:8px;color:#66666d;font-size:13px}
+.ds-legend-row span:nth-child(2){min-width:0;flex:1}
+.ds-legend-row strong{color:#1d1d1f;font-variant-numeric:tabular-nums}
+.ds-color-dot{width:9px;height:9px;border-radius:4px;flex:none}
+.ds-two-column{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.ds-cause{display:grid;gap:6px}
+.ds-cause-label{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:#56565d}
+.ds-cause-label strong{color:#1d1d1f}
+.ds-track{height:7px;border-radius:9px;background:#f1f2f5;overflow:hidden}
+.ds-track i{display:block;height:100%;background:#0071e3;border-radius:9px}
+.ds-empty{margin:4px 0;color:#85858b;font-size:13px}
+.ds-export{display:flex;gap:7px;flex-wrap:wrap}
+.ds-table-scroll{overflow:auto}
+.ds-table{width:100%;border-collapse:collapse;text-align:left;min-width:550px;font-size:13px}
+.ds-table th{font-size:12px;color:#6e6e73;font-weight:650}
+.ds-table td,.ds-table th{padding:12px 9px;border-bottom:1px solid #eeeef0}
+.ds-table td:nth-child(n+3){font-variant-numeric:tabular-nums}
+@media(max-width:860px){.ds-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-two-column{grid-template-columns:1fr}}
+@media(max-width:480px){.ds-controls{padding:12px}.ds-controls label{min-width:100%}.ds-tabs{width:100%}.ds-tabs button{flex:1}.ds-panel{padding:18px}.ds-kpi{padding:17px}.ds-legend{grid-template-columns:1fr}}
+@media print{.delivery-app:has(.delivery-analytics-container){background:#fff}.delivery-app:has(.delivery-analytics-container) .delivery-topbar,.ds-controls,.ds-header>.btn,.ds-export,.ds-tabs{display:none!important}.delivery-app:has(.delivery-analytics-container) .delivery-shell{padding:0;width:100%}.ds-panel,.ds-kpi{box-shadow:none;break-inside:avoid}.ds-table-scroll{overflow:visible}.ds-table{min-width:0}}

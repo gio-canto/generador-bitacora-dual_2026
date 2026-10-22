@@ -7,8 +7,10 @@ describe("catálogo de motivos frecuentes de Sin labores", () => {
     expect(reasons.length).toBeGreaterThan(15);
     const ids = new Set();
     for (const reason of reasons) {
-      expect(Object.keys(reason).sort()).toEqual(["id", "label", "text"]);
+      expect(Object.keys(reason).sort()).toEqual(["code", "id", "label", "text"]);
       expect(reason.id).toMatch(/^[a-z0-9_]+$/);
+      expect(reason.code).toBeGreaterThan(0);
+      expect(reason.code).toBeLessThan(63);
       expect(ids.has(reason.id)).toBe(false);
       ids.add(reason.id);
       expect(reason.label.trim().length).toBeGreaterThan(1);

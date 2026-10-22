@@ -57,10 +57,10 @@ No sustituye al historial y no debe contener actividades semanales como fuente c
 Clave actual:
 
 ```text
-bitacora_dual_delivery_registry_v7
+bitacora_dual_delivery_registry_v8
 ```
 
-Las claves `v1` a `v6` pueden leerse para migración.
+Las claves `v1` a `v7` pueden leerse para migración.
 
 El estado contiene, entre otros:
 
@@ -76,6 +76,8 @@ El estado contiene, entre otros:
 - entregas por alumno;
 - fecha/hora;
 - origen de registro;
+- versión de código y resumen opcional de jornadas en las entregas;
+- género opcional y modalidad registrada de uso del generador, editables desde el padrón;
 - estado de entrega: a tiempo, a destiempo, no entregado o **No aplica**.
 
 **No aplica** se conserva como un estado explícito por alumno y semana. Indica que esa persona no tenía obligación de entregar en ese periodo, por lo que se excluye del denominador utilizado para calcular el porcentaje de cumplimiento.
@@ -116,7 +118,7 @@ Cuando cambie un esquema persistente:
 
 El Data Matrix contiene información necesaria para identificar la bitácora y su periodo.
 
-El formato actual incluye identidad del alumno y fechas del periodo. Versiones anteriores pueden contener menos información.
+El formato actual conserva el encabezado `BD26|4` con identidad, especialidad, empresa y fechas. Añade opcionalmente `S5:` seguido de 14 caracteres Base64URL (10 bytes) con estados, minutos y códigos numéricos de causas para cuatro jornadas. La codificación ocupa un solo bloque añadido al final y los lectores antiguos siguen leyendo los siete campos originales. Los códigos anteriores carecen de las estadísticas nuevas y se mantienen sin datos para esos indicadores. El género nunca se incluye en Data Matrix.
 
 El contenido del Data Matrix no debe incluir secretos ni información innecesaria. Tampoco debe copiarse en diagnósticos públicos.
 
