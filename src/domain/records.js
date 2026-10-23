@@ -1,7 +1,7 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
-export const VERSION = "0.55.0-beta.1";
-export const RELEASE = "Expediente estadístico individual y firmas P. A. discretas";
+export const VERSION = "0.55.1-beta.1";
+export const RELEASE = "PDF individual y estadísticas móviles";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
