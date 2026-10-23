@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.52.5-beta.1 · Motivos de participación directos · 2026-10-23
+
+- Se simplifican las etiquetas de los nueve motivos académicos incorporados en 0.52.4. Ejemplos: «Prototipos y Emprendimiento · Local», «Festival Académico · Estatal» y «ENAC · Nacional».
+- La justificación automática ahora solo indica «Participación en [nombre del evento], fase [local/estatal/nacional]». Se eliminan frases redundantes como «inasistencia por asistir», referencias al horario y explicaciones sobre representación escolar.
+- Se preservan los nueve IDs, los códigos 20–28 y las opciones anteriores del catálogo; el editor, el registro manual, las estadísticas y el Data Matrix siguen leyendo correctamente las causas históricas.
+- Se amplían las pruebas para verificar las etiquetas cortas, la justificación directa y los códigos estables.
+
+
 ## 0.52.4-beta.1 · Faltas académicas y captura semanal · 2026-10-23
 
 - Nueve causas de falta por asistencia a concursos de la DGETI, cada una con ID y código numérico independiente: Concurso Nacional de Prototipos y Proyectos de Emprendimiento (20 local, 21 estatal, 22 nacional), Festival Académico (23 local, 24 estatal, 25 nacional) y Encuentro Nacional de Arte y Cultura, ENAC (26 local, 27 estatal, 28 nacional).
