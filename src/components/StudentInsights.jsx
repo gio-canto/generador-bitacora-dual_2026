@@ -1,14 +1,16 @@
 import {useMemo,useState} from "react";
 import {calculateStudentInsights} from "../services/student-insights.js";
+import StudentDossier from "./StudentDossier.jsx";
 
 const number=value=>Number(value||0).toLocaleString("es-MX",{maximumFractionDigits:1});
 const suffix=(v,singular,plural)=>v===1?singular:plural;
 
-function PersonCard({item,index,value,detail}) {
+function PersonCard({item,index,value,detail,onOpen}) {
   return <article className="ds-person" key={item.id}>
     <span className="ds-person-index" aria-hidden="true">{index+1}</span>
     <div className="ds-person-body">
-      <strong>{item.name}</strong>
+      <button className="ds-person-link" type="button" onClick={()=>onOpen(item.id)}
+        aria-label={"Ver expediente de "+item.name}>{item.name}</button>
       <small>{item.specialty} · {item.company}{item.group!=="Sin especificar"?" · Grupo "+item.group:""}</small>
       <span>{detail(item)}</span>
     </div>
@@ -16,14 +18,14 @@ function PersonCard({item,index,value,detail}) {
   </article>;
 }
 
-function Ranking({title,description,items,value,detail,empty,notice}) {
+function Ranking({title,description,items,value,detail,empty,notice,onOpen}) {
   const [expanded,setExpanded]=useState(false);
   const shown=expanded?items:items.slice(0,3);
   return <section className="ds-panel ds-people-panel">
     <div className="ds-insight-heading"><h3>{title}</h3><p>{description}</p></div>
     {shown.length ? <div className="ds-person-list">
       {shown.map((item,index)=><PersonCard key={item.id} item={item} index={index}
-        value={value} detail={detail}/>)}
+        value={value} detail={detail} onOpen={onOpen}/>)}
     </div> : <p className="ds-empty">{empty}</p>}
     {notice && <p className="ds-insight-notice">{notice}</p>}
     {items.length>3 && <button type="button" className="btn ds-more"
@@ -35,6 +37,8 @@ function Ranking({title,description,items,value,detail,empty,notice}) {
 
 export default function StudentInsights({state,period,weekId,month,specialty,company}) {
   const [group,setGroup]=useState("");
+  const [selectedStudentId,setSelectedStudentId]=useState("");
+  const [dossierSearch,setDossierSearch]=useState("");
   const [breakdown,setBreakdown]=useState("specialty");
   const [search,setSearch]=useState("");
   const [pendingLevel,setPendingLevel]=useState("all");
@@ -45,6 +49,11 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
   const insights=useMemo(()=>calculateStudentInsights(state,{
     period,weekId,month,specialty,company,group
   }),[state,period,weekId,month,specialty,company,group]);
+  const candidates=useMemo(()=>(state.students||[])
+    .filter(s=>!dossierSearch.trim()||s.name.toLocaleLowerCase("es-MX")
+      .includes(dossierSearch.trim().toLocaleLowerCase("es-MX")))
+    .sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"})),
+    [state.students,dossierSearch]);
   const labelScope=period==="all"?"histórico general":period==="monthly"?"mes seleccionado":"semana seleccionada";
   const name=(item)=>item.name;
   const pending=useMemo(()=>insights.ledger.filter(item=>{
@@ -80,33 +89,62 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
       <article className="ds-kpi"><strong>{number(insights.totalDue)}</strong><span>Entregas cuyo plazo venció</span></article>
       <article className="ds-kpi"><strong>{number(insights.totalPending)}</strong><span>Bitácoras vencidas pendientes</span></article>
     </div>
+    <section className="ds-panel ds-dossier-shell" id="student-dossier" aria-label="Expediente individual del alumno">
+      <div className="ds-dossier-selector">
+        <div className="ds-insight-heading">
+          <span className="delivery-kicker">Historial académico personal</span>
+          <h3>Expediente individual</h3>
+          <p>Selecciona a cualquier alumno para consultar todas sus semanas registradas, entregas, faltas, horas y evolución. Este expediente siempre utiliza el histórico completo.</p>
+        </div>
+        <div className="ds-dossier-controls">
+          <label>Buscar por nombre
+            <input type="search" value={dossierSearch}
+              onChange={event=>setDossierSearch(event.target.value)}
+              placeholder="Nombre del alumno"/>
+          </label>
+          <label>Seleccionar alumno
+            <select value={selectedStudentId}
+              onChange={event=>setSelectedStudentId(event.target.value)}>
+              <option value="">Selecciona un alumno</option>
+              {candidates.map(student=><option key={student.id} value={student.id}>
+                {student.name}{student.dualStatus==="desisted"?" · Historial":""}
+              </option>)}
+              {selectedStudentId&&!candidates.some(student=>student.id===selectedStudentId) &&
+                (state.students||[]).filter(student=>student.id===selectedStudentId)
+                  .map(student=><option key={student.id} value={student.id}>{student.name}</option>)}
+            </select>
+          </label>
+        </div>
+      </div>
+      <StudentDossier state={state} studentId={selectedStudentId}/>
+    </section>
     <div className="ds-two-column">
-      <Ranking title="Menor cumplimiento de entrega"
+      <Ranking title="Menor cumplimiento de entrega" onOpen={setSelectedStudentId}
         description="De menor a mayor porcentaje de bitácoras entregadas entre las ya vencidas."
         items={insights.leastCompliant}
         value={item=>number(item.fulfillmentRate)+"%"}
         detail={item=>number(item.pending)+" pendientes de "+number(item.due)+" semanas vencidas"}
         empty="No hay plazos de entrega vencidos en esta selección."/>
-      <Ranking title="Más faltas registradas"
+      <Ranking title="Más faltas registradas" onOpen={setSelectedStudentId}
         description="Solo se consideran faltas asentadas en jornadas con estadísticas."
         items={insights.mostAbsences}
         value={item=>number(item.absences)}
         detail={item=>number(item.knownDays)+" jornadas con datos · "+number(item.absenceRate||0)+"% entre días laborales y faltas"}
         empty="No hay faltas registradas con datos verificables."/>
-      <Ranking title="Menos faltas registradas"
+      <Ranking title="Menos faltas registradas" onOpen={setSelectedStudentId}
         description="También considera cero faltas, pero nunca confunde ausencia de datos con cero."
         items={insights.fewestAbsences}
         value={item=>number(item.absences)}
         detail={item=>number(item.knownDays)+" jornadas con datos"}
         notice={tiedNotice}
         empty="Todavía no hay alumnos con jornadas registradas."/>
-      <Ranking title="Mayor puntualidad"
+      <Ranking title="Mayor puntualidad" onOpen={setSelectedStudentId}
         description="Porcentaje de entregas a tiempo respecto de las semanas vencidas."
         items={insights.mostPunctual}
         value={item=>number(item.onTimeRate)+"%"}
         detail={item=>number(item.onTime)+" a tiempo de "+number(item.due)+" semanas vencidas"}
         empty="No hay entregas realizadas en semanas vencidas."/>
-      <Ranking title="Más horas registradas"
+      <Ranking title="Más horas registradas" onOpen={setSelectedStudentId}
         description="Suma de horas verificadas en el periodo; no incluye jornadas sin datos."
         items={insights.mostHours}
         value={item=>number(item.hours)+" h"}
@@ -172,7 +210,8 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
       {pending.length ? <div className="ds-overdue-list">
         {(showAllLedger?pending:pending.slice(0,12)).map(item=><article className="ds-overdue-person" key={item.id}>
           <div className="ds-overdue-person-main">
-            <strong>{name(item)}</strong>
+            <button className="ds-person-link" type="button"
+              onClick={()=>setSelectedStudentId(item.id)}>{name(item)}</button>
             <small>{item.specialty} · {item.company} · Grupo {item.group}</small>
             <span>{number(item.submitted)} de {number(item.due)} semanas vencidas entregadas · {number(item.fulfillmentRate||0)}% de cumplimiento</span>
             <p>{item.overdue.map(week=>week.label+" ("+week.startDate+")").join(" · ")}</p>

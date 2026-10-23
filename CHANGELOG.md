@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.55.0-beta.1 · Expediente histórico individual y firmas P. A. discretas · 2026-10-23
+
+- Se añade **Expediente individual** en las estadísticas de entregas: búsqueda por nombre, selección por ID, acceso desde clasificaciones y desde el historial de pendientes, incluidos alumnos desistidos con registros históricos.
+- Cada expediente consulta todas las semanas disponibles e indica datos de alumno, obligaciones vencidas y en plazo, entregas recibidas a tiempo y tarde, pendientes, «No aplica», cumplimiento y puntualidad con denominadores reales.
+- Nuevos datos históricos por persona: suma, promedio, mínimo y máximo de horas verificadas, asistencia y jornadas conocidas, motivos de las faltas, evolución mensual de horas y entregas, y detalle desplegable por semana de martes a viernes con motivo y método de registro.
+- Las semanas sin datos estadísticos se identifican como desconocidas, nunca como cero horas o cero faltas; los periodos aún no vencidos no incrementan el número de pendientes.
+- En las firmas de Autorizó e Instructor formador, se elimina el marco azul de la opción P. A. y se integra como una casilla discreta de la interfaz; el formulario de suplencia también utiliza elementos neutros.
+- La leyenda predeterminada se cambia a «P. A. · Por ausencia del titular» y en el documento a «P. A. · Por ausencia del [nombre del titular]». Se conservan los datos históricos de firmantes, campos y respaldos.
+- Se incorporan pruebas del cómputo individual, búsqueda, navegación por alumno, semanas duplicadas, datos faltantes, faltas y leyendas P. A.; se preserva la estructura de datos actual.
+
+
 ## 0.54.0-beta.1 · Estadísticas por alumno e historial de pendientes · 2026-10-23
 
 - Cinco nuevas comparaciones nominativas en Estadísticas: menor cumplimiento de entrega, mayor número de faltas registradas, menor número de faltas, mayor puntualidad y más horas verificadas; cada tarjeta explica los periodos o jornadas utilizados.

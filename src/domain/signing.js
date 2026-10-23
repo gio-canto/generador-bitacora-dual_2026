@@ -7,7 +7,7 @@ export function actingSigner({name="",role="",enabled=false,paName="",paRole=""}
     role:acting ? String(paRole||"").trim() : String(role||"").trim(),
     principal,
     byAbsence:Boolean(acting),
-    absenceLine:acting ? "P. A. de "+principal : "",
+    absenceLine:acting ? "P. A. · Por ausencia del "+principal : "",
   };
 }
 

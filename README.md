@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.54.0--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.55.0--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -210,3 +210,11 @@ En **Registro de entregas → Estadísticas** hay un apartado con comparaciones 
 Las comparaciones admiten filtros de periodo, empresa, especialidad y grupo, junto con un desglose dinámico por empresa, especialidad o grupo. La vista **General** incorpora un **historial interno de entregas pendientes** con búsqueda, nivel de atraso y detalle de semanas. El historial no es un buró de crédito ni califica permanentemente a nadie: al capturar una entrega, deja de figurar como pendiente.
 
 Solo se consideran vencidas las semanas con fecha límite superada, periodo concluido o cierre manual; se excluyen las semanas futuras, las entregas «No aplica» y los alumnos desistidos del seguimiento activo. Un alumno sin estadísticas de jornadas no se considera con cero faltas. El PDF institucional incorpora una quinta página de seguimiento por persona. Esta información nominal está destinada exclusivamente al uso administrativo autorizado del plantel y debe manejarse con confidencialidad.
+
+### Expediente individual e historial completo · v0.55
+
+En **Registro de entregas → Estadísticas → Expediente individual** se puede buscar y seleccionar a cualquier alumno, incluido quien haya desistido, para consultar su historial longitudinal completo. La ficha muestra identificadores escolares (especialidad, empresa y grupo), semanas cuyo plazo venció, entregadas a tiempo o tarde, pendientes, «No aplica» y futuras; tasas con su base de cálculo; horas totales, mínimas, máximas y promedio por semana con datos; días conocidos y asistencia; motivos registrados, evolución mensual y todas las semanas en una lista desplegable con detalles diarios. También puedes abrir la ficha pulsando los nombres en las comparaciones y en el historial general.
+
+El historial no es una calificación crediticia ni un score permanente. No se inventan faltas u horas en semanas sin estadísticas ni se confunde el incumplimiento con un periodo aún en plazo. Corrige las entregas en el registro para actualizar la ficha. Los datos personales permanecen sujetos al acceso administrativo local y deben tratarse como confidenciales.
+
+En el paso **Responsables**, la firma **P. A.** se selecciona mediante una casilla discreta, sin recuadro azul. Su leyenda predeterminada es **«P. A. · Por ausencia del titular»** y el PDF consigna **«P. A. · Por ausencia del [nombre]»**, sin modificar al firmante suplente ni al titular guardados.

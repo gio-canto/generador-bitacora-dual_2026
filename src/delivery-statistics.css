@@ -320,3 +320,82 @@
 }
 @media(max-width:350px){.ds-insight-kpis{grid-template-columns:1fr}}
 @media print{.ds-more,.ds-overdue-filters{display:none!important}.ds-overdue-person,.ds-person{break-inside:avoid}}
+
+
+/* v0.55 — expediente longitudinal, sin convertir la actividad en un score crediticio. */
+.ds-dossier-shell{display:grid;gap:19px;border-color:#e3e7ee}
+.ds-dossier-selector{display:flex;gap:22px;align-items:end;justify-content:space-between;flex-wrap:wrap}
+.ds-dossier-selector>.ds-insight-heading{flex:1 1 325px;min-width:0}
+.ds-dossier-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;flex:1 1 410px;min-width:0}
+.ds-dossier-controls label,.ds-dossier-week-filter{display:grid;gap:7px;font-size:12px;font-weight:600;color:#70737d;min-width:0}
+.ds-dossier-controls input,.ds-dossier-controls select,.ds-dossier-week-filter select{width:100%;min-width:0;max-width:100%;border:1px solid #dfe2e9;background:#fff;border-radius:12px;padding:10px 12px;color:#1b2733;font-size:14px;min-height:45px}
+.ds-dossier-welcome{padding:27px 18px;border:1px dashed #d5dbe5;border-radius:14px;color:#747c87;font-size:14px;text-align:center;background:#fbfcfe}
+.ds-dossier-record{display:grid;gap:19px;min-width:0;animation:ds-chart-change .4s ease both}
+.ds-dossier-identity{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;padding:24px;border-radius:19px;background:#f6f8fb}
+.ds-dossier-identity>div:first-child{min-width:0;flex:1 1 320px}
+.ds-dossier-identity h3{font-size:clamp(25px,3.3vw,36px);line-height:1.15;letter-spacing:-.045em;margin:7px 0 9px;overflow-wrap:anywhere}
+.ds-dossier-identity p{font-size:14px;color:#556170;margin:0 0 7px;line-height:1.5}
+.ds-dossier-identity small{font-size:12px;color:#7a818c}
+.ds-dossier-summary{display:grid;gap:5px;justify-items:center;min-width:177px;padding:13px 22px;border-left:1px solid #dfe3e9;text-align:center}
+.ds-dossier-summary strong{font-size:clamp(28px,3.6vw,43px);line-height:1.12;font-variant-numeric:tabular-nums;letter-spacing:-.045em}
+.ds-dossier-summary span{font-size:12px;color:#596272;font-weight:600}
+.ds-dossier-summary small{font-size:11px;color:#858992}
+.ds-dossier-indicators{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.ds-dossier-indicator{border:1px solid #e8ebf0;background:#fff;border-radius:15px;padding:15px;display:grid;align-content:start;gap:8px;min-width:0}
+.ds-dossier-indicator>span{font-size:11px;color:#6f7580;line-height:1.4}
+.ds-dossier-indicator strong{font-size:clamp(18px,2.4vw,27px);font-variant-numeric:tabular-nums;letter-spacing:-.035em;overflow-wrap:anywhere;line-height:1.1}
+.ds-dossier-indicator small{font-size:11px;color:#80868e;line-height:1.4}
+.ds-dossier-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.ds-dossier-section{display:grid;align-content:start;gap:15px;padding:20px;border:1px solid #e9ecf1;border-radius:18px;min-width:0}
+.ds-dossier-section h4{font-size:clamp(17px,2.3vw,21px);letter-spacing:-.025em;margin:0}
+.ds-dossier-section p{font-size:12px;color:#777c85;line-height:1.5;margin:0}
+.ds-dossier-month-list{display:grid;gap:13px;max-height:345px;overflow-y:auto;padding-right:2px}
+.ds-dossier-month{display:grid;gap:6px}
+.ds-dossier-month>div:first-child{display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap;font-size:12px}
+.ds-dossier-month strong{font-variant-numeric:tabular-nums}
+.ds-dossier-month span{font-size:11px;color:#747b85}
+.ds-dossier-causes{display:grid;gap:10px;max-height:350px;overflow:auto}
+.ds-dossier-causes>div{display:flex;align-items:baseline;justify-content:space-between;gap:15px;padding-bottom:9px;border-bottom:1px solid #e9ecf1;font-size:12px}
+.ds-dossier-causes span{overflow-wrap:anywhere;line-height:1.4}
+.ds-dossier-causes strong{flex:0 0 auto;font-variant-numeric:tabular-nums}
+.ds-dossier-mini{font-size:11px!important}
+.ds-dossier-week-filter{width:min(225px,100%)}
+.ds-dossier-weeks{display:grid;gap:9px}
+.ds-dossier-week{border:1px solid #e6e9ee;border-radius:13px;min-width:0;overflow:hidden}
+.ds-dossier-week[open]{border-color:#cbd6e3;background:#fbfcfd}
+.ds-dossier-week summary{display:grid;grid-template-columns:minmax(0,1fr) auto auto 19px;align-items:center;gap:13px;padding:14px;list-style:none;cursor:pointer}
+.ds-dossier-week summary::-webkit-details-marker{display:none}
+.ds-dossier-week-title{display:grid;gap:4px;min-width:0}
+.ds-dossier-week-title strong{font-size:13px;overflow-wrap:anywhere}
+.ds-dossier-week-title small{font-size:11px;color:#828895}
+.ds-dossier-week summary>b{font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ds-dossier-state{font-size:11px;font-weight:650;color:#606b7b;white-space:nowrap;padding:7px 10px;border-radius:10px;background:#f0f3f6}
+.ds-dossier-state-a_tiempo{background:#edf5ef;color:#346d48}
+.ds-dossier-state-tarde{background:#faf4e7;color:#85612b}
+.ds-dossier-state-vencida{background:#faf0ee;color:#925447}
+.ds-dossier-chevron{color:#697482;font-size:17px;text-align:center}
+.ds-dossier-week[open] .ds-dossier-chevron{transform:rotate(180deg)}
+.ds-dossier-week-body{padding:5px 14px 17px;display:grid;gap:14px}
+.ds-dossier-week-body dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0}
+.ds-dossier-week-body dl>div{display:grid;gap:5px;min-width:0}
+.ds-dossier-week-body dt{color:#828895;font-size:11px}
+.ds-dossier-week-body dd{margin:0;font-size:12px;overflow-wrap:anywhere}
+.ds-dossier-days{min-width:510px}
+.ds-person-link{padding:0;border:0;cursor:pointer;text-align:left;color:#1a477e;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;background:transparent;font-weight:700;font-size:14px;overflow-wrap:anywhere}
+.ds-person-link:focus-visible{outline:2px solid #1565c0;outline-offset:3px;border-radius:3px}
+.ds-person-link:hover{color:#0e64b0}
+@media(max-width:1100px){.ds-dossier-indicators{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.ds-dossier-columns{grid-template-columns:1fr}.ds-dossier-indicators{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-dossier-summary{border-left:0;border-top:1px solid #dfe3e9;justify-items:start;padding:14px 0 0;text-align:left}}
+@media(max-width:540px){
+ .ds-dossier-selector{display:grid}
+ .ds-dossier-controls{grid-template-columns:1fr}
+ .ds-dossier-identity{padding:17px}
+ .ds-dossier-week summary{grid-template-columns:1fr auto 16px;gap:9px}
+ .ds-dossier-week summary>b{grid-column:1;grid-row:2;justify-self:start}
+ .ds-dossier-state{white-space:normal;text-align:center}
+ .ds-dossier-week-body dl{grid-template-columns:1fr}
+ .ds-dossier-section{padding:15px}
+ .ds-dossier-indicator{padding:12px}
+}
+@media(max-width:330px){.ds-dossier-indicators{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.ds-dossier-record{animation:none!important}}
