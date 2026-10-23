@@ -110,7 +110,8 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
     };
   }, [viewKey,metric]);
 
-  const interpretation=interpretStatistics(data,calculateStudentInsights(state,filters));
+  const insightSummary=useMemo(()=>calculateStudentInsights(state,filters),[state,period,weekId,month,specialty,company]);
+  const interpretation=useMemo(()=>interpretStatistics(data,insightSummary),[data,insightSummary]);
 
   return <div className="delivery-analytics-container" ref={rootRef}>
     <div className="ds-header">
