@@ -2531,3 +2531,14 @@ button.delivery-action-tile{cursor:pointer}
  .delivery-report-person-picker input,.delivery-report-person-picker select,
  .delivery-announcement-form input,.delivery-announcement-form select{font-size:16px}
 }
+
+
+/* v0.56 — cinco accesos de la pantalla principal y resumen de atención. */
+.delivery-summary-grid{grid-template-columns:repeat(auto-fit,minmax(min(205px,100%),1fr));gap:14px}
+.delivery-attention-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.delivery-attention-summary>div{display:grid;gap:7px;flex:1 1 235px}
+.delivery-attention-summary strong{font-size:18px;letter-spacing:-.025em}
+.delivery-attention-summary span{font-size:13px;color:#657386}
+.delivery-attention-summary .btn{min-height:42px}
+@media(max-width:800px){.delivery-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.delivery-summary-grid{grid-template-columns:1fr}}
