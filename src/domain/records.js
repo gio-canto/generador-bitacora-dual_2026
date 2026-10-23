@@ -1,4 +1,5 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
+import {paIsComplete,isDifferentSigner} from "./signing.js";
 export const VERSION = "0.52.5-beta.1";
 export const RELEASE = "Motivos de participación más directos";
 export const MAX_DAYS = 4;
@@ -65,8 +66,9 @@ export function normalizeRecord(raw) {
       ...base.authorities,
       ...raw.authorities,
       elaboroName: raw.student || "",
+      autorizoPaEnabled: raw.authorities?.autorizoPaEnabled === true,
     },
-    instructor: { ...base.instructor, ...raw.instructor },
+    instructor: { ...base.instructor, ...raw.instructor, paEnabled: raw.instructor?.paEnabled === true },
     entries: (raw.entries || []).map((e) => ({
       ...e,
       status: e.status || "laboral",
@@ -147,7 +149,19 @@ export function validateRecord(r, step) {
         label,
         key.endsWith("Name") ? 100 : 180,
       );
-    if (r.instructor.enabled) {
+    if (r.authorities.autorizoPaEnabled) {
+      required("authorities.autorizoPaName",r.authorities.autorizoPaName,"el nombre de quien firma P. A.",100);
+      required("authorities.autorizoPaRole",r.authorities.autorizoPaRole,"el cargo de quien firma P. A.",140);
+      if(!isDifferentSigner(r.authorities.autorizoName,r.authorities.autorizoPaName))
+        errors["authorities.autorizoPaName"]="El suplente debe ser distinto del titular.";
+    }
+    if (r.instructor.enabled) { 
+      if (r.instructor.paEnabled) {
+        required("instructor.paName",r.instructor.paName,"el nombre del instructor suplente",100);
+        required("instructor.paRole",r.instructor.paRole,"el cargo del instructor suplente",140);
+        if(!isDifferentSigner(r.instructor.name,r.instructor.paName))
+          errors["instructor.paName"]="El suplente debe ser distinto del titular.";
+      }
       required(
         "instructor.name",
         r.instructor.name,
@@ -187,7 +201,8 @@ export function recordShape(r) {
           typeof r[k] === "object" &&
           !Array.isArray(r[k]) &&
           Object.entries(r[k]).every(([field, v]) =>
-            k === "instructor" && field === "enabled"
+            (k === "instructor" && ["enabled","paEnabled"].includes(field)) ||
+            (k === "authorities" && field === "autorizoPaEnabled")
               ? typeof v === "boolean"
               : string(v, 300),
           )),
