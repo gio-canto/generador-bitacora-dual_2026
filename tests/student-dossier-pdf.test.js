@@ -1,6 +1,7 @@
 import {afterEach,describe,expect,it,vi} from "vitest";
 import {createCanvas} from "@napi-rs/canvas";
-import {generateStudentDossierPdf} from "../src/services/student-dossier-report.js";
+import {generateStudentDossierPdf,interpretStudentDossier,DOSSIER_ROWS_PER_PAGE} from "../src/services/student-dossier-report.js";
+import {buildStudentDossier} from "../src/services/student-dossier.js";
 import {createStudent,createWeek,saveManualDelivery} from "../src/services/delivery-registry.js";
 import {buildManualStatistics} from "../src/services/manual-statistics.js";
 
@@ -26,15 +27,19 @@ describe("PDF del expediente individual v0.55.1",()=>{
     vi.spyOn(document,"createElement").mockImplementation(name=>
       name==="canvas"?createCanvas(1240,1754):real(name));
     const fakeAvatar=createCanvas(96,96);
+    const officialLogo=createCanvas(180,65);
     const state=sample(9);
     const result=await generateStudentDossierPdf(state,"s1",{
-      avatarImage:fakeAvatar,download:false,asOf:new Date("2026-10-23T18:00:00Z")
+      avatarImage:fakeAvatar,logoImage:officialLogo,download:false,asOf:new Date("2026-10-23T18:00:00Z")
     });
     expect(result.studentId).toBe("s1");
-    expect(result.pages).toBe(3); // portada + 2 páginas de semanas
-    expect(result.filename).toMatch(/^expediente-dual-ana-lopez-.*\.pdf$/);
+    expect(DOSSIER_ROWS_PER_PAGE).toBeGreaterThan(9);
+    expect(result.pages).toBe(2); // resumen + historial compacto
+    expect(result.filename).toBe("expediente-dual-ana-lopez.pdf");
     const raw=new TextDecoder("latin1").decode(result.bytes);
-    expect(raw).toContain("/Count 3");
+    expect(raw).toContain("/Count 2");
+    expect(result.interpretation).toMatch(/bitácoras vencidas/);
+    expect(result.bytes.length).toBeGreaterThan(1800);
     expect(result.bytes.length).toBeGreaterThan(1800);
   });
   it("genera dos páginas mínimas incluso sin semanas y sin avatar",async()=>{
@@ -43,13 +48,35 @@ describe("PDF del expediente individual v0.55.1",()=>{
       name==="canvas"?createCanvas(1240,1754):real(name));
     const result=await generateStudentDossierPdf({
       students:[student],weeks:[],context:{school:"Plantel"}}, "s1",
-      {avatarImage:null,download:false});
+      {avatarImage:null,logoImage:createCanvas(180,65),download:false});
     expect(result.pages).toBe(2);
     expect(new TextDecoder("latin1").decode(result.bytes)).toContain("/Count 2");
   });
   it("rechaza la selección de un ID que no está en el registro",async()=>{
     await expect(generateStudentDossierPdf(sample(),"absent",{
-      avatarImage:null,download:false
+      avatarImage:null,logoImage:createCanvas(180,65),download:false
     })).rejects.toThrow("El alumno no está en el registro");
   });
+  it("interpreta la situación sin inventar cumplimiento ni fecha de emisión",()=>{
+    const noDue=buildStudentDossier({students:[student],weeks:[]},"s1");
+    expect(interpretStudentDossier(noDue)).toContain("Sin entregas vencidas");
+    const d=buildStudentDossier(sample(5),"s1",{asOf:new Date("2026-10-23T18:00:00Z")});
+    const explanation=interpretStudentDossier(d);
+    expect(explanation).toMatch(/Hay \d+ pendientes?\./);
+    expect(explanation).toMatch(/faltas en \d+ jornadas/);
+    expect(explanation).not.toMatch(/folio|actualización|emitido/i);
+  });
+  it("pagina sin cortar historial de muchas semanas",async()=>{
+    const real=document.createElement.bind(document);
+    vi.spyOn(document,"createElement").mockImplementation(name=>
+      name==="canvas"?createCanvas(1754,1240):real(name));
+    const weeks=DOSSIER_ROWS_PER_PAGE*2+1;
+    const result=await generateStudentDossierPdf(sample(weeks),"s1",{
+      avatarImage:null,logoImage:createCanvas(180,65),download:false,
+      asOf:new Date("2026-12-23T18:00:00Z")
+    });
+    expect(result.pages).toBe(4);
+    expect(new TextDecoder("latin1").decode(result.bytes)).toContain("/Count 4");
+  });
+
 });
