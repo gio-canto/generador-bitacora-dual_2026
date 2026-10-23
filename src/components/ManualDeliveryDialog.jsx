@@ -5,7 +5,7 @@ import {
 } from "../services/manual-statistics.js";
 
 export default function ManualDeliveryDialog({
-  student, week, previous, initialStatus, onCancel, onSave,
+  student, week, previous, initialStatus, onCancel, onSave, onSkip, batchProgress,
 }) {
   const [status, setStatus] = useState(initialStatus ||
     (["entregado", "entregado_tarde", "no_entregado"].includes(previous?.status) ?
@@ -67,7 +67,7 @@ export default function ManualDeliveryDialog({
       >
         <div className="delivery-manual-heading">
           <div>
-            <span className="delivery-kicker">Registro de entrega</span>
+            <span className="delivery-kicker">{batchProgress ? "Captura de jornadas · "+batchProgress.position+" de "+batchProgress.total : "Registro de entrega"}</span>
             <h2 id="delivery-manual-title">{student.name}</h2>
             <p>{week.label} · {student.specialty}</p>
           </div>
@@ -153,8 +153,16 @@ export default function ManualDeliveryDialog({
             {error && <p className="ds-error" role="alert" ref={errorRef}>{error}</p>}
           </div>
           <div className="delivery-manual-actions">
-            <button type="button" className="btn" onClick={onCancel}>Cancelar</button>
-            <button type="submit" className="btn primary">Guardar registro</button>
+            <button type="button" className="btn" onClick={onCancel}>
+              {batchProgress ? "Terminar" : "Cancelar"}
+            </button>
+            {batchProgress && <button type="button" className="btn" onClick={() => {
+              if (hasCaptured && !window.confirm("¿Omitir este alumno sin guardar los cambios?")) return;
+              onSkip?.();
+            }}>Omitir alumno</button>}
+            <button type="submit" className="btn primary">
+              {batchProgress ? (batchProgress.remaining > 1 ? "Guardar y siguiente" : "Guardar y finalizar") : "Guardar registro"}
+            </button>
           </div>
         </form>
       </section>
