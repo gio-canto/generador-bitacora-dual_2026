@@ -15,6 +15,7 @@ import {
   listArchivedProfiles,
 } from "../services/profile.js";
 import companies from "../data/companies.json";
+import {actingSigner} from "../domain/signing.js";
 import schools from "../data/schools.json";
 import absenceReasons from "../data/absence-reasons.json";
 import nonWorkingReasons from "../data/non-working-reasons.json";
@@ -132,6 +133,9 @@ export function startEditor() {
           "Jefa del Departamento de Vinculación con el Sector Productivo\nCBTis No. 134",
         autorizoName: "",
         autorizoRole: "",
+        autorizoPaEnabled: false,
+        autorizoPaName: "",
+        autorizoPaRole: "",
       },
       instructor: {
         enabled: false,
@@ -139,6 +143,9 @@ export function startEditor() {
         name: "",
         roleMain: "",
         note: "Instructor Formador",
+        paEnabled: false,
+        paName: "",
+        paRole: "",
       },
     };
     Object.assign(DEFAULTS, {
@@ -347,6 +354,8 @@ export function startEditor() {
       setSaveState("Sin guardar", "warn");
       queueDraftSave();
     }
+    const representatives = () =>
+      companies.find(c => c.name === $("#company").value)?.representatives || [];
     function populateInstructorSelect() {
       const s = $("#instructorPreset");
       s.innerHTML =
@@ -358,6 +367,51 @@ export function startEditor() {
         s.appendChild(o);
       });
     }
+    function populatePaSelect(selectId, people, roleKey) {
+      const select = $("#"+selectId);
+      select.innerHTML = '<option value="__custom__">Personalizar / otra persona</option>';
+      for (const person of people) {
+        const option = document.createElement("option");
+        option.value = person.name;
+        option.textContent = person.name + " · " + (person[roleKey] || "");
+        select.add(option);
+      }
+    }
+    function populatePaSelects() {
+      populatePaSelect("autorizoPaPreset", representatives(), "role");
+      populatePaSelect("instructorPaPreset", instructors(), "roleMain");
+      syncPaSelect("autorizo");
+      syncPaSelect("instructor");
+    }
+    function syncPaSelect(kind) {
+      const people = kind === "autorizo" ? representatives() : instructors();
+      const prefix = kind === "autorizo" ? "autorizoPa" : "instructorPa";
+      const name = $("#"+prefix+"Name").value;
+      $("#"+prefix+"Preset").value = people.some(person=>person.name===name)
+        ? name : "__custom__";
+      $("#"+prefix+"PresetField").hidden = people.length === 0;
+    }
+    function syncPaUI() {
+      const authOn = $("#autorizoPaEnabled").checked;
+      const instructorOn = $("#instructorEnabled").checked && $("#instructorPaEnabled").checked;
+      $("#autorizoPaFields").hidden = !authOn;
+      $("#instructorPaFields").hidden = !instructorOn;
+      for (const [prefix,on] of [["autorizoPa",authOn],["instructorPa",instructorOn]])
+        for (const suffix of ["Preset","Name","Role"])
+          $("#"+prefix+suffix).disabled = !on;
+      $("#instructorPaEnabled").disabled = !$("#instructorEnabled").checked;
+    }
+    function applyPaPreset(kind) {
+      const people = kind === "autorizo" ? representatives() : instructors();
+      const prefix = kind === "autorizo" ? "autorizoPa" : "instructorPa";
+      const person = people.find(p=>p.name===$("#"+prefix+"Preset").value);
+      if (!person) return;
+      $("#"+prefix+"Name").value = person.name;
+      $("#"+prefix+"Role").value = kind === "autorizo" ? person.role : person.roleMain;
+      rememberProfile(collectProfileDefaults());
+      markDirty();updatePreview();
+    }
+
     function setInstructorEnabledUI() {
       const on = $("#instructorEnabled").checked,
         isCouncil = instructors().length > 0;
@@ -372,6 +426,7 @@ export function startEditor() {
           ($("#" + id).disabled =
             !on || (id === "instructorPreset" && !isCouncil)),
       );
+      syncPaUI();
     }
     function applyInstructorPreset() {
       const p = instructors().find(
@@ -981,6 +1036,9 @@ export function startEditor() {
           voboRole: $("#voboRole").value.trim(),
           autorizoName: $("#autorizoName").value.trim(),
           autorizoRole: $("#autorizoRole").value.trim(),
+          autorizoPaEnabled: $("#autorizoPaEnabled").checked,
+          autorizoPaName: $("#autorizoPaName").value.trim(),
+          autorizoPaRole: $("#autorizoPaRole").value.trim(),
         },
         instructor: {
           enabled: $("#instructorEnabled").checked,
@@ -988,12 +1046,16 @@ export function startEditor() {
           name: $("#instructorName").value.trim(),
           roleMain: $("#instructorRoleMain").value.trim(),
           note: $("#instructorNote").value.trim() || "Instructor Formador",
+          paEnabled: $("#instructorPaEnabled").checked,
+          paName: $("#instructorPaName").value.trim(),
+          paRole: $("#instructorPaRole").value.trim(),
         },
       };
     }
     function syncCompanyContext(changed = false) {
       const config = companies.find((c) => c.name === $("#company").value);
       populateInstructorSelect();
+      populatePaSelects();
       if (changed)
         $("#instructorEnabled").checked = !!config?.instructorEnabledByDefault;
       const council = $("#company").value === COUNCIL;
@@ -1063,6 +1125,9 @@ export function startEditor() {
         a.autorizoName || companyRepresentative?.name || "";
       $("#autorizoRole").value =
         a.autorizoRole || companyRepresentative?.role || "";
+      $("#autorizoPaEnabled").checked = a.autorizoPaEnabled === true;
+      $("#autorizoPaName").value = a.autorizoPaName || "";
+      $("#autorizoPaRole").value = a.autorizoPaRole || "";
       const ins = { ...DEFAULTS.instructor, ...(r.instructor || {}) };
       $("#instructorEnabled").checked =
         r.instructor?.enabled ??
@@ -1076,7 +1141,11 @@ export function startEditor() {
       $("#instructorName").value = ins.name || "";
       $("#instructorRoleMain").value = ins.roleMain || "";
       $("#instructorNote").value = ins.note || "Instructor Formador";
+      $("#instructorPaEnabled").checked = ins.paEnabled === true;
+      $("#instructorPaName").value = ins.paName || "";
+      $("#instructorPaRole").value = ins.paRole || "";
       syncCompanyContext();
+      syncPaUI();
     }
     function autoTitle() {
       const dates = entries
@@ -1117,6 +1186,9 @@ export function startEditor() {
           voboRole: identity.authorities.voboRole,
           autorizoName: identity.authorities.autorizoName,
           autorizoRole: identity.authorities.autorizoRole,
+          autorizoPaEnabled: identity.authorities.autorizoPaEnabled,
+          autorizoPaName: identity.authorities.autorizoPaName,
+          autorizoPaRole: identity.authorities.autorizoPaRole,
         },
         instructor: identity.instructor,
       };
@@ -1387,9 +1459,9 @@ export function startEditor() {
       const people = [
         ["Elaboró", authorities.elaboroName || record.student || "—", authorities.elaboroRole || ""],
         ["Vo.Bo.", authorities.voboName || "—", authorities.voboRole || ""],
-        ["Autorizó", authorities.autorizoName || "—", authorities.autorizoRole || ""],
+        ["Autorizó", actingSigner({name:authorities.autorizoName,role:authorities.autorizoRole,enabled:authorities.autorizoPaEnabled,paName:authorities.autorizoPaName,paRole:authorities.autorizoPaRole}).name || "—", (authorities.autorizoPaEnabled ? "P. A. de "+authorities.autorizoName+"\n"+authorities.autorizoPaRole : authorities.autorizoRole) || ""],
         ...(instructor.enabled
-          ? [["Instructor formador", instructor.name || "—", instructor.roleMain || ""]]
+          ? [["Instructor formador", actingSigner({name:instructor.name,role:instructor.roleMain,enabled:instructor.paEnabled,paName:instructor.paName,paRole:instructor.paRole}).name || "—", instructor.paEnabled ? "P. A. de "+instructor.name+"\n"+instructor.paRole : instructor.roleMain || ""]]
           : []),
       ]
         .map(
