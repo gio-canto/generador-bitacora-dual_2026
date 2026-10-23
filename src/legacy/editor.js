@@ -1269,10 +1269,25 @@ export function startEditor() {
         ["autorizoName", "el nombre de quien autoriza"],
         ["autorizoRole", "el cargo de quien autoriza"],
       ];
+      if ($("#autorizoPaEnabled").checked) {
+        required.push(["autorizoPaName","el nombre del suplente que autoriza"],["autorizoPaRole","el cargo del suplente que autoriza"]);
+      }
+      if ($("#instructorEnabled").checked && $("#instructorPaEnabled").checked) {
+        required.push(["instructorPaName","el nombre del instructor suplente"],["instructorPaRole","el cargo del instructor suplente"]);
+      }
       const missing = required.find(
         ([id]) => !String($("#" + id)?.value || "").trim(),
       );
-      if (!missing) return { ok: true };
+      if (!missing) {
+        const duplicate =
+          $("#autorizoPaEnabled").checked &&
+          $("#autorizoPaName").value.trim().toLowerCase()===$("#autorizoName").value.trim().toLowerCase()
+          ? "La persona suplente que autoriza debe ser distinta de la titular."
+          : $("#instructorEnabled").checked && $("#instructorPaEnabled").checked &&
+            $("#instructorPaName").value.trim().toLowerCase()===$("#instructorName").value.trim().toLowerCase()
+            ? "El instructor suplente debe ser distinto del titular." : "";
+        return duplicate ? {ok:false,title:"Revisa al suplente",message:duplicate} : {ok:true};
+      }
       return {
         ok: false,
         field: missing[0],
@@ -1298,6 +1313,10 @@ export function startEditor() {
       ];
       if ($("#instructorEnabled").checked)
         required.push("instructorName", "instructorRoleMain");
+      if ($("#autorizoPaEnabled").checked)
+        required.push("autorizoPaName","autorizoPaRole");
+      if ($("#instructorEnabled").checked && $("#instructorPaEnabled").checked)
+        required.push("instructorPaName","instructorPaRole");
       const missing = required.find((id) => !$("#" + id).value.trim());
       if (!missing) return true;
       showGuardAlert(
@@ -2611,6 +2630,15 @@ export function startEditor() {
         updatePreview();
       });
       $("#instructorPreset").onchange = applyInstructorPreset;
+      $("#autorizoPaPreset").onchange = () => applyPaPreset("autorizo");
+      $("#instructorPaPreset").onchange = () => applyPaPreset("instructor");
+      for (const id of ["autorizoPaEnabled","instructorPaEnabled"]) {
+        $("#"+id).addEventListener("change",()=>{
+          syncPaUI();
+          rememberProfile(collectProfileDefaults());
+          markDirty();updatePreview();
+        });
+      }
       $("#instructorEnabled").onchange = () => {
         setInstructorEnabledUI();
         rememberProfile({ instructor: getIdentity().instructor });
@@ -2634,6 +2662,7 @@ export function startEditor() {
         "instructorName",
         "instructorRoleMain",
         "instructorNote",
+        "autorizoPaName","autorizoPaRole","instructorPaName","instructorPaRole",
       ].forEach((id) => {
         const el = $("#" + id);
         el.addEventListener("input", () => {
@@ -2678,6 +2707,7 @@ export function startEditor() {
         "instructorName",
         "instructorRoleMain",
         "instructorNote",
+        "autorizoPaName","autorizoPaRole","instructorPaName","instructorPaRole",
       ].forEach((id) => {
         $("#" + id).addEventListener("input", queueProfileDefaults);
         $("#" + id).addEventListener("change", queueProfileDefaults);
@@ -2698,7 +2728,15 @@ export function startEditor() {
         }
 
         if (payload.reason === "edit") {
-          renderRecords();
+          const a=profile.authorities||{}, ins=profile.instructor||{};
+          $("#autorizoPaEnabled").checked=a.autorizoPaEnabled===true;
+          $("#autorizoPaName").value=a.autorizoPaName||"";
+          $("#autorizoPaRole").value=a.autorizoPaRole||"";
+          $("#instructorPaEnabled").checked=ins.paEnabled===true;
+          $("#instructorPaName").value=ins.paName||"";
+          $("#instructorPaRole").value=ins.paRole||"";
+          populatePaSelects();syncPaUI();
+          renderRecords();markDirty();updatePreview();
           return;
         }
 
@@ -2734,6 +2772,9 @@ export function startEditor() {
           authorities.voboRole || DEFAULTS.authorities.voboRole;
         $("#autorizoName").value = authorities.autorizoName || "";
         $("#autorizoRole").value = authorities.autorizoRole || "";
+        $("#autorizoPaEnabled").checked = authorities.autorizoPaEnabled === true;
+        $("#autorizoPaName").value = authorities.autorizoPaName || "";
+        $("#autorizoPaRole").value = authorities.autorizoPaRole || "";
 
         const instructor = profile.instructor || {};
         $("#instructorEnabled").checked = instructor.enabled === true;
@@ -2747,6 +2788,10 @@ export function startEditor() {
         $("#instructorRoleMain").value = instructor.roleMain || "";
         $("#instructorNote").value =
           instructor.note || "Instructor Formador";
+        $("#instructorPaEnabled").checked = instructor.paEnabled === true;
+        $("#instructorPaName").value = instructor.paName || "";
+        $("#instructorPaRole").value = instructor.paRole || "";
+        populatePaSelects();
         setInstructorEnabledUI();
 
         $("#markdown").checked = profile.markdown !== false;
