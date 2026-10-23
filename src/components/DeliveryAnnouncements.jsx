@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from "react";
-import {announcementOverview,createAnnouncement,visibleAnnouncements} from "../services/delivery-announcements.js";
+import {announcementOverview,createAnnouncement,normalizeAnnouncement} from "../services/delivery-announcements.js";
 import {VERSION,RELEASE} from "../domain/records.js";
 import {
   NOTICE_FORMATS,NOTICE_THEMES,NOTICE_TEMPLATES,drawNoticeCanvas,
@@ -8,7 +8,7 @@ import {
 import {loadDossierLogo} from "../services/student-dossier-report.js";
 
 const initial={kind:"custom",title:"",subtitle:"",message:"",footer:"Generador de Bitácora Dual",
-  audience:"all",audienceId:"",expiresAt:"",format:"post",theme:"editorial"};
+  audience:"all",audienceId:"",displayDate:"",expiresAt:"",format:"post",theme:"editorial"};
 const dateLabel=raw=>{
  if(!raw)return "";
  const date=new Date(raw);
@@ -35,7 +35,8 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
  const specialties=useMemo(()=>[...new Set((state.students||[]).map(s=>s.specialty).filter(Boolean))].sort(),[state.students]);
  const students=useMemo(()=>[...(state.students||[])].sort((a,b)=>a.name.localeCompare(b.name,"es")),[state.students]);
  const overview=useMemo(()=>announcementOverview(state),[state]);
- const saved=useMemo(()=>visibleAnnouncements(state),[state]);
+ const saved=useMemo(()=>(state.announcements||[]).map(normalizeAnnouncement)
+   .filter(Boolean).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)),[state.announcements]);
  const automatic=useMemo(()=>[
    ...overview.deadlines.map(item=>({...item,subtitle:"RECORDATORIO DE ENTREGA",
      dueLabel:dateLabel(item.dueAt),footer:"Generador de Bitácora Dual",
@@ -58,6 +59,7 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
    message:trim(form.message),
    footer:trim(form.footer)||"Generador de Bitácora Dual",
    audienceLabel:audienceLabel(form),
+   dueLabel:form.displayDate?"FECHA: "+form.displayDate.split("-").reverse().join("/"):"",
    theme,format});
  const activeNotice=tab==="manual"?fromForm():current?{
    ...current,audienceLabel:audienceLabel(current)}:null;
@@ -224,8 +226,8 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
                  .map(item=><option value={item.value} key={item.value}>{item.name}</option>)}
              </select>
            </label>}
-           <label>Visible hasta (opcional)
-             <input type="date" value={form.expiresAt} onChange={e=>update("expiresAt",e.target.value)}/>
+           <label>Fecha del aviso (opcional)
+             <input type="date" value={form.displayDate} onChange={e=>update("displayDate",e.target.value)}/>
            </label>
            <label className="delivery-announcement-wide">Pie del aviso
              <input maxLength={160} value={form.footer}
