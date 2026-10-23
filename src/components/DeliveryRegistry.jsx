@@ -475,6 +475,7 @@ export default function DeliveryRegistry({ onClose }) {
     () => state.students.filter(studentIsActive),
     [state.students],
   );
+  const announcementsNow=useMemo(()=>announcementOverview(state),[state]);
   const desistedStudents = useMemo(
     () => state.students.filter((student) => !studentIsActive(student)),
     [state.students],
@@ -2697,7 +2698,26 @@ export default function DeliveryRegistry({ onClose }) {
                   Crear reporte
                 </button>
               </article>
+              <article className="delivery-summary-card">
+                <Info size={28} />
+                <span>Anuncios</span>
+                <strong>{announcementsNow.notices.length+announcementsNow.deadlines.length}</strong>
+                <small>Recordatorios y avisos</small>
+                <button className="btn" type="button" onClick={()=>setView("announcements")}>
+                  Abrir anuncios
+                </button>
+              </article>
             </section>
+            {(announcementsNow.deadlines.length>0||announcementsNow.notices.length>0)&&
+              <section className="delivery-panel delivery-home-announcements" aria-label="Avisos recientes">
+                <div className="delivery-panel-head"><h2>Avisos recientes</h2>
+                  <button className="btn" type="button" onClick={()=>setView("announcements")}>Ver todos</button>
+                </div>
+                {[...announcementsNow.deadlines,...announcementsNow.notices].slice(0,3).map(item=>
+                  <div className="delivery-announcement-home-item" key={item.id}>
+                    <strong>{item.title}</strong><span>{item.message}</span>
+                  </div>)}
+              </section>}
 
             <section className="delivery-panel">
               <div className="delivery-panel-head">
@@ -2758,6 +2778,10 @@ export default function DeliveryRegistry({ onClose }) {
 
           </>
         )}
+
+        {view === "announcements" && <DeliveryAnnouncements state={state}
+          onBack={()=>setView("home")}
+          onSave={announcements=>commit({...state,announcements})}/>}
 
         {view === "statistics" && (
           <DeliveryStatistics state={state} onBack={() => setView("home")}
