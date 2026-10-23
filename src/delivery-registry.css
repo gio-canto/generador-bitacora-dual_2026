@@ -2584,6 +2584,17 @@ button.delivery-action-tile{cursor:pointer}
 .delivery-png-manual{align-content:start}
 .delivery-png-manual .delivery-announcement-form label{min-width:0}
 .delivery-png-manual .delivery-announcement-form{grid-template-columns:1fr}
+.delivery-announcement-weeks{display:grid;gap:10px;min-width:0}
+.delivery-announcement-weeks>strong{font-size:13px;font-weight:650;color:#576476}
+.delivery-announcement-week-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(165px,100%),1fr));gap:8px;
+ max-height:230px;overflow-y:auto}
+.delivery-announcement-week-list label{display:flex;align-items:center;gap:10px;min-width:0;min-height:44px;
+ padding:10px 12px;border:1px solid #dbe2eb;border-radius:10px;background:#fbfcfe;
+ color:#24364b;font-size:13px;font-weight:600;cursor:pointer}
+.delivery-announcement-week-list label:has(input:checked){background:#eef5ff;border-color:#7ca6db}
+.delivery-announcement-week-list input[type="checkbox"]{width:17px;height:17px;min-width:17px;min-height:17px;
+ margin:0;padding:0;accent-color:#1c568f}
+.delivery-announcement-week-list label:focus-within{outline:2px solid #2568bc;outline-offset:2px}
 .delivery-png-manual .delivery-announcement-actions{display:flex;gap:10px;justify-content:flex-start}
 .delivery-png-manual .delivery-announcement-actions .btn{min-height:46px}
 @media(max-width:1050px){
