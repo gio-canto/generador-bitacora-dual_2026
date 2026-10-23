@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.56.1-beta.1 · Generador de avisos PNG · 2026-10-23
+
+- La antigua sección de Anuncios se convierte en **Avisos PNG**, un generador de imágenes compartibles con vista previa en vivo y logotipo oficial.
+- Los recordatorios automáticos de fechas límite registradas y el aviso de la versión actual pueden descargarse como PNG individual o juntos en un archivo ZIP.
+- Se incorporan plantillas para entregas, comunicados, novedades y mensajes personalizados; el editor permite título, subtítulo, mensaje, destinatario, fecha de presentación y pie.
+- Tres medidas de salida: **1080 × 1080** (cuadrado), **1080 × 1350** (publicación vertical) y **1080 × 1920** (historia), además de tres estilos visuales.
+- Los diseños guardados de versiones anteriores se conservan y pueden convertirse en PNG, editarse o reunirse en un ZIP.
+- La interfaz de Inicio enlaza al generador visual, en vez de presentar los comunicados como publicaciones de un tablón interno.
+- El renderizado y las descargas de imagen/ZIP se efectúan localmente en el navegador; los respaldos conservan los nuevos campos de diseño sin cambiar de esquema.
+- Pruebas de dimensiones PNG, vista previa, logotipo, edición de diseños, recuperación de avisos antiguos, plantillas, descarga individual y lote ZIP.
+
+
 ## 0.56.0-beta.1 · Reportes centralizados, anuncios y estadísticas · 2026-10-23
 
 - Se amplía Reportes con expedientes individuales, listados de alumnos y reportes estadísticos, junto a las tres modalidades existentes. Las clasificaciones nominales enlazan a Reportes con el alumno seleccionado.
