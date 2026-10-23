@@ -182,6 +182,11 @@ function duePanel(ctx,p,notice,x,y,w,h){
 /** La vista previa y la descarga usan exactamente el mismo Canvas local. */
 export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
  const notice=noticeModel(item,{format,theme});
+ // En los recordatorios automáticos, las semanas y el plazo ya tienen
+ // bloques propios: evita imprimir el mismo dato tres veces.
+ if(Array.isArray(item?.weeks)&&item.weeks.length&&notice.dueAt){
+   notice.message="";
+ }
  const selected=NOTICE_FORMATS.find(x=>x.id===notice.format);
  canvas.width=selected.width;canvas.height=selected.height;
  const ctx=canvas.getContext("2d");
