@@ -61,6 +61,7 @@ import DeliveryAnnouncements from "./DeliveryAnnouncements.jsx";
 import {announcementOverview} from "../services/delivery-announcements.js";
 import {generateStudentDossierPdf} from "../services/student-dossier-report.js";
 import {generateStatisticsReportPdf} from "../services/statistics-report.js";
+import {calculateStudentInsights} from "../services/student-insights.js";
 import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
 import { parseStudentSpreadsheet } from "../services/student-spreadsheet.js";
 import { generateDeliveryReportPdf } from "../services/delivery-report.js";
@@ -476,6 +477,7 @@ export default function DeliveryRegistry({ onClose }) {
     [state.students],
   );
   const announcementsNow=useMemo(()=>announcementOverview(state),[state]);
+  const attentionNow=useMemo(()=>calculateStudentInsights(state,{period:"all"}),[state]);
   const desistedStudents = useMemo(
     () => state.students.filter((student) => !studentIsActive(student)),
     [state.students],
@@ -2708,6 +2710,13 @@ export default function DeliveryRegistry({ onClose }) {
                 </button>
               </article>
             </section>
+            {attentionNow.ledger.some(p=>p.pending>=2)&&
+              <section className="delivery-panel delivery-attention-summary">
+                <div><strong>{attentionNow.ledger.filter(p=>p.pending>=2).length} alumnos con dos o más pendientes</strong>
+                  <span>{attentionNow.ledger.filter(p=>p.pending>=2).reduce((a,p)=>a+p.pending,0)} entregas vencidas sin registrar</span>
+                </div>
+                <button className="btn" type="button" onClick={()=>setView("statistics")}>Ver seguimiento</button>
+              </section>}
             {(announcementsNow.deadlines.length>0||announcementsNow.notices.length>0)&&
               <section className="delivery-panel delivery-home-announcements" aria-label="Avisos recientes">
                 <div className="delivery-panel-head"><h2>Avisos recientes</h2>
