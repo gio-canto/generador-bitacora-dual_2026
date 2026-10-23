@@ -29,5 +29,21 @@ describe("captura manual de estadísticas",()=>{
     expect(saved.students[0].group).toBe("A");
     expect(delivery.usageSource).toBe("other");
     expect(delivery.statistics.entries[1].status).toBe("falta");
+  });  it("permite escoger cada fase y conservar su ID en el registro manual",()=>{
+    const reasons=[
+      ["prototypes_entrepreneurship_local",20],
+      ["prototypes_entrepreneurship_state",21],
+      ["prototypes_entrepreneurship_national",22],
+      ["academic_festival_local",23],["academic_festival_state",24],
+      ["academic_festival_national",25],["enac_local",26],
+      ["enac_state",27],["enac_national",28],
+    ];
+    for (const [id,code] of reasons) {
+      const day={status:"falta",hours:"",reasonCode:String(code)};
+      const stats=buildManualStatistics([sample[0],day,sample[2],sample[3]]);
+      expect(stats.entries[1]).toMatchObject({status:"falta",reasonCode:code,reasonId:id});
+      expect(manualDaysFromStatistics(stats)[1].reasonCode).toBe(String(code));
+    }
   });
+
 });
