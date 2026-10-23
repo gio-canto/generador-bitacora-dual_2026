@@ -573,7 +573,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
         h: "Autorizó",
         n: auth.name,
         r: auth.byAbsence
-          ? [auth.role,auth.absenceLine,companyName].filter(Boolean)
+          ? [auth.role.split("\n")[0],auth.absenceLine,companyName].filter(Boolean)
           : authoritySignatureRoles(id.authorities.autorizoRole, id.company),
         on: true,
       },
@@ -581,7 +581,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
         h: "Vo.Bo",
         n: instructor.name,
         r: instructor.byAbsence
-          ? [instructor.role,instructor.absenceLine,id.instructor.note,companyName].filter(Boolean)
+          ? [instructor.role.split("\n")[0],instructor.absenceLine,id.instructor.note,companyName].filter(Boolean)
           : [id.instructor.roleMain, id.instructor.note, companyName].filter(Boolean),
         on: id.instructor.enabled,
       },
@@ -770,7 +770,7 @@ function signatureFits(r) {
     {
       name: auth.name,
       roles: auth.byAbsence
-        ? [auth.role,auth.absenceLine,companySignatureName(r.company)].filter(Boolean)
+        ? [auth.role.split("\n")[0],auth.absenceLine,companySignatureName(r.company)].filter(Boolean)
         : authoritySignatureRoles(r.authorities.autorizoRole,r.company),
     },
   ];
@@ -778,7 +778,7 @@ function signatureFits(r) {
     groups.push({
       name: instructor.name,
       roles: instructor.byAbsence
-        ? [instructor.role,instructor.absenceLine,r.instructor.note,companySignatureName(r.company)].filter(Boolean)
+        ? [instructor.role.split("\n")[0],instructor.absenceLine,r.instructor.note,companySignatureName(r.company)].filter(Boolean)
         : [r.instructor.roleMain,r.instructor.note,companySignatureName(r.company)].filter(Boolean),
     });
   return (
