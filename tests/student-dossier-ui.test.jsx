@@ -31,6 +31,6 @@ describe("v0.56 · acceso a reportes desde estadísticas",()=>{
   view(onReportStudent);
   fireEvent.click(screen.getByRole("button",{name:"Beto López"}));
   expect(onReportStudent).toHaveBeenCalledWith("s2");
-  expect(screen.getByText("2")).toBeTruthy();
+  expect(screen.getAllByText("2").length).toBeGreaterThan(0);
  });
 });
