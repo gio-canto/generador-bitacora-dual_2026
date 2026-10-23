@@ -11,14 +11,14 @@ export const NOTICE_THEMES=[
   {id:"warm",label:"Editorial cálido"},
 ];
 export const NOTICE_TEMPLATES=[
-  {id:"reminder",label:"Recordatorio de entrega",title:"Último día de entrega",
-    subtitle:"BITÁCORAS DE EDUCACIÓN DUAL",message:"Recuerda entregar las semanas indicadas antes de la fecha límite."},
+  {id:"reminder",label:"Entrega de bitácoras",title:"Entrega de bitácoras",
+    subtitle:"",message:"Entrega las bitácoras indicadas antes de la fecha límite."},
   {id:"announcement",label:"Comunicado general",title:"Aviso importante",
-    subtitle:"COMUNICADO",message:"Escribe aquí el mensaje que deseas compartir."},
-  {id:"release",label:"Novedades del Generador",title:"Nueva versión disponible",
-    subtitle:"ACTUALIZACIÓN DEL SISTEMA",message:"Consulta las nuevas funciones del Generador de Bitácora Dual."},
-  {id:"custom",label:"Aviso personalizado",title:"Un aviso para ti",
-    subtitle:"AVISO",message:"Escribe aquí tu aviso."},
+    subtitle:"",message:""},
+  {id:"release",label:"Novedades de la aplicación",title:"Nueva versión disponible",
+    subtitle:"",message:"Consulta las nuevas funciones disponibles."},
+  {id:"custom",label:"Aviso personalizado",title:"",
+    subtitle:"",message:""},
 ];
 const clean=s=>String(s??"").trim();
 const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
@@ -36,12 +36,18 @@ export function noticeFilename(item,format="post"){
 export function noticeModel(item,overrides={}){
  return {
    title:clean(item?.title)||"Aviso",
-   subtitle:clean(item?.subtitle)||(item?.kind==="release"?"NOVEDADES DEL SISTEMA":
-     item?.kind==="reminder"?"FECHA DE ENTREGA":"COMUNICADO"),
+   subtitle:clean(item?.subtitle),
    message:clean(item?.message)||"",
-   footer:clean(item?.footer)||"GENERADOR DE BITÁCORA DUAL",
+   footer:/^generador de bitácora dual$/i.test(clean(item?.footer))?"":clean(item?.footer),
    audienceLabel:clean(item?.audienceLabel),
-   dueLabel:clean(item?.dueLabel)||(item?.displayDate?"FECHA: "+String(item.displayDate).split("-").reverse().join("/"):""),
+   weeksLabel:(Array.isArray(item?.weekLabels)?item.weekLabels:
+     Array.isArray(item?.weeks)?item.weeks.map(week=>week?.label):[])
+     .map(clean).filter(Boolean).join(" · "),
+   dueLabel:clean(item?.dueLabel)||(item?.dueAt&&Number.isFinite(Date.parse(item.dueAt))
+     ?"ENTREGA HASTA EL "+new Intl.DateTimeFormat("es-MX",{
+       day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"
+     }).format(new Date(item.dueAt)).toLocaleUpperCase("es-MX"):
+     item?.displayDate?"FECHA: "+String(item.displayDate).split("-").reverse().join("/"):""),
    kind:item?.kind||"custom",
    format:NOTICE_FORMATS.some(x=>x.id===(overrides.format||item?.format))
      ?(overrides.format||item.format):"post",
@@ -107,25 +113,22 @@ export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
  if(!ctx)throw Error("El navegador no admite la vista previa del aviso.");
  const W=selected.width,H=selected.height,p=palette(notice.theme);
  ctx.fillStyle=p.bg;ctx.fillRect(0,0,W,H);
- // The artwork uses a flexible vertical composition with restrained institutional shapes.
- ctx.fillStyle=p.accent;ctx.fillRect(0,0,W,17);
- ctx.globalAlpha=.065;
- ctx.fillStyle=p.accent;
- ctx.beginPath();ctx.arc(W+85,H*.2,W*.57,0,Math.PI*2);ctx.fill();
- ctx.beginPath();ctx.arc(-105,H*.85,W*.4,0,Math.PI*2);ctx.fill();
- ctx.globalAlpha=1;
+ // Superficie limpia: no círculos, degradados ni textos institucionales repetidos.
+ ctx.fillStyle=p.accent;ctx.fillRect(0,0,W,9);
  const margin=72,top=H===1920?90:72,logoHeight=104;
  drawLogo(ctx,logo,margin,top,234,logoHeight);
- label(ctx,"G E N E R A D O R   D E   B I T Á C O R A   D U A L",
-   margin,top+145,20,p.muted,700);
- ctx.fillStyle=p.rule;ctx.fillRect(margin,top+174,W-margin*2,2);
+ ctx.fillStyle=p.rule;ctx.fillRect(margin,top+158,W-margin*2,2);
  const contentTop=H===1920?top+295:H===1080?top+210:top+255;
- const type=notice.subtitle.toLocaleUpperCase("es-MX");
- label(ctx,type,margin,contentTop,25,p.accent,750);
+ const type=(notice.weeksLabel||notice.subtitle).toLocaleUpperCase("es-MX");
+ if(type){
+   const typeFit=fitText(ctx,type,W-margin*2,25,19,2,750);
+   if(typeFit.truncated)throw Error("Demasiadas semanas para el aviso. Selecciona menos semanas.");
+   typeFit.lines.forEach((row,i)=>label(ctx,row,margin,contentTop+i*30,typeFit.size,p.accent,750,W-margin*2));
+ }
  const title=fitText(ctx,notice.title,W-margin*2,86,49,H===1080?3:4,750);
  if(title.truncated)throw Error("El título no cabe. Acórtalo para crear el PNG.");
  const titleHeight=title.size*1.16;
- const titleY=contentTop+87;
+ const titleY=contentTop+(type?100:25);
  title.lines.forEach((row,i)=>label(ctx,row,margin,titleY+i*titleHeight,title.size,p.ink,750,W-margin*2));
  const endTitle=titleY+(title.lines.length-1)*titleHeight;
  const stripY=H-300-(notice.audienceLabel&&notice.dueLabel?115:80);
@@ -148,10 +151,12 @@ export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
    if(notice.dueLabel){label(ctx,notice.dueLabel,margin+25,y,26,p.accent,750);y+=43;}
    if(notice.audienceLabel)label(ctx,"PARA: "+notice.audienceLabel,margin+25,y,21,p.muted,650);
  }
- ctx.fillStyle=p.rule;ctx.fillRect(margin,bottom-30,W-margin*2,2);
- const footer=fitText(ctx,notice.footer,W-margin*2,23,17,2,600);
- footer.lines.forEach((row,i)=>label(ctx,row,margin,bottom+i*28,footer.size,p.ink,600));
- label(ctx,"GD",W-margin-54,bottom+2,25,p.stamp,800);
+ if(notice.footer){
+   ctx.fillStyle=p.rule;ctx.fillRect(margin,bottom-30,W-margin*2,2);
+   const footer=fitText(ctx,notice.footer,W-margin*2,23,17,2,600);
+   if(footer.truncated)throw Error("El pie del aviso es demasiado largo.");
+   footer.lines.forEach((row,i)=>label(ctx,row,margin,bottom+i*28,footer.size,p.ink,600));
+ }
  return canvas;
 }
 const dataBytes=dataUrl=>{
