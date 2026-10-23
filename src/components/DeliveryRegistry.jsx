@@ -60,6 +60,7 @@ import DeliveryStatistics from "./DeliveryStatistics.jsx";
 import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
 import { parseStudentSpreadsheet } from "../services/student-spreadsheet.js";
 import { generateDeliveryReportPdf } from "../services/delivery-report.js";
+import { generateStudentRosterPdf, ROSTER_MODES } from "../services/student-roster-report.js";
 import {
   createScannerIssue,
   formatScannerDiagnostic,
@@ -437,6 +438,9 @@ export default function DeliveryRegistry({ onClose }) {
     initialState.weeks.at(-1)?.id || "",
   );
   const [reportBusy, setReportBusy] = useState(false);
+  const [rosterSort,setRosterSort] = useState("alphabetical");
+  const [rosterIncludeDesisted,setRosterIncludeDesisted] = useState(false);
+  const [rosterBusy,setRosterBusy] = useState(false);
   const [scanQueue, setScanQueue] = useState([]);
   const [fuzzyPrompt, setFuzzyPrompt] = useState(null);
   const [scanMessage, setScanMessage] = useState("Apunta la cámara al Data Matrix.");
@@ -1283,6 +1287,21 @@ export default function DeliveryRegistry({ onClose }) {
     } finally {
       setReportBusy(false);
     }
+  };
+
+  const downloadRoster = async () => {
+    if(rosterBusy)return;
+    setRosterBusy(true);
+    try{
+      const result=await generateStudentRosterPdf(state,{
+        sortBy:rosterSort,includeDesisted:rosterIncludeDesisted
+      });
+      notify("success","Lista de alumnos descargada",
+        result.pages+(result.pages===1?" página":" páginas"));
+    }catch(error){
+      showNotice("error","No se pudo generar la lista",
+        error?.message||"Revisa los datos e inténtalo nuevamente.");
+    }finally{setRosterBusy(false);}
   };
 
   const startSetup = () => {
@@ -2370,6 +2389,34 @@ export default function DeliveryRegistry({ onClose }) {
                       : "Sin alumnos desistidos"}
                   </span>
                 </div>
+                <section className="delivery-roster-export" aria-label="Imprimir lista de alumnos">
+                  <div className="delivery-roster-export-heading">
+                    <strong>Lista de alumnos en PDF</strong>
+                    <span>Ordena y descarga la lista para imprimir.</span>
+                  </div>
+                  <div className="delivery-roster-export-controls">
+                    <label className="delivery-field">
+                      <span>Organizar</span>
+                      <select value={rosterSort} onChange={event=>setRosterSort(event.target.value)}>
+                        {ROSTER_MODES.map(mode=><option value={mode.id} key={mode.id}>{mode.name}</option>)}
+                      </select>
+                    </label>
+                    <label className="delivery-field">
+                      <span>Alumnos</span>
+                      <select value={rosterIncludeDesisted?"all":"active"}
+                        onChange={event=>setRosterIncludeDesisted(event.target.value==="all")}>
+                        <option value="active">Solo activos</option>
+                        <option value="all">Activos y desistidos</option>
+                      </select>
+                    </label>
+                    <button className="btn primary" type="button"
+                      disabled={rosterBusy||!(rosterIncludeDesisted?state.students.length:activeStudents.length)}
+                      onClick={downloadRoster}>
+                      <FilePdf size={18}/>
+                      {rosterBusy?"Generando PDF…":"Descargar lista PDF"}
+                    </button>
+                  </div>
+                </section>
                 <div className="delivery-student-list compact">
                   {state.students.map((student) => (
                     <div

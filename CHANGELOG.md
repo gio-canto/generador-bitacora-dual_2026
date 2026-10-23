@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.55.2-beta.1 · Expediente compacto y listas PDF de alumnos · 2026-10-23
+
+- Rediseño del expediente individual en formato A4 horizontal con logotipo oficial en todas las páginas y Blobatar identificativo; resumen de cumplimiento y matriz mensual de estados de entrega.
+- Interpretación breve automática según entregas vencidas, pendientes, puntualidad y faltas registradas. Si aún no hay plazos vencidos o datos de jornadas, lo señala sin asignar tasas artificiales.
+- Historial de semanas condensado en tablas con entrega, periodo, horas, faltas, labores, origen del registro y clave de estado. Las tablas continúan automáticamente en tantas páginas como sea necesario.
+- Se omiten el folio del reporte, la fecha de emisión y la última actualización del expediente individual.
+- En la sección **Alumnos** se incorpora la impresión de listados PDF: por orden alfabético, por especialidad o por empresa, con elección de alumnos activos o inclusión de desistidos.
+- Los listados incluyen logo, Blobatar, datos académicos, empresa, grupo y situación de Educación Dual, con paginación automática.
+- Pruebas de interpretación, matriz histórica, paginación de expedientes, agrupación de alumnos, ordenamiento, casos sin datos y PDF multipágina; se mantiene el esquema de almacenamiento actual.
+
+
 ## 0.55.1-beta.1 · PDF individual y estadísticas móviles · 2026-10-23
 
 - Los expedientes de alumnos se descargan directamente en PDF al seleccionar el nombre en Estadísticas o pulsarlo en un ranking o listado de pendientes; no se carga el expediente extenso como panel en la página.

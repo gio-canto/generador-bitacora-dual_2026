@@ -1,6 +1,6 @@
 {
   "name": "generador-bitacora-dual-2026",
-  "version": "0.55.1-beta.1",
+  "version": "0.55.2-beta.1",
   "private": true,
   "type": "module",
   "scripts": {

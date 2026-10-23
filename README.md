@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.55.1--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.55.2--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -226,3 +226,9 @@ En **Registro de entregas → Estadísticas → Expediente por alumno**, busca o
 El documento incluye el **Blobatar** del alumno, resumen del cumplimiento y faltas, horas, actividad mensual, motivos registrados y detalle de cada jornada, repartido automáticamente en tantas páginas como sea necesario. La última página nominal del PDF general también utiliza Blobatar para distinguir alumnos. El informe se genera localmente en el navegador con los datos del registro; no requiere subir información de los estudiantes.
 
 El módulo de Estadísticas ajusta las tarjetas, filtros, tablas y controles para móviles y tabletas. Las tablas horizontales se desplazan dentro de su panel, sin hacer que toda la página desborde. Para registros incompletos se mantiene la distinción entre cero y dato no capturado.
+
+### Expediente compacto y listados de alumnos · v0.55.2
+
+En **Registro de entregas → Estadísticas → Expediente por alumno**, el PDF individual utiliza ahora A4 horizontal, logotipo oficial en todas las páginas y Blobatar del alumno. La primera hoja reúne cumplimiento, puntualidad, pendientes, horas y faltas; incluye una **interpretación automática breve** basada en las semanas vencidas y las jornadas capturadas. Una matriz por meses muestra cada semana con una clave visual para «a tiempo», «tarde», «pendiente vencida», «en plazo» y «no aplica». Las hojas posteriores muestran todas las semanas en tablas compactas que continúan automáticamente. El encabezado no incluye folio, fecha de emisión ni última actualización.
+
+En **Alumnos**, debajo del contador de alumnos activos, aparece **Lista de alumnos en PDF**: elige **orden alfabético, por especialidad o por empresa**, además de «solo activos» o «activos y desistidos». El PDF utiliza el logotipo oficial y Blobs con el nombre, especialidad, empresa, grupo y situación de cada alumno; continúa en otras páginas si es necesario. Todos los PDF se generan localmente en el navegador. No se modifica ningún registro al imprimir o descargar listas.
