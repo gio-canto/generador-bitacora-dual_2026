@@ -2453,3 +2453,17 @@ button.delivery-action-tile{cursor:pointer}
   .delivery-stats-trigger span,.delivery-edit-label{font-size:11px}
   .delivery-row-actions>.btn{padding:9px 5px}
 }
+
+/* v0.52.4: captura opcional al crear una semana. */
+.delivery-week-capture-tip{margin:0;padding:10px 14px;color:#516075;font-size:13px;line-height:1.55;background:rgba(0,113,227,.055);border:1px solid rgba(0,113,227,.09);border-radius:14px}
+.delivery-week-submit-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px;min-width:0}
+.delivery-week-submit-actions .btn{min-height:46px}
+.delivery-manual-card .delivery-manual-actions{gap:9px}
+.delivery-manual-card .delivery-manual-actions>.btn{flex:0 1 auto}
+@media(max-width:640px){
+ .delivery-week-submit-actions{display:grid;grid-template-columns:1fr;width:100%}
+ .delivery-week-submit-actions>.btn{width:100%;justify-content:center;white-space:normal}
+ .delivery-manual-card .delivery-manual-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .delivery-manual-card .delivery-manual-actions>.btn.primary{grid-column:1/-1;grid-row:1}
+ .delivery-manual-card .delivery-manual-actions>.btn{min-width:0;width:100%;font-size:12px;padding-inline:8px}
+}
