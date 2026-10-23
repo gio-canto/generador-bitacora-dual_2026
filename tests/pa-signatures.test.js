@@ -26,7 +26,7 @@ function store(){
  return {getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v),
    removeItem:k=>map.delete(k)};
 }
-describe("P. A. · por ausencia de",()=>{
+describe("P. A. · por ausencia del titular",()=>{
  it("mantiene al titular y define a la persona suplente sin sobrescribirla",()=>{
    const original=actingSigner({name:"Lic. Titular",role:"Dirección",enabled:false,
      paName:"Ing. Suplente",paRole:"Subdirección"});
@@ -34,7 +34,7 @@ describe("P. A. · por ausencia de",()=>{
    const acting=actingSigner({name:"Lic. Titular",role:"Dirección",enabled:true,
      paName:"Ing. Suplente",paRole:"Subdirección"});
    expect(acting).toMatchObject({name:"Ing. Suplente",principal:"Lic. Titular",
-     absenceLine:"P. A. de Lic. Titular",byAbsence:true});
+     absenceLine:"P. A. · Por ausencia del Lic. Titular",byAbsence:true});
    expect(paIsComplete(true,"Suplente","")).toBe(false);
    expect(isDifferentSigner("Misma Persona","misma persona")).toBe(false);
  });
