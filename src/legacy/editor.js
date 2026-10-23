@@ -1887,7 +1887,9 @@ export function startEditor() {
         it = st.includes("italic") ? "italic " : "";
       c.font = `${it}${w} ${px}px "Times New Roman", Times, serif`;
     }
-    function drawText(c, t, x, y, s, st, a, col, p) {
+    function drawText(c, t, x, y, s, st, a, col, p, maxWidth) {
+      if (maxWidth)
+        s = Math.min(s, (s*maxWidth)/Math.max(measureMm(t,s,st),0.01));
       setFont(c, s, st, p);
       c.fillStyle = col || "#000";
       c.textAlign = a || "left";
@@ -2322,6 +2324,7 @@ export function startEditor() {
           "center",
           "#000",
           p,
+          sw[i]-3,
         );
         cell.r
           .slice(0, 4)
@@ -2338,6 +2341,7 @@ export function startEditor() {
               "center",
               r.toLowerCase() === "instructor formador" ? "#555" : "#000",
               p,
+              sw[i]-3,
             ),
           );
       });
