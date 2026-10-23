@@ -2542,3 +2542,70 @@ button.delivery-action-tile{cursor:pointer}
 .delivery-attention-summary .btn{min-height:42px}
 @media(max-width:800px){.delivery-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.delivery-summary-grid{grid-template-columns:1fr}}
+
+
+/* v0.56.1 — Studio de imágenes descargables para avisos. */
+.delivery-png-studio{max-width:1500px;margin:0 auto;padding:0 0 48px}
+.delivery-png-tabs{display:flex;align-items:center;gap:7px;padding:5px;
+  background:#edf1f6;border-radius:15px;width:fit-content;max-width:100%}
+.delivery-png-tabs button{border:0;border-radius:11px;min-height:43px;padding:10px 23px;
+ background:transparent;color:#536274;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.delivery-png-tabs button.active{background:#fff;color:#1a2b41;box-shadow:0 2px 10px rgba(19,40,70,.1)}
+.delivery-png-tabs button:focus-visible,.delivery-png-pick-select:focus-visible{
+ outline:2px solid #2568bc;outline-offset:2px}
+.delivery-png-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(310px,.84fr);
+ align-items:start;gap:18px;min-width:0}
+.delivery-png-editor,.delivery-png-preview{min-width:0}
+.delivery-png-editor>.delivery-announcement-area{gap:17px}
+.delivery-png-preview{display:grid;gap:14px;padding:20px;background:#fff;
+ border:1px solid #e3e9f0;border-radius:20px;position:sticky;top:15px}
+.delivery-png-preview>.btn.primary{min-height:49px}
+.delivery-png-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.delivery-png-options label{display:grid;min-width:0;gap:6px;font-size:12px;
+ font-weight:650;color:#5c6a79}
+.delivery-png-options select{font:inherit;width:100%;min-width:0;max-width:100%;
+ padding:10px 12px;min-height:44px;border-radius:11px;border:1px solid #d5dfea;background:#fff;color:#18283d}
+.delivery-png-preview-surface{width:100%;min-width:0;border-radius:16px;
+ background:repeating-conic-gradient(#f4f6f8 0% 25%,#ebeff3 0% 50%) 50% / 22px 22px;
+ display:grid;place-items:center;padding:17px;max-height:76vh;overflow:hidden}
+.delivery-png-canvas{display:block;width:auto;max-width:100%;max-height:67vh;height:auto;
+ object-fit:contain;box-shadow:0 15px 43px rgba(18,35,55,.14);border-radius:3px}
+.delivery-png-picks{display:grid;gap:11px}
+.delivery-png-pick{display:flex;gap:10px;align-items:center;justify-content:space-between;
+ min-width:0;padding:13px 12px;border:1px solid #e0e7ef;border-radius:14px;background:#fff}
+.delivery-png-pick.selected{border-color:#81addd;background:#f6faff}
+.delivery-png-pick-select{display:grid;gap:5px;min-width:0;flex:1;text-align:left;
+ border:0;background:transparent;padding:2px 0;cursor:pointer;color:#1f3043}
+.delivery-png-pick-select small{color:#718093;font-size:11px;line-height:1.4}
+.delivery-png-pick-select strong{font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+.delivery-png-pick-select span{font-size:12px;line-height:1.5;color:#566779;max-height:3.2em;overflow:hidden}
+.delivery-png-pick-actions{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.delivery-png-pick .btn{padding:8px 11px;min-height:38px;white-space:nowrap}
+.delivery-png-manual{align-content:start}
+.delivery-png-manual .delivery-announcement-form label{min-width:0}
+.delivery-png-manual .delivery-announcement-form{grid-template-columns:1fr}
+.delivery-png-manual .delivery-announcement-actions{display:flex;gap:10px;justify-content:flex-start}
+.delivery-png-manual .delivery-announcement-actions .btn{min-height:46px}
+@media(max-width:1050px){
+ .delivery-png-layout{grid-template-columns:1fr}
+ .delivery-png-preview{position:static;max-width:640px;width:100%;margin-inline:auto}
+ .delivery-png-editor{order:1}.delivery-png-preview{order:0}
+ .delivery-png-preview-surface{max-height:550px}
+ .delivery-png-canvas{max-height:480px}
+}
+@media(max-width:600px){
+ .delivery-png-layout{gap:13px}
+ .delivery-png-studio{padding-bottom:25px}
+ .delivery-png-tabs{width:100%;display:grid;grid-template-columns:1fr 1fr}
+ .delivery-png-tabs button{padding:9px;min-height:45px}
+ .delivery-png-preview,.delivery-png-editor>.delivery-announcement-area{padding:14px}
+ .delivery-png-options{grid-template-columns:1fr 1fr}
+ .delivery-png-options select{font-size:16px;min-height:46px}
+ .delivery-png-preview-surface{padding:10px;max-height:390px}
+ .delivery-png-canvas{max-height:360px}
+ .delivery-png-pick{align-items:flex-start;flex-direction:column}
+ .delivery-png-pick>.btn,.delivery-png-pick-actions{width:100%;justify-content:flex-start}
+ .delivery-png-pick-actions .btn{flex:1 1 auto}
+ .delivery-png-manual input,.delivery-png-manual select{font-size:16px}
+}
+@media(max-width:365px){.delivery-png-options{grid-template-columns:1fr}}
