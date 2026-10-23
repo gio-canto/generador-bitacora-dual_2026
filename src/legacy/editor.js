@@ -1056,8 +1056,15 @@ export function startEditor() {
       const config = companies.find((c) => c.name === $("#company").value);
       populateInstructorSelect();
       populatePaSelects();
-      if (changed)
+      if (changed) {
         $("#instructorEnabled").checked = !!config?.instructorEnabledByDefault;
+        $("#autorizoPaEnabled").checked = false;
+        $("#autorizoPaName").value = "";
+        $("#autorizoPaRole").value = "";
+        $("#instructorPaEnabled").checked = false;
+        $("#instructorPaName").value = "";
+        $("#instructorPaRole").value = "";
+      }
       const council = $("#company").value === COUNCIL;
       $("#instructorPresetField").hidden = !instructors().length;
       $("#instructorContext").textContent = council
