@@ -69,7 +69,7 @@ describe("PDF del expediente individual v0.55.1",()=>{
   it("pagina sin cortar historial de muchas semanas",async()=>{
     const real=document.createElement.bind(document);
     vi.spyOn(document,"createElement").mockImplementation(name=>
-      name==="canvas"?createCanvas(1754,1240):real(name));
+      name==="canvas"?createCanvas(1240,1754):real(name));
     const weeks=DOSSIER_ROWS_PER_PAGE*2+1;
     const result=await generateStudentDossierPdf(sample(weeks),"s1",{
       avatarImage:null,logoImage:createCanvas(180,65),download:false,
