@@ -2209,8 +2209,18 @@ export function startEditor() {
         sw = s.colRatio.map((r) => r * s.w),
         sx2 = [s.x];
       sw.forEach((w) => sx2.push(sx2.at(-1) + w));
-      const companyName = companySignatureName(id.company),
-        cells = [
+      const companyName = companySignatureName(id.company);
+      const authSigner = actingSigner({
+        name:id.authorities.autorizoName,role:id.authorities.autorizoRole,
+        enabled:id.authorities.autorizoPaEnabled,
+        paName:id.authorities.autorizoPaName,paRole:id.authorities.autorizoPaRole
+      });
+      const instructorSigner = actingSigner({
+        name:id.instructor.name,role:id.instructor.roleMain,
+        enabled:id.instructor.paEnabled,
+        paName:id.instructor.paName,paRole:id.instructor.paRole
+      });
+      const cells = [
           {
             h: "Elaboró",
             n: id.authorities.elaboroName,
@@ -2231,16 +2241,18 @@ export function startEditor() {
           },
           {
             h: "Autorizó",
-            n: id.authorities.autorizoName,
-            r: authoritySignatureRoles(id.authorities.autorizoRole, id.company),
+            n: authSigner.name,
+            r: authSigner.byAbsence
+              ? [authSigner.role.split("\n")[0],authSigner.absenceLine,companyName].filter(Boolean)
+              : authoritySignatureRoles(id.authorities.autorizoRole,id.company),
             on: true,
           },
           {
             h: "Vo.Bo",
-            n: id.instructor.name,
-            r: [id.instructor.roleMain, id.instructor.note, companyName].filter(
-              Boolean,
-            ),
+            n: instructorSigner.name,
+            r: instructorSigner.byAbsence
+              ? [instructorSigner.role.split("\n")[0],instructorSigner.absenceLine,id.instructor.note,companyName].filter(Boolean)
+              : [id.instructor.roleMain, id.instructor.note, companyName].filter(Boolean),
             on: id.instructor.enabled,
           },
         ];
