@@ -108,19 +108,21 @@ export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
  label(ctx,"G E N E R A D O R   D E   B I T Á C O R A   D U A L",
    margin,top+145,20,p.muted,700);
  ctx.fillStyle=p.rule;ctx.fillRect(margin,top+174,W-margin*2,2);
- const contentTop=H===1920?top+375:top+315;
+ const contentTop=H===1920?top+295:H===1080?top+210:top+255;
  const type=notice.subtitle.toLocaleUpperCase("es-MX");
  label(ctx,type,margin,contentTop,25,p.accent,750);
  const title=fitText(ctx,notice.title,W-margin*2,86,49,H===1080?3:4,750);
  const titleHeight=title.size*1.16;
- const titleY=contentTop+100;
+ const titleY=contentTop+87;
  title.lines.forEach((row,i)=>label(ctx,row,margin,titleY+i*titleHeight,title.size,p.ink,750));
  const endTitle=titleY+(title.lines.length-1)*titleHeight;
- const availableHeight=Math.max(160,(H===1080?H-280:H-365)-endTitle);
+ const stripY=H-300-(notice.audienceLabel&&notice.dueLabel?115:80);
+ const bodyLimit=(notice.audienceLabel||notice.dueLabel?stripY-35:H-240);
+ const availableHeight=Math.max(30,bodyLimit-(endTitle+75));
  const messageSize=clamp(H===1080?33:38,29,41);
- const maxLines=Math.max(3,Math.floor(availableHeight/(messageSize*1.48)));
- const textFit=fitText(ctx,notice.message,W-margin*2-50,messageSize,27,maxLines,450);
- const bodyY=endTitle+100;
+ const maxLines=Math.max(1,Math.floor(availableHeight/(messageSize*1.48)));
+ const textFit=fitText(ctx,notice.message,W-margin*2-50,messageSize,22,maxLines,450);
+ const bodyY=endTitle+75;
  textFit.lines.forEach((row,i)=>label(ctx,row,margin,bodyY+i*textFit.size*1.48,
    textFit.size,p.muted,450));
  // Recipient/date strip is optional, never invent a deadline.
@@ -201,6 +203,7 @@ function zipFiles(files){
 }
 export async function downloadNoticeBatch(items,options={}){
  if(!items.length)throw Error("No hay avisos para descargar.");
+ if(items.length>25)throw Error("Para descargar por lote, selecciona un máximo de 25 avisos.");
  const logo=options.logo||await loadDossierLogo();
  const results=[];
  for(let i=0;i<items.length;i++){
