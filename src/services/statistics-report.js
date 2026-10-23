@@ -1,6 +1,7 @@
 import { canvasToJpeg, createPdfFromJpegs, downloadPdf } from "./delivery-report.js";
 import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLabels, percent } from "./statistics.js";
 import { VERSION } from "../domain/records.js";
+import { calculateStudentInsights } from "./student-insights.js";
 
 const W = 1240;
 const H = 1754;
@@ -227,7 +228,7 @@ function pageBase(report, pageNumber, logo) {
   separator(ctx, 54, 317, W - 108);
   separator(ctx, 54, 1658, W - 108);
   label(ctx, "GENERACIÓN  " + report.generation, 54, 1694, 16, C.muted, 600, 550);
-  label(ctx, "Emitido " + report.date + "  ·  " + pageNumber + "/4  ·  " + VERSION,
+  label(ctx, "Emitido " + report.date + "  ·  " + pageNumber + "/5  ·  " + VERSION,
     W - 435, 1694, 15, C.muted, 500, 430);
   return { ctx, canvas };
 }
@@ -240,7 +241,8 @@ export function statisticsReportModel(state, filters = {}) {
     filters.specialty, filters.company,
   ].filter(Boolean).join(" · ");
   return {
-    data, lifetime: calculateDualLifetimeStatistics(state, filters), scope,
+    data, lifetime: calculateDualLifetimeStatistics(state, filters),
+    insights:calculateStudentInsights(state, filters), scope,
     school: state.context?.school || "Registro de entrega",
     generation: state.context?.generation || "No especificada",
     date: new Date().toLocaleDateString("es-MX", {day:"2-digit", month:"long", year:"numeric"}),
@@ -387,6 +389,51 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     });
     label(ctx,"Los códigos sin horas se excluyen del promedio, mínimo, máximo y rango.",85,1512,17,C.secondary,400,1060);
     label(ctx,"Las horas capturadas de una bitácora pendiente no cambian su estado de entrega.",85,1544,17,C.secondary,400,1060);
+    images.push(canvasToJpeg(canvas));
+  }
+
+
+  // Página 5: seguimiento nominal interno (no calificaciones ni buró de crédito).
+  {
+    const {ctx,canvas}=pageBase(report,5,logo);
+    const person=report.insights;
+    const ranking=(entries,x,y,w,h,mode)=>{
+      if(!entries.length){
+        label(ctx,"Sin datos verificables",x+18,y+78,18,C.muted,500,w-40);
+        return;
+      }
+      entries.slice(0,5).forEach((row,index)=>{
+        const yy=y+24+index*74;
+        label(ctx,String(index+1).padStart(2,"0"),x+14,yy+5,18,C.muted,700,40);
+        label(ctx,row.name,x+55,yy+5,20,C.ink,700,w-175);
+        const sub=mode==="missing" ? fmt(row.pending)+" pendientes / "+fmt(row.due)+" vencidas":
+          fmt(row.absences)+" faltas registradas · "+fmt(row.knownDays)+" jornadas";
+        label(ctx,sub,x+55,yy+27,15,C.muted,500,w-78);
+        label(ctx,mode==="missing"?fmt(row.fulfillmentRate)+"%":fmt(row.absences),
+          x+w-115,yy+7,25,C.ink,750,105);
+        if(index<Math.min(entries.length,5)-1)separator(ctx,x+14,yy+43,w-28);
+      });
+    };
+    panel(ctx,54,345,551,510,"Menor cumplimiento","Periodos ya vencidos · datos por alumno");
+    ranking(person.leastCompliant,69,460,523,370,"missing");
+    panel(ctx,623,345,563,510,"Más faltas verificadas","No se consideran días sin estadísticas");
+    ranking(person.mostAbsences,638,460,535,370,"absences");
+    panel(ctx,54,873,1132,726,
+      filters.period==="all" ? "Historial global de pendientes":"Seguimiento del periodo",
+      filters.period==="all"?"Alumnos activos con entregas cuyo plazo ya venció":
+        "Comparación por alumno de las semanas seleccionadas");
+    const followed=filters.period==="all"?person.ledger:person.leastCompliant;
+    if(!followed.length)empty(ctx,88,1013,1050,
+      "Sin entregas vencidas pendientes ni comparativas disponibles.");
+    followed.slice(0,9).forEach((p,index)=>{
+      const yy=1009+index*61;
+      label(ctx,String(index+1).padStart(2,"0"),87,yy,17,C.muted,700,40);
+      label(ctx,p.name,135,yy,19,C.ink,700,390);
+      label(ctx,p.specialty+" · "+p.company,135,yy+20,14,C.muted,450,610);
+      label(ctx,fmt(p.pending)+" pendientes / "+fmt(p.due)+" vencidas",827,yy+3,18,C.secondary,650,310);
+      if(index<Math.min(followed.length,9)-1)separator(ctx,84,yy+33,1070);
+    });
+    label(ctx,"Solo seguimiento escolar. Las faltas pueden estar justificadas; revisar sus motivos.",83,1571,16,C.muted,500,1080);
     images.push(canvasToJpeg(canvas));
   }
 

@@ -255,3 +255,68 @@
     filter:none!important;
   }
 }
+
+
+/* v0.54 — Seguimiento nominal: legible, sin etiquetas punitivas. */
+.ds-insights{display:grid;gap:17px;min-width:0;margin-top:10px}
+.ds-insights-top{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap}
+.ds-insights-top>div{min-width:0;flex:1 1 420px}
+.ds-insights-top h2{font-size:clamp(27px,3.4vw,40px);letter-spacing:-.045em;line-height:1.15;margin:8px 0}
+.ds-insights-top p,.ds-insight-heading p{color:#737780;font-size:13px;line-height:1.55;margin:5px 0 0}
+.ds-insight-group{display:grid;gap:7px;min-width:min(230px,100%);color:#71727b;font-size:12px;font-weight:650}
+.ds-insight-group select,.ds-insight-breakdown select,.ds-overdue-filters select,.ds-overdue-filters input{min-width:0;max-width:100%;width:100%;border-radius:12px;border:1px solid #dfe2e9;background:#fff;color:#212532;min-height:44px;padding:10px 12px;font:inherit;font-size:14px}
+.ds-insight-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ds-people-panel{gap:14px}
+.ds-insight-heading h3,.ds-panel .ds-insight-heading h3,.ds-insight-explainer h3{margin:0;font-size:clamp(18px,2.3vw,23px);letter-spacing:-.03em}
+.ds-person-list{display:grid;gap:0;min-width:0}
+.ds-person{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:start;gap:12px;padding:13px 0;border-bottom:1px solid #eceef2}
+.ds-person:last-child{border-bottom:0}
+.ds-person-index{height:28px;width:28px;display:grid;place-items:center;background:#f0f4f9;color:#4c6a8a;font-size:12px;border-radius:9px;font-weight:800}
+.ds-person-body{display:grid;gap:5px;min-width:0}
+.ds-person-body strong{font-size:14px;overflow-wrap:anywhere}
+.ds-person-body small{font-size:11px;line-height:1.4;color:#838793;overflow-wrap:anywhere}
+.ds-person-body span{font-size:12px;line-height:1.4;color:#586373}
+.ds-person-value{font-size:clamp(17px,2vw,21px);letter-spacing:-.025em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ds-insight-notice{font-size:12px;color:#625b46;background:#f9f7ef;border-radius:11px;padding:11px 12px;line-height:1.5;margin:0}
+.ds-more{justify-self:start;min-height:39px}
+.ds-insight-explainer{background:#f8fafc;gap:10px}
+.ds-insight-explainer p{font-size:13px;line-height:1.65;color:#5f6570;margin:0}
+.ds-insight-breakdown .ds-panel-head{align-items:end}
+.ds-insight-breakdown .ds-panel-head>label{display:grid;gap:6px;font-size:12px;color:#6a6c76;min-width:180px}
+.ds-insight-table{min-width:640px}
+.ds-insight-table th:first-child{max-width:270px;overflow-wrap:anywhere}
+.ds-insight-table th,.ds-insight-table td{font-variant-numeric:tabular-nums;vertical-align:middle}
+.ds-insight-table td small{display:inline;font-size:11px;color:#868894;white-space:nowrap}
+.ds-overdue-ledger{gap:20px}
+.ds-overdue-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ds-overdue-head>.ds-insight-heading{flex:1 1 380px;min-width:0}
+.ds-overdue-head h3{margin-top:8px!important}
+.ds-overdue-totals{display:grid;gap:3px;justify-items:center;padding:12px 20px;border-radius:16px;background:#f0f5fb}
+.ds-overdue-totals strong{font-size:36px;font-variant-numeric:tabular-nums;line-height:1}
+.ds-overdue-totals span{font-size:11px;color:#697384}
+.ds-overdue-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ds-overdue-filters label{display:grid;gap:7px;min-width:0;color:#767781;font-size:12px;font-weight:600}
+.ds-overdue-list{display:grid;gap:9px;min-width:0}
+.ds-overdue-person{display:flex;align-items:start;justify-content:space-between;gap:15px;border-radius:15px;background:#f8fafc;border:1px solid #e9edf1;padding:16px;min-width:0}
+.ds-overdue-person-main{display:grid;gap:6px;min-width:0}
+.ds-overdue-person-main strong{font-size:15px;overflow-wrap:anywhere}
+.ds-overdue-person-main small,.ds-overdue-person-main span{font-size:12px;color:#697484;line-height:1.5;overflow-wrap:anywhere}
+.ds-overdue-person-main p{margin:2px 0 0;font-size:11px;color:#727c88;line-height:1.45;overflow-wrap:anywhere}
+.ds-overdue-count{display:grid;gap:3px;justify-items:center;min-width:83px;border-radius:12px;padding:9px;background:#fff;border:1px solid #e9edf1}
+.ds-overdue-count strong{font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.ds-overdue-count span{font-size:10px;color:#6a6b74}
+@media(max-width:850px){.ds-insight-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .ds-insights{gap:13px}
+ .ds-insights-top{align-items:stretch}
+ .ds-insight-group{width:100%}
+ .ds-insight-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ds-overdue-filters{grid-template-columns:1fr}
+ .ds-overdue-person{padding:13px;gap:8px}
+ .ds-overdue-count{min-width:69px}
+ .ds-person{grid-template-columns:25px minmax(0,1fr) auto;gap:8px}
+ .ds-person-index{width:24px;height:24px}
+ .ds-insight-table{min-width:620px}
+}
+@media(max-width:350px){.ds-insight-kpis{grid-template-columns:1fr}}
+@media print{.ds-more,.ds-overdue-filters{display:none!important}.ds-overdue-person,.ds-person{break-inside:avoid}}

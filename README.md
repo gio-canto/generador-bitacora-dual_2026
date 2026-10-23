@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.53.0--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.54.0--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -202,3 +202,11 @@ Los nueve motivos de faltas por concursos muestran nombres breves en los despleg
 ### Firmas P. A. (por ausencia de) · v0.53
 
 En **Responsables** puedes activar **P. A. · Por ausencia de** para la firma de **Autorizó** de la empresa y, por separado, para el **Instructor formador**. Cada opción ofrece el mismo listado de personal de la empresa o captura personalizada del suplente, incluido su cargo. Los datos del titular no se reemplazan: se conservan en la bitácora y en el perfil. En la vista previa y en el PDF, el espacio de firma muestra el nombre del suplente, su cargo y la leyenda **P. A. de [titular]**. Sin la opción activada, las firmas funcionan como antes. Los respaldos antiguos siguen siendo compatibles.
+
+### Estadísticas nominales y seguimiento de pendientes · v0.54
+
+En **Registro de entregas → Estadísticas** hay un apartado con comparaciones de **menor cumplimiento**, **más faltas**, **menos faltas**, **mayor puntualidad** y **más horas registradas**. En cada persona se muestra su base de cálculo: semanas vencidas o jornadas con información. Si más de tres alumnos empatan con el mínimo de faltas, la interfaz lo señala y permite ver a todas las personas.
+
+Las comparaciones admiten filtros de periodo, empresa, especialidad y grupo, junto con un desglose dinámico por empresa, especialidad o grupo. La vista **General** incorpora un **historial interno de entregas pendientes** con búsqueda, nivel de atraso y detalle de semanas. El historial no es un buró de crédito ni califica permanentemente a nadie: al capturar una entrega, deja de figurar como pendiente.
+
+Solo se consideran vencidas las semanas con fecha límite superada, periodo concluido o cierre manual; se excluyen las semanas futuras, las entregas «No aplica» y los alumnos desistidos del seguimiento activo. Un alumno sin estadísticas de jornadas no se considera con cero faltas. El PDF institucional incorpora una quinta página de seguimiento por persona. Esta información nominal está destinada exclusivamente al uso administrativo autorizado del plantel y debe manejarse con confidencialidad.

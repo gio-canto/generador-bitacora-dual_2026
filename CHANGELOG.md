@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.54.0-beta.1 · Estadísticas por alumno e historial de pendientes · 2026-10-23
+
+- Cinco nuevas comparaciones nominativas en Estadísticas: menor cumplimiento de entrega, mayor número de faltas registradas, menor número de faltas, mayor puntualidad y más horas verificadas; cada tarjeta explica los periodos o jornadas utilizados.
+- Los resultados muestran inicialmente a tres alumnos y permiten desplegar a los demás. Si más de tres comparten el menor número de faltas, se informa el tamaño del empate.
+- Se pueden filtrar los datos personales por semana, mes, general, empresa, especialidad y grupo. Un comparador agregado muestra alumnos, periodos vencidos, pendientes, tasa de entrega y faltas por empresa, especialidad o grupo.
+- La vista General añade un historial nominal de **entregas vencidas pendientes**, con nombre, empresa, especialidad, grupo, número de semanas y periodo concreto; permite buscar y distinguir uno, dos y tres o más pendientes.
+- El historial se actualiza al registrar una entrega y no se presenta como buró de crédito, calificación crediticia ni sanción. Se muestran datos verificables para uso administrativo, con notas para evitar interpretaciones punitivas.
+- No se atribuye falta a un alumno sin estadísticas; se excluyen entregas «No aplica» y periodos aún no vencidos; se evita duplicar un mismo alumno-periodo.
+- El PDF del panel amplía de cuatro a cinco sus páginas e incluye resumen nominal de cumplimiento, faltas y pendientes. Pruebas automatizadas de filtrado, cómputo, vencimientos, empates, deduplicación y PDF.
+- Se mantiene el almacenamiento y el esquema de respaldos existentes.
+
+
 ## 0.53.0-beta.1 · Firmas P. A. por ausencia de · 2026-10-23
 
 - El paso **Responsables** incluye un interruptor «P. A. · Por ausencia de» independiente para **Autorizó** (representante de empresa) y **Instructor formador**.
