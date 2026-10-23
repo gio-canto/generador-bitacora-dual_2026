@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.52.4--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.52.5--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -194,3 +194,7 @@ Al abrir **Estadísticas**, las tarjetas aparecen progresivamente, las cifras mu
 El catálogo de **Falta** ofrece motivos separados por fase local, estatal y nacional para el Concurso Nacional de Prototipos y Proyectos de Emprendimiento, el Festival Académico y el Encuentro Nacional de Arte y Cultura (ENAC). Los nueve motivos tienen identificadores permanentes y códigos del 20 al 28, compatibles con el Data Matrix estadístico.
 
 Al crear una semana, puedes pulsar **Crear y capturar jornadas** para registrar o modificar las horas, faltas y causas de cada alumno. La ventana permite **Guardar y siguiente**, **Omitir alumno** y **Terminar**. El mismo recorrido puede iniciarse desde **Capturar jornadas** en una semana abierta. Las entregas guardadas en este flujo se registran como **manuales**, independientemente de su origen previo, y las horas de una semana no entregada no la convierten automáticamente en entregada.
+
+### Motivos de concursos simplificados · v0.52.5
+
+Los nueve motivos de faltas por concursos muestran nombres breves en los desplegables, por ejemplo «Festival Académico · Estatal» o «ENAC · Nacional». El texto de la bitácora indica simplemente la participación en el evento y su fase, sin repetir explicaciones sobre la inasistencia. Los IDs y códigos 20–28 permanecen intactos para preservar las bitácoras, estadísticas y Data Matrix anteriores.

@@ -59,4 +59,25 @@ describe("catálogo de motivos frecuentes de falta", () => {
     }
   });
 
+  it("usa nombres cortos y justificaciones directas sin repetir la inasistencia", () => {
+    const names = [
+      "Prototipos y Emprendimiento", "Festival Académico", "ENAC",
+    ];
+    const titles = [
+      "el Concurso Nacional de Prototipos y Proyectos de Emprendimiento",
+      "el Festival Académico",
+      "el Encuentro Nacional de Arte y Cultura (ENAC)",
+    ];
+    const phases = [
+      ["local","Local"],["estatal","Estatal"],["nacional","Nacional"],
+    ];
+    for (let group=0; group<3; group++) for (let phase=0; phase<3; phase++) {
+      const reason=absenceReasons.find(x=>x.code===20+group*3+phase);
+      expect(reason.label).toBe(names[group]+" · "+phases[phase][1]);
+      expect(reason.text).toBe("Participación en "+titles[group]+", fase "+phases[phase][0]+".");
+      expect(reason.text).not.toMatch(/inasistencia|horario|jornada|representación/i);
+      expect(reason.label.length).toBeLessThan(60);
+    }
+  });
+
 });
