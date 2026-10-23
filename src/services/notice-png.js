@@ -6,9 +6,9 @@ export const NOTICE_FORMATS=[
   {id:"story",label:"Historia · 1080 × 1920",width:1080,height:1920},
 ];
 export const NOTICE_THEMES=[
-  {id:"editorial",label:"Institucional claro"},
-  {id:"night",label:"Azul Oxford"},
-  {id:"warm",label:"Editorial cálido"},
+  {id:"editorial",label:"Editorial institucional · A + B"},
+  {id:"night",label:"Azul Oxford · A + B"},
+  {id:"warm",label:"Editorial cálido · A + B"},
 ];
 export const NOTICE_TEMPLATES=[
   {id:"reminder",label:"Entrega de bitácoras",title:"Entrega de bitácoras",
@@ -17,37 +17,46 @@ export const NOTICE_TEMPLATES=[
     subtitle:"",message:""},
   {id:"release",label:"Novedades de la aplicación",title:"Nueva versión disponible",
     subtitle:"",message:"Consulta las nuevas funciones disponibles."},
-  {id:"custom",label:"Aviso personalizado",title:"",
-    subtitle:"",message:""},
+  {id:"custom",label:"Aviso personalizado",title:"",subtitle:"",message:""},
 ];
-const clean=s=>String(s??"").trim();
-const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
-const label=(ctx,text,x,y,size,color,weight=500,maxWidth)=>{
-  ctx.font=weight+" "+size+"px Arial, Helvetica, sans-serif";
-  ctx.fillStyle=color;
-  if(maxWidth)ctx.fillText(text,x,y,maxWidth);
-  else ctx.fillText(text,x,y);
+
+const clean=value=>String(value??"").trim();
+const font=(ctx,size,weight=500)=>{ctx.font=weight+" "+size+"px Arial, Helvetica, sans-serif";};
+const txt=(ctx,value,x,y,size,color,weight=500)=>{
+  font(ctx,size,weight);ctx.fillStyle=color;ctx.fillText(value,x,y);
 };
+const line=(ctx,x,y,width,color,height=2)=>{
+  ctx.fillStyle=color;ctx.fillRect(x,y,width,height);
+};
+const labelCategory=kind=>kind==="reminder"?"ENTREGA":
+  kind==="release"?"ACTUALIZACIÓN":"AVISO";
+const upper=text=>text.toLocaleUpperCase("es-MX");
+
 export function noticeFilename(item,format="post"){
  const base=clean(item?.title||"aviso").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
    .replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").slice(0,60).toLowerCase()||"aviso";
  return "aviso-"+base+"-"+format+".png";
 }
+
 export function noticeModel(item,overrides={}){
+ const weekLabels=Array.isArray(item?.weekLabels)&&item.weekLabels.length?
+   item.weekLabels:Array.isArray(item?.weeks)?item.weeks.map(week=>week?.label):[];
+ const dueAt=typeof item?.dueAt==="string"&&Number.isFinite(Date.parse(item.dueAt))
+   ?item.dueAt:"";
+ const displayDate=/^\d{4}-\d{2}-\d{2}$/.test(item?.displayDate||"")?item.displayDate:"";
  return {
    title:clean(item?.title)||"Aviso",
    subtitle:clean(item?.subtitle),
-   message:clean(item?.message)||"",
+   message:clean(item?.message),
    footer:/^generador de bitácora dual$/i.test(clean(item?.footer))?"":clean(item?.footer),
    audienceLabel:clean(item?.audienceLabel),
-   weeksLabel:(Array.isArray(item?.weekLabels)?item.weekLabels:
-     Array.isArray(item?.weeks)?item.weeks.map(week=>week?.label):[])
-     .map(clean).filter(Boolean).join(" · "),
-   dueLabel:clean(item?.dueLabel)||(item?.dueAt&&Number.isFinite(Date.parse(item.dueAt))
-     ?"ENTREGA HASTA EL "+new Intl.DateTimeFormat("es-MX",{
+   weeksLabel:weekLabels.map(clean).filter(Boolean).join(" · "),
+   dueAt,displayDate,
+   dueLabel:clean(item?.dueLabel)||(dueAt?"ENTREGA HASTA EL "+
+     new Intl.DateTimeFormat("es-MX",{
        day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"
-     }).format(new Date(item.dueAt)).toLocaleUpperCase("es-MX"):
-     item?.displayDate?"FECHA: "+String(item.displayDate).split("-").reverse().join("/"):""),
+     }).format(new Date(dueAt)).toLocaleUpperCase("es-MX"):
+     displayDate?"FECHA: "+displayDate.split("-").reverse().join("/"):""),
    kind:item?.kind||"custom",
    format:NOTICE_FORMATS.some(x=>x.id===(overrides.format||item?.format))
      ?(overrides.format||item.format):"post",
@@ -55,47 +64,68 @@ export function noticeModel(item,overrides={}){
      ?(overrides.theme||item.theme):"editorial",
  };
 }
+
+// Una sola retícula editorial para los tres tamaños y paletas cromáticas.
 function palette(theme){
- if(theme==="night")return {bg:"#101D33",ink:"#FFFFFF",muted:"#D4DFED",accent:"#89B8EF",panel:"#1C2F4C",rule:"#405779",stamp:"#C9E0FC"};
- if(theme==="warm")return {bg:"#F1ECE4",ink:"#332B26",muted:"#726357",accent:"#9B483B",panel:"#FFFBF5",rule:"#D8C9B9",stamp:"#9B483B"};
- return {bg:"#F5F7FA",ink:"#12233B",muted:"#516277",accent:"#174F91",panel:"#FFFFFF",rule:"#D5DEE9",stamp:"#174F91"};
+ if(theme==="night")return {
+   paper:"#122139",ink:"#FFFFFF",muted:"#CFD9E6",accent:"#AACBEC",
+   rule:"#445A75",date:"#E6EFF8",dateInk:"#142B47",dateMuted:"#435D79",stripe:"#4C82B4"
+ };
+ if(theme==="warm")return {
+   paper:"#FCF9F3",ink:"#302C29",muted:"#655E55",accent:"#95513F",
+   rule:"#D7C8B9",date:"#37302D",dateInk:"#FFF9F3",dateMuted:"#E0D2C5",stripe:"#B16852"
+ };
+ return {
+   paper:"#FCFDFE",ink:"#172C49",muted:"#4D5F72",accent:"#20517F",
+   rule:"#C9D5E1",date:"#172C49",dateInk:"#FFFFFF",dateMuted:"#D6E2EF",stripe:"#4C8CBF"
+ };
 }
-function wrapped(ctx,words,width,size,weight=500){
- // Use conservative character capacity to make wrapping consistent across
- // mobile canvas and server-side font renderers.
- ctx.font=weight+" "+size+"px Arial, Helvetica, sans-serif";
- const capacity=Math.max(8,Math.floor(width/(size*.64)));
- const lines=[];let line="";
- for(const word of clean(words).split(/\s+/).filter(Boolean)){
-   let rest=word;
-   while(rest.length>capacity){
-     if(line){lines.push(line);line="";}
-     lines.push(rest.slice(0,capacity));
-     rest=rest.slice(capacity);
+
+// Calcula cortes por ancho real, no por número estimado de caracteres.
+// No se recortan ni estiran palabras para que los PNG conserven legibilidad.
+function wrapText(ctx,value,maxWidth,size,weight=500){
+ font(ctx,size,weight);
+ const result=[];
+ const paragraphs=clean(value).split(/\r?\n/);
+ for(const paragraph of paragraphs){
+   const words=paragraph.split(/\s+/).filter(Boolean);
+   let row="";
+   const pushWord=word=>{
+     let part="";
+     for(const char of [...word]){
+       if(part&&ctx.measureText(part+char).width>maxWidth){
+         if(row){result.push(row);row="";}
+         result.push(part);part=char;
+       }else part+=char;
+     }
+     return part;
+   };
+   for(const rawWord of words){
+     const word=ctx.measureText(rawWord).width>maxWidth?pushWord(rawWord):rawWord;
+     if(!word)continue;
+     const combined=row?row+" "+word:word;
+     if(row&&ctx.measureText(combined).width>maxWidth){
+       result.push(row);row=word;
+     }else row=combined;
    }
-   if(!rest)continue;
-   const next=line?line+" "+rest:rest;
-   if(line&&next.length>capacity){lines.push(line);line=rest;}
-   else line=next;
+   if(row)result.push(row);
  }
- if(line)lines.push(line);
- return lines;
+ return result;
 }
-function fitText(ctx,text,width,initial,min,maxLines,weight=700,maxHeight=Infinity){
+function fitted(ctx,text,width,initial,min,maxLines,maxHeight,weight=500,leading=1.25){
+ if(!clean(text))return {lines:[],size:initial,height:0,leading};
  for(let size=initial;size>=min;size-=2){
-   const lines=wrapped(ctx,text,width,size,weight);
-   if(lines.length<=maxLines&&lines.length*size*1.48<=maxHeight)return {lines,size,truncated:false};
+   const lines=wrapText(ctx,text,width,size,weight);
+   const height=lines.length*size*leading;
+   if(lines.length<=maxLines&&height<=maxHeight){
+     return {lines,size,height,leading};
+   }
  }
- const size=min,lines=wrapped(ctx,text,width,size,weight);
- if(lines.length>maxLines){
-   const clipped=lines.slice(0,maxLines);
-   let last=clipped[maxLines-1]||"";
-   ctx.font=weight+" "+size+"px Arial, Helvetica, sans-serif";
-   while(last.length&&ctx.measureText(last+"…").width>width)last=last.slice(0,-1);
-   clipped[maxLines-1]=last+"…";
-   return {lines:clipped,size,truncated:true};
- }
- return {lines,size,truncated:false};
+ return null;
+}
+function drawBlock(ctx,block,x,top,color,weight=500){
+ block.lines.forEach((row,index)=>txt(ctx,row,x,top+block.size+
+   index*block.size*block.leading,block.size,color,weight));
 }
 function drawLogo(ctx,img,x,y,maxW,maxH){
  if(!img)throw Error("No se pudo cargar el logotipo oficial.");
@@ -104,61 +134,138 @@ function drawLogo(ctx,img,x,y,maxW,maxH){
  const scale=Math.min(maxW/w,maxH/h);
  ctx.drawImage(img,x,y+(maxH-h*scale)/2,w*scale,h*scale);
 }
-/** Canvas drawing uses only local data. Returns the canvas for preview or PNG export. */
+function dateParts(notice){
+ if(notice.dueAt){
+   const d=new Date(notice.dueAt);
+   if(Number.isFinite(d.getTime()))return {
+     day:new Intl.DateTimeFormat("es-MX",{day:"2-digit"}).format(d),
+     month:upper(new Intl.DateTimeFormat("es-MX",{month:"long"}).format(d)),
+     year:new Intl.DateTimeFormat("es-MX",{year:"numeric"}).format(d),
+     time:new Intl.DateTimeFormat("es-MX",{hour:"2-digit",minute:"2-digit",hour12:false}).format(d)
+   };
+ }
+ if(notice.displayDate){
+   const [y,m,d]=notice.displayDate.split("-").map(Number);
+   const value=new Date(y,m-1,d,12);
+   return {day:String(d).padStart(2,"0"),month:upper(
+     new Intl.DateTimeFormat("es-MX",{month:"long"}).format(value)),year:String(y),time:""};
+ }
+ return null;
+}
+function duePanel(ctx,p,notice,x,y,w,h){
+ const parts=dateParts(notice);
+ ctx.fillStyle=p.date;ctx.fillRect(x,y,w,h);
+ ctx.fillStyle=p.stripe;ctx.fillRect(x,y,8,h);
+ const px=x+36;
+ txt(ctx,"FECHA LÍMITE",px,y+43,19,p.dateMuted,700);
+ if(parts){
+   const daySize=h<=190?92:h<=225?106:124;
+   txt(ctx,parts.day,px,y+h-31,daySize,p.dateInk,800);
+   const monthX=px+178;
+   const monthFit=fitted(ctx,parts.month,w-390,43,27,1,53,750);
+   if(!monthFit)throw Error("La fecha no cabe en el diseño seleccionado.");
+   txt(ctx,parts.month,monthX,y+h-79,monthFit.size,p.dateInk,750);
+   txt(ctx,parts.year,monthX,y+h-38,29,p.dateMuted,600);
+   if(parts.time){
+     font(ctx,27,700);
+     const time=parts.time+" h";
+     txt(ctx,time,x+w-33-ctx.measureText(time).width,y+h-41,27,p.dateInk,700);
+   }
+ }else{
+   const withoutPrefix=notice.dueLabel.replace(
+     /^(?:FECHA(?:\s+LÍMITE)?|ENTREGA\s+HASTA\s+EL)\s*[: ]*\s*/i,"").trim()||notice.dueLabel;
+   const fit=fitted(ctx,withoutPrefix,w-76,h<=190?44:51,25,2,h-78,750,1.17);
+   if(!fit)throw Error("La fecha no cabe. Reduce el texto de la fecha límite.");
+   drawBlock(ctx,fit,px,y+52,p.dateInk,750);
+ }
+}
+/** La vista previa y la descarga usan exactamente el mismo Canvas local. */
 export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
  const notice=noticeModel(item,{format,theme});
  const selected=NOTICE_FORMATS.find(x=>x.id===notice.format);
  canvas.width=selected.width;canvas.height=selected.height;
  const ctx=canvas.getContext("2d");
  if(!ctx)throw Error("El navegador no admite la vista previa del aviso.");
- const W=selected.width,H=selected.height,p=palette(notice.theme);
- ctx.fillStyle=p.bg;ctx.fillRect(0,0,W,H);
- // Superficie limpia: no círculos, degradados ni textos institucionales repetidos.
- ctx.fillStyle=p.accent;ctx.fillRect(0,0,W,9);
- const margin=72,top=H===1920?90:72,logoHeight=104;
- drawLogo(ctx,logo,margin,top,234,logoHeight);
- ctx.fillStyle=p.rule;ctx.fillRect(margin,top+158,W-margin*2,2);
- const contentTop=H===1920?top+295:H===1080?top+210:top+255;
- const type=(notice.weeksLabel||notice.subtitle).toLocaleUpperCase("es-MX");
- if(type){
-   const typeFit=fitText(ctx,type,W-margin*2,25,19,2,750);
-   if(typeFit.truncated)throw Error("Demasiadas semanas para el aviso. Selecciona menos semanas.");
-   typeFit.lines.forEach((row,i)=>label(ctx,row,margin,contentTop+i*30,typeFit.size,p.accent,750,W-margin*2));
- }
- const title=fitText(ctx,notice.title,W-margin*2,86,49,H===1080?3:4,750);
- if(title.truncated)throw Error("El título no cabe. Acórtalo para crear el PNG.");
- const titleHeight=title.size*1.16;
- const titleY=contentTop+(type?100:25);
- title.lines.forEach((row,i)=>label(ctx,row,margin,titleY+i*titleHeight,title.size,p.ink,750,W-margin*2));
- const endTitle=titleY+(title.lines.length-1)*titleHeight;
- const stripY=H-300-(notice.audienceLabel&&notice.dueLabel?115:80);
- const bodyLimit=(notice.audienceLabel||notice.dueLabel?stripY-35:H-240);
- const availableHeight=Math.max(30,bodyLimit-(endTitle+75));
- const messageSize=clamp(H===1080?33:38,29,41);
- const maxLines=Math.max(1,Math.floor(availableHeight/(22*1.48)));
- const textFit=fitText(ctx,notice.message,W-margin*2-50,messageSize,22,maxLines,450,availableHeight);
- if(textFit.truncated)throw Error("El mensaje es demasiado largo para este formato. Acórtalo o elige Historia.");
- const bodyY=endTitle+75;
- textFit.lines.forEach((row,i)=>label(ctx,row,margin,bodyY+i*textFit.size*1.48,
-   textFit.size,p.muted,450,W-margin*2-50));
- // Recipient/date strip is optional, never invent a deadline.
- const bottom=H-145;
- if(notice.audienceLabel||notice.dueLabel){
-   const stripH=notice.audienceLabel&&notice.dueLabel?115:80;
-   const stripY=H-300-stripH;
-   ctx.fillStyle=p.panel;ctx.beginPath();ctx.roundRect(margin,stripY,W-margin*2,stripH,20);ctx.fill();
-   let y=stripY+44;
-   if(notice.dueLabel){label(ctx,notice.dueLabel,margin+25,y,26,p.accent,750);y+=43;}
-   if(notice.audienceLabel)label(ctx,"PARA: "+notice.audienceLabel,margin+25,y,21,p.muted,650);
- }
+ const W=selected.width,H=selected.height;
+ const p=palette(notice.theme);
+ const square=H===1080,story=H===1920;
+ const m=72,w=W-2*m;
+ const top=story?105:square?46:75;
+ const headerY=top+99,kindY=headerY+44,titleTop=kindY+24;
+ const bottom=H-(story?100:67);
+ ctx.fillStyle=p.paper;ctx.fillRect(0,0,W,H);
+ // Cabecera discreta: solo logotipo, categoría y una regla.
+ drawLogo(ctx,logo,m,top,206,80);
+ const cat=labelCategory(notice.kind);
+ font(ctx,20,750);
+ txt(ctx,cat,W-m-ctx.measureText(cat).width,top+49,20,p.accent,750);
+ line(ctx,m,headerY,w,p.rule,2);
+ // Reserva los datos operativos primero; el texto ocupa el espacio restante.
+ let cursor=bottom;
  if(notice.footer){
-   ctx.fillStyle=p.rule;ctx.fillRect(margin,bottom-30,W-margin*2,2);
-   const footer=fitText(ctx,notice.footer,W-margin*2,23,17,2,600);
-   if(footer.truncated)throw Error("El pie del aviso es demasiado largo.");
-   footer.lines.forEach((row,i)=>label(ctx,row,margin,bottom+i*28,footer.size,p.ink,600));
+   const footer=fitted(ctx,notice.footer,w,21,17,2,60,600,1.2);
+   if(!footer)throw Error("La firma es demasiado larga para este formato.");
+   const footerTop=cursor-footer.height;
+   line(ctx,m,footerTop-22,w,p.rule,2);
+   drawBlock(ctx,footer,m,footerTop,p.muted,600);
+   cursor=footerTop-49;
  }
+ const hasDue=Boolean(notice.dueAt||notice.displayDate||notice.dueLabel);
+ const dueH=hasDue?(square?184:story?265:230):0;
+ const dueY=hasDue?cursor-dueH:0;
+ if(hasDue){cursor=dueY-(square?26:34);}
+ const audience=notice.audienceLabel?fitted(ctx,notice.audienceLabel,w,25,19,2,70,650):null;
+ if(notice.audienceLabel&&!audience)throw Error("El destinatario es demasiado largo para el PNG.");
+ const audienceTop=audience?cursor-(audience.height+29):0;
+ if(audience)cursor=audienceTop-20;
+ const weekFit=notice.weeksLabel?fitted(ctx,notice.weeksLabel,w,34,23,3,
+   square?115:story?175:145,700,1.22):null;
+ if(notice.weeksLabel&&!weekFit)throw Error("Demasiadas semanas para el aviso. Selecciona menos semanas.");
+ const weeksHeight=weekFit?weekFit.height+50:0;
+ const weeksTop=weekFit?cursor-weeksHeight:0;
+ if(weekFit)cursor=weeksTop-(square?18:28);
+ const heroWidth=w-28;
+ const heroHeight=cursor-titleTop-8;
+ if(heroHeight<=0)throw Error("No hay espacio para el aviso. Reduce el texto o utiliza Historia.");
+ let titleFit=null,bodyFit=null;
+ for(let size=square?82:story?99:94;size>=50;size-=2){
+   const candidate=fitted(ctx,notice.title,heroWidth,size,size,square?4:5,
+     heroHeight,800,1.12);
+   if(!candidate)continue;
+   const remaining=heroHeight-candidate.height-(notice.message?27:0);
+   const body=notice.message?fitted(ctx,notice.message,heroWidth,
+     square?33:story?42:37,22,story?15:square?7:10,remaining,450,1.35):
+     {lines:[],size:30,height:0,leading:1.35};
+   if(body){titleFit=candidate;bodyFit=body;break;}
+ }
+ if(!titleFit||!bodyFit)throw Error(
+   "El título o el mensaje es demasiado largo para este formato. Acórtalo o elige Historia.");
+ // Retícula suiza: filete vertical, titular contundente, texto sin adornos.
+ line(ctx,m,titleTop+4,8,p.accent,Math.min(88,titleFit.height-8));
+ drawBlock(ctx,titleFit,m+28,titleTop,p.ink,800);
+ if(bodyFit.lines.length){
+   drawBlock(ctx,bodyFit,m+28,titleTop+titleFit.height+27,p.muted,450);
+ }
+ if(weekFit){
+   line(ctx,m,weeksTop,w,p.rule,2);
+   txt(ctx,"SEMANAS POR ENTREGAR",m,weeksTop+28,18,p.accent,750);
+   drawBlock(ctx,weekFit,m,weeksTop+39,p.ink,700);
+ }else if(notice.subtitle){
+   // En los avisos sin semanas, la etiqueta opcional es información contextual.
+   // Va en la retícula solo cuando no oculta el contenido operativo.
+   const extra=fitted(ctx,notice.subtitle,w,22,18,2,57,650);
+   if(extra&&weeksTop===0&&cursor-titleTop-titleFit.height-bodyFit.height>85){
+     drawBlock(ctx,extra,m,titleTop+titleFit.height+bodyFit.height+44,p.accent,650);
+   }
+ }
+ if(audience){
+   txt(ctx,"DIRIGIDO A",m,audienceTop+19,17,p.accent,700);
+   drawBlock(ctx,audience,m,audienceTop+22,p.ink,650);
+ }
+ if(hasDue)duePanel(ctx,p,notice,m,dueY,w,dueH);
  return canvas;
 }
+
 const dataBytes=dataUrl=>{
  const base64=String(dataUrl||"").split(",")[1]||"";
  const binary=atob(base64);
