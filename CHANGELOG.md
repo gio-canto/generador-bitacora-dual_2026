@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.56.0-beta.1 · Reportes centralizados, anuncios y estadísticas · 2026-10-23
+
+- Se amplía Reportes con expedientes individuales, listados de alumnos y reportes estadísticos, junto a las tres modalidades existentes. Las clasificaciones nominales enlazan a Reportes con el alumno seleccionado.
+- El expediente individual adopta A4 vertical y muestra cada semana con su identificador abreviado real («Semana 20» → «S20»), con matriz, resumen e historial paginado. Mantiene logotipo oficial y datos anteriores.
+- Las interpretaciones automáticas de cumplimiento, asistencia, faltas y horas se presentan en Estadísticas y como notas breves en el PDF general.
+- El Historial de entregas pendientes muestra exclusivamente alumnos con dos o más entregas vencidas sin entregar. Los totales globales de entregas no se restringen.
+- Se ajustan la escala tipográfica, cifras y etiquetas de los indicadores en Estadísticas, incluyendo móviles y tabletas.
+- Nueva sección Anuncios: fechas de entrega próximas obtenidas de las semanas existentes, anuncios redactados por el administrador y comunicados de versión, con destinatario opcional, fecha de caducidad, vista previa, edición y eliminación.
+- El Inicio muestra accesos a Anuncios y una vista abreviada de avisos próximos. Los anuncios se incluyen en el registro y respaldo local, sin infraestructura de notificaciones remotas.
+- Se incluyen pruebas de anuncios y destinatarios, normalización y respaldo, vencimientos, abreviaturas semanales, interpretación y navegación de reportes. No cambia el esquema de datos.
+
+
 ## 0.55.2-beta.1 · Expediente compacto y listas PDF de alumnos · 2026-10-23
 
 - Rediseño del expediente individual en formato A4 horizontal con logotipo oficial en todas las páginas y Blobatar identificativo; resumen de cumplimiento y matriz mensual de estados de entrega.
