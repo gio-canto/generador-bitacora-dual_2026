@@ -18,7 +18,7 @@ export function interpretStatistics(data,insights){
      ? count(worked)+" jornadas con labores y "+count(absent)+" faltas."
      : "No hay jornadas de asistencia registradas.",
    hours:data.weeksWithStatistics
-     ? count((data.totalMinutes||0)/60)+" horas en "+count(data.weeksWithStatistics)+" registros con jornadas."
+     ? Number((Number(data.totalMinutes||0)/60).toFixed(1)).toLocaleString("es-MX")+" horas en "+count(data.weeksWithStatistics)+" registros con jornadas."
      : "Todavía no hay horas registradas.",
    pending:expected
      ? count(insights?.totalPending||0)+" de "+count(expected)+" entregas vencidas siguen pendientes."
