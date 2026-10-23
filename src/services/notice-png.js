@@ -22,10 +22,11 @@ export const NOTICE_TEMPLATES=[
 ];
 const clean=s=>String(s??"").trim();
 const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
-const label=(ctx,text,x,y,size,color,weight=500)=>{
+const label=(ctx,text,x,y,size,color,weight=500,maxWidth)=>{
   ctx.font=weight+" "+size+"px Arial, Helvetica, sans-serif";
   ctx.fillStyle=color;
-  ctx.fillText(text,x,y);
+  if(maxWidth)ctx.fillText(text,x,y,maxWidth);
+  else ctx.fillText(text,x,y);
 };
 export function noticeFilename(item,format="post"){
  const base=clean(item?.title||"aviso").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
@@ -54,11 +55,21 @@ function palette(theme){
  return {bg:"#F5F7FA",ink:"#12233B",muted:"#516277",accent:"#174F91",panel:"#FFFFFF",rule:"#D5DEE9",stamp:"#174F91"};
 }
 function wrapped(ctx,words,width,size,weight=500){
+ // Use conservative character capacity to make wrapping consistent across
+ // mobile canvas and server-side font renderers.
  ctx.font=weight+" "+size+"px Arial, Helvetica, sans-serif";
+ const capacity=Math.max(8,Math.floor(width/(size*.64)));
  const lines=[];let line="";
  for(const word of clean(words).split(/\s+/).filter(Boolean)){
-   const next=line?line+" "+word:word;
-   if(line&&ctx.measureText(next).width>width){lines.push(line);line=word;}
+   let rest=word;
+   while(rest.length>capacity){
+     if(line){lines.push(line);line="";}
+     lines.push(rest.slice(0,capacity));
+     rest=rest.slice(capacity);
+   }
+   if(!rest)continue;
+   const next=line?line+" "+rest:rest;
+   if(line&&next.length>capacity){lines.push(line);line=rest;}
    else line=next;
  }
  if(line)lines.push(line);
@@ -115,7 +126,7 @@ export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
  if(title.truncated)throw Error("El título no cabe. Acórtalo para crear el PNG.");
  const titleHeight=title.size*1.16;
  const titleY=contentTop+87;
- title.lines.forEach((row,i)=>label(ctx,row,margin,titleY+i*titleHeight,title.size,p.ink,750));
+ title.lines.forEach((row,i)=>label(ctx,row,margin,titleY+i*titleHeight,title.size,p.ink,750,W-margin*2));
  const endTitle=titleY+(title.lines.length-1)*titleHeight;
  const stripY=H-300-(notice.audienceLabel&&notice.dueLabel?115:80);
  const bodyLimit=(notice.audienceLabel||notice.dueLabel?stripY-35:H-240);
@@ -126,7 +137,7 @@ export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
  if(textFit.truncated)throw Error("El mensaje es demasiado largo para este formato. Acórtalo o elige Historia.");
  const bodyY=endTitle+75;
  textFit.lines.forEach((row,i)=>label(ctx,row,margin,bodyY+i*textFit.size*1.48,
-   textFit.size,p.muted,450));
+   textFit.size,p.muted,450,W-margin*2-50));
  // Recipient/date strip is optional, never invent a deadline.
  const bottom=H-145;
  if(notice.audienceLabel||notice.dueLabel){
