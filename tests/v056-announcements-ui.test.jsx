@@ -46,6 +46,7 @@ describe("v0.56.1 · generador de avisos PNG",()=>{
   fireEvent.click(screen.getByRole("button",{name:"Usar datos de la versión actual"}));
   expect(screen.getByLabelText("Título").value).toContain("0.56.1");
   expect(screen.getByLabelText("Mensaje").value).toContain("Novedades:");
+  await waitFor(()=>expect(screen.getAllByRole("button",{name:"Descargar PNG"})[0].disabled).toBe(false));
   fireEvent.click(screen.getAllByRole("button",{name:"Descargar PNG"})[0]);
   await waitFor(()=>expect(downloadNoticePng).toHaveBeenCalled());
  });
