@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import AnimatedValue from "./AnimatedValue.jsx";
 import StudentInsights from "./StudentInsights.jsx";
+import {calculateStudentInsights} from "../services/student-insights.js";
 import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLabels, percent } from "../services/statistics.js";
-import { generateStatisticsReportPdf } from "../services/statistics-report.js";
+import { interpretStatistics } from "../services/statistics-interpretation.js";
 import "../delivery-statistics.css";
 
 const fmt = (n, digits = 0) => Number(n || 0).toLocaleString("es-MX", { maximumFractionDigits:digits });
@@ -40,7 +41,7 @@ function Bars({ title, rows, unit = "", max = 7 }) {
 function Metric({name,value}) {
   return <article className="ds-kpi"><strong><AnimatedValue value={value}/></strong><span>{name}</span></article>;
 }
-export default function DeliveryStatistics({ state, onBack }) {
+export default function DeliveryStatistics({ state, onBack, onReportStudent, onReportStatistics }) {
   const rootRef = useRef(null);
   const [period,setPeriod] = useState("weekly");
   const [weekId,setWeekId] = useState(state.weeks.at(-1)?.id || "");
@@ -48,8 +49,6 @@ export default function DeliveryStatistics({ state, onBack }) {
   const [specialty,setSpecialty] = useState("");
   const [company,setCompany] = useState("");
   const [metric,setMetric] = useState("hours");
-  const [pdfBusy,setPdfBusy] = useState(false);
-  const [pdfError,setPdfError] = useState("");
   const specialties = [...new Set(state.students.map(student=>student.specialty).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const companies = [...new Set(state.students.map(student=>student.company).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const filters = {period,weekId,month,specialty,company};
@@ -111,13 +110,7 @@ export default function DeliveryStatistics({ state, onBack }) {
     };
   }, [viewKey,metric]);
 
-  const exportPdf = async () => {
-    if(pdfBusy)return;
-    setPdfError("");setPdfBusy(true);
-    try {await generateStatisticsReportPdf(state,filters);}
-    catch(error){setPdfError(error?.message||"No se pudo generar el PDF.");}
-    finally{setPdfBusy(false);}
-  };
+  const interpretation=interpretStatistics(data,calculateStudentInsights(state,filters));
 
   return <div className="delivery-analytics-container" ref={rootRef}>
     <div className="ds-header">
@@ -125,10 +118,8 @@ export default function DeliveryStatistics({ state, onBack }) {
       <span className="delivery-kicker">Registro de entrega</span>
       <div className="ds-panel-head">
         <h1>Estadísticas</h1>
-        <button className="btn primary" disabled={pdfBusy||!data.weeks.length}
-          type="button" onClick={exportPdf}>{pdfBusy?"Generando PDF…":"Descargar PDF"}</button>
+        <button className="btn" type="button" onClick={onReportStatistics}>Abrir Reportes</button>
       </div>
-      {pdfError && <p className="ds-error" role="alert">{pdfError}</p>}
     </div>
 
     <div className="ds-controls">
@@ -163,6 +154,15 @@ export default function DeliveryStatistics({ state, onBack }) {
       <Metric name="Jornadas con falta" value={fmt(data.daily.falta)}/>
       <Metric name="Uso identificado" value={percent(data.usage.used,data.students.length)+"%"}/>
     </div>
+    <section className="ds-panel ds-interpretations" aria-label="Interpretación del periodo">
+      <h2>Resumen del periodo</h2>
+      <div className="ds-insight-explainer-grid">
+        <p><strong>Entregas.</strong> {interpretation.deliveries}</p>
+        <p><strong>Jornadas.</strong> {interpretation.attendance}</p>
+        <p><strong>Horas.</strong> {interpretation.hours}</p>
+        <p><strong>Faltas.</strong> {interpretation.causes}</p>
+      </div>
+    </section>
     <section className="ds-panel">
       <div className="ds-panel-head">
         <h2>Actividad de formación</h2>
@@ -249,7 +249,7 @@ export default function DeliveryStatistics({ state, onBack }) {
       <p className="ds-lifetime-caption">Histórico de todas las semanas, incluidas las pendientes y las de alumnos desistidos.</p>
     </section>
     <StudentInsights state={state} period={period} weekId={weekId} month={month}
-      specialty={specialty} company={company}/>
+      specialty={specialty} company={company} onReportStudent={onReportStudent}/>
     </div>
   </div>;
 }
