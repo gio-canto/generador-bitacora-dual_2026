@@ -112,5 +112,59 @@
     "label": "Motivos sociales",
     "text": "Inasistencia por un compromiso de carácter social que coincidió con el horario previsto de actividades.",
     "code": 19
+  },
+  {
+    "id": "prototypes_entrepreneurship_local",
+    "label": "Concurso Nacional de Prototipos y Proyectos de Emprendimiento · Fase local",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase local del Concurso Nacional de Prototipos y Proyectos de Emprendimiento, programada durante la jornada de Educación Dual.",
+    "code": 20
+  },
+  {
+    "id": "prototypes_entrepreneurship_state",
+    "label": "Concurso Nacional de Prototipos y Proyectos de Emprendimiento · Fase estatal",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase estatal del Concurso Nacional de Prototipos y Proyectos de Emprendimiento, programada durante la jornada de Educación Dual.",
+    "code": 21
+  },
+  {
+    "id": "prototypes_entrepreneurship_national",
+    "label": "Concurso Nacional de Prototipos y Proyectos de Emprendimiento · Fase nacional",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase nacional del Concurso Nacional de Prototipos y Proyectos de Emprendimiento, programada durante la jornada de Educación Dual.",
+    "code": 22
+  },
+  {
+    "id": "academic_festival_local",
+    "label": "Festival Académico · Fase local",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase local del Festival Académico, programada durante la jornada de Educación Dual.",
+    "code": 23
+  },
+  {
+    "id": "academic_festival_state",
+    "label": "Festival Académico · Fase estatal",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase estatal del Festival Académico, programada durante la jornada de Educación Dual.",
+    "code": 24
+  },
+  {
+    "id": "academic_festival_national",
+    "label": "Festival Académico · Fase nacional",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase nacional del Festival Académico, programada durante la jornada de Educación Dual.",
+    "code": 25
+  },
+  {
+    "id": "enac_local",
+    "label": "Encuentro Nacional de Arte y Cultura (ENAC) · Fase local",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase local del Encuentro Nacional de Arte y Cultura (ENAC), programada durante la jornada de Educación Dual.",
+    "code": 26
+  },
+  {
+    "id": "enac_state",
+    "label": "Encuentro Nacional de Arte y Cultura (ENAC) · Fase estatal",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase estatal del Encuentro Nacional de Arte y Cultura (ENAC), programada durante la jornada de Educación Dual.",
+    "code": 27
+  },
+  {
+    "id": "enac_national",
+    "label": "Encuentro Nacional de Arte y Cultura (ENAC) · Fase nacional",
+    "text": "Inasistencia por asistir, en representación o participación escolar, a la fase nacional del Encuentro Nacional de Arte y Cultura (ENAC), programada durante la jornada de Educación Dual.",
+    "code": 28
   }
 ]

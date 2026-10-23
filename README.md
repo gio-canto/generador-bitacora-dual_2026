@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.52.3--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.52.4--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -188,3 +188,9 @@ Desde **Registro de entrega**, selecciona el estado **A tiempo**, **A destiempo*
 ### Estadísticas animadas
 
 Al abrir **Estadísticas**, las tarjetas aparecen progresivamente, las cifras muestran un conteo hasta su valor real y las gráficas se dibujan al entrar en pantalla. Al cambiar periodo, semana, especialidad o empresa, los resultados se actualizan con una transición breve. Si el dispositivo tiene activado **Reducir movimiento**, las cifras y las gráficas se muestran de inmediato sin animaciones. Estas mejoras no afectan los datos guardados ni los reportes PDF.
+
+### Faltas académicas y captura semanal · v0.52.4
+
+El catálogo de **Falta** ofrece motivos separados por fase local, estatal y nacional para el Concurso Nacional de Prototipos y Proyectos de Emprendimiento, el Festival Académico y el Encuentro Nacional de Arte y Cultura (ENAC). Los nueve motivos tienen identificadores permanentes y códigos del 20 al 28, compatibles con el Data Matrix estadístico.
+
+Al crear una semana, puedes pulsar **Crear y capturar jornadas** para registrar o modificar las horas, faltas y causas de cada alumno. La ventana permite **Guardar y siguiente**, **Omitir alumno** y **Terminar**. El mismo recorrido puede iniciarse desde **Capturar jornadas** en una semana abierta. Las entregas guardadas en este flujo se registran como **manuales**, independientemente de su origen previo, y las horas de una semana no entregada no la convierten automáticamente en entregada.

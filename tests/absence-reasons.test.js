@@ -34,4 +34,29 @@ describe("catálogo de motivos frecuentes de falta", () => {
     expect(ids).toContain("natural_disaster");
     expect(ids).toContain("social_unrest");
   });
+  it("agrega los nueve concursos por fase con IDs y códigos estables sin colisiones", () => {
+    const expected = [
+      ["prototypes_entrepreneurship_local",20],
+      ["prototypes_entrepreneurship_state",21],
+      ["prototypes_entrepreneurship_national",22],
+      ["academic_festival_local",23],
+      ["academic_festival_state",24],
+      ["academic_festival_national",25],
+      ["enac_local",26],
+      ["enac_state",27],
+      ["enac_national",28],
+    ];
+    const codes = absenceReasons.map(reason=>reason.code);
+    expect(new Set(codes).size).toBe(absenceReasons.length);
+    expect(absenceReasons.filter(reason=>reason.code<=19).map(reason=>reason.code))
+      .toEqual(Array.from({length:19},(_,i)=>i+1));
+    for (const [id,code] of expected) {
+      const reason=absenceReasons.find(item=>item.id===id);
+      expect(reason?.code).toBe(code);
+      expect(reason?.label.toLowerCase()).toContain(
+        id.endsWith("_local")?"local":id.endsWith("_state")?"estatal":"nacional"
+      );
+    }
+  });
+
 });

@@ -165,3 +165,9 @@ La proporción por especialidad usa el padrón de alumnos activos. El promedio, 
 ## v0.52.2: jornadas capturadas sin bitácora entregada
 
 El estado `no_entregado` puede guardarse con un resumen de jornadas, horas y método de elaboración. Su presencia **no equivale a una entrega recibida**: sigue contando en pendientes y en el denominador de cumplimiento. Si contiene estadísticas válidas, esas horas se incluyen en las estadísticas de actividad y se identifican separadamente como «pendientes con horas». `no_aplica` no admite estadísticas; el administrador debe confirmar cualquier eliminación de jornadas existentes al seleccionar este estado. Las semanas antiguas sin jornadas no representan cero horas trabajadas. Se mantiene `schemaVersion: 9`, con retrocompatibilidad de registros anteriores.
+
+## Versión 0.52.4: faltas académicas y captura al crear la semana
+
+Los códigos de falta `20..28` corresponden a las tres fases independientes de Prototipos y Proyectos de Emprendimiento, Festival Académico y ENAC. Los códigos `1..19` conservan su significado. El Data Matrix estadístico sigue usando códigos de causa de 6 bits, sin cambiar el esquema ni la versión `S5`.
+
+La acción **Crear y capturar jornadas** crea primero la semana y luego abre la captura manual progresiva de cada alumno aplicable (martes a viernes), permitiendo corregir datos previos o registrar nuevos. Cada registro guardado mediante este recorrido usa `source: "manual"`, aun si su procedencia anterior era cámara. No se sobrescriben las demás entregas si se omite un alumno o se interrumpe el recorrido. `no_entregado` puede contener horas de actividad sin contabilizarse como entrega realizada; `no_aplica` queda excluido. Se mantiene el esquema local v9.

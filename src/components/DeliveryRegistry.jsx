@@ -403,6 +403,9 @@ export default function DeliveryRegistry({ onClose }) {
   const [setupReturnView,setSetupReturnView] = useState("home");
   const [importPreview,setImportPreview] = useState(null);
   const [manualTarget,setManualTarget] = useState(null);
+  const [weekCaptureQueue,setWeekCaptureQueue] = useState([]);
+  const [weekCaptureTotal,setWeekCaptureTotal] = useState(0);
+  const [weekCaptureBackupAfter,setWeekCaptureBackupAfter] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [studentForm, setStudentForm] = useState({
@@ -1506,6 +1509,39 @@ export default function DeliveryRegistry({ onClose }) {
     notify("info", "Alumno eliminado definitivamente", studentName);
   };
 
+  const beginWeekCapture = (week, students = state.students, backupAfter = false) => {
+    if (!week || week.closedAt) return;
+    const ids = students.filter(student => studentAppliesToWeek(student,week) &&
+      deliveryStatus(week,student.id)!=="no_aplica").map(student=>student.id);
+    if (!ids.length) {
+      showNotice("info","Sin alumnos para registrar","No hay alumnos aplicables a esta semana.");
+      return;
+    }
+    setWeekCaptureTotal(ids.length);
+    setWeekCaptureBackupAfter(backupAfter);
+    setWeekCaptureQueue(ids);
+    setManualTarget({studentId:ids[0],status:deliveryStatus(week,ids[0])});
+  };
+  const advanceWeekCapture = (savedState = state) => {
+    const rest = weekCaptureQueue.slice(1);
+    setWeekCaptureQueue(rest);
+    if (rest.length && activeWeek) {
+      setManualTarget({studentId:rest[0],status:deliveryStatus(activeWeek,rest[0])});
+    } else {
+      if (weekCaptureBackupAfter) exportDeliveryState(savedState);
+      setWeekCaptureBackupAfter(false);
+      setWeekCaptureTotal(0);
+      setManualTarget(null);
+    }
+  };
+  const endWeekCapture = () => {
+    if (weekCaptureBackupAfter) exportDeliveryState(state);
+    setWeekCaptureBackupAfter(false);
+    setWeekCaptureQueue([]);
+    setWeekCaptureTotal(0);
+    setManualTarget(null);
+  };
+
   const addWeek = (event, downloadAfter = false) => {
     event?.preventDefault?.();
     if (!weekForm.startDate) {
@@ -1550,17 +1586,19 @@ export default function DeliveryRegistry({ onClose }) {
       );
       return;
     }
+    const capture = event?.nativeEvent?.submitter?.dataset?.capture === "true";
     const saved = commit({ ...state, weeks: [...state.weeks, week] });
     setActiveWeekId(week.id);
     setWeekForm({ label: "", startDate: "", dueAt: "" });
     clearNotice();
-    if (downloadAfter) exportDeliveryState(saved);
+    if (downloadAfter && !capture) exportDeliveryState(saved);
     notify(
       "success",
       "Semana creada",
-      week.label + (downloadAfter ? " · Archivo guardado" : ""),
+      week.label + (downloadAfter && !capture ? " · Archivo guardado" : ""),
     );
     setView("week");
+    if (capture) beginWeekCapture(week, saved.students, downloadAfter);
   };
 
   const setManualStatus = (studentId, status) => {
@@ -1600,9 +1638,10 @@ export default function DeliveryRegistry({ onClose }) {
     const next=state.weeks.map(week=>week.id===activeWeek.id
       ?saveManualDelivery(week,manualTarget.studentId,status,{usageSource,statistics})
       :week);
-    commit({...state,weeks:next});
+    const saved = commit({...state,weeks:next});
     notify("success","Registro manual guardado",state.students.find(student=>student.id===manualTarget.studentId)?.name||"");
-    setManualTarget(null);
+    if (weekCaptureQueue.length) advanceWeekCapture(saved);
+    else setManualTarget(null);
   };
   const startDueAtEdit = () => {
     if (!activeWeek) return;
@@ -2486,12 +2525,15 @@ export default function DeliveryRegistry({ onClose }) {
                       }
                     />
                   </label>
-                  <button
-                    className="btn primary delivery-form-submit"
-                    type="submit"
-                  >
-                    Crear y entrar
-                  </button>
+                  <p className="delivery-week-capture-tip delivery-field-wide">
+                    Puedes registrar horas, faltas y jornadas al crear la semana. Los datos se guardarán como captura manual.
+                  </p>
+                  <div className="delivery-week-submit-actions delivery-field-wide">
+                    <button className="btn" type="submit">Crear y entrar</button>
+                    <button className="btn primary" type="submit" data-capture="true">
+                      Crear y capturar jornadas
+                    </button>
+                  </div>
                 </form>
                 <div className="delivery-setup-actions">
                   <button
@@ -2705,12 +2747,15 @@ export default function DeliveryRegistry({ onClose }) {
                   }
                 />
               </label>
-              <button
-                className="btn primary delivery-form-submit"
-                type="submit"
-              >
-                Crear semana
-              </button>
+              <p className="delivery-week-capture-tip delivery-field-wide">
+                Al crear la semana también puedes capturar o corregir las horas y las faltas de cada alumno. Se registrarán como datos manuales.
+              </p>
+              <div className="delivery-week-submit-actions delivery-field-wide">
+                <button className="btn" type="submit">Crear semana</button>
+                <button className="btn primary" type="submit" data-capture="true">
+                  Crear y capturar jornadas
+                </button>
+              </div>
             </form>
           </section>
         )}
@@ -2739,6 +2784,11 @@ export default function DeliveryRegistry({ onClose }) {
                 </p>
               </div>
               <div className="delivery-week-head-actions">
+                <button className="btn delivery-nav-button" type="button"
+                  disabled={Boolean(activeWeek.closedAt)}
+                  onClick={() => beginWeekCapture(activeWeek)}>
+                  <ChartBar size={18}/><span>Capturar jornadas</span>
+                </button>
                 <button className="btn delivery-nav-button" type="button" onClick={() => setView("statistics")}>
                   <ChartBar size={18} /><span>Estadísticas</span>
                 </button>
@@ -3309,7 +3359,13 @@ export default function DeliveryRegistry({ onClose }) {
           student={state.students.find(student=>student.id===manualTarget.studentId)}
           previous={activeWeek.deliveries?.[manualTarget.studentId]}
           initialStatus={manualTarget.status}
-          onCancel={()=>setManualTarget(null)}
+          batchProgress={weekCaptureQueue.length ? {
+            position: weekCaptureTotal - weekCaptureQueue.length + 1,
+            total: weekCaptureTotal,
+            remaining:weekCaptureQueue.length
+          } : null}
+          onSkip={weekCaptureQueue.length ? advanceWeekCapture : undefined}
+          onCancel={endWeekCapture}
           onSave={commitManualEntry}
         />
       )}

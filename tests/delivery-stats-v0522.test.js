@@ -53,5 +53,20 @@ describe("estados pendientes con estadísticas · v0.52.2",()=>{
     expect(stats.weeksWithStatistics).toBe(0);
     expect(stats.pendingMinutes).toBe(0);
     expect(stats.coverage).toBe(0);
+  });  it("una captura al crear la semana queda manual incluso al corregir un código de cámara",()=>{
+    const one=createWeek({id:"w1",startDate:"2026-10-20"});
+    const original={
+      ...one,
+      deliveries:{[a.id]:{status:"entregado",registeredAt:"2026-10-24T10:00:00Z",
+        source:"camera",matrixVersion:4,usageSource:"generator",statistics:valid}},
+    };
+    const manual=saveManualDelivery(original,a.id,"entregado",{statistics:valid,usageSource:"other"});
+    const saved=sanitizeDeliveryState({schemaVersion:9,students:[a],weeks:[manual]});
+    const d=saved.weeks[0].deliveries[a.id];
+    expect(d.source).toBe("manual");
+    expect(d.matrixVersion).toBeUndefined();
+    expect(d.usageSource).toBe("other");
+    expect(d.statistics.entries[0].minutes).toBe(240);
   });
+
 });

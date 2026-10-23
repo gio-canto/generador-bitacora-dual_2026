@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.52.4-beta.1 · Faltas académicas y captura semanal · 2026-10-23
+
+- Nueve causas de falta por asistencia a concursos de la DGETI, cada una con ID y código numérico independiente: Concurso Nacional de Prototipos y Proyectos de Emprendimiento (20 local, 21 estatal, 22 nacional), Festival Académico (23 local, 24 estatal, 25 nacional) y Encuentro Nacional de Arte y Cultura, ENAC (26 local, 27 estatal, 28 nacional).
+- Se mantienen todos los motivos preexistentes y su codificación. Los nuevos motivos aparecen en el editor de bitácoras, en la captura manual del registro y en los reportes de causas; pueden viajar en el Data Matrix estadístico S5 sin cambiar su formato.
+- Al crear una semana desde Registro de entrega o desde el asistente inicial se puede elegir **Crear y capturar jornadas**. La captura recorre alumno por alumno, permite revisar o modificar las cuatro jornadas y horas, guardar, omitir o salir cuando se desee.
+- Una semana abierta también ofrece **Capturar jornadas** para completar o corregir las estadísticas existentes. Solo se incluyen los alumnos a quienes corresponde ese periodo y cuyo estado no es «No aplica».
+- Las capturas realizadas en este recorrido se registran con origen `manual`. La edición manual de una entrega de cámara elimina la atribución de lectura por QR para ese registro, conservando la información introducida por el administrador.
+- En el asistente inicial, el respaldo de la semana se descarga al terminar el recorrido de captura para incluir las jornadas manuales recién guardadas, no antes de registrarlas.
+- Se conserva el esquema de respaldo v9, los registros históricos y los PDF existentes. La captura y sus acciones se adaptan a teléfonos y tabletas.
+- Pruebas de IDs, códigos, selección de motivos, Data Matrix, navegación de captura y persistencia manual.
+
+
 ## 0.52.3-beta.1 · Movimiento en Estadísticas · 2026-10-22
 
 - La pantalla Estadísticas incorpora entrada suave del encabezado y los filtros, revelado escalonado de las tarjetas y paneles al aparecer en el área visible.
