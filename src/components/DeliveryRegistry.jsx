@@ -2702,11 +2702,11 @@ export default function DeliveryRegistry({ onClose }) {
               </article>
               <article className="delivery-summary-card">
                 <Info size={28} />
-                <span>Anuncios</span>
-                <strong>{announcementsNow.notices.length+announcementsNow.deadlines.length}</strong>
-                <small>Recordatorios y avisos</small>
+                <span>Avisos PNG</span>
+                <strong>{(state.announcements||[]).length+announcementsNow.deadlines.length+1}</strong>
+                <small>Listos para compartir</small>
                 <button className="btn" type="button" onClick={()=>setView("announcements")}>
-                  Abrir anuncios
+                  Crear avisos PNG
                 </button>
               </article>
             </section>
@@ -2716,16 +2716,6 @@ export default function DeliveryRegistry({ onClose }) {
                   <span>{attentionNow.ledger.filter(p=>p.pending>=2).reduce((a,p)=>a+p.pending,0)} entregas vencidas sin registrar</span>
                 </div>
                 <button className="btn" type="button" onClick={()=>setView("statistics")}>Ver seguimiento</button>
-              </section>}
-            {(announcementsNow.deadlines.length>0||announcementsNow.notices.length>0)&&
-              <section className="delivery-panel delivery-home-announcements" aria-label="Avisos recientes">
-                <div className="delivery-panel-head"><h2>Avisos recientes</h2>
-                  <button className="btn" type="button" onClick={()=>setView("announcements")}>Ver todos</button>
-                </div>
-                {[...announcementsNow.deadlines,...announcementsNow.notices].slice(0,3).map(item=>
-                  <div className="delivery-announcement-home-item" key={item.id}>
-                    <strong>{item.title}</strong><span>{item.message}</span>
-                  </div>)}
               </section>}
 
             <section className="delivery-panel">
