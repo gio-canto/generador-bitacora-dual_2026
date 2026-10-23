@@ -1,3 +1,4 @@
+import {normalizeAnnouncement} from "./delivery-announcements.js";
 import companies from "../data/companies.json";
 import { decodeWeekStatistics, encodeWeekStatistics } from "./matrix-statistics.js";
 
@@ -228,6 +229,7 @@ export function createDeliveryState() {
     context: createRegistryContext(),
     students: [],
     weeks: [],
+    announcements: [],
     settings: {
       tutorialDone: false,
     },
@@ -411,6 +413,8 @@ export function sanitizeDeliveryState(raw) {
     ),
     students,
     weeks,
+    announcements:Array.isArray(raw.announcements) ? raw.announcements.slice(0,200)
+      .map(normalizeAnnouncement).filter(Boolean) : [],
     settings: {
       ...base.settings,
       ...(raw.settings && typeof raw.settings === "object"
