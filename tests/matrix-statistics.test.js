@@ -65,5 +65,16 @@ describe("Data Matrix estadístico v0.51", () => {
   it("no fabrica estadísticas cuando no hay cuatro jornadas válidas", () => {
     expect(encodeWeekStatistics(sample.slice(0,3))).toBe("");
     expect(encodeWeekStatistics([{...sample[0],end:"09:00"},...sample.slice(1)])).toBe("");
+  });  it("codifica y reconoce los 9 nuevos motivos de falta en Data Matrix", () => {
+    const expected=["prototypes_entrepreneurship_local","prototypes_entrepreneurship_state",
+      "prototypes_entrepreneurship_national","academic_festival_local",
+      "academic_festival_state","academic_festival_national",
+      "enac_local","enac_state","enac_national"];
+    for (const reasonId of expected) {
+      const entries=[sample[0],{...sample[1],reasonId},sample[2],sample[3]];
+      const decoded=decodeWeekStatistics(encodeWeekStatistics(entries));
+      expect(decoded?.entries[1].reasonId).toBe(reasonId);
+    }
   });
+
 });
