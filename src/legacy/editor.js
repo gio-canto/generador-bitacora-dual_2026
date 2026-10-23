@@ -1485,9 +1485,9 @@ export function startEditor() {
       const people = [
         ["Elaboró", authorities.elaboroName || record.student || "—", authorities.elaboroRole || ""],
         ["Vo.Bo.", authorities.voboName || "—", authorities.voboRole || ""],
-        ["Autorizó", actingSigner({name:authorities.autorizoName,role:authorities.autorizoRole,enabled:authorities.autorizoPaEnabled,paName:authorities.autorizoPaName,paRole:authorities.autorizoPaRole}).name || "—", (authorities.autorizoPaEnabled ? "P. A. de "+authorities.autorizoName+"\n"+authorities.autorizoPaRole : authorities.autorizoRole) || ""],
+        ["Autorizó", actingSigner({name:authorities.autorizoName,role:authorities.autorizoRole,enabled:authorities.autorizoPaEnabled,paName:authorities.autorizoPaName,paRole:authorities.autorizoPaRole}).name || "—", (authorities.autorizoPaEnabled ? "P. A. · Por ausencia del "+authorities.autorizoName+"\n"+authorities.autorizoPaRole : authorities.autorizoRole) || ""],
         ...(instructor.enabled
-          ? [["Instructor formador", actingSigner({name:instructor.name,role:instructor.roleMain,enabled:instructor.paEnabled,paName:instructor.paName,paRole:instructor.paRole}).name || "—", instructor.paEnabled ? "P. A. de "+instructor.name+"\n"+instructor.paRole : instructor.roleMain || ""]]
+          ? [["Instructor formador", actingSigner({name:instructor.name,role:instructor.roleMain,enabled:instructor.paEnabled,paName:instructor.paName,paRole:instructor.paRole}).name || "—", instructor.paEnabled ? "P. A. · Por ausencia del "+instructor.name+"\n"+instructor.paRole : instructor.roleMain || ""]]
           : []),
       ]
         .map(
