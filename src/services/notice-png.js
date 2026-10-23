@@ -121,6 +121,10 @@ function fitted(ctx,text,width,initial,min,maxLines,maxHeight,weight=500,leading
      return {lines,size,height,leading};
    }
  }
+ if(clean(text).length<95)console.warn("PNG-FIT-DIAG",JSON.stringify({
+   text:clean(text),width,initial,min,maxLines,maxHeight,weight,
+   lines:wrapText(ctx,text,width,min,weight),measured:ctx.measureText("OCTUBRE").width,cssFont:ctx.font
+ }));
  return null;
 }
 function drawBlock(ctx,block,x,top,color,weight=500){
