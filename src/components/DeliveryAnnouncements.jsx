@@ -1,5 +1,6 @@
 import {useMemo,useState} from "react";
 import {announcementOverview,createAnnouncement,visibleAnnouncements} from "../services/delivery-announcements.js";
+import {VERSION,RELEASE} from "../domain/records.js";
 
 const initial={kind:"custom",title:"",message:"",audience:"all",audienceId:"",expiresAt:""};
 export default function DeliveryAnnouncements({state,onSave,onBack}){
@@ -84,6 +85,12 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
            <option value="release">Novedad de la aplicación</option>
          </select>
        </label>
+       {form.kind==="release"&&<div className="delivery-announcement-wide">
+         <button type="button" className="btn" onClick={()=>{
+           setForm(current=>({...current,title:"Generador de Bitácora Dual "+VERSION,
+             message:"Novedades: "+RELEASE+"."}));
+         }}>Usar datos de la versión actual</button>
+       </div>}
        <label>Destinatarios
          <select value={form.audience} onChange={e=>update("audience",e.target.value)}>
            <option value="all">Todos</option>
