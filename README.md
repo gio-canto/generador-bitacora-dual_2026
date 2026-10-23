@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.52.5--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.53.0--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -198,3 +198,7 @@ Al crear una semana, puedes pulsar **Crear y capturar jornadas** para registrar 
 ### Motivos de concursos simplificados · v0.52.5
 
 Los nueve motivos de faltas por concursos muestran nombres breves en los desplegables, por ejemplo «Festival Académico · Estatal» o «ENAC · Nacional». El texto de la bitácora indica simplemente la participación en el evento y su fase, sin repetir explicaciones sobre la inasistencia. Los IDs y códigos 20–28 permanecen intactos para preservar las bitácoras, estadísticas y Data Matrix anteriores.
+
+### Firmas P. A. (por ausencia de) · v0.53
+
+En **Responsables** puedes activar **P. A. · Por ausencia de** para la firma de **Autorizó** de la empresa y, por separado, para el **Instructor formador**. Cada opción ofrece el mismo listado de personal de la empresa o captura personalizada del suplente, incluido su cargo. Los datos del titular no se reemplazan: se conservan en la bitácora y en el perfil. En la vista previa y en el PDF, el espacio de firma muestra el nombre del suplente, su cargo y la leyenda **P. A. de [titular]**. Sin la opción activada, las firmas funcionan como antes. Los respaldos antiguos siguen siendo compatibles.
