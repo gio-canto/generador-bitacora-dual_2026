@@ -7,8 +7,17 @@ import {
 } from "../services/notice-png.js";
 import {loadDossierLogo} from "../services/student-dossier-report.js";
 
-const initial={kind:"custom",title:"",subtitle:"",message:"",footer:"Generador de Bitácora Dual",
-  audience:"all",audienceId:"",displayDate:"",expiresAt:"",format:"post",theme:"editorial"};
+const initial={kind:"custom",title:"",subtitle:"",message:"",footer:"",
+  audience:"all",audienceId:"",displayDate:"",dueAt:"",weekIds:[],weekLabels:[],
+  expiresAt:"",format:"post",theme:"editorial"};
+const toLocalInput=value=>{
+ if(!value)return "";
+ const date=new Date(value);
+ if(!Number.isFinite(date.getTime()))return "";
+ const pad=n=>String(n).padStart(2,"0");
+ return date.getFullYear()+"-"+pad(date.getMonth()+1)+"-"+pad(date.getDate())+
+   "T"+pad(date.getHours())+":"+pad(date.getMinutes());
+};
 const dateLabel=raw=>{
  if(!raw)return "";
  const date=new Date(raw);
@@ -34,16 +43,19 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
  const companies=useMemo(()=>[...new Set((state.students||[]).map(s=>s.company).filter(Boolean))].sort(),[state.students]);
  const specialties=useMemo(()=>[...new Set((state.students||[]).map(s=>s.specialty).filter(Boolean))].sort(),[state.students]);
  const students=useMemo(()=>[...(state.students||[])].sort((a,b)=>a.name.localeCompare(b.name,"es")),[state.students]);
+ const weeks=useMemo(()=>[...(state.weeks||[])].filter(w=>w.id&&w.label)
+   .sort((a,b)=>(a.startDate||"").localeCompare(b.startDate||"")),[state.weeks]);
+ const weekById=useMemo(()=>new Map(weeks.map(w=>[w.id,w])),[weeks]);
  const overview=useMemo(()=>announcementOverview(state),[state]);
  const saved=useMemo(()=>(state.announcements||[]).map(normalizeAnnouncement)
    .filter(Boolean).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)),[state.announcements]);
  const automatic=useMemo(()=>[
-   ...overview.deadlines.map(item=>({...item,subtitle:"RECORDATORIO DE ENTREGA",
-     dueLabel:dateLabel(item.dueAt),footer:"Generador de Bitácora Dual",
+   ...overview.deadlines.map(item=>({...item,subtitle:"",
+     dueLabel:dateLabel(item.dueAt),footer:"",
      format:"post",theme:"editorial"})),
-   {id:"current-release",kind:"release",title:"Generador de Bitácora Dual "+VERSION,
-     subtitle:"NUEVA VERSIÓN DISPONIBLE",message:RELEASE+".",
-     footer:"Generador de Bitácora Dual",format:"post",theme:"editorial",
+   {id:"current-release",kind:"release",title:"Versión "+VERSION,
+     subtitle:"",message:RELEASE+".",
+     footer:"",format:"post",theme:"editorial",
      audience:"all",audienceId:""},
  ],[overview.deadlines]);
  const gallery=useMemo(()=>[...automatic,...saved],[automatic,saved]);
@@ -53,14 +65,23 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
    if(entry.audience==="student")return students.find(s=>s.id===entry.audienceId)?.name||"Alumno";
    return entry.audienceId||"";
  };
- const fromForm=()=>({...form,
-   title:trim(form.title)||"Aviso",
-   subtitle:trim(form.subtitle),
-   message:trim(form.message),
-   footer:trim(form.footer)||"Generador de Bitácora Dual",
-   audienceLabel:audienceLabel(form),
-   dueLabel:form.displayDate?"FECHA: "+form.displayDate.split("-").reverse().join("/"):"",
-   theme,format});
+ const fromForm=()=>{
+   const weekLabels=(form.weekIds||[]).map(id=>weekById.get(id)?.label)
+     .filter(Boolean);
+   const dueAt=form.dueAt&&Number.isFinite(Date.parse(form.dueAt))
+     ?new Date(form.dueAt).toISOString():"";
+   return {...form,
+     title:trim(form.title)||"Aviso",
+     subtitle:trim(form.subtitle),
+     message:trim(form.message),
+     footer:trim(form.footer),
+     weekLabels:weekLabels.length?weekLabels:(form.weekLabels||[]),
+     dueAt,
+     audienceLabel:audienceLabel(form),
+     dueLabel:dueAt?dateLabel(dueAt):
+       form.displayDate?"FECHA: "+form.displayDate.split("-").reverse().join("/"):"",
+     theme,format};
+ };
  const activeNotice=tab==="manual"?fromForm():current?{
    ...current,audienceLabel:audienceLabel(current)}:null;
  useEffect(()=>{
@@ -90,7 +111,7 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
    setSelected(entry.id);setTab("automatic");setError("");setNotice("");
  };
  const edit=(entry)=>{
-   setEditing(entry.id);setForm({...initial,...entry});
+   setEditing(entry.id);setForm({...initial,...entry,dueAt:toLocalInput(entry.dueAt)});
    setFormat(entry.format||"post");setTheme(entry.theme||"editorial");
    setTab("manual");setError("");setNotice("");
  };
@@ -98,7 +119,13 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
    event.preventDefault();setError("");setNotice("");
    if(!trim(form.title)||!trim(form.message)){setError("Escribe el título y el mensaje.");return;}
    if(form.audience!=="all"&&!form.audienceId){setError("Selecciona el destinatario.");return;}
-   const entry=createAnnouncement({...form,format,theme});
+   if(form.kind==="reminder"&&!(form.weekIds||[]).length){
+     setError("Selecciona las semanas que se deben entregar.");return;
+   }
+   if(form.kind==="reminder"&&(!form.dueAt||!Number.isFinite(Date.parse(form.dueAt)))){
+     setError("Indica la fecha y hora límite de entrega.");return;
+   }
+   const entry=createAnnouncement(fromForm());
    if(!entry){setError("No se pudo guardar el diseño.");return;}
    const next=editing?(state.announcements||[]).map(item=>item.id===editing?{
      ...entry,id:editing,createdAt:item.createdAt}:item):
@@ -108,6 +135,10 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
  };
  const download=async(entry=activeNotice)=>{
    if(!entry||busy)return;
+   if(tab==="manual"&&entry.kind==="reminder"&&
+     (!(entry.weekIds||[]).length||!entry.dueAt)){
+     setError("Selecciona las semanas y la fecha límite antes de descargar.");return;
+   }
    setBusy("one");setError("");setNotice("");
    try{
      await downloadNoticePng(entry,{logo,format,theme});
@@ -127,8 +158,7 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
  return <section className="delivery-announcements delivery-png-studio" aria-label="Generador de avisos PNG">
    <header className="delivery-announcements-heading">
      <button className="btn" type="button" onClick={onBack}>← Inicio</button>
-     <div><span className="delivery-kicker">Generador de Bitácora Dual</span>
-       <h1>Avisos PNG</h1>
+     <div><h1>Avisos PNG</h1>
        <p>Crea avisos para compartir por WhatsApp, redes sociales o imprimir.</p>
      </div>
    </header>
@@ -201,11 +231,34 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
              <input maxLength={120} required value={form.title}
                onChange={e=>update("title",e.target.value)} placeholder="Último día para entregar"/>
            </label>
-           <label className="delivery-announcement-wide">Subtítulo
+           <label className="delivery-announcement-wide">Etiqueta adicional (opcional)
              <input maxLength={120} value={form.subtitle}
                onChange={e=>update("subtitle",e.target.value)}
-               placeholder="RECORDATORIO DE ENTREGA"/>
+               placeholder="Solo si el aviso necesita una aclaración breve"/>
            </label>
+           {form.kind==="reminder"&&<>
+             <div className="delivery-announcement-wide delivery-announcement-weeks">
+               <strong>Semanas que se deben entregar</strong>
+               {weeks.length?<div className="delivery-announcement-week-list">
+                 {weeks.map(w=><label key={w.id}>
+                   <input type="checkbox" checked={(form.weekIds||[]).includes(w.id)}
+                     onChange={e=>setForm(current=>({
+                       ...current,
+                       weekIds:e.target.checked?[...(current.weekIds||[]),w.id]:
+                         (current.weekIds||[]).filter(id=>id!==w.id),
+                       weekLabels:[],
+                     }))}/>
+                   <span>{w.label}</span>
+                 </label>)}
+               </div>:<p className="delivery-announcements-muted">
+                 Todavía no hay semanas registradas. Crea una semana desde el registro de entregas.
+               </p>}
+             </div>
+             <label className="delivery-announcement-wide">Fecha y hora límite de entrega
+               <input type="datetime-local" required value={form.dueAt}
+                 onChange={e=>update("dueAt",e.target.value)}/>
+             </label>
+           </>}
            <label className="delivery-announcement-wide">Mensaje
              <textarea rows={5} maxLength={1000} required value={form.message}
                onChange={e=>update("message",e.target.value)}
@@ -229,14 +282,15 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
            <label>Fecha del aviso (opcional)
              <input type="date" value={form.displayDate} onChange={e=>update("displayDate",e.target.value)}/>
            </label>
-           <label className="delivery-announcement-wide">Pie del aviso
+           <label className="delivery-announcement-wide">Firma (opcional)
              <input maxLength={160} value={form.footer}
-               onChange={e=>update("footer",e.target.value)}/>
+               onChange={e=>update("footer",e.target.value)}
+               placeholder="Déjala vacía para no agregar un pie al PNG"/>
            </label>
            {form.kind==="release"&&<div className="delivery-announcement-wide">
              <button type="button" className="btn" onClick={()=>setForm(current=>({
-               ...current,title:"Generador de Bitácora Dual "+VERSION,
-               subtitle:"NUEVA VERSIÓN DISPONIBLE",message:"Novedades: "+RELEASE+"."}))}>
+               ...current,title:"Versión "+VERSION,
+               subtitle:"",message:"Novedades: "+RELEASE+"."}))}>
                Usar datos de la versión actual
              </button>
            </div>}
