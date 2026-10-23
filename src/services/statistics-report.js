@@ -3,6 +3,7 @@ import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLab
 import { VERSION } from "../domain/records.js";
 import {loadDossierAvatar} from "./student-dossier-report.js";
 import { calculateStudentInsights } from "./student-insights.js";
+import {interpretStatistics} from "./statistics-interpretation.js";
 
 const W = 1240;
 const H = 1754;
@@ -253,6 +254,7 @@ export function statisticsReportModel(state, filters = {}) {
 export async function generateStatisticsReportPdf(state, filters = {}, options = {}) {
   const report = statisticsReportModel(state, filters);
   const r = report.data;
+  const interpretation=interpretStatistics(r,report.insights);
   if (!r.weeks.length) throw new Error("Selecciona un periodo con semanas registradas.");
   // El logotipo oficial se incorpora en cada página.
   const logo = options.logoImage || await loadLogo();
@@ -306,6 +308,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       ["Mar","Mié","Jue","Vie"].map((label,i)=>({label,value:r.dayTrend[i]/60})):
       r.trend.map((v,i)=>({label:String(i+1),value:v.minutes/60}));
     trend(ctx,series,{x:650,y:1120,w:500,h:412});
+    label(ctx,interpretation.deliveries,77,1638,18,C.secondary,550,1090);
     images.push(canvasToJpeg(canvas));
   }
 
@@ -326,6 +329,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     columns(ctx,["Mar","Mié","Jue","Vie"].map((label,i)=>({
       label,value:Number((r.dayTrend[i]/60).toFixed(1))
     })),{x:669,y:1098,w:460,h:423,colors:[C.blue,C.lightBlue,C.teal,C.purple]});
+    label(ctx,interpretation.causes,77,1638,18,C.secondary,550,1090);
     images.push(canvasToJpeg(canvas));
   }
 
@@ -346,6 +350,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       {label:"Cobertura estadística",value:r.coverage,color:C.purple},
     ],{x:93,y:1035,w:1054,h:495});
     label(ctx,"Promedio de horas por registro con datos: "+fmt(r.avgHours,1)+" h",82,1559,18,C.secondary,600);
+    label(ctx,interpretation.punctuality,77,1638,18,C.secondary,550,1090);
     images.push(canvasToJpeg(canvas));
   }
 
@@ -390,6 +395,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     });
     label(ctx,"Los códigos sin horas se excluyen del promedio, mínimo, máximo y rango.",85,1512,17,C.secondary,400,1060);
     label(ctx,"Las horas capturadas de una bitácora pendiente no cambian su estado de entrega.",85,1544,17,C.secondary,400,1060);
+    label(ctx,interpretation.hours,77,1638,18,C.secondary,550,1090);
     images.push(canvasToJpeg(canvas));
   }
 
@@ -398,7 +404,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
   // En pruebas con logotipo inyectado se usa el fallback de iniciales.
   const nominalPeople=[...report.insights.leastCompliant.slice(0,5),
     ...report.insights.mostAbsences.slice(0,5),
-    ...(filters.period==="all"?report.insights.ledger:report.insights.leastCompliant).slice(0,9)];
+    ...(filters.period==="all"?report.insights.ledger.filter(p=>p.pending>=2):report.insights.leastCompliant).slice(0,9)];
   const avatarNames=[...new Set(nominalPeople.map(p=>p.name))];
   const avatarEntries=options.avatarImages ? [...options.avatarImages.entries()] :
     options.logoImage ? [] : await Promise.all(avatarNames.map(async name=>[
@@ -446,9 +452,9 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     ranking(person.mostAbsences,638,460,535,370,"absences");
     panel(ctx,54,873,1132,726,
       filters.period==="all" ? "Historial global de pendientes":"Seguimiento del periodo",
-      filters.period==="all"?"Alumnos activos con entregas cuyo plazo ya venció":
+      filters.period==="all"?"Alumnos con 2 o más pendientes vencidas":
         "Comparación por alumno de las semanas seleccionadas");
-    const followed=filters.period==="all"?person.ledger:person.leastCompliant;
+    const followed=filters.period==="all"?person.ledger.filter(p=>p.pending>=2):person.leastCompliant;
     if(!followed.length)empty(ctx,88,1013,1050,
       "Sin entregas vencidas pendientes ni comparativas disponibles.");
     followed.slice(0,9).forEach((p,index)=>{
@@ -461,6 +467,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       if(index<Math.min(followed.length,9)-1)separator(ctx,84,yy+33,1070);
     });
     label(ctx,"Las faltas pueden estar justificadas.",83,1571,16,C.muted,500,1080);
+    label(ctx,interpretation.pending,77,1638,18,C.secondary,550,1090);
     images.push(canvasToJpeg(canvas));
   }
 

@@ -17,7 +17,7 @@ const two=createStudent({id:"two",name:"Alumno Beta",company:"Empresa B",
 const rawWeek=createWeek({id:"old",label:"Semana antigua",startDate:"2026-08-04",
   endDate:"2026-08-07",dueAt:"2026-08-08T18:00:00-06:00"});
 const w=saveManualDelivery(rawWeek,one.id,"entregado",{statistics:stats,usageSource:"other"});
-const state={students:[one,two],weeks:[w]};
+const state={students:[one,two],weeks:[w,createWeek({id:"old2",label:"Semana siguiente",startDate:"2026-08-11",endDate:"2026-08-14",dueAt:"2026-08-15T18:00:00-06:00"})]};
 afterEach(cleanup);
 
 describe("pantalla de seguimiento nominal 0.54",()=>{
@@ -37,7 +37,7 @@ describe("pantalla de seguimiento nominal 0.54",()=>{
     render(<StudentInsights state={state} period="all"
       weekId="old" month="" specialty="" company=""/>);
     fireEvent.change(screen.getByLabelText("Grupo"),{target:{value:"B"}});
-    expect(screen.getByText("No hay alumnos con pendientes que coincidan con los filtros.")).toBeTruthy();
+    expect(screen.getByText("No hay alumnos con dos o más pendientes en esta selección.")).toBeTruthy();
     expect(screen.getByRole("heading",{name:"Menor cumplimiento de entrega"})).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Grupo"),{target:{value:"C"}});
     expect(screen.getAllByText("Alumno Beta").length).toBeGreaterThan(0);

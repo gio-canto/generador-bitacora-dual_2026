@@ -57,6 +57,11 @@ import {
 } from "../services/delivery-registry.js";
 import { VERSION } from "../domain/records.js";
 import DeliveryStatistics from "./DeliveryStatistics.jsx";
+import DeliveryAnnouncements from "./DeliveryAnnouncements.jsx";
+import {announcementOverview} from "../services/delivery-announcements.js";
+import {generateStudentDossierPdf} from "../services/student-dossier-report.js";
+import {generateStatisticsReportPdf} from "../services/statistics-report.js";
+import {calculateStudentInsights} from "../services/student-insights.js";
 import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
 import { parseStudentSpreadsheet } from "../services/student-spreadsheet.js";
 import { generateDeliveryReportPdf } from "../services/delivery-report.js";
@@ -434,6 +439,9 @@ export default function DeliveryRegistry({ onClose }) {
   const [groupBy, setGroupBy] = useState("none");
   const [reportOpen, setReportOpen] = useState(false);
   const [reportMode, setReportMode] = useState("simple");
+  const [reportStudentId,setReportStudentId] = useState("");
+  const [reportStudentSearch,setReportStudentSearch] = useState("");
+  const [reportStatsPeriod,setReportStatsPeriod] = useState("all");
   const [reportWeekId, setReportWeekId] = useState(
     initialState.weeks.at(-1)?.id || "",
   );
@@ -468,6 +476,8 @@ export default function DeliveryRegistry({ onClose }) {
     () => state.students.filter(studentIsActive),
     [state.students],
   );
+  const announcementsNow=useMemo(()=>announcementOverview(state),[state]);
+  const attentionNow=useMemo(()=>calculateStudentInsights(state,{period:"all"}),[state]);
   const desistedStudents = useMemo(
     () => state.students.filter((student) => !studentIsActive(student)),
     [state.students],
@@ -1247,7 +1257,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const downloadReport = async () => {
-    if (!state.weeks.length) {
+    if (!state.weeks.length && ["simple","weekly","global","statistics"].includes(reportMode)) {
       showNotice(
         "warning",
         "No hay semanas para reportar",
@@ -1265,12 +1275,19 @@ export default function DeliveryRegistry({ onClose }) {
       return;
     }
 
+    if(reportMode==="individual"&&!reportStudentId){
+      showNotice("warning","Selecciona un alumno","Elige a la persona del reporte.");return;
+    }
     setReportBusy(true);
     try {
-      const result = await generateDeliveryReportPdf(state, {
-        mode: reportMode,
-        weekId: reportWeekId,
-      });
+      const result=reportMode==="individual"
+        ? await generateStudentDossierPdf(state,reportStudentId)
+        : reportMode==="roster"
+          ? await generateStudentRosterPdf(state,{sortBy:rosterSort,includeDesisted:rosterIncludeDesisted})
+          : reportMode==="statistics"
+            ? await generateStatisticsReportPdf(state,{period:reportStatsPeriod,
+                weekId:reportWeekId,month:state.weeks.at(-1)?.startDate?.slice(0,7)||""})
+            : await generateDeliveryReportPdf(state,{mode:reportMode,weekId:reportWeekId});
       notify(
         "success",
         "Reporte PDF generado",
@@ -1289,6 +1306,12 @@ export default function DeliveryRegistry({ onClose }) {
     }
   };
 
+  const openStudentReport = studentId => {
+    setReportStudentId(studentId||"");setReportMode("individual");setReportOpen(true);
+  };
+  const openStatisticsReport = () => {
+    setReportMode("statistics");setReportOpen(true);
+  };
   const downloadRoster = async () => {
     if(rosterBusy)return;
     setRosterBusy(true);
@@ -2671,13 +2694,39 @@ export default function DeliveryRegistry({ onClose }) {
                 <button
                   className="btn"
                   type="button"
-                  disabled={!state.weeks.length}
+                  disabled={!state.weeks.length&&!state.students.length}
                   onClick={() => openReport()}
                 >
                   Crear reporte
                 </button>
               </article>
+              <article className="delivery-summary-card">
+                <Info size={28} />
+                <span>Anuncios</span>
+                <strong>{announcementsNow.notices.length+announcementsNow.deadlines.length}</strong>
+                <small>Recordatorios y avisos</small>
+                <button className="btn" type="button" onClick={()=>setView("announcements")}>
+                  Abrir anuncios
+                </button>
+              </article>
             </section>
+            {attentionNow.ledger.some(p=>p.pending>=2)&&
+              <section className="delivery-panel delivery-attention-summary">
+                <div><strong>{attentionNow.ledger.filter(p=>p.pending>=2).length} alumnos con dos o más pendientes</strong>
+                  <span>{attentionNow.ledger.filter(p=>p.pending>=2).reduce((a,p)=>a+p.pending,0)} entregas vencidas sin registrar</span>
+                </div>
+                <button className="btn" type="button" onClick={()=>setView("statistics")}>Ver seguimiento</button>
+              </section>}
+            {(announcementsNow.deadlines.length>0||announcementsNow.notices.length>0)&&
+              <section className="delivery-panel delivery-home-announcements" aria-label="Avisos recientes">
+                <div className="delivery-panel-head"><h2>Avisos recientes</h2>
+                  <button className="btn" type="button" onClick={()=>setView("announcements")}>Ver todos</button>
+                </div>
+                {[...announcementsNow.deadlines,...announcementsNow.notices].slice(0,3).map(item=>
+                  <div className="delivery-announcement-home-item" key={item.id}>
+                    <strong>{item.title}</strong><span>{item.message}</span>
+                  </div>)}
+              </section>}
 
             <section className="delivery-panel">
               <div className="delivery-panel-head">
@@ -2739,8 +2788,13 @@ export default function DeliveryRegistry({ onClose }) {
           </>
         )}
 
+        {view === "announcements" && <DeliveryAnnouncements state={state}
+          onBack={()=>setView("home")}
+          onSave={announcements=>commit({...state,announcements})}/>}
+
         {view === "statistics" && (
-          <DeliveryStatistics state={state} onBack={() => setView("home")} />
+          <DeliveryStatistics state={state} onBack={() => setView("home")}
+            onReportStudent={openStudentReport} onReportStatistics={openStatisticsReport} />
         )}
 
         {view === "new-week" && (
@@ -3497,6 +3551,58 @@ export default function DeliveryRegistry({ onClose }) {
                 </button>
               </div>
 
+              <div className="delivery-report-options delivery-report-extra-options">
+                <button type="button" className={reportMode==="individual"?"delivery-report-option active":"delivery-report-option"}
+                  onClick={()=>setReportMode("individual")}>
+                  <strong>Expediente individual</strong><span>Historial vertical, cumplimiento y semanas reales.</span>
+                </button>
+                <button type="button" className={reportMode==="roster"?"delivery-report-option active":"delivery-report-option"}
+                  onClick={()=>setReportMode("roster")}>
+                  <strong>Lista de alumnos</strong><span>Por nombre, especialidad o empresa.</span>
+                </button>
+                <button type="button" className={reportMode==="statistics"?"delivery-report-option active":"delivery-report-option"}
+                  onClick={()=>setReportMode("statistics")}>
+                  <strong>Estadísticas</strong><span>Informe general con interpretaciones.</span>
+                </button>
+              </div>
+              {reportMode==="individual"&&<div className="delivery-report-person-picker">
+                <label className="delivery-field">Buscar alumno
+                  <input type="search" value={reportStudentSearch}
+                    onChange={e=>setReportStudentSearch(e.target.value)} placeholder="Nombre"/>
+                </label>
+                <label className="delivery-field">Alumno
+                  <select value={reportStudentId} onChange={e=>setReportStudentId(e.target.value)}>
+                    <option value="">Seleccionar alumno…</option>
+                    {[...state.students].filter(p=>p.name.toLocaleLowerCase("es-MX")
+                      .includes(reportStudentSearch.trim().toLocaleLowerCase("es-MX")))
+                      .sort((a,b)=>a.name.localeCompare(b.name,"es")).map(student=>
+                        <option key={student.id} value={student.id}>{student.name}</option>)}
+                    {reportStudentId&&!state.students.some(p=>p.id===reportStudentId&&p.name.toLocaleLowerCase("es-MX")
+                      .includes(reportStudentSearch.trim().toLocaleLowerCase("es-MX"))) &&
+                       state.students.filter(p=>p.id===reportStudentId).map(p=>
+                         <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </label>
+              </div>}
+              {reportMode==="roster"&&<div className="delivery-report-person-picker">
+                <label className="delivery-field">Organizar
+                  <select value={rosterSort} onChange={e=>setRosterSort(e.target.value)}>
+                    {ROSTER_MODES.map(mode=><option key={mode.id} value={mode.id}>{mode.name}</option>)}
+                  </select>
+                </label>
+                <label className="delivery-field">Alumnos
+                  <select value={rosterIncludeDesisted?"all":"active"}
+                    onChange={e=>setRosterIncludeDesisted(e.target.value==="all")}>
+                    <option value="active">Solo activos</option><option value="all">Activos y desistidos</option>
+                  </select>
+                </label>
+              </div>}
+              {reportMode==="statistics"&&<label className="delivery-field delivery-report-week">Periodo
+                <select value={reportStatsPeriod} onChange={e=>setReportStatsPeriod(e.target.value)}>
+                  <option value="all">General</option><option value="weekly">Semana más reciente</option>
+                  <option value="monthly">Mes más reciente</option>
+                </select>
+              </label>}
               {reportMode === "simple" && (
                 <label className="delivery-field delivery-report-week">
                   <span>Semana del reporte</span>
@@ -3517,9 +3623,12 @@ export default function DeliveryRegistry({ onClose }) {
                 <div>
                   <strong>Incluye</strong>
                   <span>
-                    {reportMode === "global"
-                      ? "Plantel, generación, fecha de creación y una matriz alumno × semana con mini Blobatar y estado por cada periodo."
-                      : "Plantel, generación, fecha de creación, periodo, límite, resumen de estados, alumnos y origen del registro."}
+                    {reportMode==="individual"?"Expediente vertical del alumno con resumen e historial de cada semana."
+                      : reportMode==="roster"?"Alumnos agrupados con sus Blobs y datos académicos."
+                      : reportMode==="statistics"?"Informe estadístico con indicadores e interpretaciones."
+                      : reportMode==="global"
+                        ? "Plantel, generación y matriz alumno × semana con Blobatar."
+                        : "Plantel, generación, periodo, resumen de estados y origen del registro."}
                   </span>
                 </div>
                 <span>{state.students.length} alumnos</span>
@@ -3537,7 +3646,9 @@ export default function DeliveryRegistry({ onClose }) {
                 <button
                   className="btn primary"
                   type="button"
-                  disabled={reportBusy || !state.weeks.length}
+                  disabled={reportBusy || (["simple","weekly","global","statistics"].includes(reportMode)&&!state.weeks.length)||
+                    (reportMode==="individual"&&!reportStudentId)||
+                    (reportMode==="roster"&&!state.students.length)}
                   onClick={downloadReport}
                 >
                   <DownloadSimple size={18} />

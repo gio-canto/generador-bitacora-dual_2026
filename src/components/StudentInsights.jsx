@@ -1,6 +1,5 @@
 import {useMemo,useState} from "react";
 import {calculateStudentInsights} from "../services/student-insights.js";
-import {generateStudentDossierPdf} from "../services/student-dossier-report.js";
 
 const number=value=>Number(value||0).toLocaleString("es-MX",{maximumFractionDigits:1});
 const suffix=(v,singular,plural)=>v===1?singular:plural;
@@ -10,7 +9,7 @@ function PersonCard({item,index,value,detail,onOpen}) {
     <span className="ds-person-index" aria-hidden="true">{index+1}</span>
     <div className="ds-person-body">
       <button className="ds-person-link" type="button" onClick={()=>onOpen(item.id)}
-        aria-label={"Descargar PDF de "+item.name}>{item.name}</button>
+        aria-label={"Abrir reporte de "+item.name}>{item.name}</button>
       <small>{item.specialty} · {item.company}{item.group!=="Sin especificar"?" · Grupo "+item.group:""}</small>
       <span>{detail(item)}</span>
     </div>
@@ -35,11 +34,8 @@ function Ranking({title,description,items,value,detail,empty,notice,onOpen}) {
   </section>;
 }
 
-export default function StudentInsights({state,period,weekId,month,specialty,company}) {
+export default function StudentInsights({state,period,weekId,month,specialty,company,onReportStudent}) {
   const [group,setGroup]=useState("");
-  const [pdfStudentId,setPdfStudentId]=useState("");
-  const [pdfError,setPdfError]=useState("");
-  const [dossierSearch,setDossierSearch]=useState("");
   const [breakdown,setBreakdown]=useState("specialty");
   const [search,setSearch]=useState("");
   const [pendingLevel,setPendingLevel]=useState("all");
@@ -50,22 +46,9 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
   const insights=useMemo(()=>calculateStudentInsights(state,{
     period,weekId,month,specialty,company,group
   }),[state,period,weekId,month,specialty,company,group]);
-  const candidates=useMemo(()=>(state.students||[])
-    .filter(s=>!dossierSearch.trim()||s.name.toLocaleLowerCase("es-MX")
-      .includes(dossierSearch.trim().toLocaleLowerCase("es-MX")))
-    .sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"})),
-    [state.students,dossierSearch]);
-  const downloadPerson=async id=>{
-    if(!id||pdfStudentId)return;
-    setPdfError("");
-    setPdfStudentId(id);
-    try{await generateStudentDossierPdf(state,id);}
-    catch(error){setPdfError(error?.message||"No se pudo generar el PDF.");}
-    finally{setPdfStudentId("");}
-  };
   const labelScope=period==="all"?"histórico general":period==="monthly"?"mes seleccionado":"semana seleccionada";
   const name=(item)=>item.name;
-  const pending=useMemo(()=>insights.ledger.filter(item=>{
+  const pending=useMemo(()=>insights.ledger.filter(item=>item.pending>=2).filter(item=>{
     const query=search.trim().toLocaleLowerCase("es-MX");
     if(query && ![item.name,item.specialty,item.company,item.group]
       .some(value=>value.toLocaleLowerCase("es-MX").includes(query)))return false;
@@ -98,60 +81,33 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
       <article className="ds-kpi"><strong>{number(insights.totalDue)}</strong><span>Entregas cuyo plazo venció</span></article>
       <article className="ds-kpi"><strong>{number(insights.totalPending)}</strong><span>Bitácoras vencidas pendientes</span></article>
     </div>
-    <section className="ds-panel ds-dossier-shell" id="student-dossier" aria-label="Expediente individual del alumno">
-      <div className="ds-dossier-selector">
-        <div className="ds-insight-heading">
-          <span className="delivery-kicker">PDF individual</span>
-          <h3>Expediente por alumno</h3>
-          <p>Elige un alumno para descargar su historial completo.</p>
-        </div>
-        <div className="ds-dossier-controls">
-          <label>Buscar por nombre
-            <input type="search" value={dossierSearch}
-              onChange={event=>setDossierSearch(event.target.value)}
-              placeholder="Nombre del alumno"/>
-          </label>
-          <label>Descargar PDF del alumno
-            <select value="" disabled={Boolean(pdfStudentId)}
-              onChange={event=>downloadPerson(event.target.value)}>
-              <option value="">Elegir alumno…</option>
-              {candidates.map(student=><option key={student.id} value={student.id}>
-                {student.name}{student.dualStatus==="desisted"?" · Historial":""}
-              </option>)}
-            </select>
-          </label>
-        </div>
-      </div>
-      {pdfStudentId&&<p className="ds-pdf-message" role="status">Preparando expediente…</p>}
-      {pdfError&&<p className="ds-error" role="alert">{pdfError}</p>}
-    </section>
     <div className="ds-two-column">
-      <Ranking title="Menor cumplimiento de entrega" onOpen={downloadPerson}
+      <Ranking title="Menor cumplimiento de entrega" onOpen={onReportStudent}
         description="Entregas recibidas frente a vencidas."
         items={insights.leastCompliant}
         value={item=>number(item.fulfillmentRate)+"%"}
         detail={item=>number(item.pending)+" pendientes de "+number(item.due)+" semanas vencidas"}
         empty="No hay plazos de entrega vencidos en esta selección."/>
-      <Ranking title="Más faltas registradas" onOpen={downloadPerson}
+      <Ranking title="Más faltas registradas" onOpen={onReportStudent}
         description="Según las jornadas registradas."
         items={insights.mostAbsences}
         value={item=>number(item.absences)}
         detail={item=>number(item.knownDays)+" jornadas con datos · "+number(item.absenceRate||0)+"% entre días laborales y faltas"}
         empty="Sin faltas registradas."/>
-      <Ranking title="Menos faltas registradas" onOpen={downloadPerson}
+      <Ranking title="Menos faltas registradas" onOpen={onReportStudent}
         description="Solo alumnos con jornadas registradas."
         items={insights.fewestAbsences}
         value={item=>number(item.absences)}
         detail={item=>number(item.knownDays)+" jornadas con datos"}
         notice={tiedNotice}
         empty="Todavía no hay alumnos con jornadas registradas."/>
-      <Ranking title="Mayor puntualidad" onOpen={downloadPerson}
+      <Ranking title="Mayor puntualidad" onOpen={onReportStudent}
         description="Entregas puntuales frente a vencidas."
         items={insights.mostPunctual}
         value={item=>number(item.onTimeRate)+"%"}
         detail={item=>number(item.onTime)+" a tiempo de "+number(item.due)+" semanas vencidas"}
         empty="No hay entregas realizadas en semanas vencidas."/>
-      <Ranking title="Más horas registradas" onOpen={downloadPerson}
+      <Ranking title="Más horas registradas" onOpen={onReportStudent}
         description="Horas registradas en el periodo."
         items={insights.mostHours}
         value={item=>number(item.hours)+" h"}
@@ -193,10 +149,10 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
       <header className="ds-overdue-head">
         <div className="ds-insight-heading">
           <span className="delivery-kicker">Control interno · histórico general</span>
-          <h3>Historial de entregas pendientes</h3>
+          <h3>Historial de entregas pendientes</h3><p>Alumnos con dos o más entregas vencidas.</p>
 
         </div>
-        <div className="ds-overdue-totals"><strong>{number(insights.pendingStudents)}</strong><span>alumnos con pendientes</span></div>
+        <div className="ds-overdue-totals"><strong>{number(insights.ledger.filter(p=>p.pending>=2).length)}</strong><span>alumnos con 2 o más pendientes</span></div>
       </header>
       <div className="ds-overdue-filters">
         <label>Buscar alumno
@@ -206,7 +162,6 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
         <label>Semanas vencidas sin entregar
           <select value={pendingLevel} onChange={e=>setPendingLevel(e.target.value)}>
             <option value="all">Todas las cantidades</option>
-            <option value="1">Una pendiente</option>
             <option value="2">Dos pendientes</option>
             <option value="3plus">Tres o más pendientes</option>
           </select>
@@ -216,14 +171,14 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
         {(showAllLedger?pending:pending.slice(0,12)).map(item=><article className="ds-overdue-person" key={item.id}>
           <div className="ds-overdue-person-main">
             <button className="ds-person-link" type="button"
-              onClick={()=>downloadPerson(item.id)}>{name(item)}</button>
+              onClick={()=>onReportStudent?.(item.id)}>{name(item)}</button>
             <small>{item.specialty} · {item.company} · Grupo {item.group}</small>
             <span>{number(item.submitted)} de {number(item.due)} semanas vencidas entregadas · {number(item.fulfillmentRate||0)}% de cumplimiento</span>
             <p>{item.overdue.map(week=>week.label+" ("+week.startDate+")").join(" · ")}</p>
           </div>
           <div className="ds-overdue-count"><strong>{item.pending}</strong><span>{suffix(item.pending,"pendiente","pendientes")}</span></div>
         </article>)}
-      </div> : <p className="ds-empty">No hay alumnos con pendientes que coincidan con los filtros.</p>}
+      </div> : <p className="ds-empty">No hay alumnos con dos o más pendientes en esta selección.</p>}
       {pending.length>12 && <button type="button" className="btn ds-more"
         onClick={()=>setShowAllLedger(v=>!v)}>{showAllLedger?"Mostrar primeros 12":"Ver los "+number(pending.length)+" alumnos"}</button>}
       <p className="ds-lifetime-caption">Solo semanas vencidas. «No aplica» queda excluido.</p>
