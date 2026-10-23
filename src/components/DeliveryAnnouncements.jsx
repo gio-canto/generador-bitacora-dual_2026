@@ -105,7 +105,8 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
    if(!template)return;
    setForm(current=>({...current,kind:id==="release"?"release":
      id==="reminder"?"reminder":"custom",
-     title:template.title,subtitle:template.subtitle,message:template.message}));
+     title:template.title,subtitle:template.subtitle,message:template.message,
+     ...(id==="reminder"?{}:{weekIds:[],weekLabels:[],dueAt:""})}));
  };
  const pick=(entry)=>{
    setSelected(entry.id);setTab("automatic");setError("");setNotice("");
