@@ -49,5 +49,30 @@ describe("captura manual en teléfonos · v0.52.2", () => {
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
       status:"no_entregado",statistics:null,usageSource:"unknown",
     }));
+  });  it("avanza por alumnos al capturar la semana y no obliga a guardar a los omitidos",()=>{
+    const onSave=vi.fn();
+    const onSkip=vi.fn();
+    const onCancel=vi.fn();
+    render(<ManualDeliveryDialog student={student} week={week}
+      batchProgress={{position:2,total:5,remaining:4}}
+      initialStatus="no_entregado" onCancel={onCancel} onSkip={onSkip} onSave={onSave}/>);
+    expect(screen.getByText(/Captura de jornadas · 2 de 5/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button",{name:"Omitir alumno"}));
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    expect(onSave).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button",{name:"Guardar y siguiente"}));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
+      status:"no_entregado",usageSource:"unknown",statistics:null
+    }));
+    fireEvent.click(screen.getByRole("button",{name:"Terminar"}));
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
+  it("las faltas de concursos aparecen por fase en la captura manual",()=>{
+    render(<ManualDeliveryDialog student={student} week={week}
+      initialStatus="no_entregado" onCancel={vi.fn()} onSave={vi.fn()}/>);
+    fireEvent.change(screen.getByLabelText("Martes · jornada"),{target:{value:"falta"}});
+    for(const code of ["20","21","22","23","24","25","26","27","28"])
+      expect(screen.getByLabelText("Martes · motivo").querySelector('option[value="'+code+'"]')).toBeTruthy();
+  });
+
 });
