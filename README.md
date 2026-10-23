@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.56.0--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.56.1--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -240,3 +240,11 @@ En **Alumnos**, debajo del contador de alumnos activos, aparece **Lista de alumn
 **Estadísticas** presenta explicaciones breves calculadas a partir de los datos del periodo; el PDF general incorpora mini interpretaciones en sus páginas. El «Historial de entregas pendientes» muestra solamente a alumnos con **dos o más** semanas vencidas sin entregar. Este umbral no altera los indicadores generales ni los datos guardados. Las cifras principales tienen mayor jerarquía visual y diseño adaptado a móvil.
 
 **Anuncios** es una nueva sección accesible desde Inicio: reúne recordatorios automáticos de semanas con plazos próximos, avisos personalizados y novedades de la aplicación. Se puede elegir destinatario (todos, empresa, especialidad o alumno), fijar caducidad, editar y eliminar avisos y revisar una vista previa. Los mensajes se guardan en el **registro local y en sus respaldos**, no se envían a otros dispositivos ni crean notificaciones remotas. El inicio muestra hasta tres avisos recientes y el acceso al centro de anuncios. Los anuncios se normalizan al importar y no requieren migrar el esquema anterior.
+
+### Generador de avisos PNG · v0.56.1
+
+En **Registro de entregas → Avisos PNG** hay un estudio para crear imágenes listas para compartir. La pestaña **Automáticos** convierte las fechas límite de las semanas próximas y el anuncio de la versión actual en imágenes. Se pueden descargar por separado o juntas en un ZIP. Los avisos guardados en versiones anteriores permanecen disponibles para editar y exportar también.
+
+La pestaña **Crear aviso** contiene plantillas para recordatorios de entrega, comunicados escolares, novedades del Generador y avisos personalizados. Puedes ajustar título, subtítulo, mensaje, destinatario, fecha visible y pie. La **vista previa en vivo** utiliza el logotipo oficial y permite elegir tres formatos PNG (**1080×1080**, **1080×1350** y **1080×1920**) con tres estilos. El botón **Guardar diseño** mantiene el aviso en el registro y sus respaldos. **Descargar PNG** genera el archivo en el navegador; **Descargar todos · ZIP** agrupa los avisos listos para compartir.
+
+No se envían automáticamente mensajes a otros dispositivos. Si un aviso contiene nombres personales o datos escolares, revisa el destinatario antes de compartirlo. Los avisos antiguos se mantienen compatibles y el esquema del registro no se modifica.
