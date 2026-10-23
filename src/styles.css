@@ -525,3 +525,17 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
 .profile-mini-action:hover{background:#ececf0}
 .profile-mini-danger{color:#a32920}
 
+
+/* v0.53: firma por ausencia de empresa e instructor formador. */
+.pa-option{margin-top:8px;padding:10px 13px;border:1px solid rgba(0,113,227,.14);background:rgba(0,113,227,.035);border-radius:14px}
+.pa-option .toggle{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-weight:650}
+.pa-option .muted{font-size:12px;margin:7px 0 0;line-height:1.5}
+.pa-fields{grid-column:1/-1;min-width:0;margin-top:5px;padding:13px;border:1px solid rgba(0,0,0,.07);border-radius:14px;background:rgba(247,249,252,.9)}
+.pa-fields .field{min-width:0}
+.pa-profile-fields{border-radius:14px;background:#f7f9fc;padding:13px;border:1px solid rgba(0,0,0,.07)}
+.pa-profile-fields label{min-width:0}
+@media(max-width:640px){
+ .pa-fields{padding:11px}
+ .pa-option{padding:10px}
+ .pa-profile-fields{grid-template-columns:1fr;min-width:0}
+}
