@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.55.1-beta.1 · PDF individual y estadísticas móviles · 2026-10-23
+
+- Los expedientes de alumnos se descargan directamente en PDF al seleccionar el nombre en Estadísticas o pulsarlo en un ranking o listado de pendientes; no se carga el expediente extenso como panel en la página.
+- Nuevo PDF individual de varias páginas con imagen Blobatar, datos del alumno, cumplimiento y puntualidad, horas, faltas, evolución mensual y detalle de jornadas por semana. El número de páginas se ajusta al historial disponible.
+- La página nominal del PDF general también incorpora Blobatar para diferenciar a las personas de los rankings y pendientes.
+- Se mejoran las distribuciones de Estadísticas en teléfonos y tabletas, el tamaño de controles táctiles, las tarjetas, los encabezados y el desplazamiento horizontal independiente de las tablas.
+- Pruebas de descarga desde selector y listados, paginación del PDF individual, identificación del alumno y ausencia de jornadas, sin modificar el esquema de datos.
+
+
 ## 0.55.0-beta.1 · Expediente histórico individual y firmas P. A. discretas · 2026-10-23
 
 - Se añade **Expediente individual** en las estadísticas de entregas: búsqueda por nombre, selección por ID, acceso desde clasificaciones y desde el historial de pendientes, incluidos alumnos desistidos con registros históricos.

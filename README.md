@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.55.0--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.55.1--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -218,3 +218,11 @@ En **Registro de entregas → Estadísticas → Expediente individual** se puede
 El historial no es una calificación crediticia ni un score permanente. No se inventan faltas u horas en semanas sin estadísticas ni se confunde el incumplimiento con un periodo aún en plazo. Corrige las entregas en el registro para actualizar la ficha. Los datos personales permanecen sujetos al acceso administrativo local y deben tratarse como confidenciales.
 
 En el paso **Responsables**, la firma **P. A.** se selecciona mediante una casilla discreta, sin recuadro azul. Su leyenda predeterminada es **«P. A. · Por ausencia del titular»** y el PDF consigna **«P. A. · Por ausencia del [nombre]»**, sin modificar al firmante suplente ni al titular guardados.
+
+### PDF individual y estadísticas móviles · v0.55.1
+
+En **Registro de entregas → Estadísticas → Expediente por alumno**, busca o selecciona una persona: la selección descarga directamente el **expediente individual en PDF**, sin abrir un panel largo en el teléfono. También puedes pulsar cualquier nombre de las clasificaciones o del historial de pendientes para descargarlo. Los indicadores generales y las comparaciones por empresa, especialidad y grupo permanecen disponibles.
+
+El documento incluye el **Blobatar** del alumno, resumen del cumplimiento y faltas, horas, actividad mensual, motivos registrados y detalle de cada jornada, repartido automáticamente en tantas páginas como sea necesario. La última página nominal del PDF general también utiliza Blobatar para distinguir alumnos. El informe se genera localmente en el navegador con los datos del registro; no requiere subir información de los estudiantes.
+
+El módulo de Estadísticas ajusta las tarjetas, filtros, tablas y controles para móviles y tabletas. Las tablas horizontales se desplazan dentro de su panel, sin hacer que toda la página desborde. Para registros incompletos se mantiene la distinción entre cero y dato no capturado.

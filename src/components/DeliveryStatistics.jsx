@@ -201,18 +201,18 @@ export default function DeliveryStatistics({ state, onBack }) {
       <Metric name="Entregas puntuales" value={data.onTimeRate+"%"}/>
       <Metric name="Asistencia" value={data.attendanceRate+"%"}/>
       <Metric name="Cobertura de jornadas" value={data.coverage+"%"}/>
-      <Metric name="Horas por registro con datos" value={hours(data.avgHours)}/>
+      <Metric name="Promedio por registro" value={hours(data.avgHours)}/>
       <Metric name="Registros con jornadas" value={fmt(data.weeksWithStatistics)}/>
     </div>
     {data.pendingWithStatistics>0 && <section className="ds-panel ds-pending-hours">
       <h2>Jornadas pendientes de entrega</h2>
-      <p>{fmt(data.pendingWithStatistics)} registros «No entregado» tienen horas capturadas ({hours(data.pendingMinutes/60)}). Las bitácoras siguen contando como pendientes.</p>
+      <p>{fmt(data.pendingWithStatistics)} entregas pendientes con {hours(data.pendingMinutes/60)} registradas.</p>
     </section>}
 
     <section className="ds-lifetime" aria-label="Acumulado de Educación Dual">
       <div className="ds-lifetime-heading">
         <div><span className="delivery-kicker">Histórico · todas las semanas</span><h2>Acumulado de Educación Dual</h2></div>
-        <span className="ds-lifetime-caption">{fmt(lifetime.studentsWithData)} alumnos con datos</span>
+        <span className="ds-lifetime-caption">{fmt(lifetime.studentsWithData)} alumnos</span>
       </div>
       <div className="ds-kpis ds-lifetime-kpis">
         {[
@@ -237,7 +237,7 @@ export default function DeliveryStatistics({ state, onBack }) {
         </section>
         <section className="ds-panel">
           <h2>Horas por especialidad · histórico</h2>
-          <p className="ds-lifetime-caption">Todas las jornadas capturadas</p>
+
           {lifetime.bySpecialty.filter(item=>item.minutes>0).length ?
             lifetime.bySpecialty.filter(item=>item.minutes>0).map(item=><div className="ds-specialty-row" key={item.label}>
               <div className="ds-specialty-heading"><span>{item.label}</span><strong>{hours(item.hours)}</strong></div>
@@ -246,7 +246,7 @@ export default function DeliveryStatistics({ state, onBack }) {
             </div>) : <p className="ds-empty">Sin horas capturadas en esta selección.</p>}
         </section>
       </div>
-      <p className="ds-lifetime-caption">Los códigos antiguos sin horas no se cuentan como cero. El histórico incluye las jornadas registradas de alumnos desistidos y de entregas pendientes; cambiar semana o mes no altera este acumulado.</p>
+      <p className="ds-lifetime-caption">Histórico de todas las semanas, incluidas las pendientes y las de alumnos desistidos.</p>
     </section>
     <StudentInsights state={state} period={period} weekId={weekId} month={month}
       specialty={specialty} company={company}/>
