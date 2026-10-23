@@ -64,10 +64,10 @@ function wrapped(ctx,words,width,size,weight=500){
  if(line)lines.push(line);
  return lines;
 }
-function fitText(ctx,text,width,initial,min,maxLines,weight=700){
+function fitText(ctx,text,width,initial,min,maxLines,weight=700,maxHeight=Infinity){
  for(let size=initial;size>=min;size-=2){
    const lines=wrapped(ctx,text,width,size,weight);
-   if(lines.length<=maxLines)return {lines,size};
+   if(lines.length<=maxLines&&lines.length*size*1.48<=maxHeight)return {lines,size,truncated:false};
  }
  const size=min,lines=wrapped(ctx,text,width,size,weight);
  if(lines.length>maxLines){
@@ -76,9 +76,9 @@ function fitText(ctx,text,width,initial,min,maxLines,weight=700){
    ctx.font=weight+" "+size+"px Arial, Helvetica, sans-serif";
    while(last.length&&ctx.measureText(last+"…").width>width)last=last.slice(0,-1);
    clipped[maxLines-1]=last+"…";
-   return {lines:clipped,size};
+   return {lines:clipped,size,truncated:true};
  }
- return {lines,size};
+ return {lines,size,truncated:false};
 }
 function drawLogo(ctx,img,x,y,maxW,maxH){
  if(!img)throw Error("No se pudo cargar el logotipo oficial.");
@@ -112,6 +112,7 @@ export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
  const type=notice.subtitle.toLocaleUpperCase("es-MX");
  label(ctx,type,margin,contentTop,25,p.accent,750);
  const title=fitText(ctx,notice.title,W-margin*2,86,49,H===1080?3:4,750);
+ if(title.truncated)throw Error("El título no cabe. Acórtalo para crear el PNG.");
  const titleHeight=title.size*1.16;
  const titleY=contentTop+87;
  title.lines.forEach((row,i)=>label(ctx,row,margin,titleY+i*titleHeight,title.size,p.ink,750));
@@ -120,8 +121,9 @@ export function drawNoticeCanvas(canvas,item,{logo,format,theme}={}){
  const bodyLimit=(notice.audienceLabel||notice.dueLabel?stripY-35:H-240);
  const availableHeight=Math.max(30,bodyLimit-(endTitle+75));
  const messageSize=clamp(H===1080?33:38,29,41);
- const maxLines=Math.max(1,Math.floor(availableHeight/(messageSize*1.48)));
- const textFit=fitText(ctx,notice.message,W-margin*2-50,messageSize,22,maxLines,450);
+ const maxLines=Math.max(1,Math.floor(availableHeight/(22*1.48)));
+ const textFit=fitText(ctx,notice.message,W-margin*2-50,messageSize,22,maxLines,450,availableHeight);
+ if(textFit.truncated)throw Error("El mensaje es demasiado largo para este formato. Acórtalo o elige Historia.");
  const bodyY=endTitle+75;
  textFit.lines.forEach((row,i)=>label(ctx,row,margin,bodyY+i*textFit.size*1.48,
    textFit.size,p.muted,450));
