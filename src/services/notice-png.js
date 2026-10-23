@@ -40,7 +40,7 @@ export function noticeModel(item,overrides={}){
    message:clean(item?.message)||"",
    footer:clean(item?.footer)||"GENERADOR DE BITÁCORA DUAL",
    audienceLabel:clean(item?.audienceLabel),
-   dueLabel:clean(item?.dueLabel),
+   dueLabel:clean(item?.dueLabel)||(item?.displayDate?"FECHA: "+String(item.displayDate).split("-").reverse().join("/"):""),
    kind:item?.kind||"custom",
    format:NOTICE_FORMATS.some(x=>x.id===(overrides.format||item?.format))
      ?(overrides.format||item.format):"post",
