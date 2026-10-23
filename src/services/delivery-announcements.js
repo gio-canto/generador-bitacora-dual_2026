@@ -9,7 +9,13 @@ export function normalizeAnnouncement(raw){
   return {id:str(raw.id,90)||id(),kind:categories.includes(raw.kind)?raw.kind:"custom",
     title,message,
     subtitle:str(raw.subtitle,120),
-    footer:str(raw.footer,160)||"Generador de Bitácora Dual",
+    footer:/^generador de bitácora dual$/i.test(str(raw.footer,160))?"":str(raw.footer,160),
+    weekIds:[...new Set((Array.isArray(raw.weekIds)?raw.weekIds:[])
+      .filter(value=>typeof value==="string").map(value=>str(value,120)).filter(Boolean))].slice(0,80),
+    weekLabels:[...new Set((Array.isArray(raw.weekLabels)?raw.weekLabels:[])
+      .filter(value=>typeof value==="string").map(value=>str(value,120)).filter(Boolean))].slice(0,80),
+    dueAt:typeof raw.dueAt==="string"&&Number.isFinite(Date.parse(raw.dueAt))
+      ?new Date(raw.dueAt).toISOString():"",
     displayDate:/^\d{4}-\d{2}-\d{2}$/.test(raw.displayDate||"")?raw.displayDate:"",
     format:["post","square","story"].includes(raw.format)?raw.format:"post",
     theme:["editorial","night","warm"].includes(raw.theme)?raw.theme:"editorial",
