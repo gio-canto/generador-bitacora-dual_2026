@@ -1,5 +1,5 @@
 const str=(v,max=240)=>String(v??"").trim().slice(0,max);
-const categories=["custom","release"];
+const categories=["custom","release","reminder"];
 const audienceTypes=["all","company","specialty","student"];
 const id=()=>globalThis.crypto?.randomUUID?.()||"notice-"+Date.now()+"-"+Math.random().toString(36).slice(2);
 export function normalizeAnnouncement(raw){
@@ -7,7 +7,13 @@ export function normalizeAnnouncement(raw){
   const title=str(raw.title,120),message=str(raw.message,1000);
   if(!title||!message)return null;
   return {id:str(raw.id,90)||id(),kind:categories.includes(raw.kind)?raw.kind:"custom",
-    title,message,audience:audienceTypes.includes(raw.audience)?raw.audience:"all",
+    title,message,
+    subtitle:str(raw.subtitle,120),
+    footer:str(raw.footer,160)||"Generador de Bitácora Dual",
+    displayDate:/^\d{4}-\d{2}-\d{2}$/.test(raw.displayDate||"")?raw.displayDate:"",
+    format:["post","square","story"].includes(raw.format)?raw.format:"post",
+    theme:["editorial","night","warm"].includes(raw.theme)?raw.theme:"editorial",
+    audience:audienceTypes.includes(raw.audience)?raw.audience:"all",
     audienceId:str(raw.audienceId,180),
     expiresAt:/^\d{4}-\d{2}-\d{2}$/.test(raw.expiresAt||"")?raw.expiresAt:"",
     createdAt:str(raw.createdAt,40)||new Date().toISOString(),
