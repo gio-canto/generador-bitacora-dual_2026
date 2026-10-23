@@ -405,6 +405,7 @@ export default function DeliveryRegistry({ onClose }) {
   const [manualTarget,setManualTarget] = useState(null);
   const [weekCaptureQueue,setWeekCaptureQueue] = useState([]);
   const [weekCaptureTotal,setWeekCaptureTotal] = useState(0);
+  const [weekCaptureBackupAfter,setWeekCaptureBackupAfter] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [studentForm, setStudentForm] = useState({
@@ -1508,7 +1509,7 @@ export default function DeliveryRegistry({ onClose }) {
     notify("info", "Alumno eliminado definitivamente", studentName);
   };
 
-  const beginWeekCapture = (week, students = state.students) => {
+  const beginWeekCapture = (week, students = state.students, backupAfter = false) => {
     if (!week || week.closedAt) return;
     const ids = students.filter(student => studentAppliesToWeek(student,week) &&
       deliveryStatus(week,student.id)!=="no_aplica").map(student=>student.id);
@@ -1517,19 +1518,25 @@ export default function DeliveryRegistry({ onClose }) {
       return;
     }
     setWeekCaptureTotal(ids.length);
+    setWeekCaptureBackupAfter(backupAfter);
     setWeekCaptureQueue(ids);
     setManualTarget({studentId:ids[0],status:deliveryStatus(week,ids[0])});
   };
-  const advanceWeekCapture = () => {
+  const advanceWeekCapture = (savedState = state) => {
     const rest = weekCaptureQueue.slice(1);
     setWeekCaptureQueue(rest);
     if (rest.length && activeWeek) {
       setManualTarget({studentId:rest[0],status:deliveryStatus(activeWeek,rest[0])});
     } else {
+      if (weekCaptureBackupAfter) exportDeliveryState(savedState);
+      setWeekCaptureBackupAfter(false);
+      setWeekCaptureTotal(0);
       setManualTarget(null);
     }
   };
   const endWeekCapture = () => {
+    if (weekCaptureBackupAfter) exportDeliveryState(state);
+    setWeekCaptureBackupAfter(false);
     setWeekCaptureQueue([]);
     setWeekCaptureTotal(0);
     setManualTarget(null);
@@ -1584,14 +1591,14 @@ export default function DeliveryRegistry({ onClose }) {
     setActiveWeekId(week.id);
     setWeekForm({ label: "", startDate: "", dueAt: "" });
     clearNotice();
-    if (downloadAfter) exportDeliveryState(saved);
+    if (downloadAfter && !capture) exportDeliveryState(saved);
     notify(
       "success",
       "Semana creada",
-      week.label + (downloadAfter ? " · Archivo guardado" : ""),
+      week.label + (downloadAfter && !capture ? " · Archivo guardado" : ""),
     );
     setView("week");
-    if (capture) beginWeekCapture(week, saved.students);
+    if (capture) beginWeekCapture(week, saved.students, downloadAfter);
   };
 
   const setManualStatus = (studentId, status) => {
@@ -1631,9 +1638,9 @@ export default function DeliveryRegistry({ onClose }) {
     const next=state.weeks.map(week=>week.id===activeWeek.id
       ?saveManualDelivery(week,manualTarget.studentId,status,{usageSource,statistics})
       :week);
-    commit({...state,weeks:next});
+    const saved = commit({...state,weeks:next});
     notify("success","Registro manual guardado",state.students.find(student=>student.id===manualTarget.studentId)?.name||"");
-    if (weekCaptureQueue.length) advanceWeekCapture();
+    if (weekCaptureQueue.length) advanceWeekCapture(saved);
     else setManualTarget(null);
   };
   const startDueAtEdit = () => {
