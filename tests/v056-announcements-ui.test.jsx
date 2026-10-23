@@ -72,4 +72,34 @@ describe("v0.56.1 · generador de avisos PNG",()=>{
   fireEvent.click(screen.getByRole("button",{name:"Editar"}));
   expect(screen.getByLabelText("Título").value).toBe("Aviso anterior");
  });
+ it("selecciona varias semanas y una fecha límite al crear un recordatorio",async()=>{
+  const onSave=vi.fn();
+  const withWeeks={...state,weeks:[
+   {id:"w18",label:"Semana 18",startDate:"2026-10-12"},
+   {id:"w19",label:"Semana 19",startDate:"2026-10-19"},
+  ]};
+  render(<DeliveryAnnouncements state={withWeeks} onSave={onSave} onBack={vi.fn()}/>);
+  fireEvent.click(screen.getByRole("tab",{name:"Crear aviso"}));
+  fireEvent.change(screen.getByLabelText("Plantilla"),{target:{value:"reminder"}});
+  fireEvent.click(screen.getByLabelText("Semana 18"));
+  fireEvent.click(screen.getByLabelText("Semana 19"));
+  fireEvent.change(screen.getByLabelText("Fecha y hora límite de entrega"),
+   {target:{value:"2026-10-30T16:30"}});
+  fireEvent.click(screen.getByRole("button",{name:"Guardar diseño"}));
+  expect(onSave).toHaveBeenCalledWith([expect.objectContaining({
+    title:"Entrega de bitácoras",kind:"reminder",
+    weekIds:["w18","w19"],weekLabels:["Semana 18","Semana 19"],
+    dueAt:new Date("2026-10-30T16:30").toISOString(),
+  })]);
+ });
+ it("elimina marca repetida sin perder firma voluntaria de avisos anteriores",()=>{
+   const old={...state,announcements:[{
+    id:"old",title:"Entrega extraordinaria",message:"Presentar bitácora",
+    footer:"Generador de Bitácora Dual",createdAt:"2026-10-20T12:00:00Z"
+   }]};
+   render(<DeliveryAnnouncements state={old} onSave={vi.fn()} onBack={vi.fn()}/>);
+   fireEvent.click(screen.getByRole("button",{name:"Editar"}));
+   expect(screen.getByLabelText("Firma (opcional)").value).toBe("");
+ });
+
 });
