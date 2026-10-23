@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import AnimatedValue from "./AnimatedValue.jsx";
+import StudentInsights from "./StudentInsights.jsx";
 import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLabels, percent } from "../services/statistics.js";
 import { generateStatisticsReportPdf } from "../services/statistics-report.js";
 import "../delivery-statistics.css";
@@ -247,6 +248,8 @@ export default function DeliveryStatistics({ state, onBack }) {
       </div>
       <p className="ds-lifetime-caption">Los códigos antiguos sin horas no se cuentan como cero. El histórico incluye las jornadas registradas de alumnos desistidos y de entregas pendientes; cambiar semana o mes no altera este acumulado.</p>
     </section>
+    <StudentInsights state={state} period={period} weekId={weekId} month={month}
+      specialty={specialty} company={company}/>
     </div>
   </div>;
 }
