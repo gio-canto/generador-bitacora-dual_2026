@@ -75,4 +75,22 @@ describe("Avisos PNG v0.56.1",()=>{
   await expect(downloadNoticeBatch(Array.from({length:26},()=>reminder),
    {logo:logo(),download:false})).rejects.toThrow("máximo de 25");
  });
+ it("conserva semanas, fecha límite y elimina pie institucional predeterminado",()=>{
+   const normalized=normalizeAnnouncement({
+     title:"Entrega de bitácoras",message:"Recuerda entregar a tiempo.",
+     kind:"reminder",weekIds:["w18","w19"],weekLabels:["Semana 18","Semana 19"],
+     dueAt:"2026-10-30T16:30:00.000Z",footer:"Generador de Bitácora Dual",
+   });
+   expect(normalized.weekIds).toEqual(["w18","w19"]);
+   expect(normalized.weekLabels).toEqual(["Semana 18","Semana 19"]);
+   expect(normalized.footer).toBe("");
+   expect(normalized.dueAt).toBe("2026-10-30T16:30:00.000Z");
+   const notice=noticeModel(normalized);
+   expect(notice.weeksLabel).toBe("Semana 18 · Semana 19");
+   expect(notice.dueLabel).toContain("ENTREGA HASTA EL");
+   expect(notice.footer).toBe("");
+   expect(()=>drawNoticeCanvas(createCanvas(1,1),normalized,{
+     logo:logo(),format:"post",theme:"editorial"})).not.toThrow();
+ });
+
 });
