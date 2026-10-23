@@ -93,4 +93,40 @@ describe("Avisos PNG v0.56.1",()=>{
      logo:logo(),format:"post",theme:"editorial"})).not.toThrow();
  });
 
+ it.each(NOTICE_FORMATS)("dibuja el diseño A + B con semanas y fecha en $id",format=>{
+   for(const theme of NOTICE_THEMES){
+     const canvas=createCanvas(1,1);
+     expect(()=>drawNoticeCanvas(canvas,{
+       title:"Entrega de bitácoras",kind:"reminder",
+       message:"Entrega las bitácoras antes de la hora indicada.",
+       weekLabels:["Semana 18","Semana 19","Semana 20"],
+       dueAt:"2026-10-30T17:30:00.000Z",
+     },{logo:logo(),format:format.id,theme:theme.id})).not.toThrow();
+     expect(canvas.width).toBe(format.width);
+     expect(canvas.height).toBe(format.height);
+     const ctx=canvas.getContext("2d");
+     const paper=Array.from(ctx.getImageData(30,30,1,1).data);
+     const date=Array.from(ctx.getImageData(80,format.height-170,1,1).data);
+     expect(paper[3]).toBe(255);
+     expect(date[3]).toBe(255);
+     expect(date.slice(0,3)).not.toEqual(paper.slice(0,3));
+   }
+ });
+ it.each(NOTICE_FORMATS)("admite avisos sin fecha ni semanas en $id",format=>{
+   const canvas=createCanvas(1,1);
+   expect(()=>drawNoticeCanvas(canvas,{
+     kind:"custom",title:"Aviso para estudiantes",
+     message:"Consulta la información proporcionada por tu docente."
+   },{logo:logo(),format:format.id,theme:"editorial"})).not.toThrow();
+ });
+ it("advierte si se seleccionan demasiadas semanas",()=>{
+   const canvas=createCanvas(1,1);
+   expect(()=>drawNoticeCanvas(canvas,{
+     kind:"reminder",title:"Entrega de bitácoras",message:"Entrega las semanas indicadas.",
+     weekLabels:Array.from({length:50},(_,i)=>"Semana "+(i+1)),
+     dueAt:"2026-10-30T17:30:00.000Z"
+   },{logo:logo(),format:"square",theme:"editorial"}))
+     .toThrow(/Demasiadas semanas/);
+ });
+
 });
