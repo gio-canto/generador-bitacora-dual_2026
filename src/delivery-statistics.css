@@ -473,3 +473,40 @@
   .ds-person-value{grid-column:2;justify-self:start}
   .ds-overdue-person{display:grid;grid-template-columns:minmax(0,1fr) auto}
 }
+
+
+/* v0.56 — jerarquía numérica coherente; reemplaza mini cifras anteriores. */
+.delivery-analytics-container .ds-kpi{min-width:0;display:flex;flex-direction:column;gap:9px;justify-content:space-between}
+.delivery-analytics-container .ds-kpi strong,
+.delivery-analytics-container .ds-kpi .ds-animated-number{
+  display:block;font-size:clamp(28px,3.2vw,47px);line-height:1.13;
+  font-weight:780;letter-spacing:-.055em;color:#182b41;font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;word-break:normal
+}
+.delivery-analytics-container .ds-kpi span:not(.ds-animated-number){font-size:13px;line-height:1.48;color:#606b7b;font-weight:600}
+.delivery-analytics-container .ds-feature-number,
+.delivery-analytics-container .ds-feature-number .ds-animated-number{
+  font-size:clamp(38px,5vw,62px);font-weight:770;line-height:1.13;letter-spacing:-.05em
+}
+.delivery-analytics-container .ds-person-value{font-size:clamp(24px,2.6vw,33px);line-height:1.18;font-weight:780;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.delivery-analytics-container .ds-person-body .ds-person-link{font-size:15px}
+.delivery-analytics-container .ds-insight-table th,
+.delivery-analytics-container .ds-insight-table td{font-size:14px;line-height:1.45;padding-top:13px;padding-bottom:13px}
+.delivery-analytics-container .ds-cause-label strong{font-size:17px;font-variant-numeric:tabular-nums}
+.delivery-analytics-container .ds-specialty-heading strong{font-size:19px;font-variant-numeric:tabular-nums}
+.ds-interpretations{background:#f8fafc}
+.ds-insight-explainer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ds-insight-explainer-grid p{margin:0;padding:13px;background:#fff;border:1px solid #e8edf3;border-radius:14px;font-size:14px;line-height:1.55}
+.ds-insight-explainer-grid strong{display:block;margin-bottom:6px;font-size:14px}
+@media(max-width:760px){
+ .delivery-analytics-container .ds-kpi strong,
+ .delivery-analytics-container .ds-kpi .ds-animated-number{font-size:clamp(25px,6.5vw,36px)}
+ .delivery-analytics-container .ds-person-value{font-size:clamp(23px,6vw,29px)}
+ .ds-insight-explainer-grid{grid-template-columns:1fr}
+ .delivery-analytics-container .ds-kpi{padding:16px;min-height:116px}
+ .delivery-analytics-container .ds-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+}
+@media(max-width:380px){
+ .delivery-analytics-container .ds-kpis{grid-template-columns:1fr}
+ .delivery-analytics-container .ds-kpi strong{font-size:35px}
+}
