@@ -2703,7 +2703,7 @@ export default function DeliveryRegistry({ onClose }) {
               <article className="delivery-summary-card">
                 <Info size={28} />
                 <span>Avisos PNG</span>
-                <strong>{announcementsNow.notices.length+announcementsNow.deadlines.length}</strong>
+                <strong>{(state.announcements||[]).length+announcementsNow.deadlines.length+1}</strong>
                 <small>Listos para compartir</small>
                 <button className="btn" type="button" onClick={()=>setView("announcements")}>
                   Crear avisos PNG
