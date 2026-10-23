@@ -62,7 +62,7 @@ describe("estadísticas personales de Educación Dual 0.54",()=>{
     expect(stats.totalPending).toBe(3);
     expect(stats.pendingStudents).toBe(2);
     expect(stats.leastCompliant[0]).toMatchObject({
-      name:"Ana",due:3,submitted:2,pending:1,fulfillmentRate:67,
+      name:"Carlos",due:3,submitted:1,pending:2,fulfillmentRate:33,
     });
     expect(stats.ledger[0]).toMatchObject({
       name:"Carlos",pending:2,fulfillmentRate:33,
