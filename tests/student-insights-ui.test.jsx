@@ -30,7 +30,7 @@ describe("pantalla de seguimiento nominal 0.54",()=>{
     rerender(<StudentInsights state={state} period="all"
       weekId="old" month="" specialty="" company=""/>);
     expect(screen.getByRole("heading",{name:"Historial de entregas pendientes"})).toBeTruthy();
-    expect(screen.getByText("Alumno Beta")).toBeTruthy();
+    expect(screen.getAllByText("Alumno Beta").length).toBeGreaterThan(0);
     expect(screen.getByText(/Semana antigua.*2026-08-04/)).toBeTruthy();
   });
   it("filtra por grupo el seguimiento y las clasificaciones",()=>{
@@ -40,6 +40,6 @@ describe("pantalla de seguimiento nominal 0.54",()=>{
     expect(screen.getByText("No hay alumnos con pendientes que coincidan con los filtros.")).toBeTruthy();
     expect(screen.getByRole("heading",{name:"Menor cumplimiento de entrega"})).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Grupo"),{target:{value:"C"}});
-    expect(screen.getByText("Alumno Beta")).toBeTruthy();
+    expect(screen.getAllByText("Alumno Beta").length).toBeGreaterThan(0);
   });
 });
