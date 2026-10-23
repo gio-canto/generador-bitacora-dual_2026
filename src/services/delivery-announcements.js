@@ -1,4 +1,3 @@
-import {isWeekDue} from "./student-insights.js";
 const str=(v,max=240)=>String(v??"").trim().slice(0,max);
 const categories=["custom","release"];
 const audienceTypes=["all","company","specialty","student"];
@@ -35,7 +34,7 @@ export function upcomingDeliveryNotices(state,{asOf=new Date(),withinDays=7}={})
  const now=asOf instanceof Date?asOf:new Date(asOf);
  if(!Number.isFinite(now.getTime()))return [];
  const candidates=(state.weeks||[]).filter(w=>{
-   if(!w.dueAt||w.closedAt||isWeekDue(w,now))return false;
+   if(!w.dueAt||w.closedAt||new Date(w.dueAt).getTime()<=now.getTime())return false;
    const date=new Date(w.dueAt);
    return Number.isFinite(date.getTime())&&date.getTime()>=now.getTime()&&
       date.getTime()-now.getTime()<=withinDays*86400000;
