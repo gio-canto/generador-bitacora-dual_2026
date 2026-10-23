@@ -15,6 +15,9 @@ export const DEFAULTS = {
       "Jefa del Departamento de Vinculación con el Sector Productivo\nCBTis No. 134",
     autorizoName: "",
     autorizoRole: "",
+    autorizoPaEnabled: false,
+    autorizoPaName: "",
+    autorizoPaRole: "",
   },
   instructor: {
     enabled: false,
@@ -22,6 +25,9 @@ export const DEFAULTS = {
     name: "",
     roleMain: "",
     note: "Instructor Formador",
+    paEnabled: false,
+    paName: "",
+    paRole: "",
   },
 };
 export const INHABIL_JUSTIFICATION =
