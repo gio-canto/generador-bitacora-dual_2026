@@ -7,6 +7,7 @@
 - Al crear una semana desde Registro de entrega o desde el asistente inicial se puede elegir **Crear y capturar jornadas**. La captura recorre alumno por alumno, permite revisar o modificar las cuatro jornadas y horas, guardar, omitir o salir cuando se desee.
 - Una semana abierta también ofrece **Capturar jornadas** para completar o corregir las estadísticas existentes. Solo se incluyen los alumnos a quienes corresponde ese periodo y cuyo estado no es «No aplica».
 - Las capturas realizadas en este recorrido se registran con origen `manual`. La edición manual de una entrega de cámara elimina la atribución de lectura por QR para ese registro, conservando la información introducida por el administrador.
+- En el asistente inicial, el respaldo de la semana se descarga al terminar el recorrido de captura para incluir las jornadas manuales recién guardadas, no antes de registrarlas.
 - Se conserva el esquema de respaldo v9, los registros históricos y los PDF existentes. La captura y sus acciones se adaptan a teléfonos y tabletas.
 - Pruebas de IDs, códigos, selección de motivos, Data Matrix, navegación de captura y persistencia manual.
 
