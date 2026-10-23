@@ -21,7 +21,7 @@ export const NOTICE_TEMPLATES=[
 ];
 
 const clean=value=>String(value??"").trim();
-const font=(ctx,size,weight=500)=>{ctx.font=weight+" "+size+"px Arial, Helvetica, sans-serif";};
+const font=(ctx,size,weight=500)=>{ctx.font=(weight>=650?"bold ":"normal ")+size+"px Arial, Helvetica, sans-serif";};
 const txt=(ctx,value,x,y,size,color,weight=500)=>{
   font(ctx,size,weight);ctx.fillStyle=color;ctx.fillText(value,x,y);
 };
@@ -121,10 +121,6 @@ function fitted(ctx,text,width,initial,min,maxLines,maxHeight,weight=500,leading
      return {lines,size,height,leading};
    }
  }
- if(clean(text).length<95)console.warn("PNG-FIT-DIAG",JSON.stringify({
-   text:clean(text),width,initial,min,maxLines,maxHeight,weight,
-   lines:wrapText(ctx,text,width,min,weight),measured:ctx.measureText("OCTUBRE").width,cssFont:ctx.font
- }));
  return null;
 }
 function drawBlock(ctx,block,x,top,color,weight=500){
