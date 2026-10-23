@@ -404,6 +404,7 @@ export default function DeliveryRegistry({ onClose }) {
   const [importPreview,setImportPreview] = useState(null);
   const [manualTarget,setManualTarget] = useState(null);
   const [weekCaptureQueue,setWeekCaptureQueue] = useState([]);
+  const [weekCaptureTotal,setWeekCaptureTotal] = useState(0);
   const [tutorialStep, setTutorialStep] = useState(0);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [studentForm, setStudentForm] = useState({
@@ -1515,6 +1516,7 @@ export default function DeliveryRegistry({ onClose }) {
       showNotice("info","Sin alumnos para registrar","No hay alumnos aplicables a esta semana.");
       return;
     }
+    setWeekCaptureTotal(ids.length);
     setWeekCaptureQueue(ids);
     setManualTarget({studentId:ids[0],status:deliveryStatus(week,ids[0])});
   };
@@ -1529,6 +1531,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
   const endWeekCapture = () => {
     setWeekCaptureQueue([]);
+    setWeekCaptureTotal(0);
     setManualTarget(null);
   };
 
@@ -3350,8 +3353,8 @@ export default function DeliveryRegistry({ onClose }) {
           previous={activeWeek.deliveries?.[manualTarget.studentId]}
           initialStatus={manualTarget.status}
           batchProgress={weekCaptureQueue.length ? {
-            position: activeStudents.filter(student => studentAppliesToWeek(student,activeWeek) &&
-              deliveryStatus(activeWeek,student.id)!=="no_aplica").length - weekCaptureQueue.length + 1,
+            position: weekCaptureTotal - weekCaptureQueue.length + 1,
+            total: weekCaptureTotal,
             remaining:weekCaptureQueue.length
           } : null}
           onSkip={weekCaptureQueue.length ? advanceWeekCapture : undefined}
