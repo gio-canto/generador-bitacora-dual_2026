@@ -38,6 +38,12 @@ describe("Avisos PNG v0.56.1",()=>{
     .not.toThrow();
   expect(canvas.height).toBe(1920);
  });
+ it("avisa si el mensaje completo no cabe en un PNG cuadrado",()=>{
+  const canvas=createCanvas(1,1);
+  const long={...reminder,message:"Es indispensable atender esta convocatoria y proporcionar todos los datos de identificación, documentos, formatos de entrega y observaciones solicitados por el plantel, tal como se comunicó durante la clase. ".repeat(8)};
+  expect(()=>drawNoticeCanvas(canvas,long,{logo:logo(),format:"square",theme:"editorial"}))
+    .toThrow(/mensaje es demasiado largo/);
+ });
  it("respeta título, pie, fecha, tamaño y tema de diseños guardados",()=>{
   const normalized=normalizeAnnouncement({
    title:"Aviso personal",message:"Presentar la bitácora",
