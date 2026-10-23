@@ -812,7 +812,7 @@ export function Profile() {
                   onChange={event=>setForm(current=>({
                     ...current,authorities:{...current.authorities,autorizoPaEnabled:event.target.checked}
                   }))}/>
-                <span>P. A. · Por ausencia de quien autoriza</span>
+                <span>P. A. · Por ausencia del titular</span>
               </label>
               {form.authorities?.autorizoPaEnabled && <div className="profile-form-grid profile-form-grid-wide pa-profile-fields">
                 {representatives.length>0 && <label>Persona suplente · mismo listado
