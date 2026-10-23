@@ -27,7 +27,7 @@ describe("v0.56.1 · generador de avisos PNG",()=>{
   render(<DeliveryAnnouncements state={state} onSave={onSave} onBack={vi.fn()}/>);
   fireEvent.click(screen.getByRole("tab",{name:"Crear aviso"}));
   fireEvent.change(screen.getByLabelText("Título"),{target:{value:"Presentar bitácora"}});
-  fireEvent.change(screen.getByLabelText("Subtítulo"),{target:{value:"RECORDATORIO"}});
+  fireEvent.change(screen.getByLabelText("Etiqueta adicional (opcional)"),{target:{value:"RECORDATORIO"}});
   fireEvent.change(screen.getByLabelText("Mensaje"),{target:{value:"Recuerda entregar la semana 20."}});
   fireEvent.change(screen.getByLabelText("Destinatarios"),{target:{value:"student"}});
   fireEvent.change(screen.getByLabelText("Seleccionar alumno"),{target:{value:"student-1"}});
