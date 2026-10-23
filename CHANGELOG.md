@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.53.0-beta.1 · Firmas P. A. por ausencia de · 2026-10-23
+
+- El paso **Responsables** incluye un interruptor «P. A. · Por ausencia de» independiente para **Autorizó** (representante de empresa) y **Instructor formador**.
+- Los suplentes se eligen de los mismos listados de representantes o instructores de la empresa. Se permite personalizar nombre y cargo cuando la persona no esté precargada.
+- El titular no se sobrescribe al utilizar un suplente. El PDF y la vista previa consignan el nombre y cargo de quien firma, seguido de «P. A. de [titular]».
+- El sistema valida que haya nombre y cargo del suplente y que no sean la misma persona titular cuando está activado P. A. Sin activarlo, los registros previos se mantienen intactos.
+- Las preferencias se guardan en el perfil, borrador, historial y respaldo de cada bitácora; se borran los P. A. al seleccionar una empresa distinta para evitar atribuciones erróneas.
+- Se ajusta el espaciado de las firmas para que los nombres largos no se superpongan en el PDF A4 horizontal, con controles adaptados a teléfono.
+- Pruebas de persistencia de perfil, modelo de suplencia, validación, interfaz y render del PDF.
+
+
 ## 0.52.5-beta.1 · Motivos de participación directos · 2026-10-23
 
 - Se simplifican las etiquetas de los nueve motivos académicos incorporados en 0.52.4. Ejemplos: «Prototipos y Emprendimiento · Local», «Festival Académico · Estatal» y «ENAC · Nacional».

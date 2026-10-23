@@ -20,6 +20,9 @@ const EMPTY_PROFILE = Object.freeze({
     voboRole: "",
     autorizoName: "",
     autorizoRole: "",
+    autorizoPaEnabled: false,
+    autorizoPaName: "",
+    autorizoPaRole: "",
   }),
   instructor: Object.freeze({
     enabled: null,
@@ -27,6 +30,9 @@ const EMPTY_PROFILE = Object.freeze({
     name: "",
     roleMain: "",
     note: "",
+    paEnabled: false,
+    paName: "",
+    paRole: "",
   }),
 });
 
@@ -150,6 +156,9 @@ export function readProfileData(storage = localStorage) {
         voboRole: cleanMultiline(authorities.voboRole, 300),
         autorizoName: cleanText(authorities.autorizoName, 160),
         autorizoRole: cleanMultiline(authorities.autorizoRole, 300),
+        autorizoPaEnabled: authorities.autorizoPaEnabled === true,
+        autorizoPaName: cleanText(authorities.autorizoPaName,160),
+        autorizoPaRole: cleanMultiline(authorities.autorizoPaRole,300),
       },
       instructor: {
         enabled:
@@ -158,6 +167,9 @@ export function readProfileData(storage = localStorage) {
         name: cleanText(instructor.name, 160),
         roleMain: cleanText(instructor.roleMain, 180),
         note: cleanText(instructor.note, 180),
+        paEnabled: instructor.paEnabled === true,
+        paName: cleanText(instructor.paName,160),
+        paRole: cleanMultiline(instructor.paRole,300),
       },
     };
   } catch {
@@ -240,6 +252,12 @@ export function rememberProfile(value, storage = localStorage) {
       autorizoRole: has(authorityPatch, "autorizoRole")
         ? cleanMultiline(authorityPatch.autorizoRole, 300)
         : current.authorities.autorizoRole,
+      autorizoPaEnabled: has(authorityPatch, "autorizoPaEnabled")
+        ? authorityPatch.autorizoPaEnabled === true : current.authorities.autorizoPaEnabled,
+      autorizoPaName: has(authorityPatch,"autorizoPaName")
+        ? cleanText(authorityPatch.autorizoPaName,160) : current.authorities.autorizoPaName,
+      autorizoPaRole: has(authorityPatch,"autorizoPaRole")
+        ? cleanMultiline(authorityPatch.autorizoPaRole,300) : current.authorities.autorizoPaRole,
     },
     instructor: {
       enabled: has(instructorPatch, "enabled")
@@ -259,6 +277,12 @@ export function rememberProfile(value, storage = localStorage) {
       note: has(instructorPatch, "note")
         ? cleanText(instructorPatch.note, 180)
         : current.instructor.note,
+      paEnabled: has(instructorPatch,"paEnabled")
+        ? instructorPatch.paEnabled===true : current.instructor.paEnabled,
+      paName: has(instructorPatch,"paName")
+        ? cleanText(instructorPatch.paName,160) : current.instructor.paName,
+      paRole: has(instructorPatch,"paRole")
+        ? cleanMultiline(instructorPatch.paRole,300) : current.instructor.paRole,
     },
   };
 

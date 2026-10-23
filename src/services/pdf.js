@@ -1,4 +1,5 @@
 import { validDate } from "../domain/records.js";
+import {actingSigner} from "../domain/signing.js";
 import { createMatrixPayload } from "./delivery-registry.js";
 const COUNCIL =
   "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)";
@@ -545,8 +546,17 @@ export function drawPdfPage(canvas, p, record, logoImage) {
     sw = s.colRatio.map((r) => r * s.w),
     sx2 = [s.x];
   sw.forEach((w) => sx2.push(sx2.at(-1) + w));
-  const companyName = companySignatureName(id.company),
-    cells = [
+  const companyName = companySignatureName(id.company);
+  const auth=actingSigner({
+    name:id.authorities.autorizoName,role:id.authorities.autorizoRole,
+    enabled:id.authorities.autorizoPaEnabled,paName:id.authorities.autorizoPaName,
+    paRole:id.authorities.autorizoPaRole
+  });
+  const instructor=actingSigner({
+    name:id.instructor.name,role:id.instructor.roleMain,
+    enabled:id.instructor.paEnabled,paName:id.instructor.paName,paRole:id.instructor.paRole
+  });
+  const cells = [
       {
         h: "Elaboró",
         n: id.authorities.elaboroName,
@@ -561,16 +571,18 @@ export function drawPdfPage(canvas, p, record, logoImage) {
       },
       {
         h: "Autorizó",
-        n: id.authorities.autorizoName,
-        r: authoritySignatureRoles(id.authorities.autorizoRole, id.company),
+        n: auth.name,
+        r: auth.byAbsence
+          ? [auth.role.split("\n")[0],auth.absenceLine,companyName].filter(Boolean)
+          : authoritySignatureRoles(id.authorities.autorizoRole, id.company),
         on: true,
       },
       {
         h: "Vo.Bo",
-        n: id.instructor.name,
-        r: [id.instructor.roleMain, id.instructor.note, companyName].filter(
-          Boolean,
-        ),
+        n: instructor.name,
+        r: instructor.byAbsence
+          ? [instructor.role.split("\n")[0],instructor.absenceLine,id.instructor.note,companyName].filter(Boolean)
+          : [id.instructor.roleMain, id.instructor.note, companyName].filter(Boolean),
         on: id.instructor.enabled,
       },
     ];
@@ -744,6 +756,8 @@ function signatureFits(r) {
   const widths = layout.signatures.colRatio.map(
     (v) => v * layout.signatures.w - 3,
   );
+  const auth=actingSigner({name:r.authorities.autorizoName,role:r.authorities.autorizoRole,enabled:r.authorities.autorizoPaEnabled,paName:r.authorities.autorizoPaName,paRole:r.authorities.autorizoPaRole});
+  const instructor=actingSigner({name:r.instructor.name,role:r.instructor.roleMain,enabled:r.instructor.paEnabled,paName:r.instructor.paName,paRole:r.instructor.paRole});
   const groups = [
     {
       name: r.student,
@@ -754,25 +768,26 @@ function signatureFits(r) {
       roles: r.authorities.voboRole.split("\n").filter(Boolean),
     },
     {
-      name: r.authorities.autorizoName,
-      roles: authoritySignatureRoles(r.authorities.autorizoRole, r.company),
+      name: auth.name,
+      roles: auth.byAbsence
+        ? [auth.role.split("\n")[0],auth.absenceLine,companySignatureName(r.company)].filter(Boolean)
+        : authoritySignatureRoles(r.authorities.autorizoRole,r.company),
     },
   ];
   if (r.instructor.enabled)
     groups.push({
-      name: r.instructor.name,
-      roles: [
-        r.instructor.roleMain,
-        r.instructor.note,
-        companySignatureName(r.company),
-      ].filter(Boolean),
+      name: instructor.name,
+      roles: instructor.byAbsence
+        ? [instructor.role.split("\n")[0],instructor.absenceLine,r.instructor.note,companySignatureName(r.company)].filter(Boolean)
+        : [r.instructor.roleMain,r.instructor.note,companySignatureName(r.company)].filter(Boolean),
     });
   return (
     groups.every(
       (g, i) =>
         g.roles.length <= 4 &&
         measureMm(g.name, 6, "bold") <= widths[i] &&
-        g.roles.every((t) => measureMm(t, 6, "italic") <= widths[i]),
+        g.roles.every((t) => t.startsWith("P. A. de ") ||
+          measureMm(t, 6, "italic") <= widths[i]),
     ) &&
     measureMm(r.school.toUpperCase(), 8, "bold") <= layout.strip.w - 4 &&
     measureMm("Nombre de la empresa: " + r.company, 9, "bold") <= layout.table.w

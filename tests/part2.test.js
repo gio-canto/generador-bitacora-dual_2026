@@ -96,6 +96,9 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
       voboRole: "Vinculación",
       autorizoName: "Responsable",
       autorizoRole: "Jefatura",
+      autorizoPaEnabled: false,
+      autorizoPaName: "",
+      autorizoPaRole: "",
     },
     instructor: {
       enabled: true,
@@ -103,6 +106,9 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
       name: "Instructor",
       roleMain: "Área técnica",
       note: "Instructor Formador",
+      paEnabled: false,
+      paName: "",
+      paRole: "",
     },
   });
   expect(

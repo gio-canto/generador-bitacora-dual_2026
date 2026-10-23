@@ -72,6 +72,9 @@ function editableDefaults(profile) {
       autorizoRole:
         profile.authorities?.autorizoRole ||
         valueFromEditor("autorizoRole", ""),
+      autorizoPaEnabled: profile.authorities?.autorizoPaEnabled ?? checkedFromEditor("autorizoPaEnabled"),
+      autorizoPaName: profile.authorities?.autorizoPaName || valueFromEditor("autorizoPaName",""),
+      autorizoPaRole: profile.authorities?.autorizoPaRole || valueFromEditor("autorizoPaRole",""),
     },
     instructor: {
       enabled:
@@ -91,6 +94,9 @@ function editableDefaults(profile) {
       note:
         profile.instructor?.note ||
         valueFromEditor("instructorNote", "Instructor Formador"),
+      paEnabled: profile.instructor?.paEnabled ?? checkedFromEditor("instructorPaEnabled"),
+      paName: profile.instructor?.paName || valueFromEditor("instructorPaName",""),
+      paRole: profile.instructor?.paRole || valueFromEditor("instructorPaRole",""),
     },
   };
 }
@@ -238,6 +244,7 @@ export function Profile() {
         ...current.authorities,
         autorizoName: representative?.name || "",
         autorizoRole: representative?.role || "",
+        autorizoPaEnabled:false,autorizoPaName:"",autorizoPaRole:"",
       },
       instructor: {
         enabled: company?.instructorEnabledByDefault === true,
@@ -245,6 +252,7 @@ export function Profile() {
         name: "",
         roleMain: "",
         note: "Instructor Formador",
+        paEnabled:false,paName:"",paRole:"",
       },
     }));
   };
@@ -313,6 +321,21 @@ export function Profile() {
         "Falta el instructor",
         "Selecciona o escribe el instructor formador y su cargo.",
       );
+      return;
+    }
+    if (form.authorities?.autorizoPaEnabled && (
+      !form.authorities.autorizoPaName?.trim() ||
+      !form.authorities.autorizoPaRole?.trim() ||
+      form.authorities.autorizoPaName.trim().toLowerCase()===form.authorities.autorizoName.trim().toLowerCase()
+    )) {
+      notify("error","Revisa el P. A.","Selecciona una persona diferente del titular y especifica su cargo.");
+      return;
+    }
+    if (form.instructor?.enabled && form.instructor?.paEnabled && (
+      !form.instructor.paName?.trim() || !form.instructor.paRole?.trim() ||
+      form.instructor.paName.trim().toLowerCase()===form.instructor.name.trim().toLowerCase()
+    )) {
+      notify("error","Revisa el P. A.","Selecciona un instructor suplente diferente del titular y su cargo.");
       return;
     }
     if (!rememberProfile(form)) {
@@ -559,13 +582,13 @@ export function Profile() {
                 </div>
                 <div>
                   <dt>Autoriza</dt>
-                  <dd>{shown(profile.authorities?.autorizoName)}</dd>
+                  <dd>{shown(profile.authorities?.autorizoName)}{profile.authorities?.autorizoPaEnabled ? " · P. A.: "+shown(profile.authorities?.autorizoPaName) : ""}</dd>
                 </div>
                 <div>
                   <dt>Instructor</dt>
                   <dd>
                     {profile.instructor?.enabled
-                      ? shown(profile.instructor?.name)
+                      ? shown(profile.instructor?.name)+(profile.instructor?.paEnabled ? " · P. A.: "+shown(profile.instructor?.paName) : "")
                       : "No usar"}
                   </dd>
                 </div>
@@ -783,6 +806,37 @@ export function Profile() {
                 </div>
               ) : null}
 
+              <label className="profile-check">
+                <input type="checkbox" id="profileAutorizoPaEnabled"
+                  checked={form.authorities?.autorizoPaEnabled === true}
+                  onChange={event=>setForm(current=>({
+                    ...current,authorities:{...current.authorities,autorizoPaEnabled:event.target.checked}
+                  }))}/>
+                <span>P. A. · Por ausencia de quien autoriza</span>
+              </label>
+              {form.authorities?.autorizoPaEnabled && <div className="profile-form-grid profile-form-grid-wide pa-profile-fields">
+                {representatives.length>0 && <label>Persona suplente · mismo listado
+                  <select id="profileAutorizoPaPreset"
+                    value={representatives.some(p=>p.name===form.authorities.autorizoPaName)?form.authorities.autorizoPaName:"__custom__"}
+                    onChange={event=>{
+                      const selected=representatives.find(p=>p.name===event.target.value);
+                      setForm(current=>({...current,authorities:{...current.authorities,
+                        autorizoPaName:selected?.name||"",autorizoPaRole:selected?.role||""}}));
+                    }}>
+                    <option value="__custom__">Personalizar / otra persona</option>
+                    {representatives.map(person=><option key={person.name} value={person.name}>{person.name}</option>)}
+                  </select>
+                </label>}
+                <label>Nombre de quien firma P. A.
+                  <input id="profileAutorizoPaName" value={form.authorities?.autorizoPaName||""}
+                    onChange={updateAuthority("autorizoPaName")} maxLength={160}/>
+                </label>
+                <label>Cargo del suplente
+                  <input id="profileAutorizoPaRole" value={form.authorities?.autorizoPaRole||""}
+                    onChange={updateAuthority("autorizoPaRole")} maxLength={300}/>
+                </label>
+              </div>}
+
               <div className="profile-form-grid">
                 <label>
                   Entrada
@@ -881,6 +935,36 @@ export function Profile() {
                       </label>
                     </div>
                   ) : null}
+                  <label className="profile-check">
+                    <input type="checkbox" id="profileInstructorPaEnabled"
+                      checked={form.instructor?.paEnabled===true}
+                      onChange={event=>setForm(current=>({...current,instructor:{
+                        ...current.instructor,paEnabled:event.target.checked
+                      }}))}/>
+                    <span>P. A. · Por ausencia del instructor formador</span>
+                  </label>
+                  {form.instructor?.paEnabled && <div className="profile-form-grid profile-form-grid-wide pa-profile-fields">
+                    {instructors.length>0 && <label>Instructor suplente · mismo listado
+                      <select id="profileInstructorPaPreset"
+                        value={instructors.some(p=>p.name===form.instructor.paName)?form.instructor.paName:"__custom__"}
+                        onChange={event=>{
+                          const selected=instructors.find(p=>p.name===event.target.value);
+                          setForm(current=>({...current,instructor:{...current.instructor,
+                            paName:selected?.name||"",paRole:selected?.roleMain||""}}));
+                        }}>
+                        <option value="__custom__">Personalizar / otra persona</option>
+                        {instructors.map(person=><option key={person.name} value={person.name}>{person.name}</option>)}
+                      </select>
+                    </label>}
+                    <label>Nombre de quien firma P. A.
+                      <input id="profileInstructorPaName" value={form.instructor?.paName||""}
+                        onChange={updateInstructor("paName")} maxLength={160}/>
+                    </label>
+                    <label>Cargo del suplente
+                      <input id="profileInstructorPaRole" value={form.instructor?.paRole||""}
+                        onChange={updateInstructor("paRole")} maxLength={180}/>
+                    </label>
+                  </div>}
                 </>
               ) : null}
             </section>
