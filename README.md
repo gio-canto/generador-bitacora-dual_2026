@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.55.2--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.56.0--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -232,3 +232,11 @@ El módulo de Estadísticas ajusta las tarjetas, filtros, tablas y controles par
 En **Registro de entregas → Estadísticas → Expediente por alumno**, el PDF individual utiliza ahora A4 horizontal, logotipo oficial en todas las páginas y Blobatar del alumno. La primera hoja reúne cumplimiento, puntualidad, pendientes, horas y faltas; incluye una **interpretación automática breve** basada en las semanas vencidas y las jornadas capturadas. Una matriz por meses muestra cada semana con una clave visual para «a tiempo», «tarde», «pendiente vencida», «en plazo» y «no aplica». Las hojas posteriores muestran todas las semanas en tablas compactas que continúan automáticamente. El encabezado no incluye folio, fecha de emisión ni última actualización.
 
 En **Alumnos**, debajo del contador de alumnos activos, aparece **Lista de alumnos en PDF**: elige **orden alfabético, por especialidad o por empresa**, además de «solo activos» o «activos y desistidos». El PDF utiliza el logotipo oficial y Blobs con el nombre, especialidad, empresa, grupo y situación de cada alumno; continúa en otras páginas si es necesario. Todos los PDF se generan localmente en el navegador. No se modifica ningún registro al imprimir o descargar listas.
+
+### Reportes y anuncios · v0.56.0
+
+**Reportes** concentra las descargas PDF desde el inicio del Registro de entregas: listado de una semana, historial semana por semana, global, **expediente individual**, listas de alumnos y reporte estadístico. En Estadísticas ya no se descarga el expediente: pulsar el nombre de cualquier alumno abre Reportes con la persona seleccionada. El informe individual ahora es **A4 vertical**, conserva el logotipo institucional y muestra las semanas según sus nombres reales abreviados (por ejemplo «Semana 20» → **S20**), junto con las interpretaciones, el histórico y los estados originales.
+
+**Estadísticas** presenta explicaciones breves calculadas a partir de los datos del periodo; el PDF general incorpora mini interpretaciones en sus páginas. El «Historial de entregas pendientes» muestra solamente a alumnos con **dos o más** semanas vencidas sin entregar. Este umbral no altera los indicadores generales ni los datos guardados. Las cifras principales tienen mayor jerarquía visual y diseño adaptado a móvil.
+
+**Anuncios** es una nueva sección accesible desde Inicio: reúne recordatorios automáticos de semanas con plazos próximos, avisos personalizados y novedades de la aplicación. Se puede elegir destinatario (todos, empresa, especialidad o alumno), fijar caducidad, editar y eliminar avisos y revisar una vista previa. Los mensajes se guardan en el **registro local y en sus respaldos**, no se envían a otros dispositivos ni crean notificaciones remotas. El inicio muestra hasta tres avisos recientes y el acceso al centro de anuncios. Los anuncios se normalizan al importar y no requieren migrar el esquema anterior.
