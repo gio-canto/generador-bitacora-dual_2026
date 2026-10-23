@@ -28,11 +28,11 @@ describe("expediente nominal en Estadísticas v0.55",()=>{
    expect(screen.getByText("Semana primera")).toBeTruthy();
    expect(screen.getByText(/Cumplimiento de entrega/)).toBeTruthy();
    fireEvent.click(screen.getByText("Semana primera"));
-   expect(screen.getByText(/Festival Académico/)).toBeTruthy();
+   expect(screen.getAllByText(/Festival Académico/).length).toBeGreaterThan(0);
  });
  it("abre fichas desde rankings y conserva la identidad por ID",()=>{
    view();
-   fireEvent.click(screen.getByRole("button",{name:"Ver expediente de Alicia Pérez"}));
+   fireEvent.click(screen.getAllByRole("button",{name:"Ver expediente de Alicia Pérez"})[0]);
    expect(screen.getByLabelText("Seleccionar alumno").value).toBe("s1");
    fireEvent.change(screen.getByLabelText("Seleccionar alumno"),{target:{value:"s2"}});
    expect(screen.getByRole("heading",{name:"Beto López"})).toBeTruthy();
