@@ -7,6 +7,10 @@ export function interpretStatistics(data,insights){
  const worked=Number(data.daily?.laboral||0);
  const absent=Number(data.daily?.falta||0);
  const expected=insights?.totalDue||0;
+ const leaders=data.companyLeaders||{};
+ const groups=(data.byGroupPerformance||[]).filter(row=>row.activeStudents>0);
+ const groupSummary=groups.map(row=>row.label+": "+count(row.activeStudents)+
+   " alumnos ("+Number(row.share).toLocaleString("es-MX",{maximumFractionDigits:1})+"%)").join("; ");
  return {
    deliveries:applicable
      ? count(delivered+late)+" de "+count(applicable)+" registros aplicables se entregaron."
@@ -24,7 +28,15 @@ export function interpretStatistics(data,insights){
      ? count(insights?.totalPending||0)+" de "+count(expected)+" entregas vencidas siguen pendientes."
      : "No hay semanas vencidas para este periodo.",
    causes:absent
-     ? count(absent)+" faltas registradas. Consulta las causas antes de evaluarlas."
+     ? count(absent)+" faltas registradas. Los días sin labores e inhábiles no son faltas."
      : "No se registraron faltas en las jornadas conocidas.",
+   nonWorking:count(data.daily?.sin_labores)+" jornadas sin labores y "+
+     count(data.daily?.inhabil)+" días inhábiles, independientes de las faltas.",
+   companies:leaders.mostHours
+     ? "Más horas registradas: "+leaders.mostHours.label+" ("+
+       Number(leaders.mostHours.hours).toLocaleString("es-MX",{maximumFractionDigits:1})+
+       " h). Las empresas sin jornadas capturadas no se incluyen en la comparación."
+     : "Todavía no hay jornadas capturadas para comparar empresas.",
+   groups:groups.length?groupSummary+".":"No hay alumnos activos para distribuir por grupos.",
  };
 }
