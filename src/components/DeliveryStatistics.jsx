@@ -42,7 +42,8 @@ function Bars({ title, rows, unit = "", max = 7 }) {
 const displayPercent=value=>value==null?"—":fmt(value,1)+"%";
 function Leader({label,row,field,empty="Sin datos comparables"}){
  const value=!row?empty:field==="hours"?hours(row.hours):
-   field==="absences"?fmt(row.absences):displayPercent(row.absenceRate);
+   field==="absences"?fmt(row.absences):
+   displayPercent(row.absenceRate)+" de "+fmt(row.applicableDays)+" jornadas";
  return <div className="ds-comparison-leader">
    <span>{label}</span><strong>{row?.label||"—"}</strong><small>{value}</small>
  </div>;
@@ -203,6 +204,9 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
         <p><strong>Jornadas.</strong> {interpretation.attendance}</p>
         <p><strong>Horas.</strong> {interpretation.hours}</p>
         <p><strong>Faltas.</strong> {interpretation.causes}</p>
+        <p><strong>Sin labores e inhábiles.</strong> {interpretation.nonWorking}</p>
+        <p><strong>Empresas.</strong> {interpretation.companies}</p>
+        <p><strong>Grupos.</strong> {interpretation.groups}</p>
       </div>
     </section>
     <section className="ds-panel">
