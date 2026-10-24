@@ -498,14 +498,23 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     const more=r.companyLeaders.mostHours;
     const less=r.companyLeaders.comparable>1?r.companyLeaders.leastHours:null;
     const most=r.companyLeaders.mostAbsences;
+    const high=r.companyLeaders.highestAbsenceRate;
+    const low=r.companyLeaders.rateComparable>1?r.companyLeaders.lowestAbsenceRate:null;
+    const rateInfo=row=>row?fmt(row.absenceRate,1)+"% / "+fmt(row.applicableDays)+" jornadas":"Sin datos comparables";
     label(ctx,"Más horas: "+(more?more.label+" · "+fmt(more.hours,1)+" h":"Sin datos comparables"),
-      82,1470,18,C.secondary,600,1060);
+      82,1471,18,C.secondary,600,504);
     label(ctx,"Menos horas: "+(less?less.label+" · "+fmt(less.hours,1)+" h":"Sin datos comparables"),
-      82,1503,18,C.secondary,600,1060);
+      82,1506,18,C.secondary,600,504);
     label(ctx,"Más faltas: "+(most?most.label+" · "+fmt(most.absences):"No se registraron faltas"),
-      82,1536,18,C.secondary,600,1060);
-    label(ctx,"Tasa de falta: faltas / (jornadas con labores + faltas). Sin labores e inhábiles se excluyen.",
-      82,1571,15,C.muted,500,1070);
+      82,1541,18,C.secondary,600,504);
+    label(ctx,"Mayor tasa: "+(high?high.label+" · "+rateInfo(high):"Sin datos comparables"),
+      648,1471,18,C.secondary,600,502);
+    label(ctx,"Menor tasa: "+(low?low.label+" · "+rateInfo(low):"Sin datos comparables"),
+      648,1506,18,C.secondary,600,502);
+    label(ctx,"0% cuenta si hay jornadas registradas; nunca cuando no hay datos.",
+      648,1541,15,C.muted,500,502);
+    label(ctx,"Tasa de faltas = faltas / (jornadas con labores + faltas). Sin labores e inhábiles se excluyen.",
+      82,1576,15,C.muted,500,1060);
     images.push(canvasToJpeg(canvas));
   }
 
