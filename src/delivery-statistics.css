@@ -510,3 +510,31 @@
  .delivery-analytics-container .ds-kpis{grid-template-columns:1fr}
  .delivery-analytics-container .ds-kpi strong{font-size:35px}
 }
+
+
+/* Comparativos de empresas y grupos: datos trazables, sin mezclar faltas con días inhábiles. */
+.ds-comparison{gap:19px}
+.ds-comparison-leaders{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.ds-comparison-leader{border:1px solid #e6ebf1;background:#fafbfd;border-radius:15px;padding:15px;display:grid;gap:8px;min-width:0}
+.ds-comparison-leader>span{font-size:12px;font-weight:650;color:#69788a}
+.ds-comparison-leader>strong{font-size:17px;line-height:1.35;color:#192e47;overflow-wrap:anywhere}
+.ds-comparison-leader>small{color:#476483;font-weight:700;font-size:19px;font-variant-numeric:tabular-nums}
+.ds-comparison-table{min-width:910px}
+.ds-comparison-table th:first-child{min-width:165px}
+.ds-comparison-table tbody th{font-weight:650;color:#1d344e;overflow-wrap:anywhere;max-width:240px}
+.ds-comparison-table td{white-space:nowrap}
+.ds-comparison-table th,.ds-comparison-table td{vertical-align:middle}
+.ds-comparison-table .ds-comparison-sample{display:block;font-size:11px;font-weight:400;color:#768295;margin-top:4px;white-space:normal}
+.ds-comparison-note{font-size:12px;line-height:1.6;margin:0;color:#617082}
+.ds-comparison-proportions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:13px}
+.ds-comparison-proportion{display:grid;gap:11px;padding:14px;border:1px solid #e4eaf0;border-radius:14px;min-width:0}
+.ds-comparison-proportion>div:first-child{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.ds-comparison-proportion strong{font-size:15px;color:#23384d;overflow-wrap:anywhere}
+.ds-comparison-proportion span{font-size:13px;color:#647388;white-space:nowrap}
+@media(max-width:1080px){.ds-comparison-leaders{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.ds-comparison-leaders{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .ds-comparison-leader{padding:12px}.ds-comparison-leader>strong{font-size:15px}
+ .ds-comparison-leader>small{font-size:17px}
+ .ds-comparison-proportion>div:first-child{align-items:start;flex-wrap:wrap}
+}
+@media(max-width:360px){.ds-comparison-leaders{grid-template-columns:1fr}}
