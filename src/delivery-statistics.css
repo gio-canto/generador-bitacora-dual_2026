@@ -514,7 +514,7 @@
 
 /* Comparativos de empresas y grupos: datos trazables, sin mezclar faltas con días inhábiles. */
 .ds-comparison{gap:19px}
-.ds-comparison-leaders{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.ds-comparison-leaders{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(195px,100%),1fr));gap:11px}
 .ds-comparison-leader{border:1px solid #e6ebf1;background:#fafbfd;border-radius:15px;padding:15px;display:grid;gap:8px;min-width:0}
 .ds-comparison-leader>span{font-size:12px;font-weight:650;color:#69788a}
 .ds-comparison-leader>strong{font-size:17px;line-height:1.35;color:#192e47;overflow-wrap:anywhere}
