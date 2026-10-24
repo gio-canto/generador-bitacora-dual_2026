@@ -252,9 +252,11 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
           data.companyLeaders.leastHours:null} field="hours"/>
         <Leader label="Más faltas registradas" row={data.companyLeaders.mostAbsences} field="absences"/>
         <Leader label="Mayor tasa de faltas" row={data.companyLeaders.highestAbsenceRate} field="rate"/>
+        <Leader label="Menor tasa de faltas" row={data.companyLeaders.rateComparable>1?
+          data.companyLeaders.lowestAbsenceRate:null} field="rate"/>
       </div>
       <PerformanceTable rows={data.byCompanyPerformance} type="company"/>
-      <p className="ds-comparison-note">Horas totales y promedio por alumno con jornadas registradas. Las empresas sin jornadas capturadas no participan en los extremos. La tasa de faltas considera solo jornadas con labores y faltas; muestra el tamaño de su base.</p>
+      <p className="ds-comparison-note">Horas totales y promedio por alumno con jornadas registradas. Las empresas sin jornadas capturadas no participan en los extremos. La tasa de faltas considera solo jornadas con labores y faltas; muestra el tamaño de su base. Una tasa de 0% es válida cuando existen jornadas computables, pero no cuando faltan datos.</p>
     </section>
     <section className="ds-panel ds-comparison" aria-label="Estadísticas por grupo">
       <div className="ds-panel-head"><h2>Grupos y proporción del alumnado</h2>
