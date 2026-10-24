@@ -38,6 +38,45 @@ function Bars({ title, rows, unit = "", max = 7 }) {
     </div>) : <p className="ds-empty">Sin registros en el periodo.</p>}
   </section>;
 }
+
+const displayPercent=value=>value==null?"—":fmt(value,1)+"%";
+function Leader({label,row,field,empty="Sin datos comparables"}){
+ const value=!row?empty:field==="hours"?hours(row.hours):
+   field==="absences"?fmt(row.absences):displayPercent(row.absenceRate);
+ return <div className="ds-comparison-leader">
+   <span>{label}</span><strong>{row?.label||"—"}</strong><small>{value}</small>
+ </div>;
+}
+function PerformanceTable({rows,type}){
+ const company=type==="company";
+ return <div className="ds-table-scroll" tabIndex={0} aria-label={company?"Tabla comparativa de empresas":"Tabla comparativa de grupos"}>
+   <table className="ds-table ds-comparison-table">
+     <thead><tr>
+       <th scope="col">{company?"Empresa":"Grupo"}</th>
+       <th scope="col">Alumnos activos</th>
+       {!company&&<th scope="col">% del alumnado</th>}
+       <th scope="col">Horas</th>
+       {company&&<th scope="col">Horas por alumno con datos</th>}
+       <th scope="col">Faltas</th>
+       <th scope="col">Tasa de faltas</th>
+       <th scope="col">Sin labores</th>
+       <th scope="col">Inhábiles</th>
+     </tr></thead>
+     <tbody>{rows.map(row=><tr key={row.label}>
+       <th scope="row">{row.label}</th>
+       <td>{fmt(row.activeStudents)}</td>
+       {!company&&<td>{displayPercent(row.share)}</td>}
+       <td>{row.reports?hours(row.hours):"Sin datos"}</td>
+       {company&&<td>{hours(row.averageHours)}</td>}
+       <td>{row.reports?fmt(row.absences):"—"}</td>
+       <td>{displayPercent(row.absenceRate)}{row.applicableDays>0?
+         <small className="ds-comparison-sample">{fmt(row.applicableDays)} jornadas computables</small>:null}</td>
+       <td>{row.reports?fmt(row.nonWorking):"—"}</td>
+       <td>{row.reports?fmt(row.holidays):"—"}</td>
+     </tr>)}</tbody>
+   </table>
+ </div>;
+}
 function Metric({name,value}) {
   return <article className="ds-kpi"><strong><AnimatedValue value={value}/></strong><span>{name}</span></article>;
 }
@@ -153,6 +192,8 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       <Metric name="Alumnos activos" value={fmt(data.students.length)}/>
       <Metric name="Horas registradas" value={hours(data.totalMinutes/60)}/>
       <Metric name="Jornadas con falta" value={fmt(data.daily.falta)}/>
+       <Metric name="Días sin labores" value={fmt(data.daily.sin_labores)}/>
+       <Metric name="Días inhábiles" value={fmt(data.daily.inhabil)}/>
       <Metric name="Uso identificado" value={percent(data.usage.used,data.students.length)+"%"}/>
     </div>
     <section className="ds-panel ds-interpretations" aria-label="Interpretación del periodo">
@@ -197,6 +238,33 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       <Bars title="Horas por especialidad" unit=" h" rows={data.bySpecialty.map(item=>({label:item.label,value:item.minutes/60}))}/>
       <Bars title="Horas por empresa" unit=" h" rows={data.byCompany.map(item=>({label:item.label,value:item.minutes/60}))}/>
     </div>
+
+    <section className="ds-panel ds-comparison" aria-label="Estadísticas por empresa">
+      <div className="ds-panel-head"><h2>Comparación por empresa</h2>
+        <span className="ds-lifetime-caption">Semanas del periodo seleccionado</span></div>
+      <div className="ds-comparison-leaders">
+        <Leader label="Más horas registradas" row={data.companyLeaders.mostHours} field="hours"/>
+        <Leader label="Menos horas registradas" row={data.companyLeaders.comparable>1?
+          data.companyLeaders.leastHours:null} field="hours"/>
+        <Leader label="Más faltas registradas" row={data.companyLeaders.mostAbsences} field="absences"/>
+        <Leader label="Mayor tasa de faltas" row={data.companyLeaders.highestAbsenceRate} field="rate"/>
+      </div>
+      <PerformanceTable rows={data.byCompanyPerformance} type="company"/>
+      <p className="ds-comparison-note">Horas totales y promedio por alumno con jornadas registradas. Las empresas sin jornadas capturadas no participan en los extremos. La tasa de faltas considera solo jornadas con labores y faltas; muestra el tamaño de su base.</p>
+    </section>
+    <section className="ds-panel ds-comparison" aria-label="Estadísticas por grupo">
+      <div className="ds-panel-head"><h2>Grupos y proporción del alumnado</h2>
+        <span className="ds-lifetime-caption">{fmt(data.students.length)} alumnos activos en la selección</span></div>
+      <div className="ds-comparison-proportions">
+        {data.byGroupPerformance.filter(row=>row.activeStudents>0).map((row,index)=>
+          <div className="ds-comparison-proportion" key={row.label}>
+            <div><strong>Grupo {row.label}</strong><span>{fmt(row.activeStudents)} alumnos · {displayPercent(row.share)}</span></div>
+            <div className="ds-track"><i style={{width:row.share+"%",background:COLORS[index%COLORS.length]}}/></div>
+          </div>)}
+      </div>
+      <PerformanceTable rows={data.byGroupPerformance} type="group"/>
+      <p className="ds-comparison-note">La proporción corresponde a alumnos activos; las jornadas registradas del periodo determinan horas, faltas, días sin labores e inhábiles. Un grupo sin datos no equivale a cero faltas.</p>
+    </section>
     <div className="ds-kpis ds-small-kpis">
       <Metric name="Cumplimiento de entrega" value={data.deliveryRate+"%"}/>
       <Metric name="Entregas puntuales" value={data.onTimeRate+"%"}/>
