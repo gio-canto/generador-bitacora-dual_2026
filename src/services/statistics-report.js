@@ -60,7 +60,7 @@ function bars(ctx, items, { x, y, w, h, unit = "", maxRows = 6, colors = palette
     const at = y + index * gap;
     const v = Math.max(0, item.value);
     label(ctx, item.label, x, at + 18, 18, C.secondary, 500, w - 165);
-    label(ctx, fmt(v, unit === " h" ? 1 : 0) + unit, x + w - 125, at + 18, 18, C.ink, 700, 122);
+    label(ctx, fmt(v, unit === " h" || unit === "%" ? 1 : 0) + unit, x + w - 125, at + 18, 18, C.ink, 700, 122);
     rect(ctx, x, at + 29, w - 6, 12, 6, C.track);
     if (v) rect(ctx, x, at + 29, Math.max(3, (w - 6) * v / max), 12, 6, colors[index % colors.length]);
   });
@@ -230,7 +230,7 @@ function pageBase(report, pageNumber, logo) {
   separator(ctx, 54, 317, W - 108);
   separator(ctx, 54, 1658, W - 108);
   label(ctx, "GENERACIÓN  " + report.generation, 54, 1694, 16, C.muted, 600, 550);
-  label(ctx, "Emitido " + report.date + "  ·  " + pageNumber + "/5  ·  " + VERSION,
+  label(ctx, "Emitido " + report.date + "  ·  " + pageNumber + "/6  ·  " + VERSION,
     W - 435, 1694, 15, C.muted, 500, 430);
   return { ctx, canvas };
 }
@@ -468,6 +468,44 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     });
     label(ctx,"Las faltas pueden estar justificadas.",83,1571,16,C.muted,500,1080);
     label(ctx,interpretation.pending,77,1638,18,C.secondary,550,1090);
+    images.push(canvasToJpeg(canvas));
+  }
+
+
+  // Página 6: empresas y grupos en el periodo filtrado. Las faltas nunca
+  // suman jornadas sin labores ni días inhábiles.
+  {
+    const {ctx,canvas}=pageBase(report,6,logo);
+    const companies=r.byCompanyPerformance.filter(e=>e.reports>0);
+    const groups=r.byGroupPerformance.filter(e=>e.activeStudents>0||e.reports>0);
+    panel(ctx,54,345,551,500,"Horas por empresa","Total de horas registradas");
+    bars(ctx,[...companies].sort((a,b)=>b.hours-a.hours).map(e=>({
+      label:e.label,value:e.hours
+    })),{x:82,y:456,w:493,h:354,unit:" h",maxRows:6});
+    panel(ctx,623,345,563,500,"Faltas por empresa","Número de jornadas marcadas como falta");
+    bars(ctx,[...companies].sort((a,b)=>b.absences-a.absences).map(e=>({
+      label:e.label,value:e.absences
+    })),{x:652,y:456,w:505,h:354,maxRows:6,colors:[C.red,C.amber]});
+    panel(ctx,54,865,551,505,"Proporción por grupo","Alumnos activos de la selección");
+    bars(ctx,[...groups].sort((a,b)=>b.share-a.share).map(e=>({
+      label:e.label+" · "+fmt(e.activeStudents)+" alumnos",value:e.share
+    })),{x:82,y:971,w:492,h:357,unit:"%",maxRows:6});
+    panel(ctx,623,865,563,505,"Faltas por grupo","Jornadas marcadas como falta");
+    bars(ctx,[...groups].sort((a,b)=>b.absences-a.absences).map(e=>({
+      label:"Grupo "+e.label,value:e.absences
+    })),{x:652,y:971,w:505,h:357,maxRows:6,colors:[C.red,C.amber]});
+    panel(ctx,54,1392,1132,205,"Comparaciones del periodo");
+    const more=r.companyLeaders.mostHours;
+    const less=r.companyLeaders.comparable>1?r.companyLeaders.leastHours:null;
+    const most=r.companyLeaders.mostAbsences;
+    label(ctx,"Más horas: "+(more?more.label+" · "+fmt(more.hours,1)+" h":"Sin datos comparables"),
+      82,1470,18,C.secondary,600,1060);
+    label(ctx,"Menos horas: "+(less?less.label+" · "+fmt(less.hours,1)+" h":"Sin datos comparables"),
+      82,1503,18,C.secondary,600,1060);
+    label(ctx,"Más faltas: "+(most?most.label+" · "+fmt(most.absences):"No se registraron faltas"),
+      82,1536,18,C.secondary,600,1060);
+    label(ctx,"Tasa de falta: faltas / (jornadas con labores + faltas). Sin labores e inhábiles se excluyen.",
+      82,1571,15,C.muted,500,1070);
     images.push(canvasToJpeg(canvas));
   }
 
