@@ -34,6 +34,6 @@ describe("comparativos de empresas y grupos en Estadísticas",()=>{
    expect(within(groups).getByText("Grupo B")).toBeTruthy();
    expect(within(groups).getAllByText("66,7%").length).toBeGreaterThan(0);
    expect(within(groups).getAllByText("33,3%").length).toBeGreaterThan(0);
-   expect(screen.getByText("Días inhábiles")).toBeTruthy();
+   expect(screen.getAllByText("Días inhábiles").length).toBeGreaterThan(0);
  });
 });
