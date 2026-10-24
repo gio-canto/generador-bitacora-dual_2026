@@ -36,4 +36,50 @@ describe("estadísticas v0.52",()=>{
     expect(result.usage.unknown).toBe(1);
     expect(result.notDelivered).toBe(1);
   });
+ it("compara empresas y grupos sin mezclar faltas con días sin labores",()=>{
+   const a=createStudent({id:"a",name:"Alumna A",group:"A",company:"Empresa 1"});
+   const b=createStudent({id:"b",name:"Alumno B",group:"A",company:"Empresa 1"});
+   const c=createStudent({id:"c",name:"Alumna C",group:"B",company:"Empresa 2"});
+   const d=createStudent({id:"d",name:"Alumno D",group:"B",company:"Empresa sin jornadas"});
+   const manual=days=>buildManualStatistics(days.map(v=>v==="laboral"?
+     {status:v,hours:"4",reasonCode:"0"}:
+     {status:v,hours:"",reasonCode:"0"}));
+   const first=manual(["laboral","falta","sin_labores","inhabil"]);
+   const second=manual(["laboral","laboral","laboral","laboral"]);
+   const third=manual(["laboral","laboral","falta","falta"]);
+   let one=createWeek({startDate:"2026-10-20"});
+   one=saveManualDelivery(one,a.id,"entregado",{statistics:first});
+   one=saveManualDelivery(one,b.id,"entregado",{statistics:second});
+   one=saveManualDelivery(one,c.id,"entregado",{statistics:third});
+   const result=calculateDeliveryStatistics({students:[a,b,c,d],weeks:[one]},
+     {period:"weekly",weekId:one.id});
+   expect(result.daily).toMatchObject({laboral:7,falta:3,sin_labores:1,inhabil:1});
+   expect(result.attendanceRate).toBe(70);
+   expect(result.companyLeaders.mostHours.label).toBe("Empresa 1");
+   expect(result.companyLeaders.leastHours.label).toBe("Empresa 2");
+   expect(result.companyLeaders.mostAbsences.label).toBe("Empresa 2");
+   expect(result.companyLeaders.comparable).toBe(2);
+   expect(result.byCompanyPerformance.find(p=>p.label==="Empresa sin jornadas"))
+     .toMatchObject({activeStudents:1,reports:0,absenceRate:null});
+   expect(result.byCompanyPerformance.find(p=>p.label==="Empresa 1")).toMatchObject({
+     hours:20,absences:1,nonWorking:1,holidays:1,studentsWithData:2,
+     averageHours:10,worked:5,applicableDays:6});
+   expect(result.byCompanyPerformance.find(p=>p.label==="Empresa 2")).toMatchObject({
+     hours:8,absences:2,worked:2,nonWorking:0,holidays:0,absenceRate:50});
+   const groups=Object.fromEntries(result.byGroupPerformance.map(p=>[p.label,p]));
+   expect(groups.A).toMatchObject({activeStudents:2,share:50,absences:1,worked:5,
+     nonWorking:1,holidays:1});
+   expect(groups.B).toMatchObject({activeStudents:2,share:50,absences:2,worked:2,
+     absenceRate:50});
+ });
+ it("no declara una empresa como la que menos trabajó por carecer de jornadas registradas",()=>{
+   const a=createStudent({id:"a",name:"Sin capturas",company:"Empresa única",group:"A"});
+   const result=calculateDeliveryStatistics({students:[a],weeks:[]},{period:"all"});
+   expect(result.companyLeaders).toMatchObject({
+     mostHours:null,leastHours:null,mostAbsences:null,comparable:0,
+   });
+   expect(result.byGroupPerformance[0]).toMatchObject({
+     label:"A",activeStudents:1,share:100,reports:0,absenceRate:null,
+   });
+ });
 });
