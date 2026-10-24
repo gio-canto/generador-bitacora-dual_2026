@@ -29,6 +29,7 @@ describe("comparativos de empresas y grupos en Estadísticas",()=>{
    expect(within(companies).getByText("Comparación por empresa")).toBeTruthy();
    expect(within(companies).getAllByText("Empresa 1").length).toBeGreaterThan(0);
    expect(within(companies).getByText("Mayor tasa de faltas")).toBeTruthy();
+   expect(within(companies).getByText("Menor tasa de faltas")).toBeTruthy();
    const groups=screen.getByRole("region",{name:"Estadísticas por grupo"});
    expect(within(groups).getByText("Grupo A")).toBeTruthy();
    expect(within(groups).getByText("Grupo B")).toBeTruthy();
