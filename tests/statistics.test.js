@@ -58,6 +58,13 @@ describe("estadísticas v0.52",()=>{
    expect(result.companyLeaders.mostHours.label).toBe("Empresa 1");
    expect(result.companyLeaders.leastHours.label).toBe("Empresa 2");
    expect(result.companyLeaders.mostAbsences.label).toBe("Empresa 2");
+   expect(result.companyLeaders.highestAbsenceRate).toMatchObject({
+     label:"Empresa 2",absenceRate:50,applicableDays:4,
+   });
+   expect(result.companyLeaders.lowestAbsenceRate.label).toBe("Empresa 1");
+   expect(result.companyLeaders.lowestAbsenceRate.applicableDays).toBe(6);
+   expect(result.companyLeaders.lowestAbsenceRate.absenceRate).toBeCloseTo(100/6,6);
+   expect(result.companyLeaders.rateComparable).toBe(2);
    expect(result.companyLeaders.comparable).toBe(2);
    expect(result.byCompanyPerformance.find(p=>p.label==="Empresa sin jornadas"))
      .toMatchObject({activeStudents:1,reports:0,absenceRate:null});
@@ -81,5 +88,36 @@ describe("estadísticas v0.52",()=>{
    expect(result.byGroupPerformance[0]).toMatchObject({
      label:"A",activeStudents:1,share:100,reports:0,absenceRate:null,
    });
+ });
+ it("reconoce 0% como menor tasa real y omite empresas sin jornadas comparables",()=>{
+   const a=createStudent({id:"a",name:"Uno",company:"Sin faltas"});
+   const b=createStudent({id:"b",name:"Dos",company:"Con faltas"});
+   const missing=createStudent({id:"c",name:"Tres",company:"Sin capturas"});
+   const onTime=buildManualStatistics([
+     {status:"laboral",hours:"4",reasonCode:"0"},
+     {status:"laboral",hours:"4",reasonCode:"0"},
+     {status:"inhabil",hours:"",reasonCode:"0"},
+     {status:"sin_labores",hours:"",reasonCode:"0"},
+   ]);
+   const absent=buildManualStatistics([
+     {status:"falta",hours:"",reasonCode:"0"},
+     {status:"laboral",hours:"4",reasonCode:"0"},
+     {status:"inhabil",hours:"",reasonCode:"0"},
+     {status:"sin_labores",hours:"",reasonCode:"0"},
+   ]);
+   let week=createWeek({startDate:"2026-10-20"});
+   week=saveManualDelivery(week,a.id,"entregado",{statistics:onTime});
+   week=saveManualDelivery(week,b.id,"entregado",{statistics:absent});
+   const r=calculateDeliveryStatistics({students:[a,b,missing],weeks:[week]},
+     {period:"weekly",weekId:week.id});
+   expect(r.companyLeaders.lowestAbsenceRate).toMatchObject({
+     label:"Sin faltas",absenceRate:0,applicableDays:2,
+   });
+   expect(r.companyLeaders.highestAbsenceRate).toMatchObject({
+     label:"Con faltas",absenceRate:50,applicableDays:2,
+   });
+   expect(r.companyLeaders.rateComparable).toBe(2);
+   expect(r.byCompanyPerformance.find(x=>x.label==="Sin capturas"))
+     .toMatchObject({reports:0,absenceRate:null});
  });
 });
