@@ -2,6 +2,40 @@ import {studentIsActive,studentAppliesToWeek,deliveryStatus} from "./delivery-re
 import {summarizeWeekStatistics,causeLabel} from "./matrix-statistics.js";
 export const percent = (value,total) => total ? Math.round(value/total*100) : 0;
 const makeCounts=()=>({laboral:0,falta:0,sin_labores:0,inhabil:0});
+const compareText=(a,b)=>a.localeCompare(b,"es",{sensitivity:"base"});
+const groupLabel=student=>String(student.group||"").trim().toLocaleUpperCase("es-MX")||"Sin grupo";
+const companyLabel=student=>String(student.company||"").trim()||"Sin especificar";
+const blankComparison=label=>({
+  label,activeStudents:0,studentIds:new Set(),reports:0,minutes:0,
+  worked:0,absences:0,nonWorking:0,holidays:0,
+});
+function calculateComparisons(entries,activeTotal){
+ return [...entries.values()].map(row=>{
+   const applicableDays=row.worked+row.absences;
+   return {
+     label:row.label,activeStudents:row.activeStudents,
+     share:activeTotal?100*row.activeStudents/activeTotal:0,
+     studentsWithData:row.studentIds.size,reports:row.reports,
+     minutes:row.minutes,hours:row.minutes/60,
+     averageHours:row.studentIds.size?row.minutes/60/row.studentIds.size:null,
+     worked:row.worked,absences:row.absences,nonWorking:row.nonWorking,
+     holidays:row.holidays,knownDays:row.worked+row.absences+row.nonWorking+row.holidays,
+     applicableDays,absenceRate:applicableDays?100*row.absences/applicableDays:null,
+   };
+ }).sort((a,b)=>compareText(a.label,b.label));
+}
+function comparisonLeaders(rows,missing){
+ const valid=rows.filter(row=>row.reports>0&&row.label!==missing);
+ const byHours=[...valid].sort((a,b)=>b.minutes-a.minutes||compareText(a.label,b.label));
+ const byAbsences=[...valid].filter(row=>row.absences>0)
+   .sort((a,b)=>b.absences-a.absences||compareText(a.label,b.label));
+ const byRate=[...valid].filter(row=>row.absenceRate!=null&&row.absences>0)
+   .sort((a,b)=>b.absenceRate-a.absenceRate||
+     b.applicableDays-a.applicableDays||compareText(a.label,b.label));
+ return {mostHours:byHours[0]||null,leastHours:byHours.at(-1)||null,
+   mostAbsences:byAbsences[0]||null,highestAbsenceRate:byRate[0]||null,
+   comparable:valid.length};
+}
 export const genderLabels={
   male:"Hombres",female:"Mujeres",nonbinary:"No binario",
   other:"Otro",undisclosed:"Prefiero no responder","":"Sin dato",
@@ -20,6 +54,12 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
   const byId=new Map(roster.map(item=>[item.id,item]));
   const weeks=(state.weeks||[]).filter(w=>period==="all" || (period==="monthly" ? w.startDate?.startsWith(month) : w.id===weekId)).sort((a,b)=>(a.startDate||"").localeCompare(b.startDate||""));
   const daily=makeCounts(),causes={falta:new Map(),sin_labores:new Map()};
+  const companyMap=new Map(),groupMap=new Map();
+  const register=(map,name)=>{if(!map.has(name))map.set(name,blankComparison(name));return map.get(name);};
+  for(const student of students){
+    register(companyMap,companyLabel(student)).activeStudents++;
+    register(groupMap,groupLabel(student)).activeStudents++;
+  }
   const methods=new Map(), trend=[];
   let totalMinutes=0, weeksWithStatistics=0,delivered=0,late=0,notDelivered=0,notApplicable=0,applicable=0;
   let pendingWithStatistics=0, pendingMinutes=0;
@@ -49,6 +89,15 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
       if(!summary)continue;
       weeksWithStatistics++;reportCount++;weekReports++;
       totalMinutes+=summary.minutes;weekMinutes+=summary.minutes;
+      for(const row of [register(companyMap,companyLabel(student)),register(groupMap,groupLabel(student))]){
+        row.studentIds.add(student.id);
+        row.reports++;
+        row.minutes+=summary.minutes;
+        row.worked+=summary.worked;
+        row.absences+=summary.absent;
+        row.nonWorking+=summary.nonWorking;
+        row.holidays+=summary.holidays;
+      }
       if(status==="no_entregado"){
         pendingWithStatistics++;
         pendingMinutes+=summary.minutes;
@@ -71,6 +120,8 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
   const other=students.filter(item=>methods.get(item.id)==="other").length;
   const genderCounts=Object.fromEntries(Object.keys(genderLabels).map(x=>[x,students.filter(s=>(s.gender||"")===x).length]));
   const breakdown=(map,type)=>[...map.entries()].map(([code,count])=>({code,count,label:causeLabel(type,code)})).sort((a,b)=>b.count-a.count);
+  const byCompanyPerformance=calculateComparisons(companyMap,students.length);
+  const byGroupPerformance=calculateComparisons(groupMap,students.length);
   const groupMinutes=(field,entries)=>[...entries.reduce((acc,row)=>{
     const name=row[field]||"Sin especificar";acc.set(name,(acc.get(name)||0)+row.minutes);return acc;
   },new Map())].map(([label,minutes])=>({label,minutes})).sort((a,b)=>b.minutes-a.minutes);
@@ -80,6 +131,9 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
     pendingWithStatistics,pendingMinutes,
     usage:{used,other,unknown:students.length-used-other},
     genderCounts, causesAbsence:breakdown(causes.falta,"falta"),causesNonWorking:breakdown(causes.sin_labores,"sin_labores"),
+    byCompanyPerformance,byGroupPerformance,
+    companyLeaders:comparisonLeaders(byCompanyPerformance,"Sin especificar"),
+    groupLeaders:comparisonLeaders(byGroupPerformance,"Sin grupo"),
     byCompany:groupMinutes("company",receivedCompanies),
     bySpecialty:groupMinutes("specialty",receivedSpecialties),
     coverage:percent(weeksWithStatistics,applicable),
