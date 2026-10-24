@@ -29,12 +29,17 @@ function comparisonLeaders(rows,missing){
  const byHours=[...valid].sort((a,b)=>b.minutes-a.minutes||compareText(a.label,b.label));
  const byAbsences=[...valid].filter(row=>row.absences>0)
    .sort((a,b)=>b.absences-a.absences||compareText(a.label,b.label));
- const byRate=[...valid].filter(row=>row.absenceRate!=null&&row.absences>0)
+ // La tasa 0% es una tasa válida si hay jornadas trabajadas;
+ // empresas sin jornadas computables se excluyen de ambas comparaciones.
+ const byRate=[...valid].filter(row=>row.absenceRate!=null)
    .sort((a,b)=>b.absenceRate-a.absenceRate||
      b.applicableDays-a.applicableDays||compareText(a.label,b.label));
+ const byLowestRate=[...byRate].sort((a,b)=>a.absenceRate-b.absenceRate||
+   b.applicableDays-a.applicableDays||compareText(a.label,b.label));
  return {mostHours:byHours[0]||null,leastHours:byHours.at(-1)||null,
    mostAbsences:byAbsences[0]||null,highestAbsenceRate:byRate[0]||null,
-   comparable:valid.length};
+   lowestAbsenceRate:byLowestRate[0]||null,
+   comparable:valid.length,rateComparable:byRate.length};
 }
 export const genderLabels={
   male:"Hombres",female:"Mujeres",nonbinary:"No binario",
