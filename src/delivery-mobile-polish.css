@@ -364,8 +364,14 @@
 .delivery-app.delivery-layout-mobile[data-view="statistics"] .delivery-backline{
   display:none!important;
 }
-.delivery-app.delivery-layout-mobile .ds-current-heading{
+.delivery-app.delivery-layout-mobile .ds-results[data-section="summary"]>.ds-current-heading{
   display:none;
+}
+.delivery-app.delivery-layout-mobile .ds-results:not([data-section="summary"])>.ds-current-heading{
+  display:block;
+  margin:3px 2px 12px;
+  font-size:22px;
+  line-height:1.2;
 }
 @media(max-width:355px){
  .delivery-app.delivery-layout-mobile .delivery-home-metrics{
