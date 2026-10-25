@@ -2236,7 +2236,10 @@ export default function DeliveryRegistry({ onClose }) {
         onManage={()=>manageStudents(view)} onReport={()=>openReport()}
         onBackup={()=>saveBackup(state,true)} onTutorial={openTutorial}/>}
 
-      <main className="delivery-shell">
+      <main key={isMobileLayout ? view : "desktop"}
+        className={"delivery-shell" +
+          (isMobileLayout && ["home","weeks","week","statistics","more","announcements"].includes(view)
+            ? " delivery-page-transition" : "")}>
         {backupReminderOpen&&["home","weeks","more"].includes(view)&&<aside
           className="delivery-backup-reminder" role="status" aria-label="Recordatorio de respaldo">
           <div className="delivery-backup-reminder-copy">
