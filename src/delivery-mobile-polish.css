@@ -85,7 +85,8 @@
 .delivery-app.delivery-layout-mobile .delivery-shell{
   width:min(calc(100% - 24px),520px);
   min-width:0;
-  padding-top:28px;
+  /* Espacio real bajo la cabecera sticky: evita el título tapado en Safari. */
+  padding-top:58px;
   padding-bottom:calc(100px + env(safe-area-inset-bottom));
   margin-inline:auto;
 }
@@ -388,4 +389,61 @@
 }
 @media(prefers-reduced-motion:reduce){
  .delivery-app.delivery-layout-mobile .delivery-week-row:hover{transform:none}
+}
+
+/* Liquid Glass discreto entre pestañas: solo móvil, sin remount en escritorio.
+ * El resplandor no captura pulsaciones ni altera los formularios o el escáner. */
+.delivery-app.delivery-layout-mobile .delivery-page-transition{
+  position:relative;
+  isolation:isolate;
+  animation:dualMobileViewEnter .34s cubic-bezier(.22,.82,.24,1) both;
+}
+.delivery-app.delivery-layout-mobile .delivery-page-transition::before{
+  content:"";
+  position:absolute;
+  z-index:2;
+  pointer-events:none;
+  top:24px;
+  left:0;
+  width:100%;
+  height:120px;
+  border-radius:30px;
+  opacity:0;
+  background:linear-gradient(104deg,
+    transparent 0%,rgba(255,255,255,.04) 32%,
+    rgba(255,255,255,.41) 49%,rgba(198,231,248,.17) 57%,
+    transparent 84%);
+  animation:dualMobileGlassSweep .52s ease-out both;
+}
+.delivery-app.delivery-layout-mobile .delivery-bottom-navigation button.active{
+  animation:dualMobileTabSelect .30s cubic-bezier(.2,.9,.27,1) both;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.84),
+    0 3px 12px rgba(49,100,148,.055);
+}
+@keyframes dualMobileViewEnter{
+  from{opacity:.72;transform:translate3d(0,10px,0) scale(.993)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes dualMobileGlassSweep{
+  0%{opacity:0;transform:translate3d(-35px,0,0)}
+  32%{opacity:.65}
+  100%{opacity:0;transform:translate3d(24px,0,0)}
+}
+@keyframes dualMobileTabSelect{
+  from{transform:scale(.955);background-color:rgba(235,244,253,.58)}
+  to{transform:scale(1);background-color:rgba(231,242,252,.84)}
+}
+@media(prefers-reduced-motion:reduce){
+  .delivery-app.delivery-layout-mobile .delivery-page-transition,
+  .delivery-app.delivery-layout-mobile .delivery-page-transition::before,
+  .delivery-app.delivery-layout-mobile .delivery-bottom-navigation button.active{
+    animation:none!important;
+    transform:none!important;
+    opacity:1;
+  }
+}
+@media(prefers-reduced-transparency:reduce){
+  .delivery-app.delivery-layout-mobile .delivery-page-transition::before{
+    display:none;
+  }
 }
