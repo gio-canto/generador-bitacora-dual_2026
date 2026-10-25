@@ -1,12 +1,11 @@
 # Notas de versión
 
-## Aclaración del Índice de Seguimiento Dual y gráfica de score · v0.57.2-beta.1
+## Depuración de textos del Índice Dual · v0.57.2-beta.1
 
-- En el PDF de expediente individual, el índice académico de 0–100 incluye una **gráfica horizontal de aportaciones ponderadas**: cumplimiento de entregas 50 %, puntualidad 30 % y regularidad de las últimas cuatro semanas vencidas 20 %. Los segmentos suman el indicador calculado, no son una clasificación crediticia.
-- Si no hay semanas vencidas aplicables, el índice permanece como «Sin evaluación» y la barra queda vacía, nunca se inventa un 0.
-- Se muestra de forma explícita que es una **referencia orientativa para seguimiento escolar interno** y que **no es puntaje de crédito ni una sanción**, tanto en el recuadro como al pie de cada página del expediente.
-- La misma aclaración se incorpora en el seguimiento nominal interno de Datos y en la página de alumnos del PDF de Estadísticas.
-- El cálculo, las ponderaciones y las reglas de exclusión originales no cambian. Sin alteraciones de registros ni de versión.
+- Retiradas del PDF individual las frases repetitivas de carácter aclaratorio, el pie «USO ESCOLAR INTERNO» y la explicación sobre entrega tardía y «No aplica». El pie identifica ahora únicamente al Registro Dual y su versión.
+- Eliminadas esas mismas leyendas de las interpretaciones automáticas, la pantalla de seguimiento nominal y el PDF estadístico.
+- Se conserva la **gráfica horizontal 0–100** y sus ponderaciones (cumplimiento 50 %, puntualidad 30 %, regularidad 20 %), así como «Sin evaluación» cuando no hay plazos.
+- Sin cambios a los cálculos, los datos, el formato de los registros o la versión.
 
 
 ## Corrección de navegación de Datos · v0.57.2-beta.1
@@ -73,7 +72,7 @@
 - Nueva experiencia móvil **Apple Native + Adaptive Pro** exclusiva del Registro de Bitácoras: cabecera con logo Dual oficial, inicio compacto, navegación inferior y vistas dedicadas de Semanas y Herramientas.
 - Selección **Automática / Móvil / Escritorio**, guardada localmente, con detección de tamaño de ventana en tiempo real. Se preservan las pantallas de escáner, formularios, importación de JSON y reportes.
 - Estadísticas divididas en **Resumen, Asistencia, Empresas, Grupos, Alumnos e Histórico** mediante un menú lateral para escritorio y panel desplegable en móvil; filtros plegables en teléfonos. Las comparaciones por empresa incluyen menor tasa de faltas y no confunden ausencia de datos con 0 %.
-- Reporte individual PDF con **Índice de Seguimiento Dual 0–100**: 50 % cumplimiento de entregas vencidas, 30 % puntualidad y 20 % regularidad de las últimas cuatro semanas vencidas. «Sin evaluación» cuando no hay plazos; valor provisional con menos de cuatro. Interpretaciones de uso administrativo, no crediticio ni sancionador. Las faltas, los motivos de salud y los días inhábiles no afectan el índice.
+- Reporte individual PDF con **Índice de Seguimiento Dual 0–100**: 50 % cumplimiento de entregas vencidas, 30 % puntualidad y 20 % regularidad de las últimas cuatro semanas vencidas. «Sin evaluación» cuando no hay plazos; valor provisional con menos de cuatro. Las faltas, los motivos de salud y los días inhábiles no afectan el índice.
 - PWA independiente de Registro Dual: logotipo oficial suministrado en `public/Assets/registro-dual-icon-original.png`, generación automática de iconos normal, maskable, Apple y favicon; manifiesto aislado del generador principal y precarga de iconos sin conexión.
 - Se mantienen el esquema de datos, los respaldos locales existentes, el generador de bitácoras y los registros de semanas anteriores. Documentación de instalación, uso y fórmula en [`docs/V057_REGISTRO_DUAL.md`](docs/V057_REGISTRO_DUAL.md).
 - Pruebas de navegación, puntuación transparente, rutas de instalación PWA y generación de iconos.
