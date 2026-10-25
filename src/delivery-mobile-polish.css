@@ -86,7 +86,7 @@
   width:min(calc(100% - 24px),520px);
   min-width:0;
   /* Espacio real bajo la cabecera sticky: evita el título tapado en Safari. */
-  padding-top:58px;
+  padding-top:82px;
   padding-bottom:calc(100px + env(safe-area-inset-bottom));
   margin-inline:auto;
 }
