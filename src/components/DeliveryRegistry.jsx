@@ -2244,7 +2244,7 @@ export default function DeliveryRegistry({ onClose }) {
             }}>Recordar después</button>
           </div>
         </aside>}
-        {started && !["home","welcome","scanner","setup"].includes(view) && <div className="delivery-backline"><button type="button" className="btn" onClick={()=>setView("home")}><ArrowLeft size={17}/> Inicio</button></div>}
+        {started && !["home","welcome","scanner","setup"].includes(view) && !["weeks","statistics","more","announcements"].includes(view) && <div className="delivery-backline"><button type="button" className="btn" onClick={()=>setView("home")}><ArrowLeft size={17}/> Inicio</button></div>}
         {view === "welcome" && (
           <section className="delivery-welcome">
             <div className="delivery-welcome-copy">
@@ -2738,9 +2738,8 @@ export default function DeliveryRegistry({ onClose }) {
         {view === "home" && (
           <>
             {isMobileLayout&&<section className="delivery-mobile-welcome" aria-label="Inicio móvil">
-              <span className="delivery-kicker">REGISTRO DUAL · v{VERSION}</span>
-              <h1>Panel de control</h1>
-              <p>{shortSchool(state.context.school) || "Tu registro"} · {state.context.generation || "Generación Dual"}</p>
+              <h1>Inicio</h1>
+              <p>{(shortSchool(state.context.school)||"Registro Dual").replace(/CBTis No\.\s*/i,"CBTIS ")}</p>
               <button type="button" className="btn primary" disabled={!state.weeks.length||!activeStudents.length}
                 onClick={()=>{setActiveWeekId(state.weeks.at(-1)?.id||"");setView("scanner");}}>
                 <Scan size={21}/> Escanear bitácora
@@ -2843,17 +2842,15 @@ export default function DeliveryRegistry({ onClose }) {
                 <Users size={25} aria-hidden="true"/>
                 <span>Alumnos activos</span>
                 <strong>{activeStudents.length}</strong>
-                <small>{desistedStudents.length?
-                  desistedStudents.length+" fuera del programa":"Padrón de Educación Dual"}</small>
+                {desistedStudents.length>0&&<small>{desistedStudents.length} fuera del programa</small>}
                 <button className="btn" type="button" onClick={()=>manageStudents("home")}>
                   Ver alumnos
                 </button>
               </article>
               <article className="delivery-summary-card">
                 <CalendarDots size={25} aria-hidden="true"/>
-                <span>Semanas registradas</span>
+                <span>Semanas</span>
                 <strong>{state.weeks.length}</strong>
-                <small>Consulta el historial completo</small>
                 <button className="btn" type="button" onClick={()=>setView("weeks")}>
                   Ver semanas
                 </button>
@@ -2875,8 +2872,8 @@ export default function DeliveryRegistry({ onClose }) {
 
             {attentionNow.ledger.some(p=>p.pending>=2)&&
               <section className="delivery-panel delivery-attention-summary">
-                <div><strong>{attentionNow.ledger.filter(p=>p.pending>=2).length} alumnos con dos o más pendientes</strong>
-                  <span>{attentionNow.ledger.filter(p=>p.pending>=2).reduce((a,p)=>a+p.pending,0)} entregas vencidas sin registrar</span>
+                <div><strong>{isMobileLayout?"Pendientes críticos":attentionNow.ledger.filter(p=>p.pending>=2).length+" alumnos con dos o más pendientes"}</strong>
+                  <span>{isMobileLayout?attentionNow.ledger.filter(p=>p.pending>=2).length+" alumnos · "+attentionNow.ledger.filter(p=>p.pending>=2).reduce((a,p)=>a+p.pending,0)+" pendientes":attentionNow.ledger.filter(p=>p.pending>=2).reduce((a,p)=>a+p.pending,0)+" entregas vencidas sin registrar"}</span>
                 </div>
                 <button className="btn" type="button" onClick={()=>setView("statistics")}>Ver seguimiento</button>
               </section>}
@@ -2944,8 +2941,7 @@ export default function DeliveryRegistry({ onClose }) {
         {view === "weeks" && (
           <section className="delivery-panel delivery-weeks-app" aria-label="Listado de semanas">
             <div className="delivery-panel-head">
-              <div><span className="delivery-kicker">Registro Dual</span><h1>Semanas</h1>
-                <p>Consulta las entregas y selecciona un periodo.</p></div>
+              <div><h1>Semanas</h1></div>
               <button className="btn primary" type="button" onClick={()=>setView("new-week")}>
                 <CalendarDots size={19}/> Nueva semana</button>
             </div>
@@ -3080,9 +3076,7 @@ export default function DeliveryRegistry({ onClose }) {
                 <span>Semanas</span>
               </button>
               <div>
-                <span className="delivery-kicker">
-                  {activeWeek.closedAt ? "Semana cerrada" : "Registro activo"}
-                </span>
+                {activeWeek.closedAt&&<span className="delivery-kicker">Cerrada</span>}
                 <h2>{activeWeek.label}</h2>
                 <p>
                   {formatPeriod(activeWeek.startDate, activeWeek.endDate)}
