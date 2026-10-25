@@ -467,7 +467,6 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       if(index<Math.min(followed.length,9)-1)separator(ctx,84,yy+33,1070);
     });
     label(ctx,"Las faltas pueden estar justificadas.",83,1571,16,C.muted,500,1080);
-    label(ctx,"Seguimiento escolar interno; no es puntaje de crédito ni sanción.",83,1598,15,C.muted,500,1080);
     label(ctx,interpretation.pending,77,1638,18,C.secondary,550,1090);
     images.push(canvasToJpeg(canvas));
   }
