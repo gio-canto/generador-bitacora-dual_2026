@@ -24,7 +24,7 @@ function fixture({mobile=false,weeks=5}={}){
 }
 describe("Inicio, accesos rápidos y respaldos · Registro Dual",()=>{
  it("Inicio enseña tres métricas balanceadas y únicamente las últimas tres semanas",()=>{
-   fixture();
+   fixture({mobile:true});
    const {container}=render(<DeliveryRegistry onClose={vi.fn()}/>);
    const metrics=screen.getByRole("region",{name:"Indicadores de inicio"});
    expect(metrics.querySelectorAll(".delivery-summary-card")).toHaveLength(3);
