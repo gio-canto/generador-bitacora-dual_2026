@@ -2153,8 +2153,8 @@ export default function DeliveryRegistry({ onClose }) {
           <img className="delivery-brand-logo-desktop"
             src={
               location.pathname.includes("/registro-entrega/")
-                ? "../Assets/registro-dual-icon-192.png"
-                : "Assets/registro-dual-icon-192.png"
+                ? "../Assets/Asset_logo.png"
+                : "Assets/Asset_logo.png"
             }
             alt=""
           />
