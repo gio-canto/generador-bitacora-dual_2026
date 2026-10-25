@@ -1,0 +1,158 @@
+/*
+ * Desktop UI restoration, v0.57.2.
+ * Desktop inherits the original delivery-registry.css theme.
+ * All Apple Native + Liquid Glass application-wide overrides remain scoped
+ * to .delivery-layout-mobile in delivery-unified-glass.css.
+ */
+.delivery-app.delivery-layout-desktop {
+  min-width:0;
+  background:
+    radial-gradient(circle at 12% 0%,rgba(0,113,227,.085),transparent 27%),
+    radial-gradient(circle at 90% 12%,rgba(175,82,222,.055),transparent 25%),
+    #f5f5f7;
+}
+.delivery-app.delivery-layout-desktop .delivery-shell {
+  box-sizing:border-box;
+  width:min(1180px,calc(100% - 28px));
+  max-width:1180px;
+  min-width:0;
+  margin-inline:auto;
+  padding:48px 0 80px;
+}
+.delivery-app.delivery-layout-desktop .delivery-topbar {
+  width:min(1280px,calc(100% - 32px));
+  max-width:1280px;
+  margin-inline:auto;
+}
+.delivery-app.delivery-layout-desktop .delivery-brand .delivery-brand-logo-desktop {
+  display:block;
+  width:clamp(158px,23vw,230px);
+  height:auto;
+  max-height:36px;
+  object-fit:contain;
+}
+.delivery-app.delivery-layout-desktop .delivery-brand .delivery-brand-logo-mobile,
+.delivery-app.delivery-layout-desktop .delivery-mobile-app-name,
+.delivery-app.delivery-layout-desktop .delivery-mobile-welcome,
+.delivery-app.delivery-layout-desktop .delivery-bottom-navigation,
+.delivery-app.delivery-layout-desktop .delivery-app-home-cards { display:none!important; }
+.delivery-app.delivery-layout-desktop .delivery-desktop-home-cards{display:block}
+.delivery-app.delivery-layout-desktop .delivery-desktop-home-cards>.delivery-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(205px,100%),1fr));
+  gap:14px;
+}
+/* Restore a normal desktop page hierarchy even on touch-enabled PCs. */
+.delivery-app.delivery-layout-desktop .delivery-hero.compact {
+  padding:18px 2px 34px;
+  margin:0;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+}
+.delivery-app.delivery-layout-desktop .delivery-hero.compact h1{
+  max-width:1000px;
+}
+.delivery-app.delivery-layout-desktop .delivery-quick-trigger{
+  display:inline-flex;
+}
+.delivery-app.delivery-layout-desktop .delivery-backup-reminder{
+  max-width:100%;
+}
+.delivery-app.delivery-layout-desktop .delivery-home-history{display:block}
+.delivery-app.delivery-layout-desktop[data-view="statistics"] .delivery-backline{
+  display:none;
+}
+/* Keep navigation within Stats without using another narrow sidebar column. */
+.delivery-app.delivery-layout-desktop .delivery-analytics-container{min-width:0}
+.delivery-app.delivery-layout-desktop .ds-workspace{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:13px;
+  min-width:0;
+}
+.delivery-app.delivery-layout-desktop .ds-sidebar{
+  position:static;
+  top:auto;
+  z-index:1;
+  width:auto;
+  max-width:100%;
+  padding:11px 13px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(18,41,67,.045);
+}
+.delivery-app.delivery-layout-desktop .ds-sidebar nav{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:5px;
+}
+.delivery-app.delivery-layout-desktop .ds-sidebar nav button{
+  min-height:41px;
+  white-space:nowrap;
+  padding:10px 13px;
+}
+.delivery-app.delivery-layout-desktop .ds-sidebar>.delivery-kicker,
+.delivery-app.delivery-layout-desktop .ds-sidebar>p{
+  display:none;
+}
+.delivery-app.delivery-layout-desktop .ds-workspace-content{min-width:0}
+.delivery-app.delivery-layout-desktop .ds-filter-panel.ds-filters-closed,
+.delivery-app.delivery-layout-desktop .ds-filter-panel.ds-filters-open{
+  display:block!important;
+}
+.delivery-app.delivery-layout-desktop .ds-filter-panel .ds-controls{
+  display:flex!important;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:end;
+}
+.delivery-app.delivery-layout-desktop .ds-controls-header,
+.delivery-app.delivery-layout-desktop .ds-mobile-toolbar,
+.delivery-app.delivery-layout-desktop .ds-sidebar-close{
+  display:none!important;
+}
+.delivery-app.delivery-layout-desktop .ds-desktop-header{margin-bottom:13px}
+.delivery-app.delivery-layout-desktop .ds-desktop-header h1{
+  font-size:clamp(30px,4vw,47px);
+  font-weight:750;
+  letter-spacing:-.035em;
+}
+/* Prevent horizontal overflow from flexible cards or wide data tables. */
+.delivery-app.delivery-layout-desktop :is(.delivery-panel,.delivery-week-head,.ds-panel,.ds-results,.ds-workspace-content){
+  min-width:0;
+}
+.delivery-app.delivery-layout-desktop :is(.ds-table-scroll,.ds-comparison-table-wrap,.delivery-roster-table-wrap){
+  max-width:100%;
+  overflow-x:auto;
+}
+@media(max-width:1100px){
+ .delivery-app.delivery-layout-desktop .delivery-desktop-home-cards>.delivery-summary-grid {
+   grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+}
+@media(max-width:800px){
+ .delivery-app.delivery-layout-desktop .delivery-topbar{
+   flex-wrap:wrap;min-height:60px;
+ }
+ .delivery-app.delivery-layout-desktop .delivery-shell{
+   padding-top:26px;
+ }
+ .delivery-app.delivery-layout-desktop .delivery-desktop-home-cards>.delivery-summary-grid{
+   grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+ .delivery-app.delivery-layout-desktop .delivery-brand .delivery-brand-logo-desktop{
+   max-width:150px;
+ }
+}
+@media(max-width:480px){
+ .delivery-app.delivery-layout-desktop .delivery-desktop-home-cards>.delivery-summary-grid{
+   grid-template-columns:1fr;
+ }
+}
+@media print{
+ .delivery-app.delivery-layout-desktop .delivery-shell{width:100%;padding:0}
+}
