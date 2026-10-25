@@ -60,6 +60,7 @@ import {
   writeDeliveryState,
 } from "../services/delivery-registry.js";
 import { VERSION } from "../domain/records.js";
+import {currentGreeting} from "../services/day-greeting.js";
 import DeliveryStatistics from "./DeliveryStatistics.jsx";
 import DeliveryAnnouncements from "./DeliveryAnnouncements.jsx";
 import {announcementOverview} from "../services/delivery-announcements.js";
@@ -425,6 +426,18 @@ export default function DeliveryRegistry({ onClose }) {
     return ()=>window.removeEventListener("resize",update);
   },[]);
   const isMobileLayout=layoutPreference==="mobile"||(layoutPreference==="auto"&&compactViewport);
+  const [greeting,setGreeting]=useState(currentGreeting);
+  useEffect(()=>{
+    if(!isMobileLayout||view!=="home")return;
+    const updateGreeting=()=>setGreeting(currentGreeting());
+    updateGreeting();
+    const interval=window.setInterval(updateGreeting,60*1000);
+    document.addEventListener("visibilitychange",updateGreeting);
+    return ()=>{
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange",updateGreeting);
+    };
+  },[isMobileLayout,view]);
   // Al cambiar de pestaña, volver al encabezado. Si se conserva la posición
   // de la vista anterior, Safari muestra títulos ocultos bajo la topbar.
   useEffect(()=>{
@@ -2750,7 +2763,7 @@ export default function DeliveryRegistry({ onClose }) {
         {view === "home" && (
           <>
             {isMobileLayout&&<section className="delivery-mobile-welcome" aria-label="Inicio móvil">
-              <h1>Inicio</h1>
+              <h1>{greeting}</h1>
               <p>{(shortSchool(state.context.school)||"Registro Dual").replace(/CBTis No\.\s*/i,"CBTIS ")}</p>
               <button type="button" className="btn primary" disabled={!state.weeks.length||!activeStudents.length}
                 onClick={()=>{setActiveWeekId(state.weeks.at(-1)?.id||"");setView("scanner");}}>
