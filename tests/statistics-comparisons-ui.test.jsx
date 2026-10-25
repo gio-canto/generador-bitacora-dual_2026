@@ -1,5 +1,5 @@
 import {afterEach,describe,expect,it,vi} from "vitest";
-import {render,screen,within,cleanup} from "@testing-library/react";
+import {render,screen,within,cleanup,fireEvent} from "@testing-library/react";
 import DeliveryStatistics from "../src/components/DeliveryStatistics.jsx";
 import {createStudent,createWeek,saveManualDelivery} from "../src/services/delivery-registry.js";
 import {buildManualStatistics} from "../src/services/manual-statistics.js";
@@ -25,16 +25,19 @@ describe("comparativos de empresas y grupos en Estadísticas",()=>{
    week=saveManualDelivery(week,a.id,"entregado",{statistics:days});
    render(<DeliveryStatistics state={{students:[a,b,c],weeks:[week]}}
      onBack={vi.fn()} onReportStudent={vi.fn()} onReportStatistics={vi.fn()}/>);
+   fireEvent.click(screen.getByRole("button",{name:/^03Empresas$/}));
    const companies=screen.getByRole("region",{name:"Estadísticas por empresa"});
    expect(within(companies).getByText("Comparación por empresa")).toBeTruthy();
    expect(within(companies).getAllByText("Empresa 1").length).toBeGreaterThan(0);
    expect(within(companies).getByText("Mayor tasa de faltas")).toBeTruthy();
    expect(within(companies).getByText("Menor tasa de faltas")).toBeTruthy();
+   fireEvent.click(screen.getByRole("button",{name:/^04Grupos$/}));
    const groups=screen.getByRole("region",{name:"Estadísticas por grupo"});
    expect(within(groups).getByText("Grupo A")).toBeTruthy();
    expect(within(groups).getByText("Grupo B")).toBeTruthy();
    expect(within(groups).getAllByText("66.7%").length).toBeGreaterThan(0);
    expect(within(groups).getAllByText("33.3%").length).toBeGreaterThan(0);
-   expect(screen.getAllByText("Días inhábiles").length).toBeGreaterThan(0);
+   fireEvent.click(screen.getByRole("button",{name:/^02Asistencia$/}));
+   expect(screen.getAllByText("Días sin labores").length).toBeGreaterThan(0);
  });
 });
