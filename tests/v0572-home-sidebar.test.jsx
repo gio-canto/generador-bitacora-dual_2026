@@ -36,7 +36,7 @@ describe("Inicio, accesos rápidos y respaldos · Registro Dual",()=>{
    expect(next).not.toBe(initial);
    expect(next.classList.contains("delivery-page-transition")).toBe(true);
    const css=await readFile(join(process.cwd(),"src","delivery-mobile-polish.css"),"utf8");
-   expect(css).toContain("padding-top:58px");
+   expect(css).toContain("padding-top:82px");
    expect(css).toContain("dualMobileViewEnter");
    expect(css).toContain("dualMobileGlassSweep");
    expect(css).toContain("dualMobileTabSelect");
