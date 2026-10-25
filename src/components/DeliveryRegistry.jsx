@@ -2208,14 +2208,7 @@ export default function DeliveryRegistry({ onClose }) {
               type="button"
               aria-label="Guardar archivo de registro"
               title="Guardar archivo"
-              onClick={() => {
-                saveBackup(state);
-                notify(
-                  "success",
-                  "Descarga iniciada",
-                  "Conserva el archivo JSON fuera del navegador.",
-                );
-              }}
+              onClick={() => saveBackup(state)}
             >
               <DownloadSimple size={18} />
               <span className="delivery-action-label">Guardar archivo</span>
@@ -2247,7 +2240,7 @@ export default function DeliveryRegistry({ onClose }) {
               setBackupReminderOpen(false);
             }}>Recordar después</button>
           </div>
-        </aside>
+        </aside>}
         {started && !["home","welcome","scanner","setup"].includes(view) && <div className="delivery-backline"><button type="button" className="btn" onClick={()=>setView("home")}><ArrowLeft size={17}/> Inicio</button></div>}
         {view === "welcome" && (
           <section className="delivery-welcome">
