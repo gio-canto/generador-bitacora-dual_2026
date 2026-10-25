@@ -538,3 +538,35 @@
  .ds-comparison-proportion>div:first-child{align-items:start;flex-wrap:wrap}
 }
 @media(max-width:360px){.ds-comparison-leaders{grid-template-columns:1fr}}
+
+
+/* v0.57 · Navegación por vistas: solo una sección se monta cada vez. */
+.ds-workspace{display:grid;grid-template-columns:194px minmax(0,1fr);align-items:start;gap:18px;max-width:100%}
+.ds-workspace-content{min-width:0;display:grid;gap:15px}
+.ds-sidebar{position:sticky;top:89px;background:#fff;border:1px solid #e5e8ef;border-radius:20px;padding:17px 12px;display:grid;gap:14px;z-index:4}
+.ds-sidebar nav{display:grid;gap:3px}
+.ds-sidebar nav button{display:flex;gap:10px;align-items:center;min-width:0;border:0;border-radius:12px;padding:12px 10px;background:transparent;color:#536174;font-weight:650;text-align:left;cursor:pointer;font:inherit;font-size:13px}
+.ds-sidebar nav button span{font-size:11px;color:#8d98a7}
+.ds-sidebar nav button.active{background:#eaf2fd;color:#17416e}
+.ds-sidebar nav button.active span{color:#1266bf}
+.ds-sidebar p{font-size:11px;line-height:1.5;color:#798495;margin:0 5px}
+.ds-sidebar-close,.ds-sidebar-scrim,.ds-mobile-toolbar,.ds-filter-toggle{display:none}
+.ds-filter-panel{display:grid;gap:10px}
+.ds-current-heading{margin:0 2px;font-size:22px;letter-spacing:-.035em;color:#1d3049}
+.ds-results{min-width:0}
+.ds-comparison-table{min-width:690px}
+@media(max-width:850px){
+ .ds-workspace{grid-template-columns:1fr;gap:10px}
+ .ds-mobile-toolbar{display:flex}
+ .ds-mobile-toolbar .btn{width:100%;justify-content:space-between;min-height:47px;font-weight:700}
+ .ds-sidebar{position:fixed;z-index:181;inset:0 auto 0 0;width:min(310px,86vw);height:100dvh;border-radius:0 22px 22px 0;padding:calc(20px + env(safe-area-inset-top)) 16px calc(25px + env(safe-area-inset-bottom));overflow-y:auto;box-shadow:0 20px 80px rgba(14,34,60,.25);transform:translateX(-110%);transition:transform .25s ease}
+ .ds-sidebar.ds-sidebar-open{transform:translateX(0)}
+ .ds-sidebar-close{display:flex;justify-content:flex-end;align-items:center;background:none;border:0;font:inherit;color:#425777;cursor:pointer;min-height:44px}
+ .ds-sidebar-scrim{display:block;position:fixed;z-index:180;inset:0;background:rgba(12,27,49,.38);border:0}
+ .ds-filter-toggle{display:block;width:100%;text-align:left;border:1px solid #e1e6ed;background:#fff;border-radius:14px;padding:13px 15px;color:#273f60;font:inherit;font-weight:700;min-height:46px;cursor:pointer}
+ .ds-filters-closed .ds-controls{display:none}
+ .ds-workspace-content{gap:10px}
+ .ds-current-heading{font-size:19px}
+ .ds-filter-panel .ds-controls{margin:0}
+}
+@media(prefers-reduced-motion:reduce){.ds-sidebar{transition:none}}
