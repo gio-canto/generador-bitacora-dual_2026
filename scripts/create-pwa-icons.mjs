@@ -5,7 +5,7 @@ import {createCanvas,loadImage} from "@napi-rs/canvas";
 
 // Derive installable PWA icons from the official Dual artwork committed in Assets.
 // Always preserve the original image; generated sizes are build artifacts.
-export const ASSET_DIR=fileURLToPath(new URL("../public/Assets/",import.meta.url));
+export const ASSET_DIR=resolve("public","Assets");
 export const PWA_SIZES=[
   ["registro-dual-icon-192.png",192,"any"],
   ["registro-dual-icon-512.png",512,"any"],
@@ -15,7 +15,7 @@ export const PWA_SIZES=[
 ];
 
 export async function generatePwaIcons(dir=ASSET_DIR){
-  const original=await readFile(new URL("../public/Assets/registro-dual-icon-original.png",import.meta.url));
+  const original=await readFile(join(ASSET_DIR,"registro-dual-icon-original.png"));
   const logo=await loadImage(original);
   if(logo.width!==logo.height||logo.width<512){
     throw new Error("El logotipo original del PWA debe ser cuadrado y medir al menos 512 píxeles.");
@@ -39,7 +39,8 @@ export async function generatePwaIcons(dir=ASSET_DIR){
   return PWA_SIZES.map(([filename])=>filename);
 }
 
-if(process.argv[1] && fileURLToPath(import.meta.url)===resolve(process.argv[1])){
+if(import.meta.url.startsWith("file:") && process.argv[1] &&
+   fileURLToPath(import.meta.url)===resolve(process.argv[1])){
   generatePwaIcons().then(files=>console.log("PWA Dual: "+files.join(", ")))
     .catch(err=>{console.error(err);process.exitCode=1;});
 }
