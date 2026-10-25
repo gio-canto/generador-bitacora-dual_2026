@@ -1,5 +1,6 @@
 import {blobatarUri} from "blobatar/uri";
 import {buildStudentDossier} from "./student-dossier.js";
+import {calculateDualScore} from "./dual-score.js";
 import {canvasToJpeg,createPdfFromJpegs,downloadPdf} from "./delivery-report.js";
 import {VERSION} from "../domain/records.js";
 
@@ -140,8 +141,16 @@ function summary(canvas,d,img,logo,pages,context){
    txt(ctx,sub,x+14,y+99,14,C.muted,500,w-28);
  });
  bar(ctx,"Interpretación automática",655);
- wrap(ctx,interpretStudentDossier(d),1100).slice(0,5)
-   .forEach((value,i)=>txt(ctx,value,63,693+i*28,19,C.ink,500,1105));
+ wrap(ctx,interpretStudentDossier(d),600).slice(0,5)
+   .forEach((value,i)=>txt(ctx,value,63,693+i*27,17,C.ink,500,590));
+ const score=calculateDualScore(d);
+ rect(ctx,708,670,474,178,C.back);
+ txt(ctx,"ÍNDICE DE SEGUIMIENTO DUAL",726,701,18,C.ink,700,442);
+ txt(ctx,score.value==null?"—":String(score.value)+"/100",726,762,44,C.blue,750,220);
+ txt(ctx,score.label,924,750,18,C.ink,700,239);
+ txt(ctx,score.provisional?(score.value==null?"Sin semanas vencidas":"Resultado provisional · "+score.due+" semanas"):
+   score.due+" semanas evaluables",727,797,15,C.muted,500,430);
+ txt(ctx,"Uso interno · No es puntaje crediticio ni sanción.",727,826,14,C.muted,500,430);
  bar(ctx,"Comportamiento de entregas",872);
  txt(ctx,"Últimas semanas registradas · número real de semana",63,911,16,C.muted,500);
  // Exactly the stored week labels, never positional S1/S2 columns.
@@ -207,5 +216,5 @@ export async function generateStudentDossierPdf(state,studentId,options={}){
   }
   const filename="expediente-dual-"+slug(d.name)+".pdf",bytes=createPdfFromJpegs(output);
   if(options.download!==false)downloadPdf(bytes,filename);
-  return {filename,pages:output.length,bytes,studentId:d.id,interpretation:interpretStudentDossier(d)};
+  return {filename,pages:output.length,bytes,studentId:d.id,interpretation:interpretStudentDossier(d),score:calculateDualScore(d)};
 }
