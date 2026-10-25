@@ -16,7 +16,7 @@ export default function RegistryQuickSidebar({open,onClose,current,canScan,
  return <>
   {open&&<button className="delivery-quick-scrim" type="button" onClick={onClose}
     aria-label="Cerrar accesos rápidos"/>}
-  <aside className={"delivery-quick-sidebar"+(open?" delivery-quick-open":"")}
+  <aside id="delivery-quick-sidebar" className={"delivery-quick-sidebar"+(open?" delivery-quick-open":"")}
     aria-label="Accesos rápidos del registro">
     <div className="delivery-quick-heading">
       <div><span>REGISTRO DUAL</span><strong>Accesos rápidos</strong></div>
