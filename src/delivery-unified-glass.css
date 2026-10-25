@@ -52,6 +52,18 @@
 }
 .delivery-app .delivery-topbar{border-radius:20px;max-width:1240px}
 .delivery-app .delivery-brand{gap:10px}
+.delivery-app .delivery-brand .delivery-brand-logo-desktop{
+  display:block;width:42px;height:42px;max-height:none;object-fit:contain;
+  border-radius:12px;background:#fff;flex:0 0 auto
+}
+.delivery-app .delivery-brand .delivery-brand-logo-mobile{display:none}
+.delivery-app .delivery-mobile-app-name{display:inline;font-size:15px;letter-spacing:-.027em}
+.delivery-app.delivery-layout-mobile .delivery-brand .delivery-brand-logo-desktop{display:none}
+.delivery-app.delivery-layout-mobile .delivery-brand .delivery-brand-logo-mobile{
+  display:block;width:42px;height:42px;max-height:none;object-fit:contain;
+  border-radius:12px;background:#fff;flex:0 0 auto
+}
+
 .delivery-app .delivery-mobile-app-name{color:var(--dual-ink);font-weight:760}
 .delivery-app .delivery-kicker{color:var(--dual-accent);font-size:11px;letter-spacing:.095em}
 .delivery-app :is(.delivery-hero h1,.delivery-panel-head h1,.delivery-panel-head h2,
