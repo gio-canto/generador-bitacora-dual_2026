@@ -1,5 +1,6 @@
-import {ArrowLeft,ArrowUpRight,SlidersHorizontal,ChartDonut,Clock,Users,FileArrowDown} from "@phosphor-icons/react";
+import {ArrowLeft,ArrowUpRight,SlidersHorizontal,Clock,Users,FileArrowDown} from "@phosphor-icons/react";
 import AnimatedValue from "./AnimatedValue.jsx";
+import {VERSION} from "../domain/records.js";
 import "../delivery-statistics-hero.css";
 
 const number=(value,digits=0)=>Number(value||0).toLocaleString("es-MX",{maximumFractionDigits:digits});
@@ -50,11 +51,10 @@ export default function StatisticsHero({data,period,onPeriodChange,onBack,onRepo
        <ArrowLeft size={17} weight="bold" aria-hidden="true"/><span>Volver al registro</span>
      </button>
      <div className="ds-premium-hero-actions">
-       <span className="ds-hero-edition">REGISTRO DUAL / 057.1</span>
-       <button type="button" className="ds-hero-logo" aria-label="Identidad oficial Dual"
-         title="Logotipo del Registro Dual" disabled>
+       <span className="ds-hero-edition">REGISTRO DUAL / v{VERSION}</span>
+       <div className="ds-hero-logo" role="img" aria-label="Logotipo oficial Dual">
          <img src={logoSrc()} alt="" />
-       </button>
+       </div>
      </div>
    </div>
    <div className="ds-hero-intro">
