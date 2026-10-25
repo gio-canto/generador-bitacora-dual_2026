@@ -1,5 +1,6 @@
 import {mkdir,readFile,writeFile} from "node:fs/promises";
 import {fileURLToPath} from "node:url";
+import {join,resolve} from "node:path";
 import {createCanvas,loadImage} from "@napi-rs/canvas";
 
 // Derive installable PWA icons from the official Dual artwork committed in Assets.
@@ -33,12 +34,12 @@ export async function generatePwaIcons(dir=ASSET_DIR){
     const side=size*fraction;
     const offset=(size-side)/2;
     ctx.drawImage(logo,offset,offset,side,side);
-    await writeFile(new URL("./"+filename,new URL("file://"+dir.replace(/\\/g,"/")+"/")),canvas.toBuffer("image/png"));
+    await writeFile(join(dir,filename),canvas.toBuffer("image/png"));
   }
   return PWA_SIZES.map(([filename])=>filename);
 }
 
-if(process.argv[1]&&fileURLToPath(import.meta.url)===fileURLToPath(new URL("file://"+process.argv[1].replace(/\\/g,"/")))){
+if(process.argv[1] && fileURLToPath(import.meta.url)===resolve(process.argv[1])){
   generatePwaIcons().then(files=>console.log("PWA Dual: "+files.join(", ")))
     .catch(err=>{console.error(err);process.exitCode=1;});
 }
