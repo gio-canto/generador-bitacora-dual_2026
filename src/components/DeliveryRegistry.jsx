@@ -83,6 +83,7 @@ import { notify } from "../services/rare-notification.jsx";
 import "../delivery-registry.css";
 import "../delivery-unified-glass.css";
 import "../delivery-quick-sidebar.css";
+import "../delivery-desktop-restoration.css";
 
 const ZXING_SOURCES = [
   "https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js",
