@@ -435,11 +435,14 @@
 }
 @media(prefers-reduced-motion:reduce){
   .delivery-app.delivery-layout-mobile .delivery-page-transition,
-  .delivery-app.delivery-layout-mobile .delivery-page-transition::before,
   .delivery-app.delivery-layout-mobile .delivery-bottom-navigation button.active{
     animation:none!important;
     transform:none!important;
     opacity:1;
+  }
+  .delivery-app.delivery-layout-mobile .delivery-page-transition::before{
+    animation:none!important;
+    opacity:0;
   }
 }
 @media(prefers-reduced-transparency:reduce){
