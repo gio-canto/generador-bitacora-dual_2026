@@ -360,7 +360,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
         </section>
       </div>
       <p className="ds-lifetime-caption">Histórico de todas las semanas, incluidas las pendientes y las de alumnos desistidos.</p>
-    </section>
+    </section>}
     {section==="students"&&<StudentInsights state={state} period={period} weekId={weekId} month={month}
       specialty={specialty} company={company} onReportStudent={onReportStudent}/>}
     </div>
