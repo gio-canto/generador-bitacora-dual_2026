@@ -8,6 +8,7 @@ import "../delivery-statistics.css";
 
 const fmt = (n, digits = 0) => Number(n || 0).toLocaleString("es-MX", { maximumFractionDigits:digits });
 const hours = value => value == null ? "—" : fmt(value, 1) + " h";
+const STAT_SECTIONS=[["summary","Resumen"],["attendance","Asistencia"],["companies","Empresas"],["groups","Grupos"],["students","Alumnos"],["history","Histórico"]];
 const COLORS = ["#0071e3","#d97979","#e3a244","#929aa6","#8b75c3","#2a9e92","#cf7ea5"];
 
 function Breakdown({ items, empty = "Sin datos en el periodo" }) {
@@ -89,6 +90,9 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
   const [specialty,setSpecialty] = useState("");
   const [company,setCompany] = useState("");
   const [metric,setMetric] = useState("hours");
+  const [section,setSection] = useState("summary");
+  const [navOpen,setNavOpen] = useState(false);
+  const [filtersOpen,setFiltersOpen] = useState(false);
   const specialties = [...new Set(state.students.map(student=>student.specialty).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const companies = [...new Set(state.students.map(student=>student.company).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const filters = {period,weekId,month,specialty,company};
@@ -148,7 +152,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       // Ensure nothing stays invisible when switching modes before an item enters view.
       elements.forEach(element => element.classList.remove("ds-reveal-ready"));
     };
-  }, [viewKey,metric]);
+  }, [viewKey,metric,section]);
 
   const insightSummary=useMemo(()=>calculateStudentInsights(state,filters),[state,period,weekId,month,specialty,company]);
   const interpretation=useMemo(()=>interpretStatistics(data,insightSummary),[data,insightSummary]);
@@ -163,6 +167,30 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       </div>
     </div>
 
+    <div className="ds-mobile-toolbar">
+      <button type="button" className="btn" aria-expanded={navOpen}
+        aria-controls="ds-sidebar" onClick={()=>setNavOpen(value=>!value)}>☰ {STAT_SECTIONS.find(([id])=>id===section)?.[1]} · Secciones</button>
+    </div>
+    <div className="ds-workspace">
+      <aside id="ds-sidebar" className={"ds-sidebar"+(navOpen?" ds-sidebar-open":"")} aria-label="Menú de estadísticas">
+        <button className="ds-sidebar-close" aria-label="Cerrar menú de estadísticas" type="button"
+          onClick={()=>setNavOpen(false)}>✕ Cerrar</button>
+        <span className="delivery-kicker">EXPLORAR DATOS</span>
+        <nav aria-label="Secciones de estadísticas">
+          {STAT_SECTIONS.map(([id,label],index)=><button type="button" key={id}
+            className={section===id?"active":""} aria-current={section===id?"page":undefined}
+            onClick={()=>{setSection(id);setNavOpen(false);}}>
+            <span>{String(index+1).padStart(2,"0")}</span>{label}
+          </button>)}
+        </nav>
+        <p>Selecciona una sección para consultar solo sus indicadores.</p>
+      </aside>
+      {navOpen&&<button type="button" className="ds-sidebar-scrim" aria-label="Cerrar menú"
+        onClick={()=>setNavOpen(false)}/>}
+      <div className="ds-workspace-content">
+        <div className={"ds-filter-panel"+(filtersOpen?" ds-filters-open":" ds-filters-closed")}>
+          <button type="button" className="ds-filter-toggle" aria-expanded={filtersOpen}
+            onClick={()=>setFiltersOpen(value=>!value)}>⚙ Filtros del periodo {filtersOpen?"▴":"▾"}</button>
     <div className="ds-controls">
       <div className="ds-tabs" role="group" aria-label="Periodo">
         {[["weekly","Semanal"],["monthly","Mensual"],["all","General"]].map(([value,label])=>
@@ -188,7 +216,10 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       </label>
     </div>
 
-    <div className="ds-results" key={viewKey}>
+        </div>
+    <div className="ds-results" key={viewKey+section}>
+    <h2 className="ds-current-heading">{STAT_SECTIONS.find(([id])=>id===section)?.[1]}</h2>
+    {section==="summary"&&<>
     <div className="ds-kpis">
       <Metric name="Alumnos activos" value={fmt(data.students.length)}/>
       <Metric name="Horas registradas" value={hours(data.totalMinutes/60)}/>
@@ -232,16 +263,20 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       {!data.weeksWithStatistics && <p className="ds-empty">Sin jornadas capturadas en este periodo.</p>}
     </section>
 
-    <div className="ds-two-column">
+    </>}
+    {section==="attendance"&&<div className="ds-two-column">
       <section className="ds-panel"><h2>Asistencia y jornadas</h2><Breakdown items={daily}/></section>
       <section className="ds-panel"><h2>Entregas</h2><Breakdown items={deliveries}/></section>
       <Bars title="Motivos de inasistencia" rows={data.causesAbsence.map(item=>({label:item.label,value:item.count}))}/>
       <Bars title="Días sin labores" rows={data.causesNonWorking.map(item=>({label:item.label,value:item.count}))}/>
+    </div>}
+    {section==="groups"&&<div className="ds-two-column">
       <section className="ds-panel"><h2>Utilización del generador</h2><Breakdown items={usage}/></section>
       <section className="ds-panel"><h2>Género del alumnado</h2><Breakdown items={genders}/></section>
       <Bars title="Horas por especialidad" unit=" h" rows={data.bySpecialty.map(item=>({label:item.label,value:item.minutes/60}))}/>
+    </div>}
+    {section==="companies"&&<>
       <Bars title="Horas por empresa" unit=" h" rows={data.byCompany.map(item=>({label:item.label,value:item.minutes/60}))}/>
-    </div>
 
     <section className="ds-panel ds-comparison" aria-label="Estadísticas por empresa">
       <div className="ds-panel-head"><h2>Comparación por empresa</h2>
@@ -258,7 +293,8 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       <PerformanceTable rows={data.byCompanyPerformance} type="company"/>
       <p className="ds-comparison-note">Horas totales y promedio por alumno con jornadas registradas. Las empresas sin jornadas capturadas no participan en los extremos. La tasa de faltas considera solo jornadas con labores y faltas; muestra el tamaño de su base. Una tasa de 0% es válida cuando existen jornadas computables, pero no cuando faltan datos.</p>
     </section>
-    <section className="ds-panel ds-comparison" aria-label="Estadísticas por grupo">
+    </>}
+    {section==="groups"&&<section className="ds-panel ds-comparison" aria-label="Estadísticas por grupo">
       <div className="ds-panel-head"><h2>Grupos y proporción del alumnado</h2>
         <span className="ds-lifetime-caption">{fmt(data.students.length)} alumnos activos en la selección</span></div>
       <div className="ds-comparison-proportions">
@@ -271,6 +307,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       <PerformanceTable rows={data.byGroupPerformance} type="group"/>
       <p className="ds-comparison-note">La proporción corresponde a alumnos activos; las jornadas registradas del periodo determinan horas, faltas, días sin labores e inhábiles. Un grupo sin datos no equivale a cero faltas.</p>
     </section>
+    {section==="attendance"&&<>
     <div className="ds-kpis ds-small-kpis">
       <Metric name="Cumplimiento de entrega" value={data.deliveryRate+"%"}/>
       <Metric name="Entregas puntuales" value={data.onTimeRate+"%"}/>
@@ -284,7 +321,8 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       <p>{fmt(data.pendingWithStatistics)} entregas pendientes con {hours(data.pendingMinutes/60)} registradas.</p>
     </section>}
 
-    <section className="ds-lifetime" aria-label="Acumulado de Educación Dual">
+    </>}
+    {section==="history"&&<section className="ds-lifetime" aria-label="Acumulado de Educación Dual">
       <div className="ds-lifetime-heading">
         <div><span className="delivery-kicker">Histórico · todas las semanas</span><h2>Acumulado de Educación Dual</h2></div>
         <span className="ds-lifetime-caption">{fmt(lifetime.studentsWithData)} alumnos</span>
@@ -323,8 +361,10 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       </div>
       <p className="ds-lifetime-caption">Histórico de todas las semanas, incluidas las pendientes y las de alumnos desistidos.</p>
     </section>
-    <StudentInsights state={state} period={period} weekId={weekId} month={month}
-      specialty={specialty} company={company} onReportStudent={onReportStudent}/>
+    {section==="students"&&<StudentInsights state={state} period={period} weekId={weekId} month={month}
+      specialty={specialty} company={company} onReportStudent={onReportStudent}/>}
+    </div>
+      </div>
     </div>
   </div>;
 }
