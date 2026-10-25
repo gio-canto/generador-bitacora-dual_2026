@@ -23,6 +23,10 @@
 
 ---
 
+## Corrección de escritorio · v0.57.2-beta.1
+
+La **interfaz web de escritorio vuelve a su composición clásica**: ancho centrado, logotipo horizontal, cinco accesos del Inicio, historial completo, tarjetas y filtros originales de Estadísticas. La barra lateral ya **no desplaza ni estrecha la página**: se abre solo al pulsar «Menú». Los estilos globales Apple Glass ahora se aplican exclusivamente al **modo móvil**, sin alterar la versión web. Véase [restauración de escritorio](docs/V0572_ESCRITORIO.md).
+
 ## v0.57.2-beta.1 · Inicio y herramientas de Registro Dual
 
 **Inicio más limpio:** tres indicadores uniformes (alumnos, semanas y avance de la última semana), y solo tres semanas recientes con acceso al historial completo. **Nueva barra lateral de accesos rápidos** en escritorio y panel desplegable en móvil, con Inicio, Semanas, Datos, Avisos PNG, Escáner, administración de alumnos, reportes y respaldos. **Recordatorios discretos de respaldo JSON** cuando existen cambios: sin alertas durante el escáner ni notificaciones del sistema, con controles para descargar o posponer. No se modifica la lógica de los registros.
