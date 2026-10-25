@@ -78,6 +78,7 @@ import {
 } from "../services/scanner-diagnostics.js";
 import { notify } from "../services/rare-notification.jsx";
 import "../delivery-registry.css";
+import "../delivery-unified-glass.css";
 
 const ZXING_SOURCES = [
   "https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js",
@@ -2086,7 +2087,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   return (
-    <div className={"delivery-app" + (view === "scanner" ? " scanner-active" : "") +
+    <div data-view={view} className={"delivery-app" + (view === "scanner" ? " scanner-active" : "") +
       (isMobileLayout?" delivery-layout-mobile":" delivery-layout-desktop")}>
       <ScanSound tone={scanTone} />
       <header className="delivery-topbar">
@@ -2096,8 +2097,8 @@ export default function DeliveryRegistry({ onClose }) {
           <img className="delivery-brand-logo-desktop"
             src={
               location.pathname.includes("/registro-entrega/")
-                ? "../Assets/Asset_logo.png"
-                : "Assets/Asset_logo.png"
+                ? "../Assets/registro-dual-icon-192.png"
+                : "Assets/registro-dual-icon-192.png"
             }
             alt=""
           />
