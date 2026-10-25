@@ -1,0 +1,153 @@
+/* v0.57.1 — Editorial Glass / Registro Dual. Sin librerías gráficas externas.
+ * Design tokens maintain contrast on glass and degrade gracefully without blur. */
+.ds-premium-hero{
+  --hero-navy:#15283d;--hero-blue:#226fb7;--hero-muted:#667589;
+  --hero-line:rgba(255,255,255,.68);--hero-peach:#efb293;
+  width:100%;min-width:0;overflow:hidden;isolation:isolate;position:relative;
+  border-radius:33px;padding:24px clamp(18px,3vw,34px) 19px;
+  color:var(--hero-navy);
+  border:1px solid rgba(255,255,255,.8);
+  background:
+    radial-gradient(ellipse 74% 64% at 9% 3%,rgba(122,226,238,.83) 0%,transparent 86%),
+    radial-gradient(ellipse 75% 81% at 100% 3%,rgba(255,179,150,.86) 0%,transparent 82%),
+    radial-gradient(ellipse 65% 66% at 58% 60%,rgba(255,255,255,.91),transparent 86%),
+    linear-gradient(120deg,#e4f7f8 2%,#f3f1ee 53%,#ffede1 100%);
+  box-shadow:0 12px 39px rgba(44,72,101,.08),inset 0 1px 0 rgba(255,255,255,.9);
+}
+.ds-premium-hero::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(ellipse 37% 19% at 35% 31%,rgba(255,255,255,.44),transparent 95%),
+    linear-gradient(175deg,transparent 44%,rgba(255,255,255,.42) 95%);
+}
+.ds-premium-hero button{font-family:inherit;cursor:pointer}
+.ds-premium-hero :where(button,a):focus-visible{outline:3px solid #174c80;outline-offset:3px}
+.ds-premium-hero-top,.ds-hero-title-row,.ds-hero-filter-row,.ds-hero-glass-head,.ds-hero-glass-body,.ds-hero-footer{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.ds-premium-hero-top{min-height:48px;align-items:flex-start}
+.ds-hero-back{border:0;background:rgba(255,255,255,.48);display:inline-flex;align-items:center;gap:8px;min-height:39px;padding:8px 14px;border-radius:999px;color:#24425e;font-size:12px;font-weight:720;box-shadow:inset 0 1px 0 rgba(255,255,255,.74)}
+.ds-hero-back:hover{background:rgba(255,255,255,.8)}
+.ds-premium-hero .ds-premium-hero-actions{display:flex;align-items:center;gap:12px}
+.ds-hero-edition{font-size:10px;letter-spacing:.11em;color:#38516c;font-weight:750;white-space:nowrap}
+.ds-hero-logo{height:52px;width:52px;padding:4px;border-radius:18px;border:1px solid rgba(255,255,255,.72);background:rgba(255,255,255,.63);display:grid;place-items:center;box-shadow:0 4px 14px rgba(24,52,77,.07);cursor:default!important}
+.ds-hero-logo img{width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;background:#fff}
+.ds-hero-intro{margin-top:9px}
+.ds-hero-eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:11px;font-weight:800;letter-spacing:.1em;color:#3c5f78}
+.ds-hero-eyebrow i{display:inline-block;width:6px;height:6px;background:#1f718c;border-radius:50%}
+.ds-hero-eyebrow span{color:#8693a1}
+.ds-hero-title-row{align-items:end;margin-top:7px}
+.ds-premium-hero h1{font-size:clamp(52px,6vw,79px);font-weight:800;letter-spacing:-.077em;line-height:1.04;margin:0 0 5px;color:#10283a}
+.ds-premium-hero h1 span{color:#1c6b98}
+.ds-hero-intro p{font-size:14px;line-height:1.5;color:#4d667b;margin:6px 0 0;max-width:510px;font-weight:500}
+.ds-hero-export{display:flex;align-items:center;justify-content:center;gap:9px;padding:12px 17px;border:1px solid rgba(255,255,255,.79);border-radius:18px;background:rgba(255,255,255,.63);box-shadow:0 3px 15px rgba(40,57,80,.06),inset 0 1px 0 #fff;color:#203e5b;font-size:13px;font-weight:730;min-height:47px}
+.ds-hero-export:hover{background:rgba(255,255,255,.89)}
+.ds-hero-filter-row{margin-top:24px;align-items:center;justify-content:flex-start;gap:8px}
+.ds-hero-periods{display:inline-flex;align-items:center;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.43);border:1px solid rgba(255,255,255,.53);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.ds-hero-periods button{border:0;border-radius:999px;background:transparent;color:#435a6f;font-weight:720;font-size:12px;min-height:39px;padding:8px 17px;transition:background .2s,color .2s,box-shadow .2s}
+.ds-hero-periods button.active{color:#14395d;background:rgba(255,255,255,.95);box-shadow:0 3px 10px rgba(21,44,67,.09),inset 0 1px 0 white}
+.ds-hero-periods button:not(.active):hover{background:rgba(255,255,255,.42)}
+.ds-hero-filter-button{display:inline-flex;align-items:center;gap:8px;justify-content:center;border:1px solid rgba(255,255,255,.64);border-radius:999px;padding:9px 17px;background:rgba(255,255,255,.48);min-height:47px;font-weight:700;font-size:12px;color:#2e4b69}
+.ds-hero-filter-button:hover,.ds-hero-filter-button[aria-expanded=true]{background:rgba(255,255,255,.83)}
+.ds-hero-filter-button b{display:grid;place-items:center;background:#205e9b;color:#fff;border-radius:50%;font-size:10px;width:18px;height:18px}
+.ds-hero-context{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px;min-width:0}
+.ds-hero-context span{padding:6px 10px;background:rgba(255,255,255,.37);border:1px solid rgba(255,255,255,.4);border-radius:10px;max-width:100%;min-width:0;overflow-wrap:anywhere;font-size:11px;line-height:1.3;color:#49637d;font-weight:630}
+.ds-hero-glass-card{
+  position:relative;overflow:hidden;z-index:0;min-width:0;margin-top:23px;
+  padding:clamp(17px,3vw,27px);border:1px solid rgba(255,255,255,.9);
+  border-radius:29px;background:rgba(255,255,255,.74);
+  box-shadow:0 18px 45px rgba(27,62,95,.105),inset 0 1px 0 rgba(255,255,255,.98);
+  -webkit-backdrop-filter:blur(26px) saturate(135%);backdrop-filter:blur(26px) saturate(135%);
+}
+.ds-hero-glass-card::after{content:"";pointer-events:none;position:absolute;inset:-1px;z-index:-1;
+  background:radial-gradient(ellipse 36% 50% at 96% 18%,rgba(168,213,240,.17),transparent 98%)}
+.ds-hero-glass-head{color:#778696;font-size:10px;font-weight:750;letter-spacing:.085em;line-height:1.3}
+.ds-hero-card-eyebrow{display:inline-flex;align-items:center;gap:9px;color:#42617e}
+.ds-hero-blue-dot{width:7px;height:7px;border-radius:50%;background:#2674b0;display:inline-block;box-shadow:0 0 0 4px rgba(38,116,176,.1)}
+.ds-hero-glass-caption{color:#95a0ac}
+.ds-hero-glass-body{min-width:0;align-items:center;gap:16px;margin:13px 0 19px}
+.ds-hero-compliance{flex:1;min-width:0}
+.ds-hero-metric-label{display:block;font-size:14px;font-weight:670;color:#42596e}
+.ds-hero-primary-value{font-size:clamp(50px,7.7vw,88px);letter-spacing:-.085em;line-height:1.03;font-weight:830;color:#122b42;margin:8px 0 6px;font-variant-numeric:tabular-nums}
+.ds-hero-primary-value .ds-animated-number{font-size:inherit!important;font-weight:inherit!important;letter-spacing:inherit}
+.ds-hero-compliance p{margin:0;color:#5f7183;font-size:13px;line-height:1.42;font-weight:530}
+.ds-hero-status-list{display:flex;flex-wrap:wrap;gap:9px 14px;margin-top:15px}
+.ds-hero-status-list span{display:inline-flex;align-items:center;gap:6px;color:#4e5e70;font-size:11px;font-weight:680}
+.ds-hero-status-list i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.ds-hero-status-on-time{background:#2675b5}
+.ds-hero-status-late{background:#d99a61}
+.ds-hero-status-pending{background:#9faabd}
+.ds-hero-ring-wrap{position:relative;width:clamp(136px,20vw,195px);height:clamp(136px,20vw,195px);flex:0 0 auto;display:grid;place-items:center}
+.ds-hero-ring{width:100%;height:100%;display:block;overflow:visible}
+.ds-hero-ring-base{fill:none;stroke:#e9edf2;stroke-width:15}
+.ds-hero-ring-segment{fill:none;stroke-width:15;stroke-linecap:butt;transition:stroke-dasharray .5s ease,stroke-dashoffset .5s ease}
+.ds-hero-ring-on-time{stroke:#2675b5}
+.ds-hero-ring-late{stroke:#d99a61}
+.ds-hero-ring-pending{stroke:#9faabd}
+.ds-hero-ring-center{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.ds-hero-ring-center strong{font-size:clamp(27px,4vw,41px);letter-spacing:-.055em;line-height:1.2;font-variant-numeric:tabular-nums;color:#182e44}
+.ds-hero-ring-center span{font-size:10px;color:#738297;font-weight:750}
+.ds-hero-mini-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid rgba(112,133,155,.18);padding-top:17px}
+.ds-hero-mini-stat{padding:0 13px;min-width:0;border-left:1px solid rgba(112,133,155,.16)}
+.ds-hero-mini-stat:first-child{padding-left:0;border-left:0}
+.ds-hero-mini-stat:last-child{padding-right:0}
+.ds-hero-mini-stat span{font-size:11px;color:#6b7c8d;display:block;line-height:1.45;font-weight:650}
+.ds-hero-mini-stat strong{display:block;font-size:clamp(21px,2.65vw,30px);font-weight:780;letter-spacing:-.04em;line-height:1.25;margin-top:6px;color:#172d45;font-variant-numeric:tabular-nums}
+.ds-hero-mini-stat strong small{font-size:.59em;color:#667789;font-weight:650}
+.ds-hero-footer{justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:14px;color:#587087;font-size:11px;font-weight:680}
+.ds-hero-footer span{display:inline-flex;gap:7px;align-items:center}
+@media(max-width:920px){
+  .ds-hero-glass-body{gap:8px}
+  .ds-hero-ring-wrap{width:135px;height:135px}
+}
+@media(max-width:670px){
+ .ds-premium-hero{border-radius:27px;padding:16px 14px 15px}
+ .ds-premium-hero-top{align-items:center;min-height:42px}
+ .ds-hero-back{padding:7px 10px;min-height:38px;font-size:11px}
+ .ds-hero-back span{max-width:95px;line-height:1.12;text-align:left}
+ .ds-hero-edition{display:none}
+ .ds-hero-logo{height:44px;width:44px;border-radius:15px}
+ .ds-hero-intro{margin-top:22px}
+ .ds-premium-hero h1{font-size:clamp(45px,12vw,62px);line-height:1.02}
+ .ds-hero-intro p{font-size:12.5px;margin-top:4px}
+ .ds-hero-title-row{align-items:end}
+ .ds-hero-export{padding:10px;min-height:43px;border-radius:14px}
+ .ds-hero-export span,.ds-hero-export svg:last-child{display:none}
+ .ds-hero-filter-row{margin-top:20px;gap:7px}
+ .ds-hero-periods{flex:1;min-width:0;justify-content:space-around}
+ .ds-hero-periods button{flex:1;min-width:0;padding:9px 7px;font-size:11px;min-height:37px}
+ .ds-hero-filter-button{padding:9px 11px;min-height:45px}
+ .ds-hero-filter-button span{display:none}
+ .ds-hero-filter-button b{position:absolute;transform:translate(19px,-17px)}
+ .ds-hero-glass-card{margin-top:15px;border-radius:23px;padding:19px 16px 16px}
+ .ds-hero-glass-caption{display:none}
+ .ds-hero-glass-body{margin:8px 0 18px;gap:5px}
+ .ds-hero-metric-label{font-size:12px}
+ .ds-hero-primary-value{font-size:clamp(44px,12vw,68px);margin:7px 0 4px}
+ .ds-hero-compliance p{font-size:11.5px}
+ .ds-hero-ring-wrap{width:clamp(108px,29vw,150px);height:clamp(108px,29vw,150px)}
+ .ds-hero-ring-center strong{font-size:27px}
+ .ds-hero-status-list{gap:7px 9px;margin-top:12px}
+ .ds-hero-status-list span{font-size:10px}
+ .ds-hero-mini-stats{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:14px;padding-top:15px}
+ .ds-hero-mini-stat:nth-child(odd){padding-left:0;border-left:0}
+ .ds-hero-mini-stat:nth-child(even){padding-left:14px}
+ .ds-hero-mini-stat strong{font-size:26px;margin-top:4px}
+ .ds-hero-footer{padding:12px 3px 0;font-size:10px}
+}
+@media(max-width:370px){
+ .ds-premium-hero{padding-inline:11px}
+ .ds-hero-status-list{gap:7px}
+ .ds-hero-ring-wrap{width:99px;height:99px}
+ .ds-hero-ring-center strong{font-size:23px}
+ .ds-hero-ring-center span{font-size:9px}
+ .ds-hero-primary-value{font-size:43px}
+ .ds-hero-compliance p{font-size:11px}
+ .ds-hero-mini-stat strong{font-size:23px}
+}
+@media(prefers-reduced-transparency:reduce){
+ .ds-hero-glass-card{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}
+ .ds-hero-export,.ds-hero-periods,.ds-hero-filter-button{background:#fff}
+}
+@media(prefers-reduced-motion:reduce){
+ .ds-premium-hero *, .ds-premium-hero *::before,.ds-premium-hero *::after{animation:none!important;transition:none!important}
+}
+@media print{.ds-hero-back,.ds-hero-export,.ds-hero-filter-row{display:none!important}.ds-premium-hero{background:#fff;box-shadow:none}}
