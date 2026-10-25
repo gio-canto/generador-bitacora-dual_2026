@@ -1,5 +1,5 @@
 import {describe,expect,it} from "vitest";
-import {calculateDualScore,dualScoreGraphParts,DUAL_SCORE_NOTICE} from "../src/services/dual-score.js";
+import {calculateDualScore,dualScoreGraphParts} from "../src/services/dual-score.js";
 const make=(states)=>({timeline:states.map((status,i)=>({
   status,expired:true,startDate:"2026-09-"+String(10+i).padStart(2,"0"),
 })).reverse()});
@@ -23,11 +23,14 @@ describe("v0.57 Índice de Seguimiento Dual",()=>{
    const missing=calculateDualScore(make(["no_entregado"]));
    expect(missing).toMatchObject({value:0,provisional:true,due:1});
  });
- it("muestra aviso de uso escolar interno también si todavía no hay score",()=>{
-   expect(DUAL_SCORE_NOTICE).toContain("Uso escolar interno");
-   expect(DUAL_SCORE_NOTICE).toContain("no es puntaje de crédito ni una sanción");
-   expect(calculateDualScore(make([])).interpretation).toContain(DUAL_SCORE_NOTICE);
-   expect(calculateDualScore(make(["entregado"])).interpretation).toContain(DUAL_SCORE_NOTICE);
+ it("la interpretación presenta solo resultados, sin leyendas añadidas",()=>{
+   const noDue=calculateDualScore(make([])).interpretation;
+   const withDue=calculateDualScore(make(["entregado"])).interpretation;
+   expect(noDue).toContain("No se asigna una puntuación.");
+   expect(withDue).toContain("Índice 100/100");
+   for(const message of [noDue,withDue]){
+     expect(message).not.toMatch(/uso escolar interno|orientativo|puntaje de cr[eé]dito|sanci[oó]n/i);
+   }
  });
  it("representa 0–100 mediante aportes 50/30/20 sin inventar barras si no hay evaluación",()=>{
    const score=calculateDualScore(make(["entregado","entregado","entregado_tarde","no_entregado","no_aplica","entregado"]));
