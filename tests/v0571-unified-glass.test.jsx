@@ -40,14 +40,13 @@ describe("v0.57.1 · sistema visual compartido en todo Registro Dual",()=>{
     expect(style).toContain("prefers-contrast");
     expect(style).not.toContain("#app >");
   });
-  it("muestra el símbolo oficial Dual en el encabezado de escritorio y permite navegar al inicio",()=>{
+  it("conserva el logotipo horizontal del sitio web y la navegación de escritorio",()=>{
     setup(false);
     const {container}=render(<DeliveryRegistry onClose={vi.fn()}/>);
     const header=container.querySelector(".delivery-topbar");
     expect(container.querySelector(".delivery-layout-desktop")).toBeTruthy();
     expect(header?.querySelector(".delivery-brand-logo-desktop")?.getAttribute("src"))
-      .toContain("registro-dual-icon-192.png");
-    expect(header?.textContent).toContain("Registro Dual");
+      .toContain("Asset_logo.png");
     fireEvent.click(screen.getByRole("button",{name:/Estadísticas/}));
     expect(container.querySelector('[data-view="statistics"]')).toBeTruthy();
     fireEvent.click(screen.getByRole("button",{name:"Volver al generador de Bitácora Dual"}));
