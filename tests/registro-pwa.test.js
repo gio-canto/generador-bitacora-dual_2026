@@ -4,10 +4,10 @@ import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {generatePwaIcons,PWA_SIZES} from "../scripts/create-pwa-icons.mjs";
 
-const manifestUrl=new URL("../public/registro-entrega/manifest.webmanifest",import.meta.url);
-const registryHtmlUrl=new URL("../registro-entrega/index.html",import.meta.url);
-const rootHtmlUrl=new URL("../index.html",import.meta.url);
-const swBuilderUrl=new URL("../scripts/build-sw.mjs",import.meta.url);
+const manifestUrl=join(process.cwd(),"public","registro-entrega","manifest.webmanifest");
+const registryHtmlUrl=join(process.cwd(),"registro-entrega","index.html");
+const rootHtmlUrl=join(process.cwd(),"index.html");
+const swBuilderUrl=join(process.cwd(),"scripts","build-sw.mjs");
 
 describe("PWA independiente de Registro Dual",()=>{
   it("inicia directamente en Registro y anuncia iconos Android normales y maskable",async()=>{
