@@ -146,6 +146,7 @@
  .delivery-app .delivery-backup-reminder-actions .btn{flex:1 1 130px}
  .delivery-app .delivery-home-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
  .delivery-app .delivery-home-metrics .delivery-summary-card:nth-child(3){grid-column:1/-1}
+ .delivery-app.delivery-layout-mobile .delivery-home-metrics .delivery-summary-card:nth-child(3){display:flex;grid-column:1/-1}
  .delivery-app .delivery-home-metrics .delivery-summary-card{padding:15px;min-height:171px}
  .delivery-app .delivery-home-metrics .delivery-summary-card:nth-child(3){min-height:140px}
  .delivery-app .delivery-home-metrics .delivery-summary-card>strong{font-size:clamp(24px,6vw,35px)}
