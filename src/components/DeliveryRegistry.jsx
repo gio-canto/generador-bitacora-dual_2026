@@ -25,6 +25,9 @@ import {
   WarningCircle,
   XCircle,
   ChartBar,
+  House,
+  CalendarDots,
+  DotsThree,
 } from "@phosphor-icons/react";
 import {
   contextIsComplete,
@@ -398,6 +401,27 @@ export default function DeliveryRegistry({ onClose }) {
     initialState.weeks.length > 0;
   const [state, setState] = useState(initialState);
   const [view, setView] = useState(initiallyStarted ? "home" : "welcome");
+  const [layoutPreference,setLayoutPreference]=useState(()=>{
+    try {const saved=localStorage.getItem("registro-dual-layout");
+      return ["auto","mobile","desktop"].includes(saved)?saved:"auto";}catch{return "auto";}
+  });
+  const [compactViewport,setCompactViewport]=useState(()=>
+    typeof window!=="undefined"&&(window.matchMedia?.("(max-width: 760px)")?.matches ?? window.innerWidth<=760));
+  useEffect(()=>{
+    if(typeof window==="undefined")return;
+    const query=window.matchMedia?.("(max-width: 760px)");
+    const update=()=>setCompactViewport(query?.matches ?? window.innerWidth<=760);
+    update();
+    if(query?.addEventListener){query.addEventListener("change",update);
+      return ()=>query.removeEventListener("change",update);}
+    window.addEventListener("resize",update);
+    return ()=>window.removeEventListener("resize",update);
+  },[]);
+  const isMobileLayout=layoutPreference==="mobile"||(layoutPreference==="auto"&&compactViewport);
+  const changeLayout=(mode)=>{
+    setLayoutPreference(mode);
+    try{localStorage.setItem("registro-dual-layout",mode);}catch{/* Vista funcional sin almacenamiento */}
+  };
   const [activeWeekId, setActiveWeekId] = useState(
     initialState.weeks.at(-1)?.id || "",
   );
@@ -2062,7 +2086,8 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   return (
-    <div className={"delivery-app" + (view === "scanner" ? " scanner-active" : "")}>
+    <div className={"delivery-app" + (view === "scanner" ? " scanner-active" : "") +
+      (isMobileLayout?" delivery-layout-mobile":" delivery-layout-desktop")}>
       <ScanSound tone={scanTone} />
       <header className="delivery-topbar">
         <button className="delivery-brand" type="button" onClick={onClose}
@@ -2631,6 +2656,15 @@ export default function DeliveryRegistry({ onClose }) {
 
         {view === "home" && (
           <>
+            {isMobileLayout&&<section className="delivery-mobile-welcome" aria-label="Inicio móvil">
+              <span className="delivery-kicker">REGISTRO DUAL · v{VERSION}</span>
+              <h1>Panel de control</h1>
+              <p>{shortSchool(state.context.school) || "Tu registro"} · {state.context.generation || "Generación Dual"}</p>
+              <button type="button" className="btn primary" disabled={!state.weeks.length||!activeStudents.length}
+                onClick={()=>{setActiveWeekId(state.weeks.at(-1)?.id||"");setView("scanner");}}>
+                <Scan size={21}/> Escanear bitácora
+              </button>
+            </section>}
             <section className="delivery-hero compact">
               <span className="delivery-kicker">Registro de entrega</span>
               <h1>{shortSchool(state.context.school) || "Tu registro"}</h1>
@@ -2728,7 +2762,7 @@ export default function DeliveryRegistry({ onClose }) {
                 <button className="btn" type="button" onClick={()=>setView("statistics")}>Ver seguimiento</button>
               </section>}
 
-            <section className="delivery-panel">
+            <section className="delivery-panel delivery-home-history">
               <div className="delivery-panel-head">
                 <div>
                   <span className="delivery-kicker">Historial</span>
@@ -2787,6 +2821,59 @@ export default function DeliveryRegistry({ onClose }) {
 
           </>
         )}
+
+        {view === "weeks" && (
+          <section className="delivery-panel delivery-weeks-app" aria-label="Listado de semanas">
+            <div className="delivery-panel-head">
+              <div><span className="delivery-kicker">Registro Dual</span><h1>Semanas</h1>
+                <p>Consulta las entregas y selecciona un periodo.</p></div>
+              <button className="btn primary" type="button" onClick={()=>setView("new-week")}>
+                <CalendarDots size={19}/> Nueva semana</button>
+            </div>
+            <div className="delivery-week-list">
+              {[...state.weeks].reverse().map(week=>{
+                const summary=weekSummary(week,state.students);
+                return <button key={week.id} className="delivery-week-row" type="button"
+                  onClick={()=>{setActiveWeekId(week.id);setStatusFilter("all");setView("week");}}>
+                  <div><strong>{week.label}</strong><span>{formatPeriod(week.startDate,week.endDate)}
+                    {" · Límite: "+formatDateTime(week.dueAt)}</span>
+                    <div className="delivery-week-progress"><i style={{width:summary.percent+"%"}}/></div></div>
+                  <b>{summary.registered}/{summary.applicable}</b>
+                </button>;
+              })}
+              {!state.weeks.length&&<p className="delivery-empty-week">Aún no hay semanas. Crea la primera para empezar.</p>}
+            </div>
+          </section>
+        )}
+
+        {view === "more"&&<section className="delivery-panel delivery-mobile-more" aria-label="Herramientas del registro">
+          <div className="delivery-panel-head">
+            <div><span className="delivery-kicker">REGISTRO DUAL</span><h1>Herramientas</h1></div>
+          </div>
+          <div className="delivery-mobile-more-actions">
+            <button className="btn" type="button" onClick={()=>openReport()}><FilePdf size={20}/> Reportes PDF</button>
+            <button className="btn" type="button" onClick={()=>setView("announcements")}><Info size={20}/> Avisos PNG</button>
+            <button className="btn" type="button" onClick={()=>{setSetupIntent("manage");setSetupReturnView("more");
+              setContextForm(state.context);setSetupStep(1);setView("setup");}}><Users size={20}/> Administrar alumnos</button>
+            <button className="btn" type="button" onClick={()=>{setTutorialStep(0);setTutorialOpen(true);}}><Info size={20}/> Tutorial</button>
+            <button className="btn" type="button" onClick={()=>{exportDeliveryState(state);
+              notify("success","Archivo guardado","Respaldo local generado.");}}>
+              <DownloadSimple size={20}/> Guardar respaldo</button>
+            <label className="btn delivery-mobile-import"><UploadSimple size={20}/> Abrir registro JSON
+              <input hidden type="file" accept=".json,application/json"
+                onChange={event=>{importPortable(event.target.files?.[0]);event.target.value="";}}/>
+            </label>
+          </div>
+          <fieldset className="delivery-layout-selector">
+            <legend>Presentación</legend>
+            <p>Automática según el tamaño de pantalla; puedes cambiarla manualmente.</p>
+            <div role="group" aria-label="Presentación del Registro Dual">
+              {[["auto","Automática"],["mobile","Móvil"],["desktop","Escritorio"]].map(([mode,label])=>
+                <button type="button" key={mode} className={layoutPreference===mode?"active":""}
+                  aria-pressed={layoutPreference===mode} onClick={()=>changeLayout(mode)}>{label}</button>)}
+            </div>
+          </fieldset>
+        </section>}
 
         {view === "announcements" && <DeliveryAnnouncements state={state}
           onBack={()=>setView("home")}
@@ -3381,6 +3468,26 @@ export default function DeliveryRegistry({ onClose }) {
           </section>
         )}
       </main>
+      {started && isMobileLayout && !["welcome","setup","scanner","new-week"].includes(view)&&
+        <nav className="delivery-bottom-navigation" aria-label="Navegación móvil">
+          {[
+            ["home","Inicio",House],
+            ["weeks","Semanas",CalendarDots],
+            ["scanner","Escanear",Scan],
+            ["statistics","Datos",ChartBar],
+            ["more","Más",DotsThree],
+          ].map(([id,label,Icon])=>{
+            const current=view===id||(id==="weeks"&&view==="week")||
+              (id==="more"&&view==="announcements");
+            return <button type="button" key={id} className={current?"active":""}
+              aria-current={current?"page":undefined}
+              disabled={id==="scanner"&&(!state.weeks.length||!activeStudents.length)}
+              onClick={()=>{if(id==="scanner")setActiveWeekId(state.weeks.at(-1)?.id||"");
+                setView(id);}}>
+              <Icon size={23} weight={current?"fill":"regular"}/><span>{label}</span>
+            </button>;
+          })}
+        </nav>}
 
       {fuzzyPrompt && fuzzyCandidate && (
         <div
