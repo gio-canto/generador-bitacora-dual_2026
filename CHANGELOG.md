@@ -1,5 +1,14 @@
 # Notas de versión
 
+## Corrección visual móvil · v0.57.2-beta.1
+
+- Barra superior móvil simplificada: símbolo y nombre Dual, Menú y Guardar, con tamaños táctiles estables. Ayuda e importar JSON siguen disponibles en Herramientas / Accesos rápidos.
+- Inicio corregido: etiquetas breves, sin subtítulos de relleno ni solapamiento entre cifra y botones. Título «Inicio»; los datos de alumnos, semanas y última semana quedan separados visualmente.
+- En Semanas, los contadores de entregas tienen una columna reservada y no invaden las fechas ni salen de las tarjetas; se retiró texto introductorio innecesario.
+- Datos funciona como una pestaña nativa: un solo encabezado, sin segundo logotipo, sin navegación «Volver» repetida ni lemas decorativos; acceso a PDF al pie del resumen.
+- Al cambiar de pantalla móvil se restablece la posición de desplazamiento para que los títulos no queden ocultos bajo la cabecera.
+- Corrección CSS **solo para `.delivery-layout-mobile`** en `src/delivery-mobile-polish.css`. El diseño clásico de escritorio se mantiene sin cambios.
+
 ## Corrección de compatibilidad escritorio · v0.57.2-beta.1
 
 - Recuperado el **diseño web anterior** de Registro de Bitácoras: logotipo horizontal, área principal centrada de hasta 1180 px y cinco tarjetas de Inicio con su historial completo. El diseño móvil A+E conserva sus propias tres tarjetas y tres semanas recientes.
