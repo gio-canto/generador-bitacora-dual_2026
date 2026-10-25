@@ -1,5 +1,7 @@
 import {afterEach,describe,expect,it,vi} from "vitest";
 import {cleanup,fireEvent,render,screen,within} from "@testing-library/react";
+import {readFile} from "node:fs/promises";
+import {join} from "node:path";
 import DeliveryRegistry from "../src/components/DeliveryRegistry.jsx";
 import {createDeliveryState,createStudent,createWeek,writeDeliveryState,DELIVERY_KEY}
  from "../src/services/delivery-registry.js";
@@ -23,6 +25,33 @@ function fixture({mobile=false,weeks=5}={}){
  writeDeliveryState(state);
 }
 describe("Inicio, accesos rápidos y respaldos · Registro Dual",()=>{
+ it("separa el contenido de la barra sticky y anima únicamente el cambio de pestañas móvil",async()=>{
+   fixture({mobile:true});
+   const {container}=render(<DeliveryRegistry onClose={vi.fn()}/>);
+   const initial=screen.getByRole("main");
+   expect(initial.classList.contains("delivery-page-transition")).toBe(true);
+   const nav=screen.getByRole("navigation",{name:"Navegación móvil"});
+   fireEvent.click(within(nav).getByRole("button",{name:"Semanas"}));
+   const next=screen.getByRole("main");
+   expect(next).not.toBe(initial);
+   expect(next.classList.contains("delivery-page-transition")).toBe(true);
+   const css=await readFile(join(process.cwd(),"src","delivery-mobile-polish.css"),"utf8");
+   expect(css).toContain("padding-top:58px");
+   expect(css).toContain("dualMobileViewEnter");
+   expect(css).toContain("dualMobileGlassSweep");
+   expect(css).toContain("dualMobileTabSelect");
+   expect(css).toContain("@media(prefers-reduced-motion:reduce)");
+   expect(css).toContain(".delivery-app.delivery-layout-mobile .delivery-page-transition");
+ });
+ it("no aplica transición de pestañas al diseño clásico de escritorio",()=>{
+   fixture();
+   render(<DeliveryRegistry onClose={vi.fn()}/>);
+   const main=screen.getByRole("main");
+   expect(main.classList.contains("delivery-page-transition")).toBe(false);
+   fireEvent.click(screen.getByRole("button",{name:"Estadísticas"}));
+   expect(screen.getByRole("main")).toBe(main);
+ });
+
  it("Inicio enseña tres métricas balanceadas y únicamente las últimas tres semanas",()=>{
    fixture({mobile:true});
    const {container}=render(<DeliveryRegistry onClose={vi.fn()}/>);
