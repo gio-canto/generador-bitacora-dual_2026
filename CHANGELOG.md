@@ -1,5 +1,14 @@
 # Notas de versión
 
+## Aclaración del Índice de Seguimiento Dual y gráfica de score · v0.57.2-beta.1
+
+- En el PDF de expediente individual, el índice académico de 0–100 incluye una **gráfica horizontal de aportaciones ponderadas**: cumplimiento de entregas 50 %, puntualidad 30 % y regularidad de las últimas cuatro semanas vencidas 20 %. Los segmentos suman el indicador calculado, no son una clasificación crediticia.
+- Si no hay semanas vencidas aplicables, el índice permanece como «Sin evaluación» y la barra queda vacía, nunca se inventa un 0.
+- Se muestra de forma explícita que es una **referencia orientativa para seguimiento escolar interno** y que **no es puntaje de crédito ni una sanción**, tanto en el recuadro como al pie de cada página del expediente.
+- La misma aclaración se incorpora en el seguimiento nominal interno de Datos y en la página de alumnos del PDF de Estadísticas.
+- El cálculo, las ponderaciones y las reglas de exclusión originales no cambian. Sin alteraciones de registros ni de versión.
+
+
 ## Corrección de navegación de Datos · v0.57.2-beta.1
 
 - Sustituida la subbarra móvil de Estadísticas que utilizaba un menú flotante y podía quedar recortada al navegar con animaciones.
