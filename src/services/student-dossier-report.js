@@ -1,6 +1,6 @@
 import {blobatarUri} from "blobatar/uri";
 import {buildStudentDossier} from "./student-dossier.js";
-import {calculateDualScore,dualScoreGraphParts,DUAL_SCORE_NOTICE} from "./dual-score.js";
+import {calculateDualScore,dualScoreGraphParts} from "./dual-score.js";
 import {canvasToJpeg,createPdfFromJpegs,downloadPdf} from "./delivery-report.js";
 import {VERSION} from "../domain/records.js";
 
@@ -85,8 +85,7 @@ function header(ctx,logo,page,pages,context){
  txt(ctx,"GENERADOR DE BITÁCORA DUAL",221,74,27,C.ink,750,975);
  txt(ctx,context.school||"Registro de entregas",223,105,18,C.muted,500,975);
  rule(ctx,46,137,1149);rule(ctx,46,1698,1149);
- txt(ctx,DUAL_SCORE_NOTICE,51,1679,14,C.muted,500,1125);
- txt(ctx,"USO ESCOLAR INTERNO · "+VERSION,50,1729,14,C.muted,600);
+ txt(ctx,"REGISTRO DUAL · "+VERSION,50,1729,14,C.muted,600);
  txt(ctx,page+" / "+pages,1131,1729,16,C.muted,700);
 }
 function bar(ctx,label,y){
@@ -169,7 +168,7 @@ function summary(canvas,d,img,logo,pages,context){
  wrap(ctx,interpretStudentDossier(d),600).slice(0,5)
    .forEach((value,i)=>txt(ctx,value,63,693+i*27,17,C.ink,500,590));
  const score=calculateDualScore(d);
- rect(ctx,708,671,474,190,C.back);
+ rect(ctx,708,671,474,177,C.back);
  txt(ctx,"ÍNDICE DE SEGUIMIENTO DUAL",726,696,18,C.ink,700,390);
  txt(ctx,"0–100",1104,696,12,C.muted,650,61);
  txt(ctx,score.value==null?"—":String(score.value)+"/100",726,743,42,C.blue,750,204);
@@ -185,7 +184,6 @@ function summary(canvas,d,img,logo,pages,context){
    txt(ctx,"Sin plazos evaluables",726,777,14,C.muted,500,420);
  }
  drawDualScoreGraph(ctx,score);
- txt(ctx,"Uso interno · No es puntaje de crédito ni sanción.",726,846,13,C.muted,500,438);
  bar(ctx,"Comportamiento de entregas",904);
  txt(ctx,"Últimas semanas registradas · número real de semana",63,944,16,C.muted,500);
  // Exactly the stored week labels, never positional S1/S2 columns.
@@ -231,7 +229,6 @@ function details(canvas,d,logo,page,pages,context,rows){
      61,top+67,15,C.muted,500,1060);
    rule(ctx,58,top+85,1132);
  });
- txt(ctx,"Una entrega tardía cuenta como recibida. «No aplica» queda excluido.",58,1646,17,C.muted,500,1130);
 }
 export async function generateStudentDossierPdf(state,studentId,options={}){
   const d=buildStudentDossier(state,studentId,options);
