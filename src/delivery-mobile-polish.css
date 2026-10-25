@@ -1,0 +1,385 @@
+/*
+ * Registro Dual · arreglo visual móvil (v0.57.2, parche).
+ * Únicamente se activa al elegir la presentación móvil.
+ * Escritorio y generador principal mantienen sus hojas originales.
+ */
+.delivery-app.delivery-layout-mobile,
+.delivery-app.delivery-layout-mobile *,
+.delivery-app.delivery-layout-mobile *::before,
+.delivery-app.delivery-layout-mobile *::after{box-sizing:border-box}
+
+/* La barra superior tiene dos bloques reales, no cuatro botones compitiendo
+   con la marca. Importación JSON y Ayuda continúan en Más / Accesos rápidos. */
+.delivery-app.delivery-layout-mobile .delivery-topbar{
+  position:sticky;
+  top:calc(env(safe-area-inset-top) + 8px);
+  z-index:80;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  width:min(calc(100% - 20px),530px);
+  min-height:62px;
+  margin:10px auto 0;
+  padding:9px 11px;
+  border-radius:19px;
+}
+.delivery-app.delivery-layout-mobile .delivery-brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex:1 1 auto;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+}
+.delivery-app.delivery-layout-mobile .delivery-brand .delivery-brand-logo-mobile{
+  display:block;
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
+  max-height:40px;
+  object-fit:contain;
+}
+.delivery-app.delivery-layout-mobile .delivery-mobile-app-name{
+  display:block;
+  flex:1 1 auto;
+  width:auto;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:clamp(13px,3.8vw,15px);
+  line-height:1.2;
+}
+.delivery-app.delivery-layout-mobile .delivery-top-actions{
+  display:flex;
+  flex:0 0 auto;
+  width:auto;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+  flex-wrap:nowrap;
+}
+/* Ninguna función desaparece: tutorial e importación siguen en Más y en el menú. */
+.delivery-app.delivery-layout-mobile .delivery-top-actions>button[aria-label="Abrir tutorial"],
+.delivery-app.delivery-layout-mobile .delivery-top-actions>.delivery-file-button{display:none!important}
+.delivery-app.delivery-layout-mobile .delivery-top-actions>.btn{
+  display:grid;
+  place-items:center;
+  width:44px;
+  min-width:44px;
+  height:44px;
+  min-height:44px;
+  padding:0;
+  border-radius:14px;
+  flex:0 0 44px;
+}
+.delivery-app.delivery-layout-mobile .delivery-top-actions>.btn svg{
+  display:block!important;
+  width:20px;
+  height:20px;
+}
+.delivery-app.delivery-layout-mobile .delivery-top-actions .delivery-quick-trigger span{display:none}
+.delivery-app.delivery-layout-mobile .delivery-shell{
+  width:min(calc(100% - 24px),520px);
+  min-width:0;
+  padding-top:28px;
+  padding-bottom:calc(100px + env(safe-area-inset-bottom));
+  margin-inline:auto;
+}
+.delivery-app.delivery-layout-mobile .delivery-shell> :first-child{
+  margin-top:0;
+}
+.delivery-app.delivery-layout-mobile :is(.delivery-panel,.delivery-mobile-welcome,.delivery-week-head,.ds-premium-hero){
+  scroll-margin-top:100px;
+}
+
+/* Inicio: flex en vertical, sin el margin-top:-48px heredado de escritorio.
+   Nunca imponer alturas fijas al contenido de las métricas. */
+.delivery-app.delivery-layout-mobile .delivery-home-metrics{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:stretch;
+  gap:10px;
+  width:100%;
+  min-width:0;
+}
+.delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card{
+  display:flex!important;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  width:100%;
+  min-width:0;
+  min-height:205px;
+  height:auto;
+  padding:16px;
+  gap:8px;
+  overflow:visible;
+}
+.delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card>svg{
+  flex:0 0 auto;
+  width:25px;
+  height:25px;
+  margin:0 0 4px;
+}
+.delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card>span{
+  display:block;
+  width:100%;
+  margin:0;
+  min-width:0;
+  color:#50667c;
+  font-size:12px;
+  font-weight:680;
+  line-height:1.35;
+  overflow-wrap:break-word;
+}
+.delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card>strong{
+  display:block;
+  flex:0 0 auto;
+  position:static;
+  width:100%;
+  min-height:0!important;
+  margin:0!important;
+  padding:0;
+  font-size:clamp(26px,6.7vw,36px);
+  line-height:1.12;
+  letter-spacing:-.045em;
+  overflow-wrap:anywhere;
+}
+.delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card>small{
+  display:block;
+  position:static;
+  align-self:stretch;
+  margin:0!important;
+  min-width:0;
+  color:#697e92;
+  font-size:11px;
+  line-height:1.4;
+  overflow-wrap:break-word;
+}
+.delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card>.btn{
+  position:static;
+  flex:0 0 auto;
+  width:100%;
+  min-height:44px;
+  margin: auto 0 0!important;
+  padding:10px 7px;
+  white-space:normal;
+  line-height:1.2;
+  font-size:12px;
+}
+.delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card:nth-child(3){
+  display:flex!important;
+  grid-column:1/-1;
+  min-height:178px;
+}
+.delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card:nth-child(3)>strong{
+  font-size:clamp(28px,7vw,38px);
+}
+.delivery-app.delivery-layout-mobile .delivery-mobile-welcome{
+  margin:0 0 14px;
+  padding:22px 19px 19px;
+}
+.delivery-app.delivery-layout-mobile .delivery-mobile-welcome h1{
+  font-size:clamp(29px,8.2vw,37px);
+  margin:0;
+  line-height:1.1;
+}
+.delivery-app.delivery-layout-mobile .delivery-mobile-welcome p{
+  font-size:13px;
+  margin:0;
+}
+.delivery-app.delivery-layout-mobile .delivery-attention-summary{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  gap:13px;
+}
+.delivery-app.delivery-layout-mobile .delivery-attention-summary :is(strong,span){
+  overflow-wrap:anywhere;
+}
+
+/* Las tarjetas de semanas tienen dos columnas explícitas: texto y contador.
+   El contador nunca pisa las fechas ni sobresale del borde derecho. */
+.delivery-app.delivery-layout-mobile .delivery-week-list{
+  min-width:0;
+  width:100%;
+  gap:10px;
+}
+.delivery-app.delivery-layout-mobile .delivery-week-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:12px;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  min-height:112px;
+  padding:17px 15px;
+  overflow:hidden;
+  border-radius:20px;
+}
+.delivery-app.delivery-layout-mobile .delivery-week-row>div:first-child{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  min-width:0;
+  width:100%;
+  gap:5px;
+  align-content:start;
+}
+.delivery-app.delivery-layout-mobile .delivery-week-row strong{
+  min-width:0;
+  margin:0;
+  font-size:15px;
+  line-height:1.35;
+}
+.delivery-app.delivery-layout-mobile .delivery-week-row span{
+  min-width:0;
+  font-size:12px;
+  line-height:1.47;
+  color:#647487;
+  white-space:normal;
+  overflow-wrap:break-word;
+}
+.delivery-app.delivery-layout-mobile .delivery-week-row>b{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  justify-self:end;
+  align-self:start;
+  position:static;
+  flex:0 0 auto;
+  min-width:60px;
+  min-height:39px;
+  max-width:82px;
+  padding:7px 11px;
+  margin:0;
+  border-radius:999px;
+  font-size:13px;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.delivery-app.delivery-layout-mobile .delivery-week-row .delivery-week-progress{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  margin-top:7px;
+}
+.delivery-app.delivery-layout-mobile .delivery-weeks-app .delivery-panel-head{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:15px;
+  margin-bottom:18px;
+}
+.delivery-app.delivery-layout-mobile .delivery-weeks-app .delivery-panel-head h1{
+  margin:0;
+  font-size:clamp(29px,8vw,35px);
+  line-height:1.13;
+}
+.delivery-app.delivery-layout-mobile .delivery-weeks-app .delivery-panel-head .btn{
+  align-self:stretch;
+  width:100%;
+  min-height:48px;
+}
+
+/* Datos forma parte de la app, no de una landing independiente. */
+.delivery-app.delivery-layout-mobile .ds-premium-hero{
+  padding:19px 16px;
+  border-radius:23px;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero .ds-hero-intro{
+  margin:0 0 18px;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero h1{
+  margin:0;
+  font-size:clamp(32px,9vw,44px);
+  line-height:1.08;
+  letter-spacing:-.045em;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero .ds-hero-filter-row{
+  margin-top:0;
+  min-width:0;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero .ds-hero-context{
+  margin-top:11px;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero .ds-hero-glass-card{
+  margin-top:17px;
+  min-width:0;
+  padding:16px 14px;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero .ds-hero-glass-body{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(100px,34%);
+  align-items:center;
+  gap:9px;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero .ds-hero-ring-wrap{
+  width:100%;
+  height:auto;
+  aspect-ratio:1;
+  max-width:145px;
+  min-width:0;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero .ds-hero-primary-value{
+  font-size:clamp(39px,10.5vw,57px);
+  line-height:1.05;
+  margin:8px 0 5px;
+}
+.delivery-app.delivery-layout-mobile .ds-premium-hero .ds-hero-status-list{
+  gap:8px 10px;
+  margin-top:11px;
+}
+.delivery-app.delivery-layout-mobile .ds-hero-footer{
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.delivery-app.delivery-layout-mobile .ds-hero-reports-link{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-left:auto;
+  padding:7px 10px;
+  min-height:34px;
+  border:1px solid rgba(135,168,194,.35);
+  border-radius:999px;
+  background:rgba(255,255,255,.55);
+  color:#265e89;
+  font:inherit;
+  font-weight:720;
+  font-size:11px;
+  cursor:pointer;
+}
+.delivery-app.delivery-layout-mobile .ds-shortcuts-heading>span{
+  display:none;
+}
+.delivery-app.delivery-layout-mobile .ds-shortcuts-heading h2{
+  font-size:20px;
+}
+.delivery-app.delivery-layout-mobile[data-view="statistics"] .delivery-backline{
+  display:none!important;
+}
+.delivery-app.delivery-layout-mobile .ds-current-heading{
+  display:none;
+}
+@media(max-width:355px){
+ .delivery-app.delivery-layout-mobile .delivery-home-metrics{
+   grid-template-columns:1fr;
+ }
+ .delivery-app.delivery-layout-mobile .delivery-home-metrics>.delivery-summary-card:nth-child(3){
+   grid-column:auto;
+ }
+ .delivery-app.delivery-layout-mobile .delivery-topbar{
+   padding-inline:9px;
+   gap:6px;
+ }
+ .delivery-app.delivery-layout-mobile .delivery-mobile-app-name{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .delivery-app.delivery-layout-mobile .delivery-week-row:hover{transform:none}
+}
