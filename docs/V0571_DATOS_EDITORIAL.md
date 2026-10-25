@@ -1,5 +1,7 @@
 # v0.57.1-beta.1 · Datos Editorial Glass (Registro Dual)
 
+> **Actualización de coherencia visual:** el hero descrito aquí ahora forma parte de un sistema visual único para **todo Registro Dual**, no es un tema exclusivo de Estadísticas. Consulta [v0.57.1 — Sistema visual unificado](V0571_UNIFIED_GLASS.md) para las superficies, páginas y excepciones.
+
 ## Objetivo y alcance
 
 Rediseño visual del módulo **Datos** en `/registro-entrega/`, inspirado en la jerarquía de Apple Health y adaptado a una identidad **editorial premium** propia. No es una reproducción literal ni utiliza tecnología privada de Apple: el efecto «liquid glass» se **emula con CSS**, desenfoque, transparencias, bordes y sombras. Se mantiene el símbolo Dual oficial aportado al repositorio.
