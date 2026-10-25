@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.57.1--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.57.2--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.57.2-beta.1 · Inicio y herramientas de Registro Dual
+
+**Inicio más limpio:** tres indicadores uniformes (alumnos, semanas y avance de la última semana), y solo tres semanas recientes con acceso al historial completo. **Nueva barra lateral de accesos rápidos** en escritorio y panel desplegable en móvil, con Inicio, Semanas, Datos, Avisos PNG, Escáner, administración de alumnos, reportes y respaldos. **Recordatorios discretos de respaldo JSON** cuando existen cambios: sin alertas durante el escáner ni notificaciones del sistema, con controles para descargar o posponer. No se modifica la lógica de los registros.
+
+Consulta [la documentación de v0.57.2](docs/V0572_INICIO_Y_RESPALDOS.md) para funcionamiento, condiciones, privacidad y compatibilidad.
 
 ## Corrección visual integral de v0.57.1-beta.1
 
