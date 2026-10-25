@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import AnimatedValue from "./AnimatedValue.jsx";
 import StudentInsights from "./StudentInsights.jsx";
+import StatisticsHero from "./StatisticsHero.jsx";
 import {calculateStudentInsights} from "../services/student-insights.js";
 import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLabels, percent } from "../services/statistics.js";
 import { interpretStatistics } from "../services/statistics-interpretation.js";
@@ -158,15 +159,12 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
   const interpretation=useMemo(()=>interpretStatistics(data,insightSummary),[data,insightSummary]);
 
   return <div className="delivery-analytics-container" ref={rootRef}>
-    <div className="ds-header">
-      <button className="btn" type="button" onClick={onBack}>← Volver</button>
-      <span className="delivery-kicker">Registro de entrega</span>
-      <div className="ds-panel-head">
-        <h1>Estadísticas</h1>
-        <button className="btn" type="button" onClick={onReportStatistics}>Abrir Reportes</button>
-      </div>
-    </div>
-
+    <StatisticsHero data={data} period={period} onPeriodChange={setPeriod}
+      onBack={onBack} onReportStatistics={onReportStatistics}
+      onToggleFilters={()=>setFiltersOpen(open=>!open)} filtersOpen={filtersOpen}
+      specialty={specialty} company={company}
+      weekLabel={state.weeks.find(week=>week.id===weekId)?.label||""}
+      month={month} section={section}/>
     <div className="ds-mobile-toolbar">
       <button type="button" className="btn" aria-expanded={navOpen}
         aria-controls="ds-sidebar" onClick={()=>setNavOpen(value=>!value)}>☰ {STAT_SECTIONS.find(([id])=>id===section)?.[1]} · Secciones</button>
@@ -189,13 +187,10 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
         onClick={()=>setNavOpen(false)}/>}
       <div className="ds-workspace-content">
         <div className={"ds-filter-panel"+(filtersOpen?" ds-filters-open":" ds-filters-closed")}>
-          <button type="button" className="ds-filter-toggle" aria-expanded={filtersOpen}
-            onClick={()=>setFiltersOpen(value=>!value)}>⚙ Filtros del periodo {filtersOpen?"▴":"▾"}</button>
-    <div className="ds-controls">
-      <div className="ds-tabs" role="group" aria-label="Periodo">
-        {[["weekly","Semanal"],["monthly","Mensual"],["all","General"]].map(([value,label])=>
-          <button type="button" key={value} className={period===value?"active":""}
-            aria-pressed={period===value} onClick={()=>setPeriod(value)}>{label}</button>)}
+    <div className="ds-controls" id="ds-controls-options" aria-label="Filtros detallados de Datos">
+      <div className="ds-controls-header">
+        <strong>Refinar resultados</strong>
+        <button type="button" onClick={()=>setFiltersOpen(false)} aria-label="Cerrar filtros">Cerrar ✕</button>
       </div>
       {period==="weekly" && <label>Semana
         <select value={weekId} onChange={event=>setWeekId(event.target.value)}>
@@ -220,14 +215,25 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
     <div className="ds-results" key={viewKey+section}>
     <h2 className="ds-current-heading">{STAT_SECTIONS.find(([id])=>id===section)?.[1]}</h2>
     {section==="summary"&&<>
-    <div className="ds-kpis">
-      <Metric name="Alumnos activos" value={fmt(data.students.length)}/>
-      <Metric name="Horas registradas" value={hours(data.totalMinutes/60)}/>
-      <Metric name="Jornadas con falta" value={fmt(data.daily.falta)}/>
-       <Metric name="Días sin labores" value={fmt(data.daily.sin_labores)}/>
-       <Metric name="Días inhábiles" value={fmt(data.daily.inhabil)}/>
-      <Metric name="Uso identificado" value={percent(data.usage.used,data.students.length)+"%"}/>
-    </div>
+    <section className="ds-shortcuts" aria-label="Explorar otras estadísticas">
+      <div className="ds-shortcuts-heading"><span>EXPLORAR / REGISTRO DUAL</span><h2>En detalle</h2></div>
+      <div className="ds-shortcut-grid">
+        {[
+          {id:"attendance",title:"Asistencia",detail:data.daily.laboral+data.daily.falta?
+            percent(data.daily.laboral,data.daily.laboral+data.daily.falta)+"%":"Sin datos",accent:"#2285a6",number:"01"},
+          {id:"companies",title:"Empresas",detail:fmt(data.byCompanyPerformance.filter(r=>r.activeStudents>0).length)+" activas",accent:"#bf8770",number:"02"},
+          {id:"groups",title:"Grupos",detail:fmt(data.byGroupPerformance.filter(r=>r.activeStudents>0).length)+" grupos",accent:"#9c8ab7",number:"03"},
+          {id:"students",title:"Alumnos",detail:fmt(data.students.length)+" registrados",accent:"#497bb4",number:"04"},
+          {id:"history",title:"Histórico",detail:hours(lifetime.totalHours)+" acumuladas",accent:"#687e8d",number:"05"},
+        ].map(item=><button type="button" key={item.id} className="ds-shortcut-card"
+          onClick={()=>{setSection(item.id);setNavOpen(false);}}>
+          <span className="ds-shortcut-number" style={{color:item.accent}}>{item.number}</span>
+          <span className="ds-shortcut-name">{item.title}</span>
+          <strong>{item.detail}</strong>
+          <span className="ds-shortcut-arrow" aria-hidden="true">↗</span>
+        </button>)}
+      </div>
+    </section>
     <section className="ds-panel ds-interpretations" aria-label="Interpretación del periodo">
       <h2>Resumen del periodo</h2>
       <div className="ds-insight-explainer-grid">
