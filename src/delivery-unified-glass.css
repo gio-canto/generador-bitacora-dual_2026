@@ -1,0 +1,304 @@
+/*
+ * Registro Dual · Unified Glass Design System (v0.57.1 visual correction)
+ * Scope: the Registro de Bitácoras React module only. Never style the
+ * legacy generator shell, or the content drawn inside PDF/PNG canvases.
+ */
+.delivery-app {
+  --dual-ink:#192d43;
+  --dual-muted:#67788b;
+  --dual-accent:#246ca5;
+  --dual-accent-strong:#195b91;
+  --dual-stroke:rgba(190,205,220,.51);
+  --dual-white:rgba(255,255,255,.83);
+  --dual-white-solid:#fff;
+  --dual-soft:rgba(249,251,253,.86);
+  --dual-shadow:0 10px 35px rgba(33,59,84,.055);
+  --dual-radius:23px;
+  --dual-glass-blur:blur(18px) saturate(135%);
+  color:var(--dual-ink);
+  background:
+    radial-gradient(ellipse 72% 30% at 1% 0%,rgba(144,224,234,.26),transparent 84%),
+    radial-gradient(ellipse 72% 29% at 99% 2%,rgba(248,190,162,.21),transparent 88%),
+    linear-gradient(160deg,#f6f9fb 0%,#f5f7fa 46%,#f7f8fa 100%);
+  background-attachment:fixed;
+  letter-spacing:-.006em;
+}
+/* All screens share one text, control and border language. */
+.delivery-app :is(.delivery-panel,.delivery-setup-card,.delivery-summary-card,.delivery-week-head,
+  .delivery-empty-start,.delivery-help-strip,.delivery-entry-card,.delivery-action-tile,
+  .delivery-roster-export,.delivery-announcement-area,.delivery-png-preview,.delivery-png-pick,
+  .delivery-report-card,.delivery-manual-card,.delivery-tutorial-card,.delivery-match-card,
+  .delivery-setup-note,.delivery-student-actions-panel,.delivery-import-preview,
+  .delivery-list-toolbar,.delivery-week-form) {
+  border-color:var(--dual-stroke);
+}
+.delivery-app :is(.delivery-panel,.delivery-setup-card,.delivery-summary-card,.delivery-week-head,
+  .delivery-empty-start,.delivery-help-strip,.delivery-entry-card,.delivery-action-tile,
+  .delivery-roster-export,.delivery-announcement-area,.delivery-png-preview,
+  .delivery-report-card,.delivery-manual-card,.delivery-tutorial-card,.delivery-match-card) {
+  background:var(--dual-white);
+  border:1px solid var(--dual-stroke);
+  box-shadow:var(--dual-shadow),inset 0 1px 0 rgba(255,255,255,.8);
+  border-radius:var(--dual-radius);
+  -webkit-backdrop-filter:var(--dual-glass-blur);
+  backdrop-filter:var(--dual-glass-blur);
+}
+.delivery-app :is(.delivery-topbar,.delivery-bottom-navigation) {
+  border:1px solid rgba(255,255,255,.72);
+  background:rgba(252,253,255,.85);
+  box-shadow:0 6px 22px rgba(28,57,87,.055),inset 0 1px 0 rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(22px) saturate(155%);
+  backdrop-filter:blur(22px) saturate(155%);
+}
+.delivery-app .delivery-topbar{border-radius:20px;max-width:1240px}
+.delivery-app .delivery-brand{gap:10px}
+.delivery-app .delivery-mobile-app-name{color:var(--dual-ink);font-weight:760}
+.delivery-app .delivery-kicker{color:var(--dual-accent);font-size:11px;letter-spacing:.095em}
+.delivery-app :is(.delivery-hero h1,.delivery-panel-head h1,.delivery-panel-head h2,
+  .delivery-week-head h2,.delivery-welcome-copy h1,.delivery-setup-head h1,
+  .delivery-announcements-heading h1,.delivery-scanner-head h1,.delivery-mobile-welcome h1) {
+  color:var(--dual-ink);font-weight:770;letter-spacing:-.052em;line-height:1.09;
+}
+.delivery-app :is(.delivery-hero p,.delivery-panel-head p,.delivery-week-head p,
+  .delivery-setup-head p,.delivery-announcements-heading p,
+  .delivery-mobile-welcome p) {color:var(--dual-muted);line-height:1.52}
+
+/* Hero is the same restrained ambient panel on home, statistics and mobile. */
+.delivery-app .delivery-hero.compact,
+.delivery-app .delivery-mobile-welcome,
+.delivery-app .delivery-welcome,
+.delivery-app .delivery-setup-head,
+.delivery-app .delivery-announcements-heading {
+  position:relative;isolation:isolate;
+  background:
+    radial-gradient(ellipse 76% 93% at 4% 0%,rgba(131,222,235,.34),transparent 78%),
+    radial-gradient(ellipse 69% 80% at 100% 0%,rgba(255,188,153,.29),transparent 81%),
+    rgba(255,255,255,.53);
+  border:1px solid rgba(255,255,255,.73);
+  border-radius:28px;
+  box-shadow:0 12px 32px rgba(32,55,79,.045),inset 0 1px 0 rgba(255,255,255,.9);
+  padding:clamp(20px,3.5vw,33px);
+  margin-bottom:15px;
+  -webkit-backdrop-filter:blur(17px);
+  backdrop-filter:blur(17px);
+}
+.delivery-app .delivery-hero.compact h1{font-size:clamp(33px,5vw,54px);line-height:1.09;max-width:100%;overflow-wrap:anywhere}
+.delivery-app .delivery-hero.compact p{font-size:14px}
+.delivery-app .delivery-mobile-welcome{
+  display:grid;gap:10px;
+  color:var(--dual-ink);
+  border-radius:26px;
+  margin-bottom:12px;
+}
+.delivery-app .delivery-mobile-welcome h1{font-size:clamp(30px,8vw,40px);color:var(--dual-ink);margin:0}
+.delivery-app .delivery-mobile-welcome .delivery-kicker{color:var(--dual-accent)}
+.delivery-app .delivery-mobile-welcome p{color:var(--dual-muted)}
+.delivery-app .delivery-mobile-welcome .btn.primary{
+  color:#fff;background:var(--dual-accent-strong);
+  box-shadow:0 5px 14px rgba(38,97,151,.13);border:1px solid rgba(255,255,255,.2);
+}
+.delivery-app .delivery-welcome{padding:clamp(22px,4vw,40px)}
+.delivery-app .delivery-setup-head{padding:clamp(20px,3vw,30px)}
+.delivery-app .delivery-announcements-heading{padding:22px 24px}
+/* Consistent lightweight controls in all flows including dialogs. */
+.delivery-app :is(.btn,.delivery-nav-button,.delivery-report-option,.delivery-png-pick-select,
+  .delivery-summary-card button,.delivery-layout-selector button) {
+  transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+.delivery-app .btn:not(.primary):not(.delivery-danger){
+  color:#27425c;
+  background:rgba(255,255,255,.79);
+  border:1px solid rgba(192,208,224,.77);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+  border-radius:13px;
+}
+.delivery-app .btn:not(.primary):not(.delivery-danger):hover:not(:disabled){
+  background:#fff;border-color:#a8bed5;
+}
+.delivery-app .btn.primary:not(:disabled){
+  background:var(--dual-accent-strong);color:#fff;
+  border-color:transparent;box-shadow:0 4px 13px rgba(34,98,155,.12);
+  border-radius:13px;
+}
+.delivery-app .btn.primary:hover:not(:disabled){background:#154d7b;box-shadow:0 7px 18px rgba(34,98,155,.21)}
+.delivery-app .btn:disabled{cursor:not-allowed}
+.delivery-app :is(.delivery-field input,.delivery-field select,.delivery-field textarea,
+  .delivery-list-toolbar input,.delivery-roster-controls select,.delivery-manual-status select,
+  .delivery-announcement-form input,.delivery-announcement-form select,.delivery-announcement-form textarea,
+  .delivery-png-options select,.delivery-overdue-filters select,.delivery-overdue-filters input,
+  .ds-controls input,.ds-controls select,.ds-overdue-filters input,.ds-overdue-filters select){
+  color:var(--dual-ink);background:rgba(255,255,255,.88);
+  border:1px solid #ced9e5;border-radius:12px;
+  box-shadow:inset 0 1px 1px rgba(25,51,78,.025);
+}
+.delivery-app :is(input,select,textarea,button):focus-visible,
+.delivery-app label.delivery-file-button:focus-within {
+  outline:3px solid rgba(39,114,177,.65);outline-offset:2px;
+}
+.delivery-app :is(.delivery-field input,.delivery-field select,.delivery-field textarea,
+ .delivery-announcement-form input,.delivery-announcement-form select,.delivery-announcement-form textarea):focus{
+  border-color:#538dbe;box-shadow:0 0 0 3px rgba(53,130,196,.095);
+}
+.delivery-app .delivery-summary-grid{gap:11px}
+.delivery-app .delivery-summary-card{min-height:0;gap:9px 11px;padding:19px}
+.delivery-app .delivery-summary-card svg{color:#3d7daa}
+.delivery-app .delivery-summary-card>strong{color:#1b3148;font-variant-numeric:tabular-nums;letter-spacing:-.055em}
+.delivery-app .delivery-summary-card>span{color:#6b7c8c}
+.delivery-app .delivery-summary-card .btn{min-height:42px;max-width:100%}
+.delivery-app :is(.delivery-week-row,.delivery-student-card,.delivery-action-tile,
+  .delivery-report-option,.delivery-png-pick,.delivery-announcement-note,
+  .delivery-roster-export,.delivery-setup-note,.delivery-import-preview){
+  background:rgba(250,252,254,.78);
+  border:1px solid rgba(197,211,225,.57);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.74);
+  border-radius:17px;
+}
+.delivery-app .delivery-week-row:hover:not(:disabled){
+  background:#fff;border-color:rgba(107,149,186,.52);
+  box-shadow:0 4px 13px rgba(27,56,88,.07);
+}
+.delivery-app :is(.delivery-week-row b,.delivery-student-group-head span) {
+  background:rgba(229,239,249,.72);color:#235e8e
+}
+.delivery-app .delivery-week-progress{border-radius:999px;overflow:hidden}
+.delivery-app .delivery-week-progress i{background:var(--dual-accent)}
+.delivery-app .delivery-list-toolbar{border:0;background:transparent;box-shadow:none}
+.delivery-app :is(.delivery-stat-card,.delivery-entry-icon){border-radius:17px}
+.delivery-app .delivery-dual-status{background:rgba(32,110,171,.09);color:#22689f!important}
+.delivery-app .delivery-notice{border-radius:17px;background:rgba(229,244,252,.8);border-color:rgba(112,168,201,.25)}
+.delivery-app .delivery-notice.warning{background:#fff7e9;border-color:#efd9b0}
+.delivery-app .delivery-notice.error{background:#fff0ed;border-color:#f1c6bf}
+
+/* Scan camera remains high-contrast and never inherits glass translucency. */
+.delivery-app .delivery-camera-shell{border-radius:24px;border:2px solid rgba(255,255,255,.85)}
+.delivery-app .delivery-camera-hud{
+  border-color:rgba(255,255,255,.27);
+  border-radius:16px;background:rgba(10,27,44,.78);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)
+}
+.delivery-app .delivery-scanner-actions .btn{min-height:44px}
+.delivery-app .delivery-scanner-error{border-radius:18px}
+
+/* Reports, students, manual-capture dialogs and PNG editor follow the same visual hierarchy. */
+.delivery-app :is(.delivery-report-card,.delivery-manual-card,.delivery-match-card,.delivery-tutorial-card) {
+  background:rgba(252,253,255,.975);
+  -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
+  box-shadow:0 24px 70px rgba(21,43,65,.19),inset 0 1px 0 #fff;
+}
+.delivery-app :is(.delivery-report-head,.delivery-manual-heading,.delivery-match-card h2,
+  .delivery-tutorial-card h2,.delivery-announcement-area h2){color:var(--dual-ink)}
+.delivery-app :is(.delivery-report-option.active,.delivery-png-pick.selected){
+  border-color:rgba(53,120,176,.65);background:rgba(235,246,253,.91)
+}
+.delivery-app .delivery-png-tabs{border-radius:999px;background:rgba(231,237,245,.82);border:1px solid rgba(255,255,255,.72)}
+.delivery-app .delivery-png-tabs button{border-radius:999px}
+.delivery-app .delivery-png-tabs button.active{background:#fff;color:var(--dual-ink)}
+.delivery-app .delivery-png-preview{position:sticky}
+.delivery-app .delivery-png-preview-surface{background-color:#f3f5f8}
+/* Statistics from older releases are unified with app panels. */
+.delivery-app :is(.ds-panel,.ds-kpi,.ds-lifetime,.ds-sidebar,.ds-comparison-leader){
+  background:var(--dual-white);
+  border:1px solid var(--dual-stroke);
+  border-radius:var(--dual-radius);
+  box-shadow:var(--dual-shadow),inset 0 1px 0 rgba(255,255,255,.85);
+  -webkit-backdrop-filter:var(--dual-glass-blur);backdrop-filter:var(--dual-glass-blur)
+}
+.delivery-app .ds-sidebar nav button.active{border-radius:12px;background:rgba(229,240,252,.87);color:#1c5e96}
+.delivery-app .ds-mobile-toolbar .btn{border-radius:15px}
+.delivery-app .ds-comparison-leader{box-shadow:none}
+.delivery-app .ds-controls{border-radius:17px;background:rgba(255,255,255,.84);box-shadow:var(--dual-shadow)}
+.delivery-app .ds-shortcut-card{background:var(--dual-white);border:1px solid var(--dual-stroke);-webkit-backdrop-filter:var(--dual-glass-blur);backdrop-filter:var(--dual-glass-blur)}
+.delivery-app .ds-tabs,.delivery-app .ds-hero-periods{background:rgba(234,240,246,.7)}
+/* Tone down the isolated aqua/peach hero; its intensity now matches the other screens. */
+.delivery-app .ds-premium-hero{
+  border-radius:28px;padding:clamp(18px,2.5vw,27px);
+  border:1px solid rgba(255,255,255,.77);
+  background:
+    radial-gradient(ellipse 67% 82% at 0% 0%,rgba(133,223,233,.36),transparent 83%),
+    radial-gradient(ellipse 66% 85% at 100% 0%,rgba(255,191,158,.30),transparent 83%),
+    rgba(255,255,255,.56);
+  box-shadow:var(--dual-shadow),inset 0 1px 0 rgba(255,255,255,.9);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)
+}
+.delivery-app .ds-premium-hero h1{font-size:clamp(43px,5vw,64px);letter-spacing:-.065em}
+.delivery-app .ds-hero-glass-card{
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(225,233,240,.86);
+  border-radius:23px;box-shadow:0 8px 23px rgba(32,63,93,.062),inset 0 1px 0 rgba(255,255,255,.94)
+}
+.delivery-app .ds-hero-export,.delivery-app .ds-hero-back,.delivery-app .ds-hero-filter-button{background:rgba(255,255,255,.77)}
+.delivery-app .ds-hero-export:hover,.delivery-app .ds-hero-back:hover,.delivery-app .ds-hero-filter-button:hover{background:#fff}
+.delivery-app .ds-hero-primary-value{font-size:clamp(44px,6vw,68px)}
+.delivery-app .ds-hero-ring-wrap{width:clamp(116px,16vw,166px);height:clamp(116px,16vw,166px)}
+.delivery-app .ds-hero-ring-center strong{font-size:clamp(25px,3.3vw,37px)}
+.delivery-app .ds-shortcuts-heading h2{font-size:21px}
+.delivery-app .ds-shortcut-card{min-height:115px;border-radius:19px}
+.delivery-app .ds-shortcut-card:hover{background:#fff}
+.delivery-app .delivery-analytics-container .ds-results>.ds-current-heading{font-size:21px;color:var(--dual-ink)}
+.delivery-app .ds-hero-context span{background:rgba(255,255,255,.69)}
+/* Desktop/mobile modes stay independent from generador and from scanning overlay. */
+.delivery-app.delivery-layout-mobile .delivery-shell{padding-top:16px}
+.delivery-app.delivery-layout-mobile .delivery-summary-card:nth-child(3){display:none} /* scan is already in glass hero + nav */
+.delivery-app.delivery-layout-mobile .delivery-mobile-welcome{padding:20px}
+.delivery-app.delivery-layout-mobile .delivery-bottom-navigation{
+  border-radius:22px 22px 0 0;border-bottom:0;
+  background:rgba(251,253,255,.92);box-shadow:0 -7px 32px rgba(28,58,83,.07)
+}
+.delivery-app.delivery-layout-mobile .delivery-bottom-navigation button{
+  border-radius:13px;color:#657588;font-weight:650
+}
+.delivery-app.delivery-layout-mobile .delivery-bottom-navigation button.active{
+  color:#1c659d;background:rgba(231,242,252,.84)
+}
+.delivery-app.delivery-layout-mobile .delivery-topbar{border-radius:17px}
+.delivery-app.delivery-layout-mobile .delivery-mobile-more-actions .btn{min-height:49px}
+.delivery-app.delivery-layout-mobile .delivery-layout-selector>div{
+  border:1px solid rgba(210,222,234,.74);background:rgba(234,242,249,.71)
+}
+.delivery-app.delivery-layout-mobile .delivery-layout-selector button.active{color:#185b91}
+@media(max-width:760px){
+  .delivery-app .delivery-shell{min-width:0}
+  .delivery-app .delivery-announcements-heading{padding:19px}
+  .delivery-app .delivery-announcement-area{padding:17px}
+  .delivery-app .delivery-summary-card{padding:15px}
+  .delivery-app .delivery-summary-card>strong{font-size:clamp(23px,6vw,34px)}
+  .delivery-app .ds-premium-hero{padding:16px;border-radius:23px}
+  .delivery-app .ds-premium-hero h1{font-size:clamp(39px,11vw,52px)}
+  .delivery-app .ds-hero-glass-card{padding:15px}
+  .delivery-app .ds-hero-primary-value{font-size:clamp(41px,11vw,56px)}
+  .delivery-app .ds-hero-ring-wrap{width:clamp(102px,28vw,132px);height:clamp(102px,28vw,132px)}
+  .delivery-app .ds-hero-glass-body{gap:5px}
+  .delivery-app .delivery-panel-head h2{font-size:clamp(23px,6vw,30px)}
+}
+@media(max-width:390px){
+  .delivery-app .ds-hero-ring-wrap{width:100px;height:100px}
+  .delivery-app .ds-hero-status-list span{font-size:10px}
+  .delivery-app .ds-hero-glass-card{padding:13px}
+  .delivery-app .ds-hero-primary-value{font-size:40px}
+}
+@media(prefers-reduced-motion:reduce){
+ .delivery-app *,.delivery-app *::before,.delivery-app *::after{
+  scroll-behavior:auto!important;
+  animation-duration:.01ms!important;
+  animation-iteration-count:1!important;
+  transition-duration:.01ms!important
+ }
+}
+@media(prefers-contrast:more){
+ .delivery-app{--dual-white:#fff;--dual-stroke:#879eb2;--dual-muted:#324e69}
+ .delivery-app :is(.delivery-panel,.delivery-summary-card,.delivery-setup-card,.ds-panel,.ds-kpi){background:#fff}
+ .delivery-app .delivery-kicker{color:#154d79}
+}
+@media(prefers-reduced-transparency:reduce){
+ .delivery-app{--dual-white:#fff}
+ .delivery-app :is(.delivery-topbar,.delivery-bottom-navigation,.delivery-panel,.delivery-summary-card,.delivery-week-head,
+  .delivery-mobile-welcome,.delivery-hero,.delivery-setup-card,.delivery-png-preview,
+  .delivery-announcement-area,.delivery-report-card,.delivery-manual-card,.ds-panel,.ds-kpi,.ds-premium-hero,.ds-hero-glass-card){
+  -webkit-backdrop-filter:none;backdrop-filter:none;background:#fff
+ }
+}
+@media print{
+  .delivery-app{background:#fff}
+  .delivery-app :is(.delivery-topbar,.delivery-bottom-navigation){display:none!important}
+  .delivery-app :is(.delivery-panel,.ds-panel,.ds-kpi){background:#fff;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+}
