@@ -26,8 +26,8 @@ describe("Datos Editorial Glass v0.57.1",()=>{
    const spies=callbacks();
    render(<DeliveryStatistics state={fixture()} {...spies}/>);
    const hero=screen.getByRole("banner",{name:"Presentación de Datos"});
-   expect(within(hero).getByRole("heading",{name:"Datos."})).toBeTruthy();
-   expect(within(hero).getByRole("img",{name:"Logotipo oficial Dual"})).toBeTruthy();
+   expect(within(hero).getByRole("heading",{name:"Datos"})).toBeTruthy();
+   expect(within(hero).queryByRole("img",{name:"Logotipo oficial Dual"})).toBeNull();
    expect(within(hero).getByText("1 de 2 registros aplicables recibidos")).toBeTruthy();
    expect(within(hero).getByText("1 a tiempo")).toBeTruthy();
    expect(within(hero).getByText("0 tardías")).toBeTruthy();
