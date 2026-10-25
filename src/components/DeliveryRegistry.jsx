@@ -84,6 +84,7 @@ import "../delivery-registry.css";
 import "../delivery-unified-glass.css";
 import "../delivery-quick-sidebar.css";
 import "../delivery-desktop-restoration.css";
+import "../delivery-mobile-polish.css";
 
 const ZXING_SOURCES = [
   "https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js",
@@ -424,6 +425,14 @@ export default function DeliveryRegistry({ onClose }) {
     return ()=>window.removeEventListener("resize",update);
   },[]);
   const isMobileLayout=layoutPreference==="mobile"||(layoutPreference==="auto"&&compactViewport);
+  // Al cambiar de pestaña, volver al encabezado. Si se conserva la posición
+  // de la vista anterior, Safari muestra títulos ocultos bajo la topbar.
+  useEffect(()=>{
+    if(!isMobileLayout||typeof document==="undefined")return;
+    if(document.scrollingElement)document.scrollingElement.scrollTop=0;
+    document.documentElement.scrollTop=0;
+    document.body.scrollTop=0;
+  },[view,isMobileLayout]);
   const changeLayout=(mode)=>{
     setLayoutPreference(mode);
     try{localStorage.setItem("registro-dual-layout",mode);}catch{/* Vista funcional sin almacenamiento */}
