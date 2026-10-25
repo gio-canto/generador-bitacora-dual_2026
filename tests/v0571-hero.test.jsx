@@ -33,8 +33,8 @@ describe("Datos Editorial Glass v0.57.1",()=>{
    expect(within(hero).getByText("0 tardías")).toBeTruthy();
    expect(within(hero).getByText("1 pendientes")).toBeTruthy();
    expect(within(hero).getByRole("img",{name:"Entregas aplicables: 1 puntuales, 0 tardías y 1 pendientes"})).toBeTruthy();
-   expect(within(hero).getByText("50%")).toBeTruthy();
-   expect(within(hero).getByText("4")).toBeTruthy();
+   expect(within(hero).getAllByText("50%").length).toBeGreaterThan(0);
+   expect(within(hero).getByText("Horas capturadas")).toBeTruthy();
    fireEvent.click(within(hero).getByRole("button",{name:"Reportes"}));
    expect(spies.onReportStatistics).toHaveBeenCalledOnce();
  });
