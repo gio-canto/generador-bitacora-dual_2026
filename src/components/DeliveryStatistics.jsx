@@ -306,7 +306,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       </div>
       <PerformanceTable rows={data.byGroupPerformance} type="group"/>
       <p className="ds-comparison-note">La proporción corresponde a alumnos activos; las jornadas registradas del periodo determinan horas, faltas, días sin labores e inhábiles. Un grupo sin datos no equivale a cero faltas.</p>
-    </section>
+    </section>}
     {section==="attendance"&&<>
     <div className="ds-kpis ds-small-kpis">
       <Metric name="Cumplimiento de entrega" value={data.deliveryRate+"%"}/>
