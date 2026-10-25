@@ -225,7 +225,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
     </div>
 
         </div>
-    <div className="ds-results" key={viewKey+section}>
+    <div className="ds-results" data-section={section} key={viewKey+section}>
     <h2 className="ds-current-heading">{STAT_SECTIONS.find(([id])=>id===section)?.[1]}</h2>
     {section==="summary"&&<>
     {mobileView?<section className="ds-shortcuts" aria-label="Explorar otras estadísticas">
