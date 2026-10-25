@@ -47,7 +47,7 @@ Ver [diseño y accesibilidad de Datos v0.57.1](docs/V0571_DATOS_EDITORIAL.md).
 
 ## Novedades de v0.57.0-beta.1
 
-El subsistema **Registro de Bitácoras** incorpora una interfaz móvil tipo aplicación (Apple Native + Adaptive Pro) con barra inferior, vistas de semanas y herramientas, modo de presentación automático y opción manual. Estadísticas ahora se organiza mediante **seis secciones** para evitar desplazamientos innecesarios. Los reportes individuales incluyen un **Índice de Seguimiento Dual (0–100)** con interpretación explicable, sin carácter crediticio ni sancionador. El icono Dual oficial identifica el PWA independiente del generador principal.
+El subsistema **Registro de Bitácoras** incorpora una interfaz móvil tipo aplicación (Apple Native + Adaptive Pro) con barra inferior, vistas de semanas y herramientas, modo de presentación automático y opción manual. Estadísticas ahora se organiza mediante **seis secciones** para evitar desplazamientos innecesarios. Los reportes individuales incluyen un **Índice de Seguimiento Dual (0–100)** con una gráfica de sus componentes. El icono Dual oficial identifica el PWA independiente del generador principal.
 
 Consulta [la documentación de Registro Dual v0.57](docs/V057_REGISTRO_DUAL.md) para conocer límites del índice, instalación, accesibilidad, privacidad y uso sin conexión.
 
