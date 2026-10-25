@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.57.0-beta.1 · Registro Dual adaptable e índice individual · 2026-10-24
+
+- Nueva experiencia móvil **Apple Native + Adaptive Pro** exclusiva del Registro de Bitácoras: cabecera con logo Dual oficial, inicio compacto, navegación inferior y vistas dedicadas de Semanas y Herramientas.
+- Selección **Automática / Móvil / Escritorio**, guardada localmente, con detección de tamaño de ventana en tiempo real. Se preservan las pantallas de escáner, formularios, importación de JSON y reportes.
+- Estadísticas divididas en **Resumen, Asistencia, Empresas, Grupos, Alumnos e Histórico** mediante un menú lateral para escritorio y panel desplegable en móvil; filtros plegables en teléfonos. Las comparaciones por empresa incluyen menor tasa de faltas y no confunden ausencia de datos con 0 %.
+- Reporte individual PDF con **Índice de Seguimiento Dual 0–100**: 50 % cumplimiento de entregas vencidas, 30 % puntualidad y 20 % regularidad de las últimas cuatro semanas vencidas. «Sin evaluación» cuando no hay plazos; valor provisional con menos de cuatro. Interpretaciones de uso administrativo, no crediticio ni sancionador. Las faltas, los motivos de salud y los días inhábiles no afectan el índice.
+- PWA independiente de Registro Dual: logotipo oficial suministrado en `public/Assets/registro-dual-icon-original.png`, generación automática de iconos normal, maskable, Apple y favicon; manifiesto aislado del generador principal y precarga de iconos sin conexión.
+- Se mantienen el esquema de datos, los respaldos locales existentes, el generador de bitácoras y los registros de semanas anteriores. Documentación de instalación, uso y fórmula en [`docs/V057_REGISTRO_DUAL.md`](docs/V057_REGISTRO_DUAL.md).
+- Pruebas de navegación, puntuación transparente, rutas de instalación PWA y generación de iconos.
+
+
 ## 0.56.1-beta.1 · Generador de avisos PNG · 2026-10-23
 
 - La antigua sección de Anuncios se convierte en **Avisos PNG**, un generador de imágenes compartibles con vista previa en vivo y logotipo oficial.
