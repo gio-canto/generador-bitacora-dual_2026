@@ -83,7 +83,7 @@ function PerformanceTable({rows,type}){
 function Metric({name,value}) {
   return <article className="ds-kpi"><strong><AnimatedValue value={value}/></strong><span>{name}</span></article>;
 }
-export default function DeliveryStatistics({ state, onBack, onReportStudent, onReportStatistics }) {
+export default function DeliveryStatistics({ state, onBack, onReportStudent, onReportStatistics, mobileView=true }) {
   const rootRef = useRef(null);
   const [period,setPeriod] = useState("weekly");
   const [weekId,setWeekId] = useState(state.weeks.at(-1)?.id || "");
@@ -159,12 +159,20 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
   const interpretation=useMemo(()=>interpretStatistics(data,insightSummary),[data,insightSummary]);
 
   return <div className="delivery-analytics-container" ref={rootRef}>
-    <StatisticsHero data={data} period={period} onPeriodChange={setPeriod}
+    {mobileView&&<StatisticsHero data={data} period={period} onPeriodChange={setPeriod}
       onBack={onBack} onReportStatistics={onReportStatistics}
       onToggleFilters={()=>setFiltersOpen(open=>!open)} filtersOpen={filtersOpen}
       specialty={specialty} company={company}
       weekLabel={state.weeks.find(week=>week.id===weekId)?.label||""}
-      month={month} section={section}/>
+      month={month} section={section}/>}
+    {!mobileView&&<div className="ds-header ds-desktop-header">
+      <button className="btn" type="button" onClick={onBack}>← Volver</button>
+      <span className="delivery-kicker">Registro de entrega</span>
+      <div className="ds-panel-head">
+        <h1>Estadísticas</h1>
+        <button className="btn" type="button" onClick={onReportStatistics}>Abrir Reportes</button>
+      </div>
+    </div>}
     <div className="ds-mobile-toolbar">
       <button type="button" className="btn" aria-expanded={navOpen}
         aria-controls="ds-sidebar" onClick={()=>setNavOpen(value=>!value)}>☰ {STAT_SECTIONS.find(([id])=>id===section)?.[1]} · Secciones</button>
@@ -188,6 +196,11 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       <div className="ds-workspace-content">
         <div className={"ds-filter-panel"+(filtersOpen?" ds-filters-open":" ds-filters-closed")}>
     <div className="ds-controls" id="ds-controls-options" aria-label="Filtros detallados de Datos">
+      {!mobileView&&<div className="ds-tabs" role="group" aria-label="Periodo">
+        {[["weekly","Semanal"],["monthly","Mensual"],["all","General"]].map(([id,label])=>
+          <button key={id} type="button" aria-pressed={period===id}
+            className={period===id?"active":""} onClick={()=>setPeriod(id)}>{label}</button>)}
+      </div>}
       <div className="ds-controls-header">
         <strong>Refinar resultados</strong>
         <button type="button" onClick={()=>setFiltersOpen(false)} aria-label="Cerrar filtros">Cerrar ✕</button>
@@ -215,7 +228,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
     <div className="ds-results" key={viewKey+section}>
     <h2 className="ds-current-heading">{STAT_SECTIONS.find(([id])=>id===section)?.[1]}</h2>
     {section==="summary"&&<>
-    <section className="ds-shortcuts" aria-label="Explorar otras estadísticas">
+    {mobileView?<section className="ds-shortcuts" aria-label="Explorar otras estadísticas">
       <div className="ds-shortcuts-heading"><span>EXPLORAR / REGISTRO DUAL</span><h2>En detalle</h2></div>
       <div className="ds-shortcut-grid">
         {[
@@ -233,7 +246,14 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
           <span className="ds-shortcut-arrow" aria-hidden="true">↗</span>
         </button>)}
       </div>
-    </section>
+    </section>:<div className="ds-kpis">
+       <Metric name="Alumnos activos" value={fmt(data.students.length)}/>
+       <Metric name="Horas registradas" value={hours(data.totalMinutes/60)}/>
+       <Metric name="Jornadas con falta" value={fmt(data.daily.falta)}/>
+       <Metric name="Días sin labores" value={fmt(data.daily.sin_labores)}/>
+       <Metric name="Días inhábiles" value={fmt(data.daily.inhabil)}/>
+       <Metric name="Uso identificado" value={percent(data.usage.used,data.students.length)+"%"}/>
+     </div>}
     <section className="ds-panel ds-interpretations" aria-label="Interpretación del periodo">
       <h2>Resumen del periodo</h2>
       <div className="ds-insight-explainer-grid">
