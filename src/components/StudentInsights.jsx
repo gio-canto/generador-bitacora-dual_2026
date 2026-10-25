@@ -115,7 +115,7 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
         empty="No hay horas registradas en este periodo."/>
       <section className="ds-panel ds-insight-explainer">
         <h3>Cómo se interpretan las comparaciones</h3>
-        <p>Las faltas pueden estar justificadas. «No aplica» queda fuera del cumplimiento y las jornadas sin datos no cuentan como cero faltas.</p>
+        <p>Las faltas pueden estar justificadas. Las jornadas sin datos no se contabilizan como cero faltas.</p>
       </section>
     </div>
 
