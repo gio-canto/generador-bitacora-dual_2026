@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.57.0--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.57.1--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## Novedades de v0.57.1-beta.1
+
+**Datos · Editorial Glass:** el módulo de Estadísticas estrena un hero de inspiración iOS con identidad Dual, fondo aqua y durazno, tipografía editorial, filtros de periodo en cápsulas y detalles plegables, tarjeta translúcida con cumplimiento real y anillo proporcional de entregas puntuales, tardías y pendientes. La vista Resumen tiene accesos breves a Asistencia, Empresas, Grupos, Alumnos e Histórico. En periodos sin registros aplicables, se muestra un estado sin datos en lugar de presentar una tasa ficticia de 0 %. Conserva la misma fuente de datos y los PDF existentes.
+
+Ver [diseño y accesibilidad de Datos v0.57.1](docs/V0571_DATOS_EDITORIAL.md).
 
 ## Novedades de v0.57.0-beta.1
 
