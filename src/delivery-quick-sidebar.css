@@ -172,3 +172,10 @@
  .delivery-app .delivery-quick-sidebar,.delivery-app .delivery-quick-trigger,
  .delivery-app .delivery-quick-scrim,.delivery-app .delivery-backup-reminder{display:none!important}
 }
+
+/* En las pestañas principales, la barra inferior y el menú rápido sustituyen
+ * al enlace «Inicio» redundante; en una semana/captura el regreso sigue visible. */
+.delivery-app.delivery-layout-mobile:is(
+  [data-view="weeks"],[data-view="statistics"],[data-view="more"],
+  [data-view="announcements"]
+) .delivery-backline{display:none}
