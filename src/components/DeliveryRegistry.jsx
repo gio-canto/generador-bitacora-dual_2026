@@ -2761,81 +2761,36 @@ export default function DeliveryRegistry({ onClose }) {
               </button>
             </section>
 
-            <section className="delivery-summary-grid">
+            <section className="delivery-summary-grid delivery-home-metrics" aria-label="Indicadores de inicio">
               <article className="delivery-summary-card">
-                <Users size={28} />
-                <span>Alumnos</span>
+                <Users size={25} aria-hidden="true"/>
+                <span>Alumnos activos</span>
                 <strong>{activeStudents.length}</strong>
-                <small>
-                  {desistedStudents.length
-                    ? desistedStudents.length + " desistido" + (desistedStudents.length === 1 ? "" : "s")
-                    : "Activos"}
-                </small>
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={() => {
-                    setSetupIntent("manage");
-                    setSetupReturnView("home");
-                    setContextForm(state.context);
-                    setSetupStep(1);
-                    setView("setup");
-                  }}
-                >
-                  Administrar base
+                <small>{desistedStudents.length?
+                  desistedStudents.length+" fuera del programa":"Padrón de Educación Dual"}</small>
+                <button className="btn" type="button" onClick={()=>manageStudents("home")}>
+                  Ver alumnos
                 </button>
               </article>
               <article className="delivery-summary-card">
-                <FileArrowUp size={28} />
-                <span>Semanas</span>
+                <CalendarDots size={25} aria-hidden="true"/>
+                <span>Semanas registradas</span>
                 <strong>{state.weeks.length}</strong>
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={() => setView("new-week")}
-                >
-                  Nueva semana
+                <small>Consulta el historial completo</small>
+                <button className="btn" type="button" onClick={()=>setView("weeks")}>
+                  Ver semanas
                 </button>
               </article>
               <article className="delivery-summary-card">
-                <Scan size={28} />
-                <span>Escaneo</span>
-                <strong className="delivery-summary-text">
-                  {state.weeks.at(-1)?.label || "Sin semana"}
-                </strong>
-                <button
-                  className="btn primary"
-                  type="button"
-                  disabled={!state.weeks.length || !activeStudents.length}
-                  onClick={() => {
-                    const week = state.weeks.at(-1);
-                    setActiveWeekId(week.id);
-                    setView("scanner");
-                  }}
-                >
-                  Escanear entregas
-                </button>
-              </article>
-              <article className="delivery-summary-card">
-                <FilePdf size={28} />
-                <span>Reporte</span>
-                <strong className="delivery-summary-text">PDF</strong>
-                <button
-                  className="btn"
-                  type="button"
-                  disabled={!state.weeks.length&&!state.students.length}
-                  onClick={() => openReport()}
-                >
-                  Crear reporte
-                </button>
-              </article>
-              <article className="delivery-summary-card">
-                <Info size={28} />
-                <span>Avisos PNG</span>
-                <strong>{(state.announcements||[]).length+announcementsNow.deadlines.length+1}</strong>
-                <small>Listos para compartir</small>
-                <button className="btn" type="button" onClick={()=>setView("announcements")}>
-                  Crear avisos PNG
+                <ChartBar size={25} aria-hidden="true"/>
+                <span>Última semana</span>
+                <strong>{activeSummary?
+                  activeSummary.registered+"/"+activeSummary.applicable:"—"}</strong>
+                <small>{activeWeek?.label||"Crea una semana para empezar"}</small>
+                <button className="btn" type="button" disabled={!activeWeek} onClick={()=>{
+                  setStatusFilter("all");setView("week");
+                }}>
+                  Abrir entregas
                 </button>
               </article>
             </section>
@@ -2851,20 +2806,20 @@ export default function DeliveryRegistry({ onClose }) {
               <div className="delivery-panel-head">
                 <div>
                   <span className="delivery-kicker">Historial</span>
-                  <h2>Semanas</h2>
+                  <h2>Actividad reciente</h2>
                 </div>
                 <button
                   className="btn"
                   type="button"
-                  onClick={() => setView("new-week")}
+                  onClick={() => setView("weeks")}
                 >
-                  <Plus size={18} />
-                  Nueva semana
+                  <ArrowRight size={18} />
+                  Ver todas
                 </button>
               </div>
               {state.weeks.length ? (
                 <div className="delivery-week-list">
-                  {[...state.weeks].reverse().map((week) => {
+                  {[...state.weeks].slice(-3).reverse().map((week) => {
                     const summary = weekSummary(week, state.students);
                     return (
                       <button
