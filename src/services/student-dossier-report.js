@@ -148,6 +148,7 @@ function summary(canvas,d,img,logo,pages,context){
  txt(ctx,"ÍNDICE DE SEGUIMIENTO DUAL",726,701,18,C.ink,700,442);
  txt(ctx,score.value==null?"—":String(score.value)+"/100",726,762,44,C.blue,750,220);
  txt(ctx,score.label,924,750,18,C.ink,700,239);
+ txt(ctx,score.components?"C "+score.components.compliance+"% · P "+score.components.punctuality+"% · R "+score.components.regularity+"%":"Sin plazos evaluables",924,780,14,C.muted,600,239);
  txt(ctx,score.provisional?(score.value==null?"Sin semanas vencidas":"Resultado provisional · "+score.due+" semanas"):
    score.due+" semanas evaluables",727,797,15,C.muted,500,430);
  txt(ctx,"Uso interno · No es puntaje crediticio ni sanción.",727,826,14,C.muted,500,430);
