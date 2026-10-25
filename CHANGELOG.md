@@ -1,5 +1,13 @@
 # Notas de versión
 
+## Corrección de coherencia visual · v0.57.1-beta.1
+
+- El primer hero Editorial Glass quedaba aislado del resto del módulo. Se corrigió mediante un **sistema visual compartido** para todas las pantallas de Registro Dual: Inicio, Semanas, Escáner, Alumnos, Formularios, Reportes, Avisos PNG, configuración, captura manual y Estadísticas.
+- El hero de Datos deja atrás el gradiente fuerte y adopta los mismos tonos ambientales suaves, blancos cálidos, bordes y elevaciones que el resto del registro. Se mantiene el resumen y el anillo con cifras reales.
+- Logo Dual oficial en cabeceras de escritorio y móvil, superficie glass unificada en menús, tarjetas y modales, controles táctiles accesibles y fallback para movimientos/transparencias reducidas.
+- El escáner preserva contraste oscuro en la cámara y los flujos de datos y exportación no cambian.
+- Véase [`docs/V0571_UNIFIED_GLASS.md`](docs/V0571_UNIFIED_GLASS.md). Sin nueva migración ni cambio de número de versión.
+
 ## 0.57.1-beta.1 · Datos Editorial Glass · 2026-10-24
 
 - Hero de **Datos** rediseñado en estilo **Apple inspirado + editorial premium**: gradiente ambiental aqua, blanco cálido y durazno, capas translúcidas, marcos suaves y tipografía de alta jerarquía, sin depender de librerías visuales externas.
