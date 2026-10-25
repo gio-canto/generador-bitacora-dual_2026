@@ -3,6 +3,24 @@
  * No es un puntaje crediticio, disciplinario ni de aptitud personal.
  * Nunca considera faltas, motivos de salud, jornadas inhábiles o sin labores.
  */
+export const DUAL_SCORE_NOTICE =
+  "Uso escolar interno: indicador orientativo de entregas; no es puntaje de crédito ni una sanción.";
+
+/**
+ * Componentes ponderados del gráfico 0–100. Cada segmento ocupa los puntos
+ * que realmente aporta al índice, no una categoría de riesgo disciplinario.
+ * Un resultado sin plazos evaluables no dibuja barras con valor cero.
+ */
+export function dualScoreGraphParts(score){
+  if(score?.value==null||!score.components)return [];
+  const {compliance,punctuality,regularity}=score.components;
+  return [
+    {key:"compliance",label:"Cumplimiento",points:clamp(compliance)*.5,color:"#1d6096"},
+    {key:"punctuality",label:"Puntualidad",points:clamp(punctuality)*.3,color:"#2d8f96"},
+    {key:"regularity",label:"Regularidad",points:clamp(regularity)*.2,color:"#c59447"},
+  ];
+}
+
 const clamp=n=>Math.max(0,Math.min(100,n));
 const received=w=>w.status==="entregado"||w.status==="entregado_tarde";
 const rounded=n=>Math.round(clamp(n));
@@ -11,7 +29,7 @@ export function calculateDualScore(dossier){
   const due=dueRows.length;
   if(!due)return {
     value:null,label:"Sin evaluación",provisional:true,due:0,
-    interpretation:"Todavía no existen semanas vencidas evaluables. No se asigna una puntuación.",
+    interpretation:"Todavía no existen semanas vencidas evaluables. No se asigna una puntuación. "+DUAL_SCORE_NOTICE,
     components:null,
   };
   const submitted=dueRows.filter(received).length;
@@ -38,6 +56,6 @@ export function calculateDualScore(dossier){
       delivered:submitted,onTime},
     interpretation:"Índice "+value+"/100"+(provisional?" (provisional)":"")+
       " calculado con "+due+" semanas vencidas evaluables. "+label+"."+
-      improvement+" No equivale a evaluación crediticia ni sanción.",
+      improvement+" "+DUAL_SCORE_NOTICE,
   };
 }
