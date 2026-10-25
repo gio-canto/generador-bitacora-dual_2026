@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.57.2-beta.1 · Inicio, accesos rápidos y respaldos preventivos · 2026-10-24
+
+- Corrección visual de Inicio: reemplaza tarjetas desiguales y la acción de escaneo duplicada por **tres indicadores proporcionados** (alumnos, semanas, última semana); la última semana usa siempre el periodo más reciente, no la selección previa.
+- Inicio muestra únicamente las **tres semanas recientes** y un acceso a «Ver todas». La pantalla Semanas conserva todo el historial.
+- Nueva barra lateral **Accesos rápidos**: anclada en escritorio ancho, desplegable con botón «Menú» en móvil y ventanas más estrechas. Incluye navegación a Inicio, Semanas, Datos y Avisos, acceso a escaneo, creación de semana, alumnos, reportes, ayuda y guardado de respaldo.
+- Recordatorio **no intrusivo** de copia JSON: después de 24 horas de uso con registros, solo si han pasado al menos 30 minutos desde el último cambio. Tras un respaldo, requiere cambios nuevos y al menos 72 horas; entre avisos transcurren 72 horas. «Recordar después» aplaza 48 horas. Solo aparece en Inicio, Semanas y Herramientas; nunca interrumpe escaneos o formularios.
+- Las descargas de respaldo desde la cabecera, la barra lateral, Herramientas y los flujos automáticos emplean la misma señal de respaldo; no se declara que el archivo se haya guardado fuera del navegador, sino que la **descarga se inició**.
+- Metadatos de recordatorios almacenados localmente, independientes de los datos académicos y de los respaldos exportados. Sin avisos push, sin telemetría ni cambios al esquema de registros.
+- Revisión de responsive, navegación con teclado y documentación en [`docs/V0572_INICIO_Y_RESPALDOS.md`](docs/V0572_INICIO_Y_RESPALDOS.md).
+
+
 ## Corrección de coherencia visual · v0.57.1-beta.1
 
 - El primer hero Editorial Glass quedaba aislado del resto del módulo. Se corrigió mediante un **sistema visual compartido** para todas las pantallas de Registro Dual: Inicio, Semanas, Escáner, Alumnos, Formularios, Reportes, Avisos PNG, configuración, captura manual y Estadísticas.
