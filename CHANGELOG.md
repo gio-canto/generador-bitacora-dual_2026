@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.57.1-beta.1 · Datos Editorial Glass · 2026-10-24
+
+- Hero de **Datos** rediseñado en estilo **Apple inspirado + editorial premium**: gradiente ambiental aqua, blanco cálido y durazno, capas translúcidas, marcos suaves y tipografía de alta jerarquía, sin depender de librerías visuales externas.
+- Conserva el símbolo original Dual en el hero e identifica correctamente la versión del sistema.
+- Selector Semanal / Mensual / General en cápsulas, acceso directo a filtros de semana, especialidad y empresa, presentación compacta de filtros aplicados y botón de reportes PDF.
+- Tarjeta principal de cumplimiento con porcentaje calculado del mismo servicio existente que alimenta el resto de estadísticas. Anillo SVG con cantidades reales de bitácoras puntuales, tardías y pendientes, miniindicadores de horas, asistencia, faltas y cobertura.
+- Si el periodo no tiene entregas aplicables, muestra **— / Sin registros**; si faltan estadísticas de jornadas, asistencia y faltas no se presentan falsamente como 0.
+- Accesos editoriales desde Resumen a Asistencia, Empresas, Grupos, Alumnos e Histórico, eliminando la antigua cuadrícula inicial redundante.
+- Estilos adaptables desde pantallas pequeñas hasta escritorio, controles táctiles, foco visible y preferencias de movimiento/transparencia reducida.
+- Sin modificar el esquema local, el cálculo de las estadísticas, los respaldos ni los PDF de los informes. Documentación en [`docs/V0571_DATOS_EDITORIAL.md`](docs/V0571_DATOS_EDITORIAL.md).
+
+
 ## 0.57.0-beta.1 · Registro Dual adaptable e índice individual · 2026-10-24
 
 - Nueva experiencia móvil **Apple Native + Adaptive Pro** exclusiva del Registro de Bitácoras: cabecera con logo Dual oficial, inicio compacto, navegación inferior y vistas dedicadas de Semanas y Herramientas.
