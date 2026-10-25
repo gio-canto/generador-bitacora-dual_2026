@@ -28,6 +28,7 @@ import {
   House,
   CalendarDots,
   DotsThree,
+  List,
 } from "@phosphor-icons/react";
 import {
   contextIsComplete,
@@ -66,6 +67,8 @@ import {generateStudentDossierPdf} from "../services/student-dossier-report.js";
 import {generateStatisticsReportPdf} from "../services/statistics-report.js";
 import {calculateStudentInsights} from "../services/student-insights.js";
 import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
+import RegistryQuickSidebar from "./RegistryQuickSidebar.jsx";
+import {acknowledgeBackupReminder,observeBackupActivity,shouldRemindBackup} from "../services/backup-reminder.js";
 import { parseStudentSpreadsheet } from "../services/student-spreadsheet.js";
 import { generateDeliveryReportPdf } from "../services/delivery-report.js";
 import { generateStudentRosterPdf, ROSTER_MODES } from "../services/student-roster-report.js";
@@ -79,6 +82,7 @@ import {
 import { notify } from "../services/rare-notification.jsx";
 import "../delivery-registry.css";
 import "../delivery-unified-glass.css";
+import "../delivery-quick-sidebar.css";
 
 const ZXING_SOURCES = [
   "https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js",
@@ -457,6 +461,8 @@ export default function DeliveryRegistry({ onClose }) {
   const [editingStudentId, setEditingStudentId] = useState("");
   const [studentActionId, setStudentActionId] = useState("");
   const [notice, setNotice] = useState(null);
+  const [quickOpen,setQuickOpen] = useState(false);
+  const [backupReminderOpen,setBackupReminderOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [specialtyFilter, setSpecialtyFilter] = useState("all");
@@ -530,6 +536,52 @@ export default function DeliveryRegistry({ onClose }) {
     setState(saved);
     return saved;
   };
+
+
+  const saveBackup=(savedState=state,showMessage=true)=>{
+    try{
+      exportDeliveryState(savedState);
+      acknowledgeBackupReminder(window.localStorage,"saved");
+      setBackupReminderOpen(false);
+      if(showMessage)notify("success","Descarga iniciada","Guarda el archivo JSON en un lugar seguro.");
+      return true;
+    }catch(error){
+      showNotice("error","No se pudo descargar el respaldo",
+        error?.message||"Revisa los permisos de descarga del navegador.");
+      return false;
+    }
+  };
+  const manageStudents=(returnView="home")=>{
+    setSetupIntent("manage");setSetupReturnView(returnView);
+    setContextForm(state.context);setSetupStep(1);setView("setup");
+  };
+  const openTutorial=()=>{setTutorialStep(0);setTutorialOpen(true);};
+  const openNewestScan=()=>{
+    if(!state.weeks.length||!activeStudents.length)return;
+    setActiveWeekId(state.weeks.at(-1)?.id||"");setView("scanner");
+  };
+  useEffect(()=>{
+    if(!started||!["home","weeks","more"].includes(view)||manualTarget||reportOpen||tutorialOpen)return;
+    const storage=window.localStorage;
+    const check=()=>{
+      const now=Date.now();
+      const meta=observeBackupActivity(storage,state,now);
+      if(shouldRemindBackup(state,meta,now)){
+        acknowledgeBackupReminder(storage,"shown",now);
+        setBackupReminderOpen(true);
+      }
+    };
+    check();
+    const timer=window.setInterval(check,60*60*1000);
+    return ()=>window.clearInterval(timer);
+  },[started,view,state.updatedAt,state.students.length,state.weeks.length,
+     state.announcements?.length,manualTarget,reportOpen,tutorialOpen]);
+  useEffect(()=>{
+    if(!quickOpen)return;
+    const escape=e=>{if(e.key==="Escape")setQuickOpen(false);};
+    document.addEventListener("keydown",escape);
+    return ()=>document.removeEventListener("keydown",escape);
+  },[quickOpen]);
 
   const showNotice = (kind, title, description = "") =>
     setNotice({ kind, title, description });
@@ -1377,6 +1429,8 @@ export default function DeliveryRegistry({ onClose }) {
     try {
       const imported = parsePortableDeliveryFile(await file.text());
       const saved = writeDeliveryState(imported);
+      acknowledgeBackupReminder(window.localStorage,"saved");
+      setBackupReminderOpen(false);
       setState(saved);
       setContextForm(saved.context);
       setActiveWeekId(saved.weeks.at(-1)?.id || "");
@@ -1595,14 +1649,14 @@ export default function DeliveryRegistry({ onClose }) {
     if (rest.length && activeWeek) {
       setManualTarget({studentId:rest[0],status:deliveryStatus(activeWeek,rest[0])});
     } else {
-      if (weekCaptureBackupAfter) exportDeliveryState(savedState);
+      if (weekCaptureBackupAfter) saveBackup(savedState);
       setWeekCaptureBackupAfter(false);
       setWeekCaptureTotal(0);
       setManualTarget(null);
     }
   };
   const endWeekCapture = () => {
-    if (weekCaptureBackupAfter) exportDeliveryState(state);
+    if (weekCaptureBackupAfter) saveBackup(state);
     setWeekCaptureBackupAfter(false);
     setWeekCaptureQueue([]);
     setWeekCaptureTotal(0);
@@ -1658,7 +1712,7 @@ export default function DeliveryRegistry({ onClose }) {
     setActiveWeekId(week.id);
     setWeekForm({ label: "", startDate: "", dueAt: "" });
     clearNotice();
-    if (downloadAfter && !capture) exportDeliveryState(saved);
+    if (downloadAfter && !capture) saveBackup(saved);
     notify(
       "success",
       "Semana creada",
@@ -1817,7 +1871,7 @@ export default function DeliveryRegistry({ onClose }) {
     }
 
     const saved = commit({ ...state, weeks });
-    if (scanQueue.length) exportDeliveryState(saved);
+    if (scanQueue.length) saveBackup(saved);
 
     const lastWeekId = scanQueue.at(-1)?.weekId || activeWeekId;
     if (lastWeekId) setActiveWeekId(lastWeekId);
@@ -2113,6 +2167,12 @@ export default function DeliveryRegistry({ onClose }) {
           <span className="delivery-mobile-app-name">Registro Dual</span>
         </button>
         <div className="delivery-top-actions">
+          {started&&view!=="scanner"&&<button className="btn delivery-quick-trigger" type="button"
+            aria-label="Abrir accesos rápidos" aria-expanded={quickOpen}
+            aria-controls="delivery-quick-sidebar" onClick={()=>setQuickOpen(value=>!value)}>
+            <List size={20} aria-hidden="true"/>
+            <span>Menú</span>
+          </button>}
           <button
             className="btn"
             type="button"
@@ -2149,11 +2209,11 @@ export default function DeliveryRegistry({ onClose }) {
               aria-label="Guardar archivo de registro"
               title="Guardar archivo"
               onClick={() => {
-                exportDeliveryState(state);
+                saveBackup(state);
                 notify(
                   "success",
-                  "Archivo guardado",
-                  "Registro de entrega actualizado.",
+                  "Descarga iniciada",
+                  "Conserva el archivo JSON fuera del navegador.",
                 );
               }}
             >
@@ -2163,8 +2223,31 @@ export default function DeliveryRegistry({ onClose }) {
           )}
         </div>
       </header>
+      {started&&view!=="scanner"&&<RegistryQuickSidebar open={quickOpen}
+        onClose={()=>setQuickOpen(false)} current={view}
+        canScan={Boolean(state.weeks.length&&activeStudents.length)}
+        onNavigate={next=>setView(next)} onScan={openNewestScan}
+        onCreateWeek={()=>setView("new-week")}
+        onManage={()=>manageStudents(view)} onReport={()=>openReport()}
+        onBackup={()=>saveBackup()} onTutorial={openTutorial}/>}
 
       <main className="delivery-shell">
+        {backupReminderOpen&&["home","weeks","more"].includes(view)&&<aside
+          className="delivery-backup-reminder" role="status" aria-label="Recordatorio de respaldo">
+          <div className="delivery-backup-reminder-copy">
+            <DownloadSimple size={23} aria-hidden="true"/>
+            <div><strong>Recuerda guardar un respaldo</strong>
+              <p>Tienes cambios en el registro. Descarga una copia JSON para conservarlos fuera del navegador.</p>
+            </div>
+          </div>
+          <div className="delivery-backup-reminder-actions">
+            <button type="button" className="btn primary" onClick={()=>saveBackup()}>Descargar respaldo</button>
+            <button type="button" className="btn" onClick={()=>{
+              acknowledgeBackupReminder(window.localStorage,"later");
+              setBackupReminderOpen(false);
+            }}>Recordar después</button>
+          </div>
+        </aside>
         {started && !["home","welcome","scanner","setup"].includes(view) && <div className="delivery-backline"><button type="button" className="btn" onClick={()=>setView("home")}><ArrowLeft size={17}/> Inicio</button></div>}
         {view === "welcome" && (
           <section className="delivery-welcome">
@@ -2858,8 +2941,8 @@ export default function DeliveryRegistry({ onClose }) {
             <button className="btn" type="button" onClick={()=>{setSetupIntent("manage");setSetupReturnView("more");
               setContextForm(state.context);setSetupStep(1);setView("setup");}}><Users size={20}/> Administrar alumnos</button>
             <button className="btn" type="button" onClick={()=>{setTutorialStep(0);setTutorialOpen(true);}}><Info size={20}/> Tutorial</button>
-            <button className="btn" type="button" onClick={()=>{exportDeliveryState(state);
-              notify("success","Archivo guardado","Respaldo local generado.");}}>
+            <button className="btn" type="button" onClick={()=>{saveBackup(state);
+              notify("success","Descarga iniciada","Guarda el archivo JSON descargado.");}}>
               <DownloadSimple size={20}/> Guardar respaldo</button>
             <label className="btn delivery-mobile-import"><UploadSimple size={20}/> Abrir registro JSON
               <input hidden type="file" accept=".json,application/json"
