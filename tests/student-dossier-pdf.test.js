@@ -1,5 +1,7 @@
 import {afterEach,describe,expect,it,vi} from "vitest";
 import {createCanvas} from "@napi-rs/canvas";
+import {readFile} from "node:fs/promises";
+import {join} from "node:path";
 import {generateStudentDossierPdf,interpretStudentDossier,drawDualScoreGraph,DOSSIER_ROWS_PER_PAGE} from "../src/services/student-dossier-report.js";
 import {buildStudentDossier} from "../src/services/student-dossier.js";
 import {calculateDualScore} from "../src/services/dual-score.js";
@@ -23,6 +25,18 @@ function sample(weeks=2){
 }
 afterEach(()=>vi.restoreAllMocks());
 describe("PDF del expediente individual v0.55.1",()=>{
+  it("elimina las frases repetitivas del PDF y conserva la gráfica del índice",async()=>{
+    const dossier=await readFile(join(process.cwd(),"src/services/student-dossier-report.js"),"utf8");
+    const statistics=await readFile(join(process.cwd(),"src/services/statistics-report.js"),"utf8");
+    const insights=await readFile(join(process.cwd(),"src/components/StudentInsights.jsx"),"utf8");
+    for(const s of [dossier,statistics,insights]){
+      expect(s).not.toMatch(/USO ESCOLAR INTERNO|DUAL_SCORE_NOTICE|No es puntaje de cr[eé]dito ni sanci[oó]n/i);
+    }
+    expect(dossier).not.toContain("Una entrega tardía cuenta como recibida. «No aplica» queda excluido.");
+    expect(dossier).toContain("drawDualScoreGraph(ctx,score)");
+    expect(dossier).toContain("REGISTRO DUAL · ");
+  });
+
   it("genera PDF multipágina, avatar y las jornadas sin depender de un servidor",async()=>{
     const real=document.createElement.bind(document);
     vi.spyOn(document,"createElement").mockImplementation(name=>
