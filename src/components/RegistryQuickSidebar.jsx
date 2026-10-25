@@ -26,7 +26,7 @@ export default function RegistryQuickSidebar({open,onClose,current,canScan,
     <nav aria-label="Navegación rápida">
       {routes.map(({id,label,icon:Icon})=><button type="button"
         className={"delivery-quick-link"+(isCurrent(id)?" active":"")}
-        aria-current={isCurrent(id)?"page":undefined} key={id}
+        aria-label={"Acceso rápido: "+label} aria-current={isCurrent(id)?"page":undefined} key={id}
         onClick={()=>{onNavigate(id);onClose();}}>
         <Icon size={19} weight={isCurrent(id)?"fill":"regular"} aria-hidden="true"/>
         <span>{label}</span><ArrowRight className="delivery-quick-chevron" size={14} aria-hidden="true"/>
