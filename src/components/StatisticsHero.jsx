@@ -1,13 +1,10 @@
-import {ArrowLeft,ArrowUpRight,SlidersHorizontal,Clock,Users,FileArrowDown} from "@phosphor-icons/react";
+import {SlidersHorizontal,Clock,Users,FileArrowDown} from "@phosphor-icons/react";
 import AnimatedValue from "./AnimatedValue.jsx";
-import {VERSION} from "../domain/records.js";
 import "../delivery-statistics-hero.css";
 
 const number=(value,digits=0)=>Number(value||0).toLocaleString("es-MX",{maximumFractionDigits:digits});
 const percentage=value=>value==null?"—":number(value)+"%";
 const periods=[["weekly","Semanal"],["monthly","Mensual"],["all","General"]];
-const logoSrc=()=>typeof window!=="undefined"&&window.location.pathname.includes("/registro-entrega/")
-  ?"../Assets/registro-dual-icon-192.png":"Assets/registro-dual-icon-192.png";
 
 function DeliveryRing({data}){
  const total=Number(data.applicable)||0;
@@ -46,28 +43,8 @@ export default function StatisticsHero({data,period,onPeriodChange,onBack,onRepo
    period==="monthly"?(month||"Sin mes seleccionado"):"Todas las semanas";
  const filterCount=Number(Boolean(specialty))+Number(Boolean(company));
  return <header className="ds-premium-hero" aria-label="Presentación de Datos">
-   <div className="ds-premium-hero-top">
-     <button className="ds-hero-back" type="button" onClick={onBack}>
-       <ArrowLeft size={17} weight="bold" aria-hidden="true"/><span>Volver al registro</span>
-     </button>
-     <div className="ds-premium-hero-actions">
-       <span className="ds-hero-edition">REGISTRO DUAL / v{VERSION}</span>
-       <div className="ds-hero-logo" role="img" aria-label="Logotipo oficial Dual">
-         <img src={logoSrc()} alt="" />
-       </div>
-     </div>
-   </div>
    <div className="ds-hero-intro">
-     <span className="ds-hero-eyebrow"><i/> PANORAMA ACADÉMICO <span> / 01</span></span>
-     <div className="ds-hero-title-row">
-       <div>
-         <h1>Datos<span>.</span></h1>
-         <p>Una mirada clara al seguimiento de Educación Dual.</p>
-       </div>
-       <button type="button" className="ds-hero-export" aria-label="Reportes" onClick={onReportStatistics}>
-         <FileArrowDown size={18} aria-hidden="true"/><span>Reportes</span><ArrowUpRight size={16} aria-hidden="true"/>
-       </button>
-     </div>
+     <h1>Datos</h1>
    </div>
    <div className="ds-hero-filter-row">
      <div className="ds-hero-periods" role="group" aria-label="Periodo de Datos">
@@ -88,8 +65,8 @@ export default function StatisticsHero({data,period,onPeriodChange,onBack,onRepo
    </div>
    {section==="summary"&&<div className="ds-hero-glass-card" aria-label="Resumen principal de entregas">
      <div className="ds-hero-glass-head">
-       <span className="ds-hero-card-eyebrow"><span className="ds-hero-blue-dot"/> SEGUIMIENTO DE ENTREGAS</span>
-       <span className="ds-hero-glass-caption">01 / RESUMEN</span>
+       <span className="ds-hero-card-eyebrow"><span className="ds-hero-blue-dot"/> ENTREGAS</span>
+       
      </div>
      <div className="ds-hero-glass-body">
        <div className="ds-hero-compliance">
@@ -125,6 +102,9 @@ export default function StatisticsHero({data,period,onPeriodChange,onBack,onRepo
    <div className="ds-hero-footer">
      <span><Clock size={14} aria-hidden="true"/> {period==="all"?"Vista acumulada":period==="monthly"?"Corte mensual":"Corte semanal"}</span>
      <span><Users size={14} aria-hidden="true"/> {number(data.students.length)} alumnos activos</span>
+     <button type="button" className="ds-hero-reports-link" aria-label="Reportes" onClick={onReportStatistics}>
+       <FileArrowDown size={16} aria-hidden="true"/> PDF
+     </button>
    </div>
  </header>;
 }
