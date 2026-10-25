@@ -31,7 +31,7 @@ describe("Restauración web de escritorio sin afectar la app móvil",()=>{
   expect(container.querySelector(".delivery-desktop-home-cards .delivery-summary-grid")
     ?.querySelectorAll(".delivery-summary-card")).toHaveLength(5);
   expect(container.querySelectorAll(".delivery-home-history .delivery-week-row")).toHaveLength(5);
-  expect(container.querySelector(".delivery-app-home-cards .delivery-home-metrics")).toBeTruthy();
+  expect(container.querySelector(".delivery-app-home-cards")).toBeNull();
   expect(container.querySelector(".delivery-bottom-navigation")).toBeNull();
   expect(screen.getByRole("button",{name:"Abrir accesos rápidos"})).toBeTruthy();
  });
