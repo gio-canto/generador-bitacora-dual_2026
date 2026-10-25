@@ -2090,8 +2090,9 @@ export default function DeliveryRegistry({ onClose }) {
       (isMobileLayout?" delivery-layout-mobile":" delivery-layout-desktop")}>
       <ScanSound tone={scanTone} />
       <header className="delivery-topbar">
-        <button className="delivery-brand" type="button" onClick={onClose}
-          aria-label="Volver al generador de Bitácora Dual">
+        <button className="delivery-brand" type="button"
+          onClick={()=>isMobileLayout?setView("home"):onClose()}
+          aria-label={isMobileLayout?"Ir al inicio de Registro Dual":"Volver al generador de Bitácora Dual"}>
           <img className="delivery-brand-logo-desktop"
             src={
               location.pathname.includes("/registro-entrega/")
