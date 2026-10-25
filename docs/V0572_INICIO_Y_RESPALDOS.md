@@ -2,6 +2,8 @@
 
 > **Ajuste posterior de escritorio:** la nueva barra de controles rápidos se abre al pulsar «Menú» en vez de permanecer como una columna fija. La versión web recupera el diseño clásico, independiente del modo móvil. Más información en [Restauración de escritorio](V0572_ESCRITORIO.md).
 
+> **Corrección visual móvil posterior:** `src/delivery-mobile-polish.css` resuelve títulos ocultos bajo la barra superior, contadores de semanas desbordados, cifras superpuestas en Inicio y encabezados duplicados en Datos. Los textos secundarios se abreviaron. La versión web de escritorio conserva su presentación clásica y los flujos de respaldo/captura no se modificaron.
+
 ## Alcance
 
 Actualización exclusiva de **Registro de Bitácoras** (ruta `/registro-entrega/`). Mantiene Apple Native + Adaptive Pro y la base Apple Glass de v0.57.1. No cambia el generador de documentos, los archivos PDF o PNG, el esquema local, ni la lógica de bitácoras, Data Matrix y estadísticas.
