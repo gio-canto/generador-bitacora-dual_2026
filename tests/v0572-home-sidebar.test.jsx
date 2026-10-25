@@ -29,7 +29,7 @@ describe("Inicio, accesos rápidos y respaldos · Registro Dual",()=>{
    const metrics=screen.getByRole("region",{name:"Indicadores de inicio"});
    expect(metrics.querySelectorAll(".delivery-summary-card")).toHaveLength(3);
    expect(within(metrics).getByText("Alumnos activos")).toBeTruthy();
-   expect(within(metrics).getByText("Semanas registradas")).toBeTruthy();
+   expect(within(metrics).getByText("Semanas")).toBeTruthy();
    expect(within(metrics).getByText("Última semana")).toBeTruthy();
    expect(metrics.textContent).toContain("Semana 5");
    expect(container.querySelectorAll(".delivery-home-history .delivery-week-row")).toHaveLength(3);
