@@ -1312,7 +1312,7 @@ button.delivery-action-tile{cursor:pointer}
 }
 .delivery-scanner-error-actions label.btn{cursor:pointer}
 
-@media (max-width:900px), (pointer:coarse){
+@media (max-width:900px){
   .delivery-app{
     min-height:100dvh;
     padding-left:env(safe-area-inset-left);
@@ -1392,7 +1392,7 @@ button.delivery-action-tile{cursor:pointer}
 }
 
 /* El modo escáner se comporta como una vista móvil dedicada. */
-@media (max-width:900px), (pointer:coarse){
+@media (max-width:900px){
   .scanner-active{
     background:#f5f5f7;
   }
@@ -1663,7 +1663,7 @@ button.delivery-action-tile{cursor:pointer}
 }
 
 
-@media (max-width:900px), (pointer:coarse){
+@media (max-width:900px){
   .scanner-active .delivery-scanner-error{
     position:fixed;
     z-index:135;
@@ -1874,7 +1874,7 @@ button.delivery-action-tile{cursor:pointer}
   }
 }
 
-@media (max-width:900px), (pointer:coarse){
+@media (max-width:900px){
   /* Los iconos de navegación se conservan en teléfono. Una regla heredada
      los ocultaba por debajo de 520 px. */
   .delivery-top-actions .btn svg{
@@ -2337,7 +2337,7 @@ button.delivery-action-tile{cursor:pointer}
   }
 }
 
-@media (max-width:900px), (pointer:coarse){
+@media (max-width:900px){
   .delivery-week-head-actions{
     grid-template-columns:repeat(4,minmax(0,1fr));
   }
