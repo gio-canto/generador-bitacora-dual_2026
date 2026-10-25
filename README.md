@@ -23,6 +23,12 @@
 
 ---
 
+## Corrección visual integral de v0.57.1-beta.1
+
+**Registro Dual ahora utiliza el mismo diseño Apple Native + Editorial Glass en todas sus pantallas**, no solo en Estadísticas. Inicio, Semanas, Escáner, Alumnos, Formularios, Avisos PNG y Reportes PDF comparten materiales blancos translúcidos, bordes, jerarquía tipográfica y acciones uniformes. El hero de Datos se suavizó para que no se vea distinto al resto; la cámara conserva un fondo contrastado. El símbolo oficial Dual aparece también en la cabecera de escritorio.
+
+Consulta [Sistema visual unificado](docs/V0571_UNIFIED_GLASS.md) para ver alcance y excepciones.
+
 ## Novedades de v0.57.1-beta.1
 
 **Datos · Editorial Glass:** el módulo de Estadísticas estrena un hero de inspiración iOS con identidad Dual, fondo aqua y durazno, tipografía editorial, filtros de periodo en cápsulas y detalles plegables, tarjeta translúcida con cumplimiento real y anillo proporcional de entregas puntuales, tardías y pendientes. La vista Resumen tiene accesos breves a Asistencia, Empresas, Grupos, Alumnos e Histórico. En periodos sin registros aplicables, se muestra un estado sin datos en lugar de presentar una tasa ficticia de 0 %. Conserva la misma fuente de datos y los PDF existentes.
