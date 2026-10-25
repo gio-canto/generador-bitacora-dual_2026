@@ -1,0 +1,173 @@
+/*
+ * v0.57.1 — Correcciones de Inicio, Quick Rail y recordatorio de respaldo.
+ * Nunca afecta el generador original, PDFs ni contenido de cámara.
+ */
+.delivery-app .delivery-quick-trigger{
+  display:inline-flex;gap:8px;align-items:center;min-height:41px;
+  padding:8px 13px;border-radius:13px;white-space:nowrap;
+}
+.delivery-app .delivery-quick-trigger svg{display:block!important;flex:0 0 auto}
+.delivery-app .delivery-quick-trigger span{font-size:12px;font-weight:720}
+.delivery-app .delivery-quick-sidebar{
+  position:fixed;top:90px;left:max(11px,calc((100vw - 1510px)/2));
+  z-index:105;width:196px;max-height:calc(100dvh - 108px);overflow-y:auto;
+  display:flex;flex-direction:column;gap:12px;
+  padding:18px 12px 12px;
+  background:rgba(252,253,255,.95);
+  border:1px solid rgba(214,224,235,.8);
+  border-radius:23px;box-shadow:0 16px 48px rgba(27,51,78,.1),inset 0 1px 0 white;
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  backdrop-filter:blur(22px) saturate(145%);
+  scrollbar-width:thin;
+}
+.delivery-quick-heading{display:flex;align-items:start;justify-content:space-between;gap:7px;padding:1px 4px 5px}
+.delivery-quick-heading>div{display:grid;gap:6px;min-width:0}
+.delivery-quick-heading span,.delivery-quick-caption,.delivery-quick-backup>span{
+  font-size:9px;letter-spacing:.105em;font-weight:850;color:#6f86a0;
+}
+.delivery-quick-heading strong{font-size:15px;color:#1b324b;line-height:1.22;letter-spacing:-.03em}
+.delivery-quick-close{display:none;align-items:center;justify-content:center;border:0;border-radius:12px;background:#eff4f8;color:#32546e;min-width:42px;min-height:42px;cursor:pointer}
+.delivery-quick-sidebar nav,.delivery-quick-actions{display:grid;gap:4px}
+.delivery-quick-sidebar :is(nav button,.delivery-quick-actions button){
+  width:100%;min-width:0;min-height:41px;display:flex;gap:10px;align-items:center;
+  border:1px solid transparent;border-radius:12px;background:transparent;color:#425970;
+  font:inherit;font-size:12px;font-weight:690;line-height:1.25;text-align:left;
+  padding:10px 9px;cursor:pointer;
+}
+.delivery-quick-sidebar nav button.active{background:#e8f2fb;color:#195d95;border-color:#e2eef9}
+.delivery-quick-sidebar nav button:hover:not(:disabled),.delivery-quick-actions button:hover:not(:disabled){background:#f1f6fb}
+.delivery-quick-sidebar nav button:focus-visible,.delivery-quick-actions button:focus-visible{
+  outline:3px solid #5a94c1;outline-offset:2px
+}
+.delivery-quick-sidebar nav button svg,.delivery-quick-actions button svg{flex:0 0 auto}
+.delivery-quick-sidebar button:disabled{opacity:.44;cursor:not-allowed}
+.delivery-quick-chevron{margin-left:auto;opacity:.48}
+.delivery-quick-rule{height:1px;background:rgba(181,199,215,.47);margin:2px 4px}
+.delivery-quick-caption{padding:0 4px}
+.delivery-quick-backup{display:grid;gap:10px;margin-top:1px;padding:13px 10px;border:1px solid #dce9f3;border-radius:16px;background:#f3f8fc}
+.delivery-quick-backup p{font-size:11px;line-height:1.48;margin:0;color:#5c7187}
+.delivery-quick-sidebar .delivery-quick-backup button{
+  display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 7px;
+  min-height:43px;border:0;border-radius:11px;background:#245f93;color:#fff;
+  font:inherit;font-weight:750;font-size:11px;cursor:pointer
+}
+.delivery-quick-sidebar .delivery-quick-backup button:hover{background:#194f7c}
+.delivery-quick-scrim{display:none}
+/* Main screen now has only three balanced metrics and a short recent-activity list. */
+.delivery-app .delivery-home-metrics{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;
+  margin:0 0 10px;
+}
+.delivery-app .delivery-home-metrics .delivery-summary-card{
+  display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+  min-height:185px;padding:18px;min-width:0;
+}
+.delivery-app .delivery-home-metrics .delivery-summary-card>svg{width:25px;height:25px}
+.delivery-app .delivery-home-metrics .delivery-summary-card>span{
+  font-size:12px;font-weight:690;color:#63768b
+}
+.delivery-app .delivery-home-metrics .delivery-summary-card>strong{
+  min-height:0;margin:0;line-height:1.08;font-size:clamp(26px,3vw,37px);letter-spacing:-.056em
+}
+.delivery-app .delivery-home-metrics .delivery-summary-card>small{
+  color:#7d8b9b;font-size:11px;line-height:1.38;overflow-wrap:anywhere;
+}
+.delivery-app .delivery-home-metrics .delivery-summary-card .btn{
+  margin-top:auto;align-self:stretch;justify-content:center;min-height:41px;
+  font-size:12px;white-space:normal;
+}
+.delivery-app .delivery-home-history{display:block;min-width:0}
+.delivery-app .delivery-home-history .delivery-week-list{gap:8px}
+.delivery-app .delivery-home-history .delivery-panel-head{margin-bottom:12px}
+.delivery-app .delivery-home-history .delivery-panel-head h2{font-size:clamp(22px,2.6vw,28px)}
+.delivery-app .delivery-home-history .delivery-week-row{min-height:68px;background:rgba(249,251,254,.8)}
+.delivery-app .delivery-home-history .delivery-week-row:hover{background:#fff}
+/* In-app reminder, not an OS notification nor a blocking modal. */
+.delivery-app .delivery-backup-reminder{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:14px;padding:15px 17px;margin:0 0 16px;
+  border:1px solid rgba(140,184,214,.53);border-radius:20px;
+  background:rgba(241,248,252,.95);color:#214363;
+  box-shadow:0 7px 24px rgba(40,83,116,.045);
+}
+.delivery-app .delivery-backup-reminder-copy{display:flex;align-items:flex-start;gap:11px;flex:1 1 270px;min-width:0}
+.delivery-app .delivery-backup-reminder-copy>svg{flex:0 0 auto;margin-top:3px;color:#2b76aa}
+.delivery-app .delivery-backup-reminder-copy strong{font-size:14px;letter-spacing:-.02em}
+.delivery-app .delivery-backup-reminder-copy p{margin:4px 0 0;color:#58718a;font-size:12px;line-height:1.5}
+.delivery-app .delivery-backup-reminder-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.delivery-app .delivery-backup-reminder-actions .btn{min-height:42px;white-space:normal;font-size:12px}
+@media(min-width:1200px){
+ .delivery-app.delivery-layout-desktop .delivery-quick-trigger{display:none}
+ .delivery-app.delivery-layout-desktop .delivery-shell{
+   width:min(1150px,calc(100vw - max(225px,calc((100vw - 1510px)/2 + 225px)) - 30px));
+   margin-left:max(225px,calc((100vw - 1510px)/2 + 225px));
+   margin-right:0;
+ }
+ .delivery-app.delivery-layout-desktop .delivery-quick-close{display:none}
+}
+@media(max-width:1199px){
+ .delivery-app .delivery-quick-sidebar{
+   z-index:302;top:0;left:0;width:min(305px,86vw);height:100dvh;
+   max-height:100dvh;padding:calc(20px + env(safe-area-inset-top)) 14px
+     calc(16px + env(safe-area-inset-bottom));
+   border-radius:0 23px 23px 0;
+   visibility:hidden;pointer-events:none;
+   transform:translateX(-110%);transition:transform .23s ease,visibility .23s ease;
+ }
+ .delivery-app .delivery-quick-sidebar.delivery-quick-open{
+   visibility:visible;pointer-events:auto;transform:translateX(0)
+ }
+ .delivery-app .delivery-quick-close{display:flex}
+ .delivery-app .delivery-quick-scrim{
+   display:block;position:fixed;z-index:301;inset:0;border:0;
+   background:rgba(15,34,52,.42);cursor:pointer;
+ }
+}
+@media(min-width:1200px){
+ /* Forced mobile presentation keeps drawer behavior on large screens too. */
+ .delivery-app.delivery-layout-mobile .delivery-quick-sidebar{
+   z-index:302;top:0;left:0;width:min(305px,86vw);height:100dvh;max-height:100dvh;
+   border-radius:0 23px 23px 0;visibility:hidden;pointer-events:none;
+   transform:translateX(-110%);transition:transform .23s ease;
+ }
+ .delivery-app.delivery-layout-mobile .delivery-quick-sidebar.delivery-quick-open{
+   visibility:visible;pointer-events:auto;transform:translateX(0)
+ }
+ .delivery-app.delivery-layout-mobile .delivery-quick-close{display:flex}
+ .delivery-app.delivery-layout-mobile .delivery-quick-scrim{
+   display:block;position:fixed;z-index:301;inset:0;border:0;background:rgba(15,34,52,.42)
+ }
+}
+@media(max-width:800px){
+ .delivery-app .delivery-quick-trigger{padding:8px 10px}
+ .delivery-app .delivery-quick-trigger span{display:none}
+ .delivery-app .delivery-backup-reminder{align-items:stretch}
+ .delivery-app .delivery-backup-reminder-actions{width:100%}
+ .delivery-app .delivery-backup-reminder-actions .btn{flex:1 1 130px}
+ .delivery-app .delivery-home-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .delivery-app .delivery-home-metrics .delivery-summary-card:nth-child(3){grid-column:1/-1}
+ .delivery-app .delivery-home-metrics .delivery-summary-card{padding:15px;min-height:171px}
+ .delivery-app .delivery-home-metrics .delivery-summary-card:nth-child(3){min-height:140px}
+ .delivery-app .delivery-home-metrics .delivery-summary-card>strong{font-size:clamp(24px,6vw,35px)}
+ .delivery-app.delivery-layout-mobile .delivery-home-history{display:block!important}
+ .delivery-app .delivery-home-history .delivery-panel-head{flex-direction:row;align-items:center}
+ .delivery-app .delivery-home-history .delivery-panel-head .btn{width:auto;min-height:42px}
+ .delivery-app .delivery-home-history .delivery-week-row>div{min-width:0}
+ .delivery-app .delivery-home-history .delivery-week-row span{overflow-wrap:anywhere}
+}
+@media(max-width:355px){
+ .delivery-app .delivery-home-metrics{grid-template-columns:1fr}
+ .delivery-app .delivery-home-metrics .delivery-summary-card:nth-child(3){grid-column:auto}
+ .delivery-app .delivery-home-metrics .delivery-summary-card{min-height:142px}
+}
+@media(prefers-reduced-motion:reduce){
+ .delivery-app .delivery-quick-sidebar{transition:none}
+}
+@media(prefers-reduced-transparency:reduce){
+ .delivery-app .delivery-quick-sidebar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}
+ .delivery-app .delivery-backup-reminder{background:#f3f8fc}
+}
+@media print{
+ .delivery-app .delivery-quick-sidebar,.delivery-app .delivery-quick-trigger,
+ .delivery-app .delivery-quick-scrim,.delivery-app .delivery-backup-reminder{display:none!important}
+}
