@@ -1,5 +1,6 @@
 import {useMemo,useState} from "react";
 import {calculateStudentInsights} from "../services/student-insights.js";
+import {DUAL_SCORE_NOTICE} from "../services/dual-score.js";
 
 const number=value=>Number(value||0).toLocaleString("es-MX",{maximumFractionDigits:1});
 const suffix=(v,singular,plural)=>v===1?singular:plural;
@@ -116,6 +117,7 @@ export default function StudentInsights({state,period,weekId,month,specialty,com
       <section className="ds-panel ds-insight-explainer">
         <h3>Cómo se interpretan las comparaciones</h3>
         <p>Las faltas pueden estar justificadas. «No aplica» queda fuera del cumplimiento y las jornadas sin datos no cuentan como cero faltas.</p>
+        <p>{DUAL_SCORE_NOTICE}</p>
       </section>
     </div>
 
