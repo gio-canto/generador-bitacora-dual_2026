@@ -1,5 +1,14 @@
 # Notas de versión
 
+## Corrección de navegación de Datos · v0.57.2-beta.1
+
+- Sustituida la subbarra móvil de Estadísticas que utilizaba un menú flotante y podía quedar recortada al navegar con animaciones.
+- Datos ahora muestra seis pestañas horizontales accesibles: Resumen, Asistencia, Empresas, Grupos, Alumnos e Histórico. Se desplazan lateralmente sin tapar gráficos, sin un segundo modal y con sección activa resaltada.
+- Al cambiar de sección, la pestaña seleccionada permanece visible y los filtros aplicados se conservan. El panel de filtros se cierra para ahorrar espacio.
+- En escritorio continúa la subnavegación horizontal existente; corregida la herencia de reglas móviles que podía ocultarla con la ventana estrecha.
+- Pruebas de navegación, filtros, modo escritorio y estilos móviles. **No hay cambios en los cálculos, respaldos, PDF ni versión.**
+
+
 ## Corrección visual móvil · v0.57.2-beta.1
 
 - Barra superior móvil simplificada: símbolo y nombre Dual, Menú y Guardar, con tamaños táctiles estables. Ayuda e importar JSON siguen disponibles en Herramientas / Accesos rápidos.
