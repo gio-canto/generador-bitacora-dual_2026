@@ -2,3 +2,10 @@ node_modules/
 dist/
 .DS_Store
 *.local
+
+# Iconos derivados del logotipo oficial; se generan en predev/prebuild.
+public/Assets/registro-dual-icon-192.png
+public/Assets/registro-dual-icon-512.png
+public/Assets/registro-dual-maskable-512.png
+public/Assets/registro-dual-apple-180.png
+public/Assets/registro-dual-favicon-32.png
