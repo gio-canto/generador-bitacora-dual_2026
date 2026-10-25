@@ -1,6 +1,6 @@
 import {blobatarUri} from "blobatar/uri";
 import {buildStudentDossier} from "./student-dossier.js";
-import {calculateDualScore} from "./dual-score.js";
+import {calculateDualScore,dualScoreGraphParts,DUAL_SCORE_NOTICE} from "./dual-score.js";
 import {canvasToJpeg,createPdfFromJpegs,downloadPdf} from "./delivery-report.js";
 import {VERSION} from "../domain/records.js";
 
@@ -85,6 +85,7 @@ function header(ctx,logo,page,pages,context){
  txt(ctx,"GENERADOR DE BITÁCORA DUAL",221,74,27,C.ink,750,975);
  txt(ctx,context.school||"Registro de entregas",223,105,18,C.muted,500,975);
  rule(ctx,46,137,1149);rule(ctx,46,1698,1149);
+ txt(ctx,DUAL_SCORE_NOTICE,51,1679,14,C.muted,500,1125);
  txt(ctx,"USO ESCOLAR INTERNO · "+VERSION,50,1729,14,C.muted,600);
  txt(ctx,page+" / "+pages,1131,1729,16,C.muted,700);
 }
@@ -92,6 +93,30 @@ function bar(ctx,label,y){
  rect(ctx,49,y-27,1142,38,C.ink);
  txt(ctx,label.toUpperCase(),63,y,20,"#fff",750,1110);
 }
+/**
+ * Gráfica del Índice de Seguimiento Dual.
+ * Cada color es la contribución real ponderada (50/30/20) al valor 0–100.
+ * No marcar como cero a quien todavía no tiene semanas evaluables.
+ */
+export function drawDualScoreGraph(ctx,score,x=726,y=790,width=430,height=14){
+ const segments=dualScoreGraphParts(score);
+ ctx.save();
+ ctx.beginPath();
+ ctx.roundRect(x,y,width,height,height/2);
+ ctx.clip();
+ rect(ctx,x,y,width,height,"#e2e8ee");
+ let cursor=x;
+ for(const segment of segments){
+   const segmentWidth=Math.max(0,Math.min(width,segment.points/100*width));
+   if(segmentWidth>0)rect(ctx,cursor,y,segmentWidth,height,segment.color);
+   cursor+=segmentWidth;
+ }
+ ctx.restore();
+ txt(ctx,"0",x,y+32,12,C.muted,600);
+ txt(ctx,"100",x+width-27,y+32,12,C.muted,600);
+ if(score.value!=null)txt(ctx,"Ponderación: 50% / 30% / 20%",x+118,y+32,12,C.muted,500,260);
+}
+
 export function interpretStudentDossier(d){
  if(!d||!d.due)return "Sin entregas vencidas. El cumplimiento se calculará al concluir los plazos.";
  const parts=["Se recibieron "+d.submitted+" de "+d.due+" bitácoras vencidas ("+pct(d.deliveryRate)+")."];
@@ -144,14 +169,23 @@ function summary(canvas,d,img,logo,pages,context){
  wrap(ctx,interpretStudentDossier(d),600).slice(0,5)
    .forEach((value,i)=>txt(ctx,value,63,693+i*27,17,C.ink,500,590));
  const score=calculateDualScore(d);
- rect(ctx,708,670,474,178,C.back);
- txt(ctx,"ÍNDICE DE SEGUIMIENTO DUAL",726,701,18,C.ink,700,442);
- txt(ctx,score.value==null?"—":String(score.value)+"/100",726,762,44,C.blue,750,220);
- txt(ctx,score.label,924,750,18,C.ink,700,239);
- txt(ctx,score.components?"C "+score.components.compliance+"% · P "+score.components.punctuality+"% · R "+score.components.regularity+"%":"Sin plazos evaluables",924,780,14,C.muted,600,239);
- txt(ctx,score.provisional?(score.value==null?"Sin semanas vencidas":"Resultado provisional · "+score.due+" semanas"):
-   score.due+" semanas evaluables",727,797,15,C.muted,500,430);
- txt(ctx,"Uso interno · No es puntaje crediticio ni sanción.",727,826,14,C.muted,500,430);
+ rect(ctx,708,665,474,195,C.back);
+ txt(ctx,"ÍNDICE DE SEGUIMIENTO DUAL",726,696,18,C.ink,700,390);
+ txt(ctx,"0–100",1104,696,12,C.muted,650,61);
+ txt(ctx,score.value==null?"—":String(score.value)+"/100",726,743,42,C.blue,750,204);
+ txt(ctx,score.label,930,735,17,C.ink,700,229);
+ txt(ctx,score.provisional?(score.value==null?"Sin semanas vencidas":"Provisional · "+score.due+" semanas"):
+   score.due+" semanas evaluables",930,756,13,C.muted,500,229);
+ if(score.components){
+   const {compliance,punctuality,regularity}=score.components;
+   txt(ctx,"Cumpl. "+compliance+"%",726,777,12,C.blue,650,134);
+   txt(ctx,"Puntual. "+punctuality+"%",877,777,12,"#2d8f96",650,139);
+   txt(ctx,"Regular. "+regularity+"%",1035,777,12,"#9a742d",650,126);
+ }else{
+   txt(ctx,"Sin plazos evaluables",726,777,14,C.muted,500,420);
+ }
+ drawDualScoreGraph(ctx,score);
+ txt(ctx,"Uso interno · No es puntaje de crédito ni sanción.",726,846,13,C.muted,500,438);
  bar(ctx,"Comportamiento de entregas",872);
  txt(ctx,"Últimas semanas registradas · número real de semana",63,911,16,C.muted,500);
  // Exactly the stored week labels, never positional S1/S2 columns.
