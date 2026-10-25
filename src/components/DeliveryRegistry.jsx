@@ -2065,15 +2065,25 @@ export default function DeliveryRegistry({ onClose }) {
     <div className={"delivery-app" + (view === "scanner" ? " scanner-active" : "")}>
       <ScanSound tone={scanTone} />
       <header className="delivery-topbar">
-        <button className="delivery-brand" type="button" onClick={onClose}>
-          <img
+        <button className="delivery-brand" type="button" onClick={onClose}
+          aria-label="Volver al generador de Bitácora Dual">
+          <img className="delivery-brand-logo-desktop"
             src={
               location.pathname.includes("/registro-entrega/")
                 ? "../Assets/Asset_logo.png"
                 : "Assets/Asset_logo.png"
             }
-            alt="Generador de Bitácora Dual"
+            alt=""
           />
+          <img className="delivery-brand-logo-mobile"
+            src={
+              location.pathname.includes("/registro-entrega/")
+                ? "../Assets/registro-dual-icon-192.png"
+                : "Assets/registro-dual-icon-192.png"
+            }
+            alt=""
+          />
+          <span className="delivery-mobile-app-name">Registro Dual</span>
         </button>
         <div className="delivery-top-actions">
           <button
