@@ -1,0 +1,32 @@
+{
+  "id": "./",
+  "name": "Registro de Bitácoras · Dual",
+  "short_name": "Registro Dual",
+  "description": "Control de entregas y seguimiento de bitácoras de Educación Dual.",
+  "lang": "es-MX",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f5f7",
+  "theme_color": "#f5f5f7",
+  "icons": [
+    {
+      "src": "../Assets/registro-dual-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../Assets/registro-dual-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../Assets/registro-dual-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
