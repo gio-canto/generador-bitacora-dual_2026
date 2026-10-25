@@ -3,9 +3,6 @@
  * No es un puntaje crediticio, disciplinario ni de aptitud personal.
  * Nunca considera faltas, motivos de salud, jornadas inhábiles o sin labores.
  */
-export const DUAL_SCORE_NOTICE =
-  "Uso escolar interno: indicador orientativo de entregas; no es puntaje de crédito ni una sanción.";
-
 /**
  * Componentes ponderados del gráfico 0–100. Cada segmento ocupa los puntos
  * que realmente aporta al índice, no una categoría de riesgo disciplinario.
@@ -29,7 +26,7 @@ export function calculateDualScore(dossier){
   const due=dueRows.length;
   if(!due)return {
     value:null,label:"Sin evaluación",provisional:true,due:0,
-    interpretation:"Todavía no existen semanas vencidas evaluables. No se asigna una puntuación. "+DUAL_SCORE_NOTICE,
+    interpretation:"Todavía no existen semanas vencidas evaluables. No se asigna una puntuación.",
     components:null,
   };
   const submitted=dueRows.filter(received).length;
@@ -56,6 +53,6 @@ export function calculateDualScore(dossier){
       delivered:submitted,onTime},
     interpretation:"Índice "+value+"/100"+(provisional?" (provisional)":"")+
       " calculado con "+due+" semanas vencidas evaluables. "+label+"."+
-      improvement+" "+DUAL_SCORE_NOTICE,
+      improvement,
   };
 }
