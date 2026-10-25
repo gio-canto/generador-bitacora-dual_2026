@@ -1,5 +1,15 @@
 # Notas de versión
 
+## Corrección de compatibilidad escritorio · v0.57.2-beta.1
+
+- Recuperado el **diseño web anterior** de Registro de Bitácoras: logotipo horizontal, área principal centrada de hasta 1180 px y cinco tarjetas de Inicio con su historial completo. El diseño móvil A+E conserva sus propias tres tarjetas y tres semanas recientes.
+- Eliminada la regla que desplazaba el contenido del escritorio a la derecha para alojar el menú rápido. Ahora el menú es **desplegable bajo demanda** en todos los tamaños y nunca roba ancho al contenido principal.
+- Las reglas globales «Apple Glass» quedan restringidas a `.delivery-layout-mobile`, por lo que en escritorio vuelven los colores, densidades y superficies previos.
+- Estadísticas distingue las dos presentaciones: escritorio con encabezado clásico, filtros y seis indicadores; teléfono con hero adaptado y navegación tipo app. Las secciones siguen disponibles en ambos.
+- Las reglas táctiles ya no fuerzan formatos móviles en computadoras con pantallas táctiles y ventanas amplias.
+- Añadidas pruebas de restauración y documentación [`docs/V0572_ESCRITORIO.md`](docs/V0572_ESCRITORIO.md). Sin cambio de esquema, cálculos, exportaciones ni número de versión.
+
+
 ## 0.57.2-beta.1 · Inicio, accesos rápidos y respaldos preventivos · 2026-10-24
 
 - Corrección visual de Inicio: reemplaza tarjetas desiguales y la acción de escaneo duplicada por **tres indicadores proporcionados** (alumnos, semanas, última semana); la última semana usa siempre el periodo más reciente, no la selección previa.
