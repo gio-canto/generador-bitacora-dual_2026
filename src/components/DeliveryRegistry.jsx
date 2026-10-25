@@ -508,6 +508,8 @@ export default function DeliveryRegistry({ onClose }) {
     [state.students],
   );
   const announcementsNow=useMemo(()=>announcementOverview(state),[state]);
+  const latestWeek=state.weeks.at(-1)||null;
+  const latestSummary=useMemo(()=>latestWeek?weekSummary(latestWeek,state.students):null,[latestWeek,state.students]);
   const attentionNow=useMemo(()=>calculateStudentInsights(state,{period:"all"}),[state]);
   const desistedStudents = useMemo(
     () => state.students.filter((student) => !studentIsActive(student)),
@@ -538,7 +540,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
 
-  const saveBackup=(savedState=state,showMessage=true)=>{
+  const saveBackup=(savedState=state,showMessage=false)=>{
     try{
       exportDeliveryState(savedState);
       acknowledgeBackupReminder(window.localStorage,"saved");
@@ -2208,7 +2210,7 @@ export default function DeliveryRegistry({ onClose }) {
               type="button"
               aria-label="Guardar archivo de registro"
               title="Guardar archivo"
-              onClick={() => saveBackup(state)}
+              onClick={() => saveBackup(state,true)}
             >
               <DownloadSimple size={18} />
               <span className="delivery-action-label">Guardar archivo</span>
@@ -2222,7 +2224,7 @@ export default function DeliveryRegistry({ onClose }) {
         onNavigate={next=>setView(next)} onScan={openNewestScan}
         onCreateWeek={()=>setView("new-week")}
         onManage={()=>manageStudents(view)} onReport={()=>openReport()}
-        onBackup={()=>saveBackup()} onTutorial={openTutorial}/>}
+        onBackup={()=>saveBackup(state,true)} onTutorial={openTutorial}/>}
 
       <main className="delivery-shell">
         {backupReminderOpen&&["home","weeks","more"].includes(view)&&<aside
@@ -2234,7 +2236,7 @@ export default function DeliveryRegistry({ onClose }) {
             </div>
           </div>
           <div className="delivery-backup-reminder-actions">
-            <button type="button" className="btn primary" onClick={()=>saveBackup()}>Descargar respaldo</button>
+            <button type="button" className="btn primary" onClick={()=>saveBackup(state,true)}>Descargar respaldo</button>
             <button type="button" className="btn" onClick={()=>{
               acknowledgeBackupReminder(window.localStorage,"later");
               setBackupReminderOpen(false);
@@ -2777,11 +2779,11 @@ export default function DeliveryRegistry({ onClose }) {
               <article className="delivery-summary-card">
                 <ChartBar size={25} aria-hidden="true"/>
                 <span>Última semana</span>
-                <strong>{activeSummary?
-                  activeSummary.registered+"/"+activeSummary.applicable:"—"}</strong>
-                <small>{activeWeek?.label||"Crea una semana para empezar"}</small>
-                <button className="btn" type="button" disabled={!activeWeek} onClick={()=>{
-                  setStatusFilter("all");setView("week");
+                <strong>{latestSummary?
+                  latestSummary.registered+"/"+latestSummary.applicable:"—"}</strong>
+                <small>{latestWeek?.label||"Crea una semana para empezar"}</small>
+                <button className="btn" type="button" disabled={!latestWeek} onClick={()=>{
+                  setActiveWeekId(latestWeek.id);setStatusFilter("all");setView("week");
                 }}>
                   Abrir entregas
                 </button>
@@ -2889,8 +2891,7 @@ export default function DeliveryRegistry({ onClose }) {
             <button className="btn" type="button" onClick={()=>{setSetupIntent("manage");setSetupReturnView("more");
               setContextForm(state.context);setSetupStep(1);setView("setup");}}><Users size={20}/> Administrar alumnos</button>
             <button className="btn" type="button" onClick={()=>{setTutorialStep(0);setTutorialOpen(true);}}><Info size={20}/> Tutorial</button>
-            <button className="btn" type="button" onClick={()=>{saveBackup(state);
-              notify("success","Descarga iniciada","Guarda el archivo JSON descargado.");}}>
+            <button className="btn" type="button" onClick={()=>saveBackup(state,true)}>
               <DownloadSimple size={20}/> Guardar respaldo</button>
             <label className="btn delivery-mobile-import"><UploadSimple size={20}/> Abrir registro JSON
               <input hidden type="file" accept=".json,application/json"
