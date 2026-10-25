@@ -2756,6 +2756,87 @@ export default function DeliveryRegistry({ onClose }) {
               </button>
             </section>
 
+            {!isMobileLayout&&<div className="delivery-desktop-home-cards">
+            <section className="delivery-summary-grid">
+              <article className="delivery-summary-card">
+                <Users size={28} />
+                <span>Alumnos</span>
+                <strong>{activeStudents.length}</strong>
+                <small>
+                  {desistedStudents.length
+                    ? desistedStudents.length + " desistido" + (desistedStudents.length === 1 ? "" : "s")
+                    : "Activos"}
+                </small>
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => {
+                    setSetupIntent("manage");
+                    setSetupReturnView("home");
+                    setContextForm(state.context);
+                    setSetupStep(1);
+                    setView("setup");
+                  }}
+                >
+                  Administrar base
+                </button>
+              </article>
+              <article className="delivery-summary-card">
+                <FileArrowUp size={28} />
+                <span>Semanas</span>
+                <strong>{state.weeks.length}</strong>
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => setView("new-week")}
+                >
+                  Nueva semana
+                </button>
+              </article>
+              <article className="delivery-summary-card">
+                <Scan size={28} />
+                <span>Escaneo</span>
+                <strong className="delivery-summary-text">
+                  {state.weeks.at(-1)?.label || "Sin semana"}
+                </strong>
+                <button
+                  className="btn primary"
+                  type="button"
+                  disabled={!state.weeks.length || !activeStudents.length}
+                  onClick={() => {
+                    const week = state.weeks.at(-1);
+                    setActiveWeekId(week.id);
+                    setView("scanner");
+                  }}
+                >
+                  Escanear entregas
+                </button>
+              </article>
+              <article className="delivery-summary-card">
+                <FilePdf size={28} />
+                <span>Reporte</span>
+                <strong className="delivery-summary-text">PDF</strong>
+                <button
+                  className="btn"
+                  type="button"
+                  disabled={!state.weeks.length&&!state.students.length}
+                  onClick={() => openReport()}
+                >
+                  Crear reporte
+                </button>
+              </article>
+              <article className="delivery-summary-card">
+                <Info size={28} />
+                <span>Avisos PNG</span>
+                <strong>{(state.announcements||[]).length+announcementsNow.deadlines.length+1}</strong>
+                <small>Listos para compartir</small>
+                <button className="btn" type="button" onClick={()=>setView("announcements")}>
+                  Crear avisos PNG
+                </button>
+              </article>
+            </section>
+            </div>}
+            {isMobileLayout&&<div className="delivery-app-home-cards">
             <section className="delivery-summary-grid delivery-home-metrics" aria-label="Indicadores de inicio">
               <article className="delivery-summary-card">
                 <Users size={25} aria-hidden="true"/>
@@ -2789,6 +2870,8 @@ export default function DeliveryRegistry({ onClose }) {
                 </button>
               </article>
             </section>
+            </div>}
+
             {attentionNow.ledger.some(p=>p.pending>=2)&&
               <section className="delivery-panel delivery-attention-summary">
                 <div><strong>{attentionNow.ledger.filter(p=>p.pending>=2).length} alumnos con dos o más pendientes</strong>
@@ -2801,7 +2884,7 @@ export default function DeliveryRegistry({ onClose }) {
               <div className="delivery-panel-head">
                 <div>
                   <span className="delivery-kicker">Historial</span>
-                  <h2>Actividad reciente</h2>
+                  <h2>{isMobileLayout?"Actividad reciente":"Semanas"}</h2>
                 </div>
                 <button
                   className="btn"
@@ -2814,7 +2897,7 @@ export default function DeliveryRegistry({ onClose }) {
               </div>
               {state.weeks.length ? (
                 <div className="delivery-week-list">
-                  {[...state.weeks].slice(-3).reverse().map((week) => {
+                  {(isMobileLayout ? [...state.weeks].slice(-3) : [...state.weeks]).reverse().map((week) => {
                     const summary = weekSummary(week, state.students);
                     return (
                       <button
