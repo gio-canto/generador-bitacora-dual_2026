@@ -64,7 +64,7 @@ export default function StatisticsHero({data,period,onPeriodChange,onBack,onRepo
          <h1>Datos<span>.</span></h1>
          <p>Una mirada clara al seguimiento de Educación Dual.</p>
        </div>
-       <button type="button" className="ds-hero-export" onClick={onReportStatistics}>
+       <button type="button" className="ds-hero-export" aria-label="Reportes" onClick={onReportStatistics}>
          <FileArrowDown size={18} aria-hidden="true"/><span>Reportes</span><ArrowUpRight size={16} aria-hidden="true"/>
        </button>
      </div>
@@ -75,7 +75,7 @@ export default function StatisticsHero({data,period,onPeriodChange,onBack,onRepo
          aria-pressed={period===id} className={period===id?"active":""}
          onClick={()=>onPeriodChange(id)}>{name}</button>)}
      </div>
-     <button className="ds-hero-filter-button" type="button" onClick={onToggleFilters}
+     <button className="ds-hero-filter-button" type="button" aria-label="Filtros" onClick={onToggleFilters}
        aria-expanded={filtersOpen} aria-controls="ds-controls-options">
        <SlidersHorizontal size={18} aria-hidden="true"/>
        <span>Filtros</span>{filterCount>0&&<b>{filterCount}</b>}
