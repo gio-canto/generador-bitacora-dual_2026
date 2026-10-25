@@ -156,3 +156,35 @@
 @media print{
  .delivery-app.delivery-layout-desktop .delivery-shell{width:100%;padding:0}
 }
+
+/* Subnavegación de Datos: la barra clásica nunca hereda el drawer móvil,
+ * tampoco cuando el usuario fuerza Escritorio en una ventana estrecha. */
+.delivery-app.delivery-layout-desktop .ds-sidebar,
+.delivery-app.delivery-layout-desktop .ds-sidebar:not(.ds-sidebar-open){
+  display:block;
+  position:static;
+  inset:auto;
+  width:auto;
+  height:auto;
+  max-height:none;
+  min-width:0;
+  overflow:visible;
+  visibility:visible;
+  pointer-events:auto;
+  transform:none;
+  transition:none;
+  box-shadow:0 6px 20px rgba(18,41,67,.045);
+}
+.delivery-app.delivery-layout-desktop .ds-mobile-sections{display:none!important}
+.delivery-app.delivery-layout-desktop .ds-sidebar nav{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  width:100%;
+  min-width:0;
+}
+.delivery-app.delivery-layout-desktop .ds-sidebar nav button{
+  flex:0 0 auto;
+  min-height:44px;
+}
