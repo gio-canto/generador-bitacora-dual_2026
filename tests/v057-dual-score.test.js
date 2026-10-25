@@ -1,5 +1,5 @@
 import {describe,expect,it} from "vitest";
-import {calculateDualScore} from "../src/services/dual-score.js";
+import {calculateDualScore,dualScoreGraphParts,DUAL_SCORE_NOTICE} from "../src/services/dual-score.js";
 const make=(states)=>({timeline:states.map((status,i)=>({
   status,expired:true,startDate:"2026-09-"+String(10+i).padStart(2,"0"),
 })).reverse()});
@@ -22,6 +22,21 @@ describe("v0.57 Índice de Seguimiento Dual",()=>{
    expect(perfect).toMatchObject({value:100,provisional:true,due:1,label:"Seguimiento sólido"});
    const missing=calculateDualScore(make(["no_entregado"]));
    expect(missing).toMatchObject({value:0,provisional:true,due:1});
+ });
+ it("muestra aviso de uso escolar interno también si todavía no hay score",()=>{
+   expect(DUAL_SCORE_NOTICE).toContain("Uso escolar interno");
+   expect(DUAL_SCORE_NOTICE).toContain("no es puntaje de crédito ni una sanción");
+   expect(calculateDualScore(make([])).interpretation).toContain(DUAL_SCORE_NOTICE);
+   expect(calculateDualScore(make(["entregado"])).interpretation).toContain(DUAL_SCORE_NOTICE);
+ });
+ it("representa 0–100 mediante aportes 50/30/20 sin inventar barras si no hay evaluación",()=>{
+   const score=calculateDualScore(make(["entregado","entregado","entregado_tarde","no_entregado","no_aplica","entregado"]));
+   const parts=dualScoreGraphParts(score);
+   expect(parts.map(p=>p.label)).toEqual(["Cumplimiento","Puntualidad","Regularidad"]);
+   expect(parts.map(p=>p.points)).toEqual([40,18,15]);
+   expect(parts.reduce((sum,p)=>sum+p.points,0)).toBe(73);
+   expect(dualScoreGraphParts(calculateDualScore(make([])))).toEqual([]);
+   expect(dualScoreGraphParts(calculateDualScore(make(["no_entregado"])))).toHaveLength(3);
  });
  it("no penaliza las faltas, sus justificaciones ni los días inhábiles",()=>{
    const base=make(["entregado","entregado_tarde","entregado","no_entregado"]);
