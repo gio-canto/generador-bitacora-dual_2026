@@ -1,7 +1,7 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
-export const VERSION = "0.57.0-beta.1";
-export const RELEASE = "Registro Dual adaptable, navegación y seguimiento";
+export const VERSION = "0.57.1-beta.1";
+export const RELEASE = "Datos Editorial Glass y resumen visual de Registro Dual";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
