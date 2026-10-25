@@ -92,7 +92,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
   const [company,setCompany] = useState("");
   const [metric,setMetric] = useState("hours");
   const [section,setSection] = useState("summary");
-  const [navOpen,setNavOpen] = useState(false);
+  const mobileNavRef=useRef(null);
   const [filtersOpen,setFiltersOpen] = useState(false);
   const specialties = [...new Set(state.students.map(student=>student.specialty).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const companies = [...new Set(state.students.map(student=>student.company).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
@@ -155,6 +155,21 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
     };
   }, [viewKey,metric,section]);
 
+  // Mantén visible la sección activa sin desplazar la página verticalmente.
+  useEffect(()=>{
+    if(!mobileView||!mobileNavRef.current)return;
+    const bar=mobileNavRef.current;
+    const active=bar.querySelector(".ds-mobile-section.active");
+    if(!active)return;
+    const left=active.offsetLeft-(bar.clientWidth-active.offsetWidth)/2;
+    if(typeof bar.scrollTo==="function"){
+      const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      bar.scrollTo({left:Math.max(0,left),behavior:reduced?"instant":"smooth"});
+    }else{
+      bar.scrollLeft=Math.max(0,left);
+    }
+  },[section,mobileView]);
+
   const insightSummary=useMemo(()=>calculateStudentInsights(state,filters),[state,period,weekId,month,specialty,company]);
   const interpretation=useMemo(()=>interpretStatistics(data,insightSummary),[data,insightSummary]);
 
@@ -173,26 +188,25 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
         <button className="btn" type="button" onClick={onReportStatistics}>Abrir Reportes</button>
       </div>
     </div>}
-    <div className="ds-mobile-toolbar">
-      <button type="button" className="btn" aria-expanded={navOpen}
-        aria-controls="ds-sidebar" onClick={()=>setNavOpen(value=>!value)}>☰ {STAT_SECTIONS.find(([id])=>id===section)?.[1]} · Secciones</button>
-    </div>
+    {mobileView&&<nav className="ds-mobile-sections" aria-label="Secciones de Datos"
+       ref={mobileNavRef}>
+      {STAT_SECTIONS.map(([id,label])=><button type="button" key={id}
+        className={"ds-mobile-section"+(section===id?" active":"")}
+        aria-current={section===id?"page":undefined}
+        onClick={()=>{setSection(id);setFiltersOpen(false);}}>
+        {label}
+      </button>)}
+    </nav>}
     <div className="ds-workspace">
-      <aside id="ds-sidebar" className={"ds-sidebar"+(navOpen?" ds-sidebar-open":"")} aria-label="Menú de estadísticas">
-        <button className="ds-sidebar-close" aria-label="Cerrar menú de estadísticas" type="button"
-          onClick={()=>setNavOpen(false)}>✕ Cerrar</button>
-        <span className="delivery-kicker">EXPLORAR DATOS</span>
+      {!mobileView&&<aside id="ds-sidebar" className="ds-sidebar" aria-label="Menú de estadísticas">
         <nav aria-label="Secciones de estadísticas">
           {STAT_SECTIONS.map(([id,label],index)=><button type="button" key={id}
             className={section===id?"active":""} aria-current={section===id?"page":undefined}
-            onClick={()=>{setSection(id);setNavOpen(false);}}>
+            onClick={()=>{setSection(id);setFiltersOpen(false);}}>
             <span>{String(index+1).padStart(2,"0")}</span>{label}
           </button>)}
         </nav>
-        <p>Selecciona una sección para consultar solo sus indicadores.</p>
-      </aside>
-      {navOpen&&<button type="button" className="ds-sidebar-scrim" aria-label="Cerrar menú"
-        onClick={()=>setNavOpen(false)}/>}
+      </aside>}
       <div className="ds-workspace-content">
         <div className={"ds-filter-panel"+(filtersOpen?" ds-filters-open":" ds-filters-closed")}>
     <div className="ds-controls" id="ds-controls-options" aria-label="Filtros detallados de Datos">
@@ -239,7 +253,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
           {id:"students",title:"Alumnos",detail:fmt(data.students.length)+" registrados",accent:"#497bb4",number:"04"},
           {id:"history",title:"Histórico",detail:hours(lifetime.totalHours)+" acumuladas",accent:"#687e8d",number:"05"},
         ].map(item=><button type="button" key={item.id} className="ds-shortcut-card"
-          onClick={()=>{setSection(item.id);setNavOpen(false);}}>
+          onClick={()=>{setSection(item.id);setFiltersOpen(false);}}>
           <span className="ds-shortcut-number" style={{color:item.accent}}>{item.number}</span>
           <span className="ds-shortcut-name">{item.title}</span>
           <strong>{item.detail}</strong>
