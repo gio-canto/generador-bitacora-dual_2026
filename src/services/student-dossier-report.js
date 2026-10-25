@@ -169,7 +169,7 @@ function summary(canvas,d,img,logo,pages,context){
  wrap(ctx,interpretStudentDossier(d),600).slice(0,5)
    .forEach((value,i)=>txt(ctx,value,63,693+i*27,17,C.ink,500,590));
  const score=calculateDualScore(d);
- rect(ctx,708,665,474,195,C.back);
+ rect(ctx,708,671,474,190,C.back);
  txt(ctx,"ÍNDICE DE SEGUIMIENTO DUAL",726,696,18,C.ink,700,390);
  txt(ctx,"0–100",1104,696,12,C.muted,650,61);
  txt(ctx,score.value==null?"—":String(score.value)+"/100",726,743,42,C.blue,750,204);
@@ -186,18 +186,18 @@ function summary(canvas,d,img,logo,pages,context){
  }
  drawDualScoreGraph(ctx,score);
  txt(ctx,"Uso interno · No es puntaje de crédito ni sanción.",726,846,13,C.muted,500,438);
- bar(ctx,"Comportamiento de entregas",872);
- txt(ctx,"Últimas semanas registradas · número real de semana",63,911,16,C.muted,500);
+ bar(ctx,"Comportamiento de entregas",904);
+ txt(ctx,"Últimas semanas registradas · número real de semana",63,944,16,C.muted,500);
  // Exactly the stored week labels, never positional S1/S2 columns.
  const recent=[...d.timeline].sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))).slice(-25);
  for(let i=0;i<recent.length;i++){
-   const w=recent[i],col=i%5,row=Math.floor(i/5),x=62+col*228,y=952+row*75;
+   const w=recent[i],col=i%5,row=Math.floor(i/5),x=62+col*228,y=984+row*75;
    rect(ctx,x,y,213,61,C.back);
    txt(ctx,abbreviateWeekLabel(w.label),x+10,y+27,22,C.ink,700,111);
    mark(ctx,w.state,x+157,y+35,29);
    txt(ctx,w.startDate||"—",x+10,y+50,14,C.muted,500,137);
  }
- if(d.timeline.length>25)txt(ctx,"El historial completo continúa en las páginas siguientes.",65,1358,15,C.muted,500,1100);
+ if(d.timeline.length>25)txt(ctx,"El historial completo continúa en las páginas siguientes.",65,1391,15,C.muted,500,1100);
  bar(ctx,"Claves de comportamiento",1465);
  ["a_tiempo","tarde","vencida","en_plazo","no_aplica"].forEach((key,i)=>{
    mark(ctx,key,65+i*229,1510,29);
