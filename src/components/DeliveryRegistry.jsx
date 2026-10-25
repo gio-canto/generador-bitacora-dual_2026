@@ -2997,7 +2997,7 @@ export default function DeliveryRegistry({ onClose }) {
           onSave={announcements=>commit({...state,announcements})}/>}
 
         {view === "statistics" && (
-          <DeliveryStatistics state={state} onBack={() => setView("home")}
+          <DeliveryStatistics state={state} mobileView={isMobileLayout} onBack={() => setView("home")}
             onReportStudent={openStudentReport} onReportStatistics={openStatisticsReport} />
         )}
 
