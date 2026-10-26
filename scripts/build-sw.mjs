@@ -65,7 +65,13 @@ self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(async c=>
 for(const path of CORE){const url=new URL(path,self.registration.scope);if(PAGES[path])await c.put(url,new Response(PAGES[path],{headers:{'Content-Type':'text/html; charset=utf-8'}}));else{const response=await fetch(new Request(url,{cache:'reload'}));if(!response.ok)throw new Error('Incomplete offline build');await c.put(url,response)}}
 })));
 self.addEventListener('message',e=>{if(e.data?.type==='SKIP_WAITING')self.skipWaiting();});
-self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{
+// Preserve the current and previous complete offline builds. Remove older ones
+// only after this build installed successfully. Never delete user data.
+const old=(await caches.keys()).filter(k=>k.startsWith('bitacora-dual-')&&k!==CACHE);
+await Promise.all(old.slice(0,-1).map(k=>caches.delete(k)));
+await self.clients.claim();
+})()));
 self.addEventListener('fetch',e=>{const url=new URL(e.request.url);if(e.request.method!=='GET'||url.origin!==self.location.origin||!url.href.startsWith(self.registration.scope))return;
 const relative='./'+url.pathname.slice(new URL(self.registration.scope).pathname.length);
 const optional=relative.startsWith('./assets/spell-worker-');
