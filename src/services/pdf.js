@@ -1,6 +1,7 @@
 import { validDate } from "../domain/records.js";
 import {actingSigner} from "../domain/signing.js";
 import { createMatrixPayload } from "./delivery-registry.js";
+import {prepareLetterPage,LETTER_PDF_POINTS} from "./print-sheet.js";
 const COUNCIL =
   "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)";
 const PAGE = { w: 297, h: 210 };
@@ -361,11 +362,7 @@ function centered(c, lines, cx, top, h, s, lh, p) {
 export function drawPdfPage(canvas, p, record, logoImage) {
   const model = buildPageModel(record),
     id = record;
-  canvas.width = Math.round(PAGE.w * p);
-  canvas.height = Math.round(PAGE.h * p);
-  const c = canvas.getContext("2d");
-  c.fillStyle = "#fff";
-  c.fillRect(0, 0, canvas.width, canvas.height);
+  const c=prepareLetterPage(canvas,p);
   drawStudentDataMatrix(c, id, p);
   if (logoImage?.naturalWidth) {
     const w = layout.logo.w * 0.9625,
@@ -688,8 +685,8 @@ function concatBytes(parts) {
   return out;
 }
 export function createPdf(jpeg, w, h) {
-  const pw = 841.8898,
-    ph = 595.2756,
+  const pw = LETTER_PDF_POINTS.w,
+    ph = LETTER_PDF_POINTS.h,
     content = asciiBytes(
       `q\n${pw.toFixed(4)} 0 0 ${ph.toFixed(4)} 0 0 cm\n/Im0 Do\nQ\n`,
     ),
