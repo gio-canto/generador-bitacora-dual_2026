@@ -91,8 +91,12 @@ const ZXING_SOURCES = [
   "https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js",
   "https://unpkg.com/@zxing/browser@0.2.1/umd/zxing-browser.min.js",
 ];
-
+const XLSX_SOURCES = [
+  "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+  "https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js",
+];
 let zxingLoadPromise = null;
+let xlsxLoadPromise = null;
 
 function loadExternalScript(src, timeout = 8000) {
   return new Promise((resolve, reject) => {
@@ -102,9 +106,8 @@ function loadExternalScript(src, timeout = 8000) {
       return;
     }
 
-    // Los scripts del HTML son parser-blocking. Si llegamos aquí y el global
-    // no existe, ese elemento ya no va a volver a emitir "load"; se reemplaza
-    // para que el reintento tenga eventos observables y un código diagnóstico.
+    // Reintentar si quedó una etiqueta externa fallida. La app ya no
+    // descarga SDK de Excel o escáner al abrir; solo en la función necesaria.
     if (existing) existing.remove();
     const script = document.createElement("script");
     const timer = setTimeout(() => {
@@ -161,6 +164,24 @@ async function ensureZxingBrowser() {
     });
   }
   return zxingLoadPromise;
+}
+
+// Importar alumnos desde Excel no debe bloquear el arranque de Registro Dual.
+// Si el servidor del proveedor está caído, el resto de la app sigue disponible.
+async function ensureXlsx(){
+  if(window.XLSX)return window.XLSX;
+  if(!xlsxLoadPromise){
+    xlsxLoadPromise=(async()=>{
+      for(const src of XLSX_SOURCES){
+        try{
+          await loadExternalScript(src);
+          if(window.XLSX)return window.XLSX;
+        }catch{/* Prueba origen secundario. */}
+      }
+      throw new Error("No se pudo cargar Excel. Comprueba tu conexión y vuelve a intentar.");
+    })().catch(error=>{xlsxLoadPromise=null;throw error;});
+  }
+  return xlsxLoadPromise;
 }
 
 const statusMeta = {
@@ -1485,10 +1506,10 @@ export default function DeliveryRegistry({ onClose }) {
   const importSpreadsheet = async (file) => {
     if (!file) return;
     try {
-      if (!window.XLSX) throw new Error("No se pudo cargar el lector de Excel.");
-      const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
+      const XLSX = await ensureXlsx();
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
       const sheets = workbook.SheetNames.map(name =>
-        window.XLSX.utils.sheet_to_json(workbook.Sheets[name], {header:1,defval:"",raw:false,blankrows:false})
+        XLSX.utils.sheet_to_json(workbook.Sheets[name], {header:1,defval:"",raw:false,blankrows:false})
       );
       let parsed=null;
       for(const rows of sheets){try{parsed=parseStudentSpreadsheet(rows);break;}catch{}}
