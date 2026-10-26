@@ -22,6 +22,7 @@ import nonWorkingReasons from "../data/non-working-reasons.json";
 import { parseBackup } from "../services/storage.js";
 import { notify, notifyImported } from "../services/rare-notification.jsx";
 import { createMatrixPayload } from "../services/delivery-registry.js";
+import {prepareLetterPage,LETTER_PDF_POINTS} from "../services/print-sheet.js";
 export function startEditor() {
   "use strict";
   return (() => {
@@ -2008,11 +2009,7 @@ export function startEditor() {
     function drawPdfPage(canvas, p) {
       const model = buildPageModel(),
         id = { ...getIdentity(), entries: deepCopy(entries) };
-      canvas.width = Math.round(PAGE.w * p);
-      canvas.height = Math.round(PAGE.h * p);
-      const c = canvas.getContext("2d");
-      c.fillStyle = "#fff";
-      c.fillRect(0, 0, canvas.width, canvas.height);
+      const c=prepareLetterPage(canvas,p);
       const matrixReady = drawStudentDataMatrix(c, id, p);
       if (logoImage && logoImage.complete && logoImage.naturalWidth)
         c.drawImage(
@@ -2392,8 +2389,8 @@ export function startEditor() {
       return out;
     }
     function createPdf(jpeg, w, h) {
-      const pw = 841.8898,
-        ph = 595.2756,
+      const pw = LETTER_PDF_POINTS.w,
+        ph = LETTER_PDF_POINTS.h,
         content = asciiBytes(
           `q\n${pw.toFixed(4)} 0 0 ${ph.toFixed(4)} 0 0 cm\n/Im0 Do\nQ\n`,
         ),
