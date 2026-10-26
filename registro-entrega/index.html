@@ -3,22 +3,185 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <meta name="theme-color" content="#f5f5f7"/>
+  <meta name="theme-color" content="#f5f6f9"/>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <meta name="apple-mobile-web-app-title" content="Registro Dual"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <link rel="icon" type="image/png" sizes="32x32" href="../Assets/registro-dual-favicon-32.png"/>
   <link rel="apple-touch-icon" sizes="180x180" href="../Assets/registro-dual-apple-180.png"/>
   <meta name="description" content="Subsistema local para registrar la entrega de bitácoras de Educación Dual."/>
   <title>Registro de Bitácoras · Dual</title>
+  <!-- CSS de arranque autónomo, embebido en el HTML precargado por el Service Worker.
+       Visible antes de React y sin peticiones a fuentes, CSS o CDNs externos. -->
+  <style>
+    #dual-boot-screen{display:none}
+    @media(max-width:760px){
+      #dual-boot-screen{
+        display:flex;position:fixed;inset:0;z-index:2147483000;isolation:isolate;
+        align-items:center;justify-content:center;flex-direction:column;
+        padding:calc(28px + env(safe-area-inset-top)) 26px calc(24px + env(safe-area-inset-bottom));
+        background:radial-gradient(ellipse at 18% 13%,rgba(209,230,252,.68),transparent 48%),
+          radial-gradient(ellipse at 83% 82%,rgba(217,235,249,.65),transparent 45%),#f5f6f9;
+        color:#18314c;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif;
+        -webkit-font-smoothing:antialiased;
+        opacity:1;visibility:visible;
+        transition:opacity .34s ease,visibility .34s ease;
+      }
+      #dual-boot-screen[data-phase="done"]{
+        opacity:0;visibility:hidden;pointer-events:none
+      }
+      .dual-boot-halo{
+        position:absolute;left:50%;top:42%;width:min(74vw,330px);height:min(74vw,330px);
+        transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+        background:radial-gradient(circle,rgba(189,217,248,.48),transparent 68%);
+        filter:blur(13px);animation:dualBootHalo 3.2s ease-in-out infinite
+      }
+      .dual-boot-content{
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        gap:0;position:relative;width:100%;max-width:310px;
+        transform:translateY(-10px);
+      }
+      .dual-boot-symbol{
+        width:98px;height:98px;position:relative;display:grid;place-items:center;
+        border-radius:28px;border:1px solid rgba(255,255,255,.92);
+        background:rgba(255,255,255,.82);
+        box-shadow:0 18px 46px rgba(33,80,129,.12),inset 0 1px rgba(255,255,255,.96);
+        -webkit-backdrop-filter:blur(22px) saturate(160%);
+        backdrop-filter:blur(22px) saturate(160%);
+        overflow:hidden;animation:dualBootSymbol 3.1s ease-in-out infinite;
+      }
+      .dual-boot-symbol::after{
+        content:"";position:absolute;inset:0;pointer-events:none;
+        background:linear-gradient(105deg,transparent 32%,rgba(255,255,255,.64) 50%,transparent 68%);
+        transform:translateX(-145%);animation:dualBootGleam 2.9s ease-in-out infinite
+      }
+      .dual-boot-initial{
+        font-size:46px;line-height:1;font-weight:780;color:#27679c;letter-spacing:-.06em;
+      }
+      .dual-boot-symbol img{
+        position:absolute;inset:12px;width:calc(100% - 24px);height:calc(100% - 24px);
+        object-fit:contain;border-radius:16px;
+      }
+      .dual-boot-title{
+        margin:25px 0 6px;font-weight:750;letter-spacing:-.04em;line-height:1.12;
+        font-size:clamp(28px,8.2vw,34px);
+      }
+      .dual-boot-caption{
+        font-size:13px;line-height:1.5;color:#637991;text-align:center;margin:0 0 25px;
+      }
+      .dual-boot-indicator{
+        width:154px;height:5px;border-radius:99px;background:#dce8f3;overflow:hidden;
+        box-shadow:inset 0 1px 1px rgba(29,69,106,.07);
+      }
+      .dual-boot-indicator::before{
+        content:"";display:block;height:100%;width:46%;border-radius:inherit;
+        background:linear-gradient(90deg,#74acd8,#2776b5,#91c3e8);
+        animation:dualBootProgress 1.65s ease-in-out infinite alternate
+      }
+      .dual-boot-footer{
+        position:absolute;bottom:calc(25px + env(safe-area-inset-bottom));
+        width:calc(100% - 42px);text-align:center;color:#8396ab;
+        font-size:10px;font-weight:670;letter-spacing:.11em;
+      }
+      .dual-boot-recovery{display:none;max-width:285px;text-align:center;margin-top:23px}
+      .dual-boot-recovery p{
+        font-size:13px;line-height:1.52;color:#53697c;margin:0 0 13px
+      }
+      .dual-boot-recovery button{
+        display:inline-flex;justify-content:center;align-items:center;
+        min-height:46px;padding:12px 22px;
+        border:0;border-radius:15px;background:#226da8;color:#fff;
+        font:inherit;font-weight:720;font-size:14px;cursor:pointer
+      }
+      #dual-boot-screen[data-phase="issue"] .dual-boot-indicator{display:none}
+      #dual-boot-screen[data-phase="issue"] .dual-boot-recovery{display:block}
+      #dual-boot-screen[data-phase="issue"] .dual-boot-caption{margin-bottom:6px}
+      @keyframes dualBootProgress{
+        from{transform:translateX(-102%)}
+        to{transform:translateX(330%)}
+      }
+      @keyframes dualBootSymbol{
+        0%,100%{transform:translateY(0) scale(1)}
+        50%{transform:translateY(-4px) scale(1.018)}
+      }
+      @keyframes dualBootGleam{
+        0%,28%{transform:translateX(-145%)}
+        66%,100%{transform:translateX(145%)}
+      }
+      @keyframes dualBootHalo{
+        0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(.95)}
+        50%{opacity:1;transform:translate(-50%,-50%) scale(1.04)}
+      }
+      @media(prefers-reduced-motion:reduce){
+        #dual-boot-screen,.dual-boot-halo,.dual-boot-symbol,
+        .dual-boot-symbol::after,.dual-boot-indicator::before{
+          transition:none!important;animation:none!important;
+        }
+        .dual-boot-symbol::after{display:none}
+        .dual-boot-indicator::before{width:55%;transform:none}
+      }
+      @media(prefers-reduced-transparency:reduce){
+        .dual-boot-symbol{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
+        .dual-boot-halo{display:none}
+      }
+    }
+  </style>
 </head>
 <body>
+  <div id="dual-boot-screen" role="status" aria-live="polite" aria-label="Iniciando Registro Dual" data-phase="loading">
+    <div class="dual-boot-halo" aria-hidden="true"></div>
+    <div class="dual-boot-content">
+      <div class="dual-boot-symbol" aria-hidden="true">
+        <span class="dual-boot-initial">D</span>
+        <img src="../Assets/registro-dual-icon-192.png" width="74" height="74" alt="" fetchpriority="high"/>
+      </div>
+      <h1 class="dual-boot-title">Registro Dual</h1>
+      <p class="dual-boot-caption" id="dual-boot-caption">Preparando tu espacio de trabajo</p>
+      <div class="dual-boot-indicator" aria-hidden="true"></div>
+      <div id="dual-boot-recovery" class="dual-boot-recovery">
+        <p>No pudimos completar la carga. Revisa la conexión e inténtalo de nuevo. Tus registros guardados permanecen en este dispositivo.</p>
+        <button type="button" id="dual-boot-retry">Reintentar</button>
+      </div>
+    </div>
+    <div class="dual-boot-footer">REGISTRO DE BITÁCORAS · DUAL</div>
+  </div>
   <div id="root"></div>
-  <script src="https://cdn.jsdelivr.net/npm/bwip-js@4.11.4/dist/bwip-js-min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/@zxing/browser@0.2.1/umd/zxing-browser.min.js'"></script>
+  <noscript>Registro Dual necesita JavaScript para abrir los registros y las herramientas.</noscript>
+  <script>
+    (function(){
+      var screen=document.getElementById("dual-boot-screen");
+      var retry=document.getElementById("dual-boot-retry");
+      if(!screen)return;
+      var ready=false;
+      var watchdog=window.setTimeout(function(){
+        if(ready)return;
+        screen.dataset.phase="issue";
+        var status=document.getElementById("dual-boot-caption");
+        if(status)status.textContent="La aplicación tarda más de lo esperado";
+      },14000);
+      window.__dualBoot={
+        ready:function(){
+          if(ready)return;
+          ready=true;
+          window.clearTimeout(watchdog);
+          screen.dataset.phase="done";
+          // Keep the fading layer long enough to finish the transition.
+          window.setTimeout(function(){screen.remove();},500);
+        },
+        fail:function(){
+          if(ready)return;
+          window.clearTimeout(watchdog);
+          screen.dataset.phase="issue";
+          var status=document.getElementById("dual-boot-caption");
+          if(status)status.textContent="No se pudo iniciar Registro Dual";
+        }
+      };
+      retry.addEventListener("click",function(){location.reload();});
+    })();
+  </script>
+  <!-- Herramientas secundarias bajo demanda: ningún CDN debe bloquear el primer render. -->
   <script type="module" src="../src/main.jsx"></script>
 </body>
 </html>
