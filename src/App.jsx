@@ -22,6 +22,16 @@ export default function App() {
   const initialized = useRef(false);
   const [deliveryMode, setDeliveryMode] = useState(isDeliveryPage);
 
+  // La pantalla de arranque está en el HTML, antes del bundle React.
+  // Retirarla solo después de montar realmente Registro Dual.
+  useEffect(()=>{
+    if(!deliveryMode)return;
+    const done=()=>window.__dualBoot?.ready?.();
+    if(typeof window.requestAnimationFrame!=="function"){done();return;}
+    const frame=window.requestAnimationFrame(done);
+    return ()=>window.cancelAnimationFrame?.(frame);
+  },[deliveryMode]);
+
   useEffect(() => {
     const syncRoute = () => setDeliveryMode(isDeliveryPage());
     window.addEventListener("hashchange", syncRoute);
