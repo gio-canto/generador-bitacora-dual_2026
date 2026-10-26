@@ -71,6 +71,7 @@ import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
 import RegistryQuickSidebar from "./RegistryQuickSidebar.jsx";
 import {acknowledgeBackupReminder,observeBackupActivity,shouldRemindBackup} from "../services/backup-reminder.js";
 import { parseStudentSpreadsheet } from "../services/student-spreadsheet.js";
+import {decodePdfPages,PDFJS_SOURCES,scanFileKind} from "../services/scanned-pdf.js";
 import { generateDeliveryReportPdf } from "../services/delivery-report.js";
 import { generateStudentRosterPdf, ROSTER_MODES } from "../services/student-roster-report.js";
 import {
@@ -97,6 +98,7 @@ const XLSX_SOURCES = [
 ];
 let zxingLoadPromise = null;
 let xlsxLoadPromise = null;
+let pdfjsLoadPromise = null;
 
 function loadExternalScript(src, timeout = 8000) {
   return new Promise((resolve, reject) => {
@@ -182,6 +184,24 @@ async function ensureXlsx(){
     })().catch(error=>{xlsxLoadPromise=null;throw error;});
   }
   return xlsxLoadPromise;
+}
+async function ensurePdfJs(){
+  if(window.pdfjsLib?.getDocument)return window.pdfjsLib;
+  if(!pdfjsLoadPromise){
+    pdfjsLoadPromise=(async()=>{
+      for(const [src,worker] of PDFJS_SOURCES){
+        try{
+          await loadExternalScript(src,12000);
+          if(window.pdfjsLib?.getDocument){
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc=worker;
+            return window.pdfjsLib;
+          }
+        }catch{/* Probar el proveedor alternativo. */}
+      }
+      throw new Error("No se pudo cargar el lector PDF. Necesitas conexión para la primera lectura.");
+    })().catch(error=>{pdfjsLoadPromise=null;throw error;});
+  }
+  return pdfjsLoadPromise;
 }
 
 const statusMeta = {
@@ -1942,6 +1962,44 @@ export default function DeliveryRegistry({ onClose }) {
     if (!file) return;
     try {
       clearScannerIssue();
+      const kind=scanFileKind(file);
+      if(!kind)throw new Error("Selecciona una imagen o un PDF de bitácora.");
+      if(kind==="pdf"){
+        const pdfjs=await ensurePdfJs();
+        const ZX=await ensureZxingBrowser().catch(()=>null);
+        const Reader=ZX?.BrowserDatamatrixCodeReader||ZX?.BrowserMultiFormatReader;
+        const reader=Reader?new Reader():null;
+        if(reader&&!ZX.BrowserDatamatrixCodeReader&&ZX.BarcodeFormat?.DATA_MATRIX!==undefined)
+          reader.possibleFormats=[ZX.BarcodeFormat.DATA_MATRIX];
+        const Detector=window.BarcodeDetector;
+        if(!reader&&!Detector)throw new Error("No está disponible un lector Data Matrix para PDF.");
+        notify("info","Leyendo PDF","Buscando códigos en las páginas de la bitácora.");
+        const result=await decodePdfPages(file,pdfjs,async(canvas)=>{
+          if(reader){
+            let url="";
+            try{
+              const blob=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error("No se pudo preparar la página PDF.")),"image/png"));
+              url=URL.createObjectURL(blob);
+              const code=await reader.decodeFromImageUrl(url);
+              return code.getText?.()||code.text||"";
+            }catch{/* No hay código legible en esta página; examinar la siguiente. */}
+            finally{if(url)URL.revokeObjectURL(url);}
+          }
+          if(Detector){
+            try{
+              const detector=new Detector({formats:["data_matrix"]});
+              const codes=await detector.detect(canvas);
+              return codes[0]?.rawValue||"";
+            }catch{/* Continúa buscando. */}
+          }
+          return "";
+        });
+        if(!result.matches.length)throw new Error("No se encontró un Data Matrix legible en las páginas revisadas.");
+        for(const match of result.matches)scanProcessorRef.current?.(match.payload,[]);
+        notify("success","PDF leído",result.matches.length+" código(s) en "+result.pages+" página(s)"+
+          (result.truncated?" · Solo se revisaron las primeras 16 páginas.":""));
+        return;
+      }
       let ZX = window.ZXingBrowser;
       if (!ZX) {
         try {
@@ -1997,8 +2055,8 @@ export default function DeliveryRegistry({ onClose }) {
     } catch (error) {
       reportScannerIssue(error?.scannerCode || "IMG-301", error, {
         stage: "decode-image",
-        source: "Archivo / ZXing",
-        message: "No se pudo leer el Data Matrix de la imagen seleccionada.",
+        source: "Archivo / ZXing / PDF.js",
+        message: error?.message || "No se pudo leer el Data Matrix del archivo seleccionado.",
       });
     }
   };
@@ -3545,12 +3603,11 @@ export default function DeliveryRegistry({ onClose }) {
                       Copiar diagnóstico
                     </button>
                     <label className="btn delivery-file-button">
-                      Leer imagen
+                      Foto o PDF
                       <input
                         hidden
                         type="file"
-                        accept="image/*"
-                        capture="environment"
+                        accept="image/*,.pdf,application/pdf"
                         onChange={(event) => {
                           scanImageFile(event.target.files?.[0]);
                           event.target.value = "";
@@ -3606,8 +3663,7 @@ export default function DeliveryRegistry({ onClose }) {
                 <input
                   hidden
                   type="file"
-                  accept="image/*"
-                  capture="environment"
+                  accept="image/*,.pdf,application/pdf"
                   onChange={(event) => {
                     scanImageFile(event.target.files?.[0]);
                     event.target.value = "";
