@@ -1,5 +1,15 @@
 # Notas de versión
 
+## Arranque móvil Liquid Glass y caché de inicio · v0.57.2-beta.1
+
+- Registro Dual presenta una pantalla de carga desde el HTML, **antes de React** y sin esperar bibliotecas externas: icono oficial, fondo blanco azulado, reflejo discreto y animación indeterminada sin porcentajes inventados.
+- Se desvanece inmediatamente después de montar la aplicación. Si la inicialización tarda 14 segundos, aparece un estado de recuperación con botón «Reintentar»; también se retira si React muestra su pantalla de error.
+- Eliminadas las etiquetas de SDK externos que bloqueaban el arranque de Registro Dual. ZXing se descarga solo al usar el escáner y Excel se carga solo al importar listas; la app y el generador web original mantienen sus otras funciones.
+- El Service Worker guarda HTML, iconos, manifiesto y archivos JS/CSS del mismo build; conserva la versión activa y una anterior, borrando cachés antiguas tras instalar correctamente la nueva. No se borra LocalStorage ni ningún registro de alumnos.
+- Coinciden los colores del lanzamiento de la PWA y del splash. Soporta «reducir movimiento» y «reducir transparencia». El primer uso con internet permite preparar el uso posterior sin conexión; las bibliotecas externas opcionales pueden requerir red.
+- Se añaden pruebas del splash estático, transición, error recuperable y recursos precargados. Sin cambios en la versión ni los datos guardados.
+
+
 ## Depuración de textos del Índice Dual · v0.57.2-beta.1
 
 - Retiradas del PDF individual las frases repetitivas de carácter aclaratorio, el pie «USO ESCOLAR INTERNO» y la explicación sobre entrega tardía y «No aplica». El pie identifica ahora únicamente al Registro Dual y su versión.
