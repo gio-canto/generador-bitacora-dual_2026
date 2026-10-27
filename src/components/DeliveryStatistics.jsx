@@ -29,12 +29,12 @@ function Breakdown({ items, empty = "Sin datos en el periodo" }) {
     </div>
   </>;
 }
-function Bars({ title, rows, unit = "", max = 7 }) {
-  const items = rows.filter(row => Number.isFinite(row.value) && row.value >= 0).sort((a,b)=>b.value-a.value).slice(0,max);
+function Bars({ title, rows, unit = "", max = 7, showZeros = false }) {
+  const items = rows.filter(row => Number.isFinite(row.value) && row.value >= 0).sort((a,b)=>b.value-a.value||a.label.localeCompare(b.label,"es")).slice(0,max);
   const high = Math.max(1, ...items.map(row=>row.value));
   return <section className="ds-panel">
     <h2>{title}</h2>
-    {items.some(item => item.value > 0) ? items.map(row => <div className="ds-cause" key={row.label}>
+    {(showZeros ? items.length>0 : items.some(item=>item.value>0)) ? items.map(row => <div className="ds-cause" key={row.label}>
       <div className="ds-cause-label"><span>{row.label}</span><strong>{fmt(row.value, unit ? 1 : 0)}{unit}</strong></div>
       <div className="ds-track"><i style={{width:100*row.value/high+"%"}}/></div>
     </div>) : <p className="ds-empty">Sin registros en el periodo.</p>}
@@ -316,7 +316,10 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       <Bars title="Horas por especialidad" unit=" h" rows={data.bySpecialty.map(item=>({label:item.label,value:item.minutes/60}))}/>
     </div>}
     {section==="companies"&&<>
-      <Bars title="Horas por empresa" unit=" h" rows={data.byCompany.map(item=>({label:item.label,value:item.minutes/60}))}/>
+      <Bars title="Horas por empresa" unit=" h" max={Infinity} showZeros
+        rows={data.byCompany.map(item=>({label:item.label,value:item.minutes/60}))}/>
+      <Bars title="Faltas por empresa" max={Infinity} showZeros
+        rows={data.byCompanyPerformance.map(item=>({label:item.label,value:item.absences}))}/>
 
     <section className="ds-panel ds-comparison" aria-label="Estadísticas por empresa">
       <div className="ds-panel-head"><h2>Comparación por empresa</h2>
