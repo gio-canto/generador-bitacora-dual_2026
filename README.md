@@ -27,6 +27,12 @@
 
 La **interfaz web de escritorio vuelve a su composición clásica**: ancho centrado, logotipo horizontal, cinco accesos del Inicio, historial completo, tarjetas y filtros originales de Estadísticas. La barra lateral ya **no desplaza ni estrecha la página**: se abre solo al pulsar «Menú». Los estilos globales Apple Glass ahora se aplican exclusivamente al **modo móvil**, sin alterar la versión web. Véase [restauración de escritorio](docs/V0572_ESCRITORIO.md).
 
+## v0.57.3-beta.1 · Carta, PDF escaneado y todas las empresas
+
+El PDF de bitácora semanal ahora usa **carta horizontal (11 × 8.5 pulgadas)** con **8 mm de margen imprimible** para que las impresoras no corten el Data Matrix. La pantalla **Escanear** acepta una **foto o un PDF**, incluso multipágina (hasta 16 páginas y 18 MB). La lectura PDF utiliza PDF.js bajo demanda, por lo que la primera vez puede necesitar internet.
+
+En **Datos → Empresas**, las comparaciones y gráficas muestran **todas las empresas** (también con cero faltas o sin capturas); el **PDF estadístico** incorpora páginas adicionales de listado completo para evitar que se pierdan las entidades que no caben en una gráfica resumida.
+
 ## v0.57.2-beta.1 · Inicio y herramientas de Registro Dual
 
 **Inicio más limpio:** tres indicadores uniformes (alumnos, semanas y avance de la última semana), y solo tres semanas recientes con acceso al historial completo. **Nueva barra lateral de accesos rápidos** en escritorio y panel desplegable en móvil, con Inicio, Semanas, Datos, Avisos PNG, Escáner, administración de alumnos, reportes y respaldos. **Recordatorios discretos de respaldo JSON** cuando existen cambios: sin alertas durante el escáner ni notificaciones del sistema, con controles para descargar o posponer. No se modifica la lógica de los registros.
