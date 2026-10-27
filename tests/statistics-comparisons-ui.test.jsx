@@ -26,6 +26,11 @@ describe("comparativos de empresas y grupos en Estadísticas",()=>{
    render(<DeliveryStatistics state={{students:[a,b,c],weeks:[week]}}
      onBack={vi.fn()} onReportStudent={vi.fn()} onReportStatistics={vi.fn()}/>);
    fireEvent.click(screen.getByRole("button",{name:"Empresas"}));
+   expect(screen.getByRole("heading",{name:"Promedio semanal acumulado por alumno"})).toBeTruthy();
+   expect(screen.getByRole("heading",{name:"Horas totales por empresa"})).toBeTruthy();
+   expect(screen.getByRole("heading",{name:"Faltas por empresa"})).toBeTruthy();
+   expect(screen.getByRole("columnheader",{name:"Promedio semanal acumulado"})).toBeTruthy();
+   expect(screen.getByRole("columnheader",{name:"Horas totales"})).toBeTruthy();
    const companies=screen.getByRole("region",{name:"Estadísticas por empresa"});
    expect(within(companies).getByText("Comparación por empresa")).toBeTruthy();
    expect(within(companies).getAllByText("Empresa 1").length).toBeGreaterThan(0);
