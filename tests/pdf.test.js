@@ -3,6 +3,7 @@ import { createCanvas, loadImage } from "@napi-rs/canvas";
 import { writeFileSync } from "node:fs";
 import { blankRecord, generateEntries } from "../src/domain/records.js";
 import { buildPageModel, drawPdfPage, createPdf } from "../src/services/pdf.js";
+import {LETTER_LANDSCAPE,ORIGINAL_LAYOUT,printPlacement} from "../src/services/print-sheet.js";
 const sample = () => {
   const r = blankRecord();
   r.student = "Alumno de Prueba";
@@ -19,7 +20,7 @@ const sample = () => {
   }));
   return r;
 };
-it("genera un PDF A4 horizontal de una página con la misma vista previa", async () => {
+it("genera PDF carta horizontal con margen seguro y vista previa proporcional", async () => {
   const r = sample(),
     canvas = createCanvas(1, 1),
     logo = await loadImage("public/Assets/Edu.png");
@@ -34,7 +35,16 @@ it("genera un PDF A4 horizontal de una página con la misma vista previa", async
     text = new TextDecoder().decode(bytes);
   expect(text.startsWith("%PDF-1.4")).toBe(true);
   expect(text).toContain("/Count 1");
-  expect(text).toContain("841.8898 595.2756");
+  expect(text).toContain("792.0000 612.0000");
+   expect(canvas.width).toBe(Math.round(279.4*6));
+   expect(canvas.height).toBe(Math.round(215.9*6));
+   const fit=printPlacement();
+   expect(fit.x).toBeGreaterThanOrEqual(LETTER_LANDSCAPE.margin);
+   expect(fit.y).toBeGreaterThanOrEqual(LETTER_LANDSCAPE.margin);
+   expect(fit.x+ORIGINAL_LAYOUT.w*fit.scale).toBeLessThanOrEqual(LETTER_LANDSCAPE.w-LETTER_LANDSCAPE.margin+0.01);
+   expect(fit.y+ORIGINAL_LAYOUT.h*fit.scale).toBeLessThanOrEqual(LETTER_LANDSCAPE.h-LETTER_LANDSCAPE.margin+0.01);
+   // La zona blanca del Data Matrix empieza más lejos de los rodillos.
+   expect(fit.x+(2.4-1.8)*fit.scale).toBeGreaterThan(8);
   writeFileSync("/tmp/bitacora-validation.pdf", bytes);
   writeFileSync("/tmp/bitacora-validation.png", canvas.toBuffer("image/png"));
 });
