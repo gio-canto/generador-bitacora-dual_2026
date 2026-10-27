@@ -60,7 +60,7 @@ function bars(ctx, items, { x, y, w, h, unit = "", maxRows = 6, colors = palette
     const at = y + index * gap;
     const v = Math.max(0, item.value);
     label(ctx, item.label, x, at + 18, 18, C.secondary, 500, w - 165);
-    label(ctx, fmt(v, unit === " h" || unit === "%" ? 1 : 0) + unit, x + w - 125, at + 18, 18, C.ink, 700, 122);
+    label(ctx, item.displayValue??(fmt(v, unit === " h" || unit === "%" ? 1 : 0) + unit), x + w - 125, at + 18, 18, C.ink, 700, 122);
     rect(ctx, x, at + 29, w - 6, 12, 6, C.track);
     if (v) rect(ctx, x, at + 29, Math.max(3, (w - 6) * v / max), 12, 6, colors[index % colors.length]);
   });
@@ -256,7 +256,8 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
   const r = report.data;
   const allCompanies=[...r.byCompanyPerformance].sort((a,b)=>a.label.localeCompare(b.label,"es"));
   const COMPANY_ROWS_PER_PAGE=23;
-  const totalPages=6+Math.ceil(allCompanies.length/COMPANY_ROWS_PER_PAGE);
+  // Una página adicional compara la normalización semanal con el total.
+  const totalPages=7+Math.ceil(allCompanies.length/COMPANY_ROWS_PER_PAGE);
   const interpretation=interpretStatistics(r,report.insights);
   if (!r.weeks.length) throw new Error("Selecciona un periodo con semanas registradas.");
   // El logotipo oficial se incorpora en cada página.
@@ -521,30 +522,61 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     images.push(canvasToJpeg(canvas));
   }
 
+  // Página 7: dos lecturas complementarias de las horas, sin sustituir
+  // la cifra histórica ni omitir empresas del anexo detallado.
+  {
+    const {ctx,canvas}=pageBase(report,7,logo,totalPages);
+    const byAverage=[...allCompanies].sort((a,b)=>
+      (b.weeklyAverageAccumulatedHours??-1)-(a.weeklyAverageAccumulatedHours??-1)||
+      a.label.localeCompare(b.label,"es"));
+    const byTotal=[...allCompanies].sort((a,b)=>b.hours-a.hours||
+      a.label.localeCompare(b.label,"es"));
+    panel(ctx,54,345,1132,505,"Promedio semanal acumulado por alumno",
+      "Se suma el promedio de horas por alumno con datos de cada semana.");
+    bars(ctx,byAverage.map(row=>({
+      label:row.label,value:row.weeklyAverageAccumulatedHours??0,
+      displayValue:row.weeksWithData?undefined:"Sin datos",
+    })),{x:81,y:455,w:1074,h:353,maxRows:6,showZeros:true,unit:" h"});
+    panel(ctx,54,869,1132,505,"Horas totales por empresa",
+      "Total original: suma de las horas de todos los alumnos registrados.");
+    bars(ctx,byTotal.map(row=>({
+      label:row.label,value:row.hours,
+      displayValue:row.weeksWithData?undefined:"Sin datos",
+    })),{x:81,y:979,w:1074,h:353,maxRows:6,showZeros:true,unit:" h"});
+    panel(ctx,54,1397,1132,205,"Cómo interpretar ambos indicadores");
+    label(ctx,"Promedio semanal acumulado = suma de (horas de la empresa en cada semana /",76,1475,17,C.secondary,500,1080);
+    label(ctx,"número de alumnos con estadísticas esa semana).",76,1509,17,C.secondary,500,1080);
+    label(ctx,"Las semanas sin datos no suman cero. El total histórico permanece sin cambios.",76,1546,16,C.muted,500,1080);
+    images.push(canvasToJpeg(canvas));
+  }
+
   // Anexo íntegro, ordenado por empresa. La gráfica de la página 6
   // resume seis, pero este listado nunca oculta entidades por umbral,
   // promedio, faltas cero o ausencia de entregas.
   for(let offset=0;offset<allCompanies.length;offset+=COMPANY_ROWS_PER_PAGE){
-    const pageNumber=7+Math.floor(offset/COMPANY_ROWS_PER_PAGE);
+    const pageNumber=8+Math.floor(offset/COMPANY_ROWS_PER_PAGE);
     const {ctx,canvas}=pageBase(report,pageNumber,logo,totalPages);
     const rows=allCompanies.slice(offset,offset+COMPANY_ROWS_PER_PAGE);
     label(ctx,"Empresas · listado completo",56,370,31,C.ink,750,1095);
     label(ctx,"Incluye empresas con 0 faltas y sin jornadas capturadas.",56,406,17,C.muted,500,1090);
-    label(ctx,"EMPRESA",73,454,16,C.secondary,750,420);
-    label(ctx,"ALUMNOS",610,454,15,C.secondary,750,93);
-    label(ctx,"HORAS",743,454,15,C.secondary,750,82);
-    label(ctx,"FALTAS",875,454,15,C.secondary,750,80);
-    label(ctx,"TASA",1038,454,15,C.secondary,750,145);
+    label(ctx,"EMPRESA",73,454,16,C.secondary,750,396);
+    label(ctx,"ALUMNOS",490,454,14,C.secondary,750,104);
+    label(ctx,"TOTAL h",628,454,14,C.secondary,750,100);
+    label(ctx,"PROM. SEM. h",764,454,14,C.secondary,750,145);
+    label(ctx,"FALTAS",940,454,14,C.secondary,750,84);
+    label(ctx,"TASA",1041,454,14,C.secondary,750,118);
     separator(ctx,71,471,1095);
     rows.forEach((row,index)=>{
       const y=500+index*47;
       if(index%2===0)rect(ctx,69,y-24,1100,42,9,"#f3f6f9");
-      label(ctx,row.label,82,y+2,17,C.ink,600,475);
-      label(ctx,fmt(row.activeStudents),630,y+2,17,C.ink,650,80);
-      label(ctx,row.reports?fmt(row.hours,1):"—",748,y+2,17,C.secondary,550,80);
-      label(ctx,row.reports?fmt(row.absences):"—",884,y+2,17,C.ink,700,77);
+      label(ctx,row.label,82,y+2,16,C.ink,600,396);
+      label(ctx,fmt(row.activeStudents),510,y+2,16,C.ink,650,82);
+      label(ctx,row.reports?fmt(row.hours,1):"—",638,y+2,16,C.secondary,550,95);
+      label(ctx,row.weeksWithData?fmt(row.weeklyAverageAccumulatedHours,1):"Sin datos",
+        764,y+2,15,C.blue,650,145);
+      label(ctx,row.reports?fmt(row.absences):"—",947,y+2,16,C.ink,700,68);
       label(ctx,row.absenceRate==null?"Sin datos":fmt(row.absenceRate,1)+"%",
-        1038,y+2,16,C.secondary,600,138);
+        1041,y+2,15,C.secondary,600,115);
     });
     label(ctx,"Empresas "+(offset+1)+"–"+(offset+rows.length)+" de "+allCompanies.length,
       77,1624,16,C.muted,550,1020);
