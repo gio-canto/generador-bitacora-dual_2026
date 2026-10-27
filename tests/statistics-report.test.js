@@ -5,7 +5,7 @@ import {createStudent,createWeek,saveManualDelivery} from "../src/services/deliv
 import {buildManualStatistics} from "../src/services/manual-statistics.js";
 describe("reporte PDF estadístico",()=>{
   afterEach(()=>{vi.restoreAllMocks();});
-  it("descarga seis páginas y un anexo completo de empresas sin abrir impresión",async()=>{
+  it("descarga seis páginas, comparativa de horas y anexo íntegro de empresas",async()=>{
     const realCreate=document.createElement.bind(document);
     vi.spyOn(document,"createElement").mockImplementation(name=>name==="canvas"?createCanvas(1240,1754):realCreate(name));
     let blob=null;
@@ -25,13 +25,13 @@ describe("reporte PDF estadístico",()=>{
     vi.spyOn(globalThis,"setTimeout").mockImplementation(()=>0);
     const logo = await loadImage("public/Assets/Asset_logo.png");
     const output=await generateStatisticsReportPdf({context:{school:"Plantel de prueba",generation:"2025–2028"},students:[student],weeks:[week]},{period:"weekly",weekId:week.id},{logoImage:logo});
-    expect(output.pages).toBe(7);
+    expect(output.pages).toBe(8);
     expect(output.filename).toMatch(/^estadisticas-dual-.*\.pdf$/);
-    expect(output.pages).toBeGreaterThanOrEqual(7);
+    expect(output.pages).toBeGreaterThanOrEqual(8);
     expect(blob?.type).toBe("application/pdf");
     expect(blob?.size).toBeGreaterThan(1500);
     const pdfText = new TextDecoder("latin1").decode(new Uint8Array(await blob.arrayBuffer()));
-    expect(pdfText).toContain("/Count 7");
+    expect(pdfText).toContain("/Count 8");
     expect(click).toHaveBeenCalledTimes(1);
     URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;
   });
@@ -51,7 +51,7 @@ describe("reporte PDF estadístico",()=>{
     vi.spyOn(globalThis,"setTimeout").mockImplementation(()=>0);
     try{
       const result=await generateStatisticsReportPdf(state,{period:"weekly",weekId:"w1"},{logoImage:logo});
-      expect(result.pages).toBe(8); // 6 tradicionales + 2 anexos (23+4 empresas).
+      expect(result.pages).toBe(9); // 6 páginas, una comparativa y 2 anexos (23+4 empresas).
     }finally{
       URL.createObjectURL=oldCreate;URL.revokeObjectURL=oldRevoke;
     }
