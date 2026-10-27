@@ -139,7 +139,9 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
     byCompanyPerformance,byGroupPerformance,
     companyLeaders:comparisonLeaders(byCompanyPerformance,"Sin especificar"),
     groupLeaders:comparisonLeaders(byGroupPerformance,"Sin grupo"),
-    byCompany:groupMinutes("company",receivedCompanies),
+    // Todas las empresas del padrón, aunque no tengan capturas o sus faltas sean cero.
+    byCompany:[...companyMap.values()].map(row=>({label:row.label,minutes:row.minutes}))
+      .sort((a,b)=>b.minutes-a.minutes||compareText(a.label,b.label)),
     bySpecialty:groupMinutes("specialty",receivedSpecialties),
     coverage:percent(weeksWithStatistics,applicable),
     onTimeRate:percent(delivered,applicable),
