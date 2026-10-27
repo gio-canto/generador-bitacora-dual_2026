@@ -8,6 +8,7 @@ const companyLabel=student=>String(student.company||"").trim()||"Sin especificar
 const blankComparison=label=>({
   label,activeStudents:0,studentIds:new Set(),reports:0,minutes:0,
   worked:0,absences:0,nonWorking:0,holidays:0,
+  weeklyAverageMinutesSum:0,weeksWithData:0,
 });
 function calculateComparisons(entries,activeTotal){
  return [...entries.values()].map(row=>{
@@ -18,6 +19,8 @@ function calculateComparisons(entries,activeTotal){
      studentsWithData:row.studentIds.size,reports:row.reports,
      minutes:row.minutes,hours:row.minutes/60,
      averageHours:row.studentIds.size?row.minutes/60/row.studentIds.size:null,
+     weeklyAverageAccumulatedHours:row.weeksWithData?row.weeklyAverageMinutesSum/60:null,
+     weeksWithData:row.weeksWithData,
      worked:row.worked,absences:row.absences,nonWorking:row.nonWorking,
      holidays:row.holidays,knownDays:row.worked+row.absences+row.nonWorking+row.holidays,
      applicableDays,absenceRate:applicableDays?100*row.absences/applicableDays:null,
@@ -76,6 +79,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
   const receivedCompanies=[],receivedSpecialties=[];
   for(const week of weeks){
     let weekMinutes=0,weekReports=0;
+    const weekCompany=new Map();
     for(const student of roster){
       if(!studentAppliesToWeek(student,week))continue;
       const delivery=week.deliveries?.[student.id];
@@ -97,7 +101,12 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
       if(!summary)continue;
       weeksWithStatistics++;reportCount++;weekReports++;
       totalMinutes+=summary.minutes;weekMinutes+=summary.minutes;
-      for(const row of [register(companyMap,companyLabel(student)),register(groupMap,groupLabel(student))]){
+      const name=companyLabel(student);
+      if(!weekCompany.has(name))weekCompany.set(name,{minutes:0,studentIds:new Set()});
+      const weekRow=weekCompany.get(name);
+      weekRow.minutes+=summary.minutes;
+      weekRow.studentIds.add(student.id);
+      for(const row of [register(companyMap,name),register(groupMap,groupLabel(student))]){
         row.studentIds.add(student.id);
         row.reports++;
         row.minutes+=summary.minutes;
@@ -122,6 +131,12 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
       receivedCompanies.push({company:student.company,minutes:summary.minutes});
       receivedSpecialties.push({specialty:student.specialty,minutes:summary.minutes});
     }
+    // Sumar promedios por semana; solo cuentan alumnos con datos esa semana.
+    for(const [name,{minutes,studentIds}] of weekCompany){
+      const row=register(companyMap,name);
+      row.weeklyAverageMinutesSum+=minutes/studentIds.size;
+      row.weeksWithData++;
+    }
     trend.push({label:week.label,startDate:week.startDate,minutes:weekMinutes,reports:weekReports});
   }
   const used=students.filter(item=>methods.get(item.id)==="generator").length;
@@ -143,7 +158,11 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
     companyLeaders:comparisonLeaders(byCompanyPerformance,"Sin especificar"),
     groupLeaders:comparisonLeaders(byGroupPerformance,"Sin grupo"),
     // Todas las empresas del padrón, aunque no tengan capturas o sus faltas sean cero.
-    byCompany:[...companyMap.values()].map(row=>({label:row.label,minutes:row.minutes}))
+    byCompany:[...companyMap.values()].map(row=>({
+      label:row.label,minutes:row.minutes,
+      weeklyAverageAccumulatedHours:row.weeksWithData?row.weeklyAverageMinutesSum/60:null,
+      weeksWithData:row.weeksWithData,
+    }))
       .sort((a,b)=>b.minutes-a.minutes||compareText(a.label,b.label)),
     bySpecialty:groupMinutes("specialty",receivedSpecialties),
     coverage:percent(weeksWithStatistics,applicable),
