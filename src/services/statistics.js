@@ -61,10 +61,13 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
   const daily=makeCounts(),causes={falta:new Map(),sin_labores:new Map()};
   const companyMap=new Map(),groupMap=new Map();
   const register=(map,name)=>{if(!map.has(name))map.set(name,blankComparison(name));return map.get(name);};
-  for(const student of students){
-    register(companyMap,companyLabel(student)).activeStudents++;
-    register(groupMap,groupLabel(student)).activeStudents++;
+  // Todas las empresas del padrón, aun cuando hoy no tengan alumnos activos
+  // o ninguna bitácora con estadísticas. Solo el campo activeStudents usa activos.
+  for(const student of roster){
+    const row=register(companyMap,companyLabel(student));
+    if(studentIsActive(student))row.activeStudents++;
   }
+  for(const student of students)register(groupMap,groupLabel(student)).activeStudents++;
   const methods=new Map(), trend=[];
   let totalMinutes=0, weeksWithStatistics=0,delivered=0,late=0,notDelivered=0,notApplicable=0,applicable=0;
   let pendingWithStatistics=0, pendingMinutes=0;
