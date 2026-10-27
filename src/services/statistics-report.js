@@ -51,9 +51,9 @@ function empty(ctx, x, y, w, message = "Sin datos en el periodo") {
   label(ctx, message, x, y, 18, C.muted, 400, w);
 }
 
-function bars(ctx, items, { x, y, w, h, unit = "", maxRows = 6, colors = palette } = {}) {
+function bars(ctx, items, { x, y, w, h, unit = "", maxRows = 6, colors = palette, showZeros = false } = {}) {
   const rows = items.slice(0, maxRows);
-  if (!rows.length || !rows.some(item => item.value > 0)) return empty(ctx, x, y + 40, w);
+  if (!rows.length || (!showZeros && !rows.some(item => item.value > 0))) return empty(ctx, x, y + 40, w);
   const gap = Math.min(76, Math.max(47, h / rows.length));
   const max = Math.max(1, ...rows.map(item => item.value));
   rows.forEach((item, index) => {
@@ -211,7 +211,7 @@ async function loadLogo() {
   }
   throw new Error("No se pudo cargar el logotipo oficial. Comprueba los archivos sin conexión.");
 }
-function pageBase(report, pageNumber, logo) {
+function pageBase(report, pageNumber, logo, totalPages = 6) {
   const canvas = document.createElement("canvas");
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext("2d");
@@ -230,7 +230,7 @@ function pageBase(report, pageNumber, logo) {
   separator(ctx, 54, 317, W - 108);
   separator(ctx, 54, 1658, W - 108);
   label(ctx, "GENERACIÓN  " + report.generation, 54, 1694, 16, C.muted, 600, 550);
-  label(ctx, "Emitido " + report.date + "  ·  " + pageNumber + "/6  ·  " + VERSION,
+  label(ctx, "Emitido " + report.date + "  ·  " + pageNumber + "/" + totalPages + "  ·  " + VERSION,
     W - 435, 1694, 15, C.muted, 500, 430);
   return { ctx, canvas };
 }
@@ -254,6 +254,9 @@ export function statisticsReportModel(state, filters = {}) {
 export async function generateStatisticsReportPdf(state, filters = {}, options = {}) {
   const report = statisticsReportModel(state, filters);
   const r = report.data;
+  const allCompanies=[...r.byCompanyPerformance].sort((a,b)=>a.label.localeCompare(b.label,"es"));
+  const COMPANY_ROWS_PER_PAGE=23;
+  const totalPages=6+Math.ceil(allCompanies.length/COMPANY_ROWS_PER_PAGE);
   const interpretation=interpretStatistics(r,report.insights);
   if (!r.weeks.length) throw new Error("Selecciona un periodo con semanas registradas.");
   // El logotipo oficial se incorpora en cada página.
@@ -282,7 +285,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
 
   // Página 1: actividad y distribución de entregas.
   {
-    const {ctx,canvas}=pageBase(report,1,logo);
+    const {ctx,canvas}=pageBase(report,1,logo,totalPages);
     const cardW=(1132 - 42)/4;
     [
       ["Alumnos activos",fmt(r.students.length)],
@@ -314,7 +317,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
 
   // Página 2: razones, distribución por género y jornadas de la semana.
   {
-    const {ctx,canvas}=pageBase(report,2,logo);
+    const {ctx,canvas}=pageBase(report,2,logo,totalPages);
     panel(ctx,54,345,551,542,"Motivos de falta","Causas registradas");
     bars(ctx,r.causesAbsence.map(e=>({label:e.label,value:e.count})),
       {x:81,y:451,w:496,h:396,maxRows:6});
@@ -335,7 +338,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
 
   // Página 3: comparativas y porcentaje de cumplimiento.
   {
-    const {ctx,canvas}=pageBase(report,3,logo);
+    const {ctx,canvas}=pageBase(report,3,logo,totalPages);
     panel(ctx,54,345,551,553,"Horas por especialidad","Totales del periodo");
     bars(ctx,r.bySpecialty.map(e=>({label:e.label,value:e.minutes/60})),{
       x:82,y:453,w:492,h:407,unit:" h",maxRows:6});
@@ -357,7 +360,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
   // Página 4: proporción de especialidades y horas históricas de todo el Dual.
   // Es independiente del intervalo elegido (respeta filtros de empresa y especialidad).
   {
-    const {ctx,canvas}=pageBase(report,4,logo);
+    const {ctx,canvas}=pageBase(report,4,logo,totalPages);
     const h=report.lifetime;
     panel(ctx,54,345,1132,355,"Acumulado de Educación Dual","Todas las semanas con datos, sin duplicar alumno-periodo");
     const value=v=>v == null?"—":fmt(v,1)+" h";
@@ -426,7 +429,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
 
   // Página 5: seguimiento nominal interno.
   {
-    const {ctx,canvas}=pageBase(report,5,logo);
+    const {ctx,canvas}=pageBase(report,5,logo,totalPages);
     const person=report.insights;
     const ranking=(entries,x,y,w,h,mode)=>{
       if(!entries.length){
@@ -475,17 +478,17 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
   // Página 6: empresas y grupos en el periodo filtrado. Las faltas nunca
   // suman jornadas sin labores ni días inhábiles.
   {
-    const {ctx,canvas}=pageBase(report,6,logo);
-    const companies=r.byCompanyPerformance.filter(e=>e.reports>0);
+    const {ctx,canvas}=pageBase(report,6,logo,totalPages);
+    const companies=r.byCompanyPerformance;
     const groups=r.byGroupPerformance.filter(e=>e.activeStudents>0||e.reports>0);
     panel(ctx,54,345,551,500,"Horas por empresa","Total de horas registradas");
     bars(ctx,[...companies].sort((a,b)=>b.hours-a.hours).map(e=>({
       label:e.label,value:e.hours
-    })),{x:82,y:456,w:493,h:354,unit:" h",maxRows:6});
+    })),{x:82,y:456,w:493,h:354,unit:" h",maxRows:6,showZeros:true});
     panel(ctx,623,345,563,500,"Faltas por empresa","Número de jornadas marcadas como falta");
     bars(ctx,[...companies].sort((a,b)=>b.absences-a.absences).map(e=>({
       label:e.label,value:e.absences
-    })),{x:652,y:456,w:505,h:354,maxRows:6,colors:[C.red,C.amber]});
+    })),{x:652,y:456,w:505,h:354,maxRows:6,showZeros:true,colors:[C.red,C.amber]});
     panel(ctx,54,865,551,505,"Proporción por grupo","Alumnos activos de la selección");
     bars(ctx,[...groups].sort((a,b)=>b.share-a.share).map(e=>({
       label:e.label+" · "+fmt(e.activeStudents)+" alumnos",value:e.share
@@ -515,6 +518,36 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
       648,1541,15,C.muted,500,502);
     label(ctx,"Tasa de faltas = faltas / (jornadas con labores + faltas). Sin labores e inhábiles se excluyen.",
       82,1576,15,C.muted,500,1060);
+    images.push(canvasToJpeg(canvas));
+  }
+
+  // Anexo íntegro, ordenado por empresa. La gráfica de la página 6
+  // resume seis, pero este listado nunca oculta entidades por umbral,
+  // promedio, faltas cero o ausencia de entregas.
+  for(let offset=0;offset<allCompanies.length;offset+=COMPANY_ROWS_PER_PAGE){
+    const pageNumber=7+Math.floor(offset/COMPANY_ROWS_PER_PAGE);
+    const {ctx,canvas}=pageBase(report,pageNumber,logo,totalPages);
+    const rows=allCompanies.slice(offset,offset+COMPANY_ROWS_PER_PAGE);
+    label(ctx,"Empresas · listado completo",56,370,31,C.ink,750,1095);
+    label(ctx,"Incluye empresas con 0 faltas y sin jornadas capturadas.",56,406,17,C.muted,500,1090);
+    label(ctx,"EMPRESA",73,454,16,C.secondary,750,420);
+    label(ctx,"ALUMNOS",610,454,15,C.secondary,750,93);
+    label(ctx,"HORAS",743,454,15,C.secondary,750,82);
+    label(ctx,"FALTAS",875,454,15,C.secondary,750,80);
+    label(ctx,"TASA",1038,454,15,C.secondary,750,145);
+    separator(ctx,71,471,1095);
+    rows.forEach((row,index)=>{
+      const y=500+index*47;
+      if(index%2===0)rect(ctx,69,y-24,1100,42,9,"#f3f6f9");
+      label(ctx,row.label,82,y+2,17,C.ink,600,475);
+      label(ctx,fmt(row.activeStudents),630,y+2,17,C.ink,650,80);
+      label(ctx,row.reports?fmt(row.hours,1):"—",748,y+2,17,C.secondary,550,80);
+      label(ctx,row.reports?fmt(row.absences):"—",884,y+2,17,C.ink,700,77);
+      label(ctx,row.absenceRate==null?"Sin datos":fmt(row.absenceRate,1)+"%",
+        1038,y+2,16,C.secondary,600,138);
+    });
+    label(ctx,"Empresas "+(offset+1)+"–"+(offset+rows.length)+" de "+allCompanies.length,
+      77,1624,16,C.muted,550,1020);
     images.push(canvasToJpeg(canvas));
   }
 
