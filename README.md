@@ -27,6 +27,12 @@
 
 La **interfaz web de escritorio vuelve a su composición clásica**: ancho centrado, logotipo horizontal, cinco accesos del Inicio, historial completo, tarjetas y filtros originales de Estadísticas. La barra lateral ya **no desplaza ni estrecha la página**: se abre solo al pulsar «Menú». Los estilos globales Apple Glass ahora se aplican exclusivamente al **modo móvil**, sin alterar la versión web. Véase [restauración de escritorio](docs/V0572_ESCRITORIO.md).
 
+## Datos → Empresas: dos medidas de horas
+
+**Promedio semanal acumulado por alumno:** para cada semana y empresa, divide las horas capturadas entre los alumnos que sí registraron estadísticas esa semana; después suma todos los promedios semanales del periodo. Por ejemplo, 30 h / 2 alumnos + 40 h / 1 alumno = **55 h de promedio semanal acumulado**, aunque las horas totales sean **70 h**.
+
+**Horas totales por empresa:** conserva la suma original de todas las jornadas, sin normalizar. Las gráficas, la tabla comparativa y el PDF muestran ambas medidas, incluida la distinción «Sin datos» para las empresas sin jornadas. El PDF añade una página comparativa y su anexo muestra las dos columnas.
+
 ## v0.57.3-beta.1 · Carta, PDF escaneado y todas las empresas
 
 El PDF de bitácora semanal ahora usa **carta horizontal (11 × 8.5 pulgadas)** con **8 mm de margen imprimible** para que las impresoras no corten el Data Matrix. La pantalla **Escanear** acepta una **foto o un PDF**, incluso multipágina (hasta 16 páginas y 18 MB). La lectura PDF utiliza PDF.js bajo demanda, por lo que la primera vez puede necesitar internet.
