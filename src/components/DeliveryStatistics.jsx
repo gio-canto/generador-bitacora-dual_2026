@@ -35,7 +35,7 @@ function Bars({ title, rows, unit = "", max = 7, showZeros = false }) {
   return <section className="ds-panel">
     <h2>{title}</h2>
     {(showZeros ? items.length>0 : items.some(item=>item.value>0)) ? items.map(row => <div className="ds-cause" key={row.label}>
-      <div className="ds-cause-label"><span>{row.label}</span><strong>{fmt(row.value, unit ? 1 : 0)}{unit}</strong></div>
+      <div className="ds-cause-label"><span>{row.label}</span><strong>{row.displayValue??(fmt(row.value, unit ? 1 : 0)+unit)}</strong></div>
       <div className="ds-track"><i style={{width:100*row.value/high+"%"}}/></div>
     </div>) : <p className="ds-empty">Sin registros en el periodo.</p>}
   </section>;
@@ -58,7 +58,8 @@ function PerformanceTable({rows,type}){
        <th scope="col">{company?"Empresa":"Grupo"}</th>
        <th scope="col">Alumnos activos</th>
        {!company&&<th scope="col">% del alumnado</th>}
-       <th scope="col">Horas</th>
+       <th scope="col">Horas totales</th>
+       {company&&<th scope="col">Promedio semanal acumulado</th>}
        {company&&<th scope="col">Horas por alumno con datos</th>}
        <th scope="col">Faltas</th>
        <th scope="col">Tasa de faltas</th>
@@ -70,6 +71,7 @@ function PerformanceTable({rows,type}){
        <td>{fmt(row.activeStudents)}</td>
        {!company&&<td>{displayPercent(row.share)}</td>}
        <td>{row.reports?hours(row.hours):"Sin datos"}</td>
+       {company&&<td>{hours(row.weeklyAverageAccumulatedHours)}</td>}
        {company&&<td>{hours(row.averageHours)}</td>}
        <td>{row.reports?fmt(row.absences):"—"}</td>
        <td>{displayPercent(row.absenceRate)}{row.applicableDays>0?
@@ -316,8 +318,17 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       <Bars title="Horas por especialidad" unit=" h" rows={data.bySpecialty.map(item=>({label:item.label,value:item.minutes/60}))}/>
     </div>}
     {section==="companies"&&<>
-      <Bars title="Horas por empresa" unit=" h" max={Infinity} showZeros
-        rows={data.byCompany.map(item=>({label:item.label,value:item.minutes/60}))}/>
+      <Bars title="Promedio semanal acumulado por alumno" unit=" h" max={Infinity} showZeros
+        rows={data.byCompany.map(item=>({
+          label:item.label,value:item.weeklyAverageAccumulatedHours??0,
+          displayValue:item.weeksWithData?undefined:"Sin datos",
+        }))}/>
+      <p className="ds-comparison-note">Se promedian las horas de los alumnos con datos en cada semana y se suman esos promedios. Las semanas sin registros no se cuentan como cero.</p>
+      <Bars title="Horas totales por empresa" unit=" h" max={Infinity} showZeros
+        rows={data.byCompany.map(item=>({
+          label:item.label,value:item.minutes/60,
+          displayValue:item.weeksWithData?undefined:"Sin datos",
+        }))}/>
       <Bars title="Faltas por empresa" max={Infinity} showZeros
         rows={data.byCompanyPerformance.map(item=>({label:item.label,value:item.absences}))}/>
 
@@ -334,7 +345,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
           data.companyLeaders.lowestAbsenceRate:null} field="rate"/>
       </div>
       <PerformanceTable rows={data.byCompanyPerformance} type="company"/>
-      <p className="ds-comparison-note">Horas totales y promedio por alumno con jornadas registradas. Las empresas sin jornadas capturadas no participan en los extremos. La tasa de faltas considera solo jornadas con labores y faltas; muestra el tamaño de su base. Una tasa de 0% es válida cuando existen jornadas computables, pero no cuando faltan datos.</p>
+      <p className="ds-comparison-note">Horas totales, promedio semanal acumulado por alumno y promedio general por alumno con datos son tres indicadores distintos. Las empresas sin jornadas capturadas no participan en los extremos. La tasa de faltas considera solo jornadas con labores y faltas; muestra el tamaño de su base. Una tasa de 0% es válida cuando existen jornadas computables, pero no cuando faltan datos.</p>
     </section>
     </>}
     {section==="groups"&&<section className="ds-panel ds-comparison" aria-label="Estadísticas por grupo">
