@@ -1,5 +1,14 @@
 # Notas de versión
 
+### Ajuste de Empresas · dos indicadores de horas (0.57.3-beta.1)
+
+- **Nuevo:** «Promedio semanal acumulado por alumno»: para cada empresa se divide el total de horas de cada semana entre sus alumnos con estadísticas registradas esa semana, y **se suman esos promedios semanales**. No se promedia el total histórico entre el número de alumnos ni se cuentan como cero semanas sin datos.
+- **Se conserva intacto** «Horas totales por empresa», suma de todas las jornadas de los alumnos, y también el anterior promedio histórico por alumno. Los filtros por semana, mes, empresa y especialidad se aplican por igual.
+- En **Datos → Empresas**, la nueva gráfica aparece primero, después la gráfica histórica de horas totales y la de faltas. La tabla comparativa contiene ambos indicadores sin ocultar empresas sin capturas.
+- En el **PDF estadístico**, se añade una página de comparación con ambas gráficas; el anexo completo de empresas muestra columnas diferenciadas «TOTAL h» y «PROM. SEM. h», con «Sin datos» cuando no hay semanas evaluables.
+- Nuevas pruebas verifican la fórmula con distintas cantidades de alumnos por semana, los filtros y la conservación del acumulado original. Los datos guardados no cambian.
+
+
 ## 0.57.3-beta.1 · Impresión carta, PDF por archivo y empresas completas · 2026-10-26
 
 - **Bitácora lista para imprimir:** los PDF semanales del generador se emiten ahora en **carta horizontal (11 × 8.5 pulgadas, 792 × 612 pt)** con margen físico de seguridad de **8 mm**. La plantilla se escala proporcionalmente y se centra sin cortar el Data Matrix, las firmas ni las tablas. La vista previa adopta la relación de aspecto carta.
