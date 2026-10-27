@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.57.3-beta.1 · Impresión carta, PDF por archivo y empresas completas · 2026-10-26
+
+- **Bitácora lista para imprimir:** los PDF semanales del generador se emiten ahora en **carta horizontal (11 × 8.5 pulgadas, 792 × 612 pt)** con margen físico de seguridad de **8 mm**. La plantilla se escala proporcionalmente y se centra sin cortar el Data Matrix, las firmas ni las tablas. La vista previa adopta la relación de aspecto carta.
+- **Registro por foto o PDF:** las dos entradas de archivo del escáner aceptan imágenes y `.pdf`. El PDF se rasteriza solo cuando se selecciona el archivo, se buscan Data Matrix en hasta 16 páginas, se evitan códigos duplicados y se reutiliza la sesión de registro existente. Límite: 18 MB. PDF.js se carga bajo demanda desde proveedores alternativos; la primera lectura de PDF necesita conexión.
+- **Empresas sin exclusiones:** estadísticas web y móviles muestran todas las empresas del padrón, incluso si no hay capturas o tienen cero faltas. Una tasa de 0 % solo se muestra cuando hay jornadas computables; sin jornadas se señala falta de datos.
+- **Reporte estadístico completo:** la página de gráficos mantiene el resumen visual y se añaden **anexos paginados** (23 empresas por página) con todas las empresas, incluidos valores bajos, ceros y sin capturas. Se ajusta el número real de páginas del PDF.
+- **Sin pérdida de datos:** no se modifican esquemas ni respaldos; las lecturas continúan sujetas a la confirmación y validaciones originales.
+
+
 ## Arranque móvil Liquid Glass y caché de inicio · v0.57.2-beta.1
 
 - Registro Dual presenta una pantalla de carga desde el HTML, **antes de React** y sin esperar bibliotecas externas: icono oficial, fondo blanco azulado, reflejo discreto y animación indeterminada sin porcentajes inventados.
