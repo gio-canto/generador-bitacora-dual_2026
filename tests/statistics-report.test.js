@@ -35,4 +35,26 @@ describe("reporte PDF estadístico",()=>{
     expect(click).toHaveBeenCalledTimes(1);
     URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;
   });
+  it("pagina todas las empresas en el anexo sin excluir las que tienen cero faltas",async()=>{
+    const realCreate=document.createElement.bind(document);
+    vi.spyOn(document,"createElement").mockImplementation(name=>name==="canvas"?createCanvas(1240,1754):realCreate(name));
+    const logo=await loadImage("public/Assets/Asset_logo.png");
+    const students=Array.from({length:27},(_,i)=>createStudent({
+      id:"empresa-"+i,name:"Estudiante "+i,company:"Empresa "+String(i+1).padStart(2,"0"),
+    }));
+    const week=createWeek({id:"w1",startDate:"2026-10-20",label:"Semana 1"});
+    const state={students,weeks:[week],context:{school:"Plantel",generation:"2025–2028"}};
+    const oldCreate=URL.createObjectURL,oldRevoke=URL.revokeObjectURL;
+    URL.createObjectURL=vi.fn(()=>"blob:estadisticas-test");
+    URL.revokeObjectURL=vi.fn();
+    vi.spyOn(HTMLAnchorElement.prototype,"click").mockImplementation(()=>{});
+    vi.spyOn(globalThis,"setTimeout").mockImplementation(()=>0);
+    try{
+      const result=await generateStatisticsReportPdf(state,{period:"weekly",weekId:"w1"},{logoImage:logo});
+      expect(result.pages).toBe(8); // 6 tradicionales + 2 anexos (23+4 empresas).
+    }finally{
+      URL.createObjectURL=oldCreate;URL.revokeObjectURL=oldRevoke;
+    }
+  });
+
 });
