@@ -18,11 +18,11 @@ const state=()=>({
 const props=()=>({state:state(),onBack:vi.fn(),onReportStudent:vi.fn(),onReportStatistics:vi.fn()});
 
 describe("Datos: subnavegación estable en móvil y escritorio",()=>{
- it("en móvil muestra las seis secciones en una barra horizontal sin drawer flotante",()=>{
+ it("en móvil muestra las siete secciones en una barra horizontal sin drawer flotante",()=>{
    const {container}=render(<DeliveryStatistics {...props()} mobileView/>);
    const nav=screen.getByRole("navigation",{name:"Secciones de Datos"});
-   const labels=["Resumen","Asistencia","Empresas","Grupos","Alumnos","Histórico"];
-   expect(within(nav).getAllByRole("button")).toHaveLength(6);
+   const labels=["Resumen","Asistencia","Empresas","Grupos","Alumnos","Hitos","Histórico"];
+   expect(within(nav).getAllByRole("button")).toHaveLength(7);
    for(const label of labels)expect(within(nav).getByRole("button",{name:label})).toBeTruthy();
    expect(within(nav).getByRole("button",{name:"Resumen"}).getAttribute("aria-current")).toBe("page");
    expect(container.querySelector(".ds-sidebar")).toBeNull();
@@ -46,11 +46,11 @@ describe("Datos: subnavegación estable en móvil y escritorio",()=>{
    expect(screen.getByLabelText("Especialidad").value).toBe("Programación");
    expect(container.querySelectorAll(".ds-mobile-sections")).toHaveLength(1);
  });
- it("en escritorio conserva sus seis opciones y no muestra la subbarra móvil",()=>{
+ it("en escritorio conserva sus siete opciones y no muestra la subbarra móvil",()=>{
    const {container}=render(<DeliveryStatistics {...props()} mobileView={false}/>);
    expect(screen.queryByRole("navigation",{name:"Secciones de Datos"})).toBeNull();
    const nav=screen.getByRole("navigation",{name:"Secciones de estadísticas"});
-   expect(within(nav).getAllByRole("button")).toHaveLength(6);
+   expect(within(nav).getAllByRole("button")).toHaveLength(7);
    fireEvent.click(within(nav).getByRole("button",{name:/^03Empresas$/}));
    expect(container.querySelector('[data-section="companies"]')).toBeTruthy();
    expect(container.querySelector(".ds-sidebar-scrim")).toBeNull();
