@@ -11,6 +11,8 @@ import { startEasterEgg } from "./legacy/easter-egg.js";
 import { startCalendarEasterEggs } from "./services/calendar-easter-eggs.js";
 import "./calendar-easter-eggs.css";
 import { recoverPreviousVersion } from "./services/recover-original.js";
+import { startGeneratorMobile } from "./services/generator-mobile.js";
+import "./generator-mobile.css";
 
 const isDeliveryPage = () =>
   /\/registro-entrega\/?$/i.test(location.pathname) ||
@@ -59,7 +61,9 @@ export default function App() {
     const stopCalendarEasterEggs = startCalendarEasterEggs();
     const stopProfile = startProfile();
     startSpelling();
+    const stopGeneratorMobile = startGeneratorMobile();
     return () => {
+      stopGeneratorMobile?.();
       stopEditor?.();
       stopCalendarEasterEggs?.();
       stopProfile?.();
