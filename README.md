@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.57.2--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/beta-0.58.0--beta.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,14 @@
 </div>
 
 ---
+
+## v0.58.0-beta.1 · Generador Mobile — Adaptive Glass
+
+El generador principal incorpora **una interfaz móvil propia** con el logotipo oficial, Inicio, Capturar, Historial, Perfil y Más, superficies Apple Glass, pestañas táctiles para las jornadas y modo de presentación Automático / Móvil / Escritorio.
+
+**El escritorio original sigue intacto.** La vista móvil utiliza el mismo formulario, datos, validaciones, historial, perfil y generador PDF; no existe una segunda copia. Los easter eggs, eventos de calendario, avisos, créditos y tutorial conservan sus activadores. El generador tiene una **PWA independiente** de Registro Dual, con iconos derivados del logotipo original.
+
+Consulta [las notas de v0.58](docs/V058_GENERADOR_MOBILE.md) para compatibilidad, respaldos, modo sin conexión y pruebas.
 
 ## Corrección de escritorio · v0.57.2-beta.1
 
