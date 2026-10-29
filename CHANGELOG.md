@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.58.2-beta.1 · Hitos de 480 y 840 horas de Educación Dual · 2026-10-29
+
+- Se incorpora la pestaña **Datos → Hitos** a la navegación móvil y de escritorio, con accesos desde el Resumen.
+- **Primer hito:** 480 horas acumuladas, referencia de servicio social. **Segundo hito:** 840 horas acumuladas, equivalente a 480 horas iniciales más otras 360 como referencia de prácticas profesionales.
+- Se calcula la suma histórica individual de jornadas capturadas en todas las semanas, sin usar promedios de empresas ni atribuir horas a semanas sin estadísticas. Un alumno desistido conserva su histórico ya registrado.
+- La pantalla presenta contadores de alumnos que alcanzaron cada hito, progreso individual, horas restantes, semanas con datos y acceso al expediente personal. Se distinguen los casos sin jornadas registradas.
+- Los filtros de especialidad y empresa se aplican a la lista; el resultado de hitos es histórico y permanece estable al seleccionar una semana o mes en el resto de Estadísticas.
+- Se incorpora un **anexo paginado en el PDF estadístico**, con 480/840 h por alumno, totales acumulados y distancia al próximo hito, sin omitir alumnos por tener cero horas.
+- Los hitos son indicadores de seguimiento; el reconocimiento y acreditación efectivos dependen de la validación institucional. No se cambia el esquema de datos ni se emite acreditación automática.
+- Nueva batería de pruebas de umbrales, filtros, periodos, desistidos y paginación PDF.
+
+
 ## 0.58.1-beta.1 · Refinamiento de Generador Mobile · 2026-10-29
 
 - Barra inferior de cinco pestañas rediseñada como **cápsula flotante Apple Glass**, con contorno redondeado, sombra, fondo translúcido, selección visible y respeto de la zona segura de iOS/Android.
