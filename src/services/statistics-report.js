@@ -3,6 +3,7 @@ import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLab
 import { VERSION } from "../domain/records.js";
 import {loadDossierAvatar} from "./student-dossier-report.js";
 import { calculateStudentInsights } from "./student-insights.js";
+import {calculateDualMilestones} from "./dual-milestones.js";
 import {interpretStatistics} from "./statistics-interpretation.js";
 
 const W = 1240;
@@ -244,6 +245,7 @@ export function statisticsReportModel(state, filters = {}) {
   ].filter(Boolean).join(" · ");
   return {
     data, lifetime: calculateDualLifetimeStatistics(state, filters),
+    milestones:calculateDualMilestones(state,filters),
     insights:calculateStudentInsights(state, filters), scope,
     school: state.context?.school || "Registro de entrega",
     generation: state.context?.generation || "No especificada",
@@ -256,8 +258,11 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
   const r = report.data;
   const allCompanies=[...r.byCompanyPerformance].sort((a,b)=>a.label.localeCompare(b.label,"es"));
   const COMPANY_ROWS_PER_PAGE=23;
-  // Una página adicional compara la normalización semanal con el total.
-  const totalPages=7+Math.ceil(allCompanies.length/COMPANY_ROWS_PER_PAGE);
+  const MILESTONE_ROWS_PER_PAGE=20;
+  const companyPages=Math.ceil(allCompanies.length/COMPANY_ROWS_PER_PAGE);
+  const milestonePages=Math.max(1,Math.ceil(report.milestones.students.length/MILESTONE_ROWS_PER_PAGE));
+  // Siete páginas originales, más anexos completos de empresas e hitos.
+  const totalPages=7+companyPages+milestonePages;
   const interpretation=interpretStatistics(r,report.insights);
   if (!r.weeks.length) throw new Error("Selecciona un periodo con semanas registradas.");
   // El logotipo oficial se incorpora en cada página.
@@ -580,6 +585,49 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     });
     label(ctx,"Empresas "+(offset+1)+"–"+(offset+rows.length)+" de "+allCompanies.length,
       77,1624,16,C.muted,550,1020);
+    images.push(canvasToJpeg(canvas));
+  }
+
+  // Anexo de hitos personales: TODOS los alumnos incluidos en el padrón
+  // filtrado, paginados, con total real de horas (nunca el promedio por empresa).
+  // Los hitos son referencias de seguimiento, no acreditación automática.
+  for(let offset=0;offset<Math.max(1,report.milestones.students.length);offset+=MILESTONE_ROWS_PER_PAGE){
+    const pageNumber=8+companyPages+Math.floor(offset/MILESTONE_ROWS_PER_PAGE);
+    const {ctx,canvas}=pageBase(report,pageNumber,logo,totalPages);
+    const rows=report.milestones.students.slice(offset,offset+MILESTONE_ROWS_PER_PAGE);
+    label(ctx,"Hitos de horas · Educación Dual",55,374,31,C.ink,750,1125);
+    panel(ctx,54,402,551,165,"480 h · Servicio social","Primer hito de seguimiento");
+    label(ctx,fmt(report.milestones.socialReached)+" de "+fmt(report.milestones.totalStudents)+" alumnos",
+      80,523,27,C.blue,750,470);
+    panel(ctx,626,402,560,165,"840 h · Prácticas profesionales","480 + 360 horas adicionales");
+    label(ctx,fmt(report.milestones.professionalReached)+" de "+fmt(report.milestones.totalStudents)+" alumnos",
+      655,523,27,C.green,750,490);
+    panel(ctx,54,586,1132,960,"Progreso por alumno",
+      "Horas acumuladas de todas las semanas con jornadas registradas");
+    label(ctx,"ALUMNO",82,691,15,C.secondary,730,490);
+    label(ctx,"HORAS",620,691,15,C.secondary,730,105);
+    label(ctx,"480 h",763,691,15,C.secondary,730,93);
+    label(ctx,"840 h",884,691,15,C.secondary,730,90);
+    label(ctx,"PRÓXIMO HITO",996,691,14,C.secondary,730,177);
+    separator(ctx,80,709,1075);
+    if(!rows.length)empty(ctx,88,773,1000,"Sin alumnos para este filtro");
+    rows.forEach((student,index)=>{
+      const y=750+index*37;
+      if(index%2===0)rect(ctx,77,y-23,1080,34,8,"#f4f7fa");
+      label(ctx,student.name,87,y,15,C.ink,650,508);
+      label(ctx,fmt(student.hours,1)+" h",627,y,15,C.secondary,650,115);
+      label(ctx,student.socialReached?"Sí":"No",781,y,15,
+        student.socialReached?C.green:C.muted,650,72);
+      label(ctx,student.professionalReached?"Sí":"No",898,y,15,
+        student.professionalReached?C.green:C.muted,650,73);
+      label(ctx,student.professionalReached?"Completado":
+        student.hasData?fmt(student.nextRemainingHours,1)+" h faltan":"Sin datos",
+        1002,y,14,C.secondary,600,161);
+    });
+    label(ctx,"Alumnos "+(rows.length?offset+1:0)+"–"+(offset+rows.length)+" de "+
+      report.milestones.totalStudents,85,1579,15,C.muted,550,1025);
+    label(ctx,"Hitos de referencia; reconocimiento sujeto a validación institucional.",
+      85,1612,14,C.muted,500,1030);
     images.push(canvasToJpeg(canvas));
   }
 
