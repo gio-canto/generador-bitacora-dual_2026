@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.58.1-beta.1 · Refinamiento de Generador Mobile · 2026-10-29
+
+- Barra inferior de cinco pestañas rediseñada como **cápsula flotante Apple Glass**, con contorno redondeado, sombra, fondo translúcido, selección visible y respeto de la zona segura de iOS/Android.
+- El ícono genérico de usuario en la cabecera móvil se sustituye por el **Blobatar del perfil activo**, utilizando el mismo componente y nombre que el menú de perfil original. Se sincroniza al cambiar o guardar perfiles sin modificar datos.
+- Saludo local según el reloj del dispositivo: **Buenos días** (05:00–11:59), **Buenas tardes** (12:00–18:59), **Buenas noches** (19:00–00:59) y **¿Qué haces aquí? ¡Duérmete!** (01:00–04:59). Se actualiza al regresar a la aplicación y mientras permanezca abierta.
+- Restaurados en la sección móvil Más los enlaces a **Aviso de privacidad, Cookies, Condiciones de uso, Accesibilidad y Agradecimientos**. El pie original de escritorio se conserva.
+- El formulario, el generador PDF, el almacenamiento, los eventos especiales y Registro Dual no cambian. Incluye pruebas para franjas horarias, avatar, enlaces y compatibilidad.
+
+
 ## 0.58.0-beta.1 · Generador Mobile — Adaptive Glass · 2026-10-29
 
 - Nuevo modo móvil con **Inicio, Capturar, Historial, Perfil y Más**; logotipo oficial, navegación inferior y presentación Apple Glass.
