@@ -35,6 +35,14 @@ Consulta [las notas de v0.58](docs/V058_GENERADOR_MOBILE.md) para compatibilidad
 
 La **interfaz web de escritorio vuelve a su composición clásica**: ancho centrado, logotipo horizontal, cinco accesos del Inicio, historial completo, tarjetas y filtros originales de Estadísticas. La barra lateral ya **no desplaza ni estrecha la página**: se abre solo al pulsar «Menú». Los estilos globales Apple Glass ahora se aplican exclusivamente al **modo móvil**, sin alterar la versión web. Véase [restauración de escritorio](docs/V0572_ESCRITORIO.md).
 
+## v0.58.2-beta.1 · Hitos de horas en Educación Dual
+
+En **Registro Dual → Datos → Hitos** puedes consultar cuántos alumnos han completado el **primer hito de 480 horas** (referencia de servicio social) y cuántos alcanzaron el **segundo hito de 840 horas acumuladas** (480 iniciales más 360 adicionales, como referencia de prácticas profesionales). La vista presenta las horas documentadas, los hitos alcanzados, el avance y las horas restantes por alumno.
+
+El cálculo utiliza **todas las semanas históricas con jornadas capturadas** para cada estudiante, aunque Datos tenga seleccionado un periodo semanal o mensual. Los filtros de especialidad y empresa sí se respetan. Los alumnos sin jornadas permanecen visibles con estado «Sin registros»; quienes salieron del programa conservan sus horas históricas. Los hitos son referencias informativas: su reconocimiento requiere el procedimiento institucional correspondiente.
+
+El **PDF de Estadísticas** contiene un anexo con el resumen de hitos y el progreso de todos los alumnos, paginado cuando sea necesario. No se modifica ningún registro ni se emiten constancias automáticas.
+
 ## Datos → Empresas: dos medidas de horas
 
 **Promedio semanal acumulado por alumno:** para cada semana y empresa, divide las horas capturadas entre los alumnos que sí registraron estadísticas esa semana; después suma todos los promedios semanales del periodo. Por ejemplo, 30 h / 2 alumnos + 40 h / 1 alumno = **55 h de promedio semanal acumulado**, aunque las horas totales sean **70 h**.
