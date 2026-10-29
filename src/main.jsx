@@ -10,6 +10,7 @@ class ErrorBoundary extends React.Component {
   componentDidCatch() {
     // El error de React tiene su propia vista; no dejar el splash encima.
     window.__dualBoot?.ready?.();
+    window.__generatorBoot?.ready?.();
   }
   render() {
     return this.state.error ? (
