@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.58.0-beta.1 · Generador Mobile — Adaptive Glass · 2026-10-29
+
+- Nuevo modo móvil con **Inicio, Capturar, Historial, Perfil y Más**; logotipo oficial, navegación inferior y presentación Apple Glass.
+- Modo Automático (760 px), Móvil o Escritorio, con preferencia propia; escritorio y Registro Dual no reciben un rediseño global.
+- El mismo formulario y sus validaciones sirven en ambas vistas. Pestañas táctiles para cada jornada, reutilización de historial y raíz React de perfiles, y sin cambios en los esquemas de datos ni en PDF carta y Data Matrix.
+- Conservados `Virtual Insanity`, easter eggs de nombres, eventos de calendario, decoraciones, créditos, tutorial, ortografía y avisos originales. Sileo se ubica encima de la pantalla móvil.
+- PWA independiente del generador con manifiesto y tamaños de ícono generados desde `Asset_logo.png`; cacheo de recursos propios del generador, conservando Registro Dual.
+- Pruebas de compatibilidad de ambos modos y manifiestos. Disponible primero mediante rama y PR, no publicado en `main`.
+
+
 ### Ajuste de Empresas · dos indicadores de horas (0.57.3-beta.1)
 
 - **Nuevo:** «Promedio semanal acumulado por alumno»: para cada empresa se divide el total de horas de cada semana entre sus alumnos con estadísticas registradas esa semana, y **se suman esos promedios semanales**. No se promedia el total histórico entre el número de alumnos ni se cuentan como cero semanas sin datos.
