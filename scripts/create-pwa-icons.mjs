@@ -39,8 +39,38 @@ export async function generatePwaIcons(dir=ASSET_DIR){
   return PWA_SIZES.map(([filename])=>filename);
 }
 
+// The generator uses its own official horizontal logo. It must never reuse
+// Registro Dual's separate icon, PWA identity, or original artwork.
+export const GENERATOR_PWA_SIZES=[
+  ["generador-dual-icon-192.png",192,"any"],
+  ["generador-dual-icon-512.png",512,"any"],
+  ["generador-dual-maskable-512.png",512,"maskable"],
+  ["generador-dual-apple-180.png",180,"apple"],
+  ["generador-dual-favicon-32.png",32,"favicon"],
+];
+export async function generateGeneratorPwaIcons(dir=ASSET_DIR){
+  const logo=await loadImage(await readFile(join(ASSET_DIR,"Asset_logo.png")));
+  if(!logo.width||!logo.height)throw new Error("Falta el logotipo oficial del generador.");
+  await mkdir(dir,{recursive:true});
+  for(const [filename,size,purpose] of GENERATOR_PWA_SIZES){
+    const canvas=createCanvas(size,size);
+    const ctx=canvas.getContext("2d");
+    ctx.fillStyle="#ffffff";
+    ctx.fillRect(0,0,size,size);
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality="high";
+    // A maskable icon needs a safe central zone; always fit the logo intact.
+    const safe=purpose==="maskable"?.68:.84;
+    const scale=Math.min(size*safe/logo.width,size*safe/logo.height);
+    const width=logo.width*scale,height=logo.height*scale;
+    ctx.drawImage(logo,(size-width)/2,(size-height)/2,width,height);
+    await writeFile(join(dir,filename),canvas.toBuffer("image/png"));
+  }
+  return GENERATOR_PWA_SIZES.map(([filename])=>filename);
+}
+
 if(import.meta.url.startsWith("file:") && process.argv[1] &&
    fileURLToPath(import.meta.url)===resolve(process.argv[1])){
-  generatePwaIcons().then(files=>console.log("PWA Dual: "+files.join(", ")))
+  Promise.all([generatePwaIcons(),generateGeneratorPwaIcons()]).then(([registry,generator])=>console.log("PWA Dual: "+[...registry,...generator].join(", ")))
     .catch(err=>{console.error(err);process.exitCode=1;});
 }
