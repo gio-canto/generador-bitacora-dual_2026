@@ -1,0 +1,32 @@
+{
+  "id": "./",
+  "name": "Generador de Bitácoras Dual",
+  "short_name": "Generador Dual",
+  "description": "Crea, guarda y exporta tus bitácoras de Educación Dual desde el teléfono o la computadora.",
+  "lang": "es-MX",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f8fc",
+  "theme_color": "#f5f8fc",
+  "icons": [
+    {
+      "src": "./Assets/generador-dual-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./Assets/generador-dual-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./Assets/generador-dual-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
