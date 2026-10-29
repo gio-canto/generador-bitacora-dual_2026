@@ -22,14 +22,16 @@ describe("PWA independiente de Registro Dual",()=>{
       expect(icon.src).toMatch(/^\.\.\/Assets\/registro-dual-/);
     }
   });
-  it("incluye manifest y icono Apple en Registro pero no en el generador principal",async()=>{
+  it("mantiene independientes los manifest e iconos Apple de Registro y Generador",async()=>{
     const html=await readFile(registryHtmlUrl,"utf8");
     const main=await readFile(rootHtmlUrl,"utf8");
     expect(html).toContain('href="./manifest.webmanifest"');
     expect(html).toContain("registro-dual-apple-180.png");
     expect(html).toContain("registro-dual-favicon-32.png");
     expect(main).not.toContain("registro-dual-apple-180.png");
-    expect(main).not.toContain("manifest.webmanifest");
+    expect(main).toContain('href="./manifest.webmanifest"');
+    expect(main).toContain("generador-dual-apple-180.png");
+    expect(main).not.toContain("registro-dual-apple-180.png");
     const script=await readFile(swBuilderUrl,"utf8");
     expect(script).toContain("./registro-entrega/manifest.webmanifest");
     expect(script).toContain("./Assets/registro-dual-maskable-512.png");
