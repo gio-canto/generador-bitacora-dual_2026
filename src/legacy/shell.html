@@ -16,12 +16,12 @@
   </svg>
   <header class="gm-header">
     <img src="Assets/Asset_logo.png" class="gm-logo" alt="Generador de Bitácora Dual" width="190" />
-    <button type="button" class="gm-avatar-button" data-gm-nav="profile" aria-label="Abrir perfil"><svg class="gm-icon"><use href="#gm-i-user"/></svg></button>
+    <button type="button" class="gm-avatar-button" data-gm-nav="profile" aria-label="Abrir perfil"><span class="gm-avatar-art" id="gmAvatarArt" aria-hidden="true"></span></button>
   </header>
   <section class="gm-view gm-home" data-gm-page="home" aria-labelledby="gmHomeTitle">
     <p class="gm-eyebrow">Tu espacio de trabajo</p>
     <h1 id="gmHomeTitle">Bienvenido</h1>
-    <p class="gm-muted">Continúa donde te quedaste o comienza una nueva bitácora semanal.</p>
+    <p class="gm-muted" id="gmGreetingDescription">Continúa donde te quedaste o comienza una nueva bitácora semanal.</p>
     <div class="gm-panel gm-draft">
       <div class="gm-between"><strong>Bitácora en progreso</strong><span class="gm-chip" id="gmProgressStep">Paso 1 de 5</span></div>
       <p class="gm-muted" id="gmDraftStatus">Borrador de bitácora</p>
@@ -71,6 +71,7 @@
       </div>
     </div>
     <p class="gm-privacy">Los borradores y registros permanecen en el navegador. Exporta un respaldo JSON para evitar pérdidas al borrar los datos de navegación.</p>
+    <footer class="gm-legal-footer" aria-label="Información legal y del proyecto"><span>Generador de Bitácora Dual 2026</span><nav aria-label="Enlaces legales del generador"><a href="privacy/">Aviso de privacidad</a><a href="cookies/">Cookies</a><a href="terms/">Condiciones de uso</a><a href="accessibility/">Accesibilidad</a><a href="acknowledgements/">Agradecimientos</a></nav></footer>
   </section>
   <nav class="gm-bottom-nav" aria-label="Navegación móvil del generador">
     <button type="button" data-gm-nav="home" class="active" aria-current="page"><svg class="gm-icon"><use href="#gm-i-home"/></svg><span>Inicio</span></button>
