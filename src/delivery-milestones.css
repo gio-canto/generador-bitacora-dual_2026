@@ -1,0 +1,46 @@
+/* Registro Dual v0.58.2 · Hitos académicos, móvil y escritorio */
+.ds-milestones{display:grid;gap:16px;min-width:0}
+.ds-milestones-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:13px;flex-wrap:wrap}
+.ds-milestones-heading h2{font-size:clamp(24px,3vw,32px);letter-spacing:-.04em;margin:0}
+.ds-milestones-heading p{font-size:13px;line-height:1.5;color:#677b8f;margin:5px 0 0}
+.ds-milestone-count{padding:7px 12px;border:1px solid #dfebf4;background:rgba(255,255,255,.75);border-radius:30px;color:#375a7b;font-size:12px;font-weight:700}
+.ds-milestones-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.ds-milestone-summary-card{padding:20px;display:grid;gap:13px;align-content:start;min-width:0;border-radius:23px;background:linear-gradient(140deg,rgba(233,245,255,.96),rgba(255,255,255,.94));border:1px solid #d9e9fa;box-shadow:0 6px 24px rgba(24,76,127,.045)}
+.ds-milestone-professional{background:linear-gradient(140deg,rgba(239,248,242,.96),rgba(255,255,255,.96));border-color:#d7ecde}
+.ds-milestone-summary-card>span{font-size:13px;font-weight:730;color:#345d83;line-height:1.4}
+.ds-milestone-professional>span{color:#2b755a}
+.ds-milestone-summary-card>strong{font-size:clamp(30px,5vw,46px);font-variant-numeric:tabular-nums;color:#203c5b;line-height:1}
+.ds-milestone-summary-card>strong small{font-size:.43em;color:#7a8c9d}
+.ds-milestone-summary-card p{margin:0;font-size:12px;color:#5d7589;line-height:1.5}
+.ds-milestone-progress{width:100%;height:9px;border-radius:20px;background:#e2eaf2;overflow:hidden;flex-shrink:0}
+.ds-milestone-progress>span{height:100%;display:block;background:linear-gradient(90deg,#3088c8,#1c5b99);border-radius:inherit;max-width:100%;transition:width .3s ease}
+.ds-milestone-professional .ds-milestone-progress>span{background:linear-gradient(90deg,#4fb694,#23845d)}
+.ds-milestones-metadata{display:flex;gap:9px;flex-wrap:wrap;font-size:12px;color:#597189}
+.ds-milestones-metadata span{border:1px solid #e1e9f0;background:#f4f8fb;padding:8px 11px;border-radius:18px}
+.ds-milestones-list{gap:0}
+.ds-milestones-list .ds-panel-head{margin-bottom:12px}
+.ds-milestone-person{display:grid;gap:12px;min-width:0;padding:17px 0;border-top:1px solid #ecf0f5}
+.ds-milestone-person-top,.ds-milestone-person-bottom{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;min-width:0}
+.ds-milestone-person-identity{display:grid;gap:4px;min-width:0}
+.ds-milestone-person-identity>span{color:#718398;font-size:12px;overflow-wrap:anywhere;line-height:1.4}
+.ds-milestone-person-name{display:block;width:fit-content;max-width:100%;text-align:left;border:0;background:transparent;color:#195b9a;font:inherit;font-size:15px;font-weight:730;padding:0;cursor:pointer;overflow-wrap:anywhere}
+.ds-milestone-person-name:hover{text-decoration:underline}
+.ds-milestone-person-name:focus-visible{outline:2px solid #237fb9;border-radius:3px}
+.ds-milestone-person-identity>strong{font-size:15px;overflow-wrap:anywhere}
+.ds-milestone-person-hours{display:grid;gap:4px;justify-items:end;flex-shrink:0}
+.ds-milestone-person-hours>strong{font-size:18px;font-variant-numeric:tabular-nums;color:#243e57}
+.ds-milestone-stage{font-size:10px;font-weight:720;padding:4px 8px;border-radius:12px;background:#f1f4f8;color:#5b6d7e}
+.ds-milestone-stage.social{background:#e7f1fb;color:#1f609e}
+.ds-milestone-stage.done{background:#e5f4e8;color:#236d4c}
+.ds-milestone-person-bottom span{font-size:11px;color:#6c7f91;line-height:1.4}
+.ds-milestone-footnote{font-size:12px;line-height:1.55;color:#6d8295;margin:0}
+@media(max-width:640px){
+ .ds-milestones-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .ds-milestone-summary-card{padding:14px;gap:11px;border-radius:19px}
+ .ds-milestone-summary-card>span{font-size:11px}
+ .ds-milestone-summary-card>strong{font-size:clamp(24px,7vw,36px)}
+ .ds-milestone-person-top{flex-wrap:wrap}
+ .ds-milestone-person-hours{flex:1;justify-items:start}
+ .ds-milestone-person-bottom span{max-width:55%}
+}
+@media(prefers-reduced-motion:reduce){.ds-milestone-progress>span{transition:none}}
