@@ -1,7 +1,7 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
-export const VERSION = "0.57.3-beta.1";
-export const RELEASE = "Impresión carta, registro PDF y empresas completas";
+export const VERSION = "0.58.2-beta.1";
+export const RELEASE = "Hitos de 480 y 840 horas de Educación Dual";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
