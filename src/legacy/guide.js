@@ -88,6 +88,7 @@ export function startGuide() {
       const pct = (step + 1) * 20;
       document.getElementById("wizardBar").style.width = pct + "%";
       document.getElementById("wizardPct").textContent = pct + "%";
+      window.dispatchEvent(new CustomEvent("bitacora-step-change", { detail: { step, percent: pct } }));
       document
         .querySelector(".workspace")
         .scrollIntoView({ behavior: "smooth", block: "start" });
