@@ -13,7 +13,7 @@ El menú «Más → Presentación» solo existe en modo móvil. Los elementos `#
 
 ## Pantallas
 
-- **Inicio:** logotipo horizontal oficial `Assets/Asset_logo.png`, saludo, progreso de las cinco etapas, continuar, nueva bitácora y accesos rápidos.
+- **Refinamiento 0.58.1:** navegación inferior flotante en cápsula Apple Glass con borde y sombra; cabecera con Blobatar del perfil activo (mismo componente de escritorio); saludos por hora local y mensaje especial entre 01:00 y 04:59; sección Más con enlaces a privacidad, cookies, condiciones, accesibilidad y agradecimientos.\n- **Inicio:** logotipo horizontal oficial `Assets/Asset_logo.png`, saludo, progreso de las cinco etapas, continuar, nueva bitácora y accesos rápidos.
 - **Capturar:** la misma guía y sus cinco etapas, con navegación horizontal. Las cuatro jornadas usan pestañas táctiles que muestran una tarjeta a la vez sin alterar el resto de los registros.
 - **Historial:** reutiliza la lista original `#homeRecords`, sin duplicar almacenamiento o acciones.
 - **Perfil:** reutiliza íntegramente el componente React existente y sus opciones.

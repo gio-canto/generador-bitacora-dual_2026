@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import App from "../src/App.jsx";
 import { GENERATOR_LAYOUT_KEY } from "../src/services/generator-mobile.js";
 
@@ -66,5 +66,36 @@ describe("v0.58 — generador móvil sin duplicar el escritorio", () => {
     expect(document.querySelector(".gm-home")?.hidden).toBe(false);
     fireEvent.click(document.querySelector('.gm-bottom-nav [data-gm-nav="profile"]'));
     expect(document.querySelector(".gm-profile")?.hidden).toBe(false);
+  });
+
+
+  it("muestra Blobatar, saludo local y los enlaces legales originales", async () => {
+    localStorage.clear();
+    window.matchMedia = vi.fn((query) => ({
+      matches: query.includes("max-width: 760px"),
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+    render(<App />);
+    const home = document.getElementById("gmHomeTitle");
+    expect(home).toBeTruthy();
+    expect(["Buenos días", "Buenas tardes", "Buenas noches", "¿Qué haces aquí? ¡Duérmete!"]).toContain(home.textContent);
+    const art = document.getElementById("gmAvatarArt");
+    expect(art).toBeTruthy();
+    await waitFor(() => expect(art.querySelector("img, svg")).toBeTruthy());
+
+    fireEvent.click(document.querySelector('.gm-bottom-nav [data-gm-nav="more"]'));
+    const nav = document.querySelector(".gm-legal-footer nav");
+    expect(nav).toBeTruthy();
+    expect([...nav.querySelectorAll("a")].map((a) => a.getAttribute("href"))).toEqual([
+      "privacy/",
+      "cookies/",
+      "terms/",
+      "accessibility/",
+      "acknowledgements/",
+    ]);
+    expect(document.querySelectorAll("#student")).toHaveLength(1);
+    expect(document.querySelector(".site-footer")).toBeTruthy();
   });
 });

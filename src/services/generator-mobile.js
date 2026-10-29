@@ -3,6 +3,9 @@
  * IMPORTANT: never clone a form field, step panel, profile or saved record.
  * Both presentations own exactly the same editor DOM and storage.
  */
+import { getGeneratorGreeting } from "./generator-greeting.js";
+import { startGeneratorMobileAvatar } from "../components/GeneratorMobileAvatar.jsx";
+
 export const GENERATOR_LAYOUT_KEY = "bitacora_dual_generator_layout_v1";
 export const GENERATOR_LAYOUTS = ["auto", "mobile", "desktop"];
 const VIEW_NAMES = ["home", "capture", "history", "profile", "more"];
@@ -51,6 +54,24 @@ export function startGeneratorMobile() {
   let active = false;
   let view = "home";
   let chosenDay = 0;
+  const stopAvatar = startGeneratorMobileAvatar();
+
+  // The welcome is local to this device and refreshes at midnight, on focus
+  // and after returning from a suspended PWA. Never persist the time/message.
+  function updateGreeting() {
+    const greeting = getGeneratorGreeting();
+    const heading = document.getElementById("gmHomeTitle");
+    const description = document.getElementById("gmGreetingDescription");
+    const home = mobile.querySelector(".gm-home");
+    if (heading) heading.textContent = greeting.title;
+    if (description) description.textContent = greeting.subtitle;
+    if (home) home.dataset.greeting = greeting.kind;
+  }
+  updateGreeting();
+  const greetingTimer = window.setInterval(updateGreeting, 60000);
+  const onVisible = () => { if (!document.hidden) updateGreeting(); };
+  window.addEventListener("focus", updateGreeting);
+  document.addEventListener("visibilitychange", onVisible);
 
   const query = (selector) => document.querySelector(selector);
   const dayHost = document.getElementById("days");
@@ -205,6 +226,10 @@ export function startGeneratorMobile() {
   changeView("home");
   window.__generatorBoot?.ready?.();
   return () => {
+    window.clearInterval(greetingTimer);
+    window.removeEventListener("focus", updateGreeting);
+    document.removeEventListener("visibilitychange", onVisible);
+    stopAvatar?.();
     progressObserver.disconnect();
     daysObserver.disconnect();
     dayHost?.removeEventListener("change", onDayDateChange);

@@ -29,9 +29,23 @@
 .generator-mobile-active .gm-logo{display:block;width:min(190px,65vw);height:45px;object-fit:contain;object-position:left center}
 .generator-mobile-active .gm-icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8;flex-shrink:0}
 .generator-mobile-active .gm-avatar-button{
-  display:grid;place-items:center;width:43px;height:43px;flex-shrink:0;
-  border:1px solid #fff;border-radius:15px;color:#376a95;background:rgba(255,255,255,.82);
-  box-shadow:0 5px 15px #28567810;
+  display:grid;place-items:center;width:49px;height:49px;flex-shrink:0;
+  padding:4px;border:1px solid rgba(255,255,255,.96);border-radius:50%;
+  background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(225,240,253,.88));
+  box-shadow:0 5px 18px #28567819,inset 0 1px 0 #fff;
+}
+.generator-mobile-active .gm-avatar-art{
+  display:grid;place-items:center;overflow:hidden;width:39px;height:39px;
+  border-radius:50%;background:linear-gradient(135deg,#dcecff,#a7d1f5);
+}
+.generator-mobile-active .gm-avatar-art img,
+.generator-mobile-active .gm-avatar-art svg{
+  display:block;width:39px;height:39px;max-width:100%;max-height:100%;
+  border-radius:50%;object-fit:cover;
+}
+.generator-mobile-active .gm-home[data-greeting="sleep"] h1{
+  font-size:clamp(28px,7vw,36px);
+  max-width:510px;
 }
 .generator-mobile-active .gm-view{padding:25px 5px 28px}
 .generator-mobile-active .gm-view[hidden]{display:none!important}
@@ -82,21 +96,36 @@
   box-shadow:0 7px 23px #244c6f0a;color:#2c536f;font-size:13px;font-weight:750;
 }
 .generator-mobile-active .gm-quick-grid svg{color:#347fb9;width:23px;height:23px}
+/* Floating Apple-style navigation capsule, inset from the viewport edges.
+   Its own safe-area offset prevents a clipped bottom edge in installed PWAs. */
 .generator-mobile-active .gm-bottom-nav{
-  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;
-  width:min(760px,100%);position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  z-index:70;padding:10px 8px calc(10px + env(safe-area-inset-bottom));
-  background:rgba(248,251,255,.91);border-top:1px solid #fff;
-  box-shadow:0 -8px 28px #315f8312;
-  backdrop-filter:blur(24px) saturate(155%);-webkit-backdrop-filter:blur(24px) saturate(155%);
+  position:fixed;z-index:70;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;
+  width:min(720px,calc(100vw - 20px));min-width:0;
+  padding:7px 8px;border-radius:30px;
+  border:1px solid rgba(255,255,255,.98);
+  background:linear-gradient(155deg,rgba(255,255,255,.91),rgba(238,247,255,.78));
+  box-shadow:0 15px 44px rgba(29,66,99,.20),0 2px 10px rgba(43,84,119,.10),
+             inset 0 1px 0 rgba(255,255,255,1),inset 0 -1px 0 rgba(195,213,229,.30);
+  backdrop-filter:blur(26px) saturate(165%);
+  -webkit-backdrop-filter:blur(26px) saturate(165%);
 }
 .generator-mobile-active .gm-bottom-nav button{
   display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;
-  padding:9px 1px;min-width:0;border:0;border-radius:13px;color:#8296a8;
-  background:transparent;font-size:10px;font-weight:650;
+  min-width:0;min-height:61px;padding:7px 2px;
+  border:1px solid transparent;border-radius:21px;color:#6f859b;
+  background:transparent;font-size:10px;font-weight:660;
+  transition:background .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease;
 }
-.generator-mobile-active .gm-bottom-nav button.active{color:#206baa;background:#e5f0f9}
+.generator-mobile-active .gm-bottom-nav button.active{
+  color:#165d9c;border-color:rgba(255,255,255,.95);
+  background:linear-gradient(155deg,#e7f5ff,#dcecff);
+  box-shadow:0 4px 13px rgba(53,119,173,.12),inset 0 1px 0 #fff;
+}
+.generator-mobile-active .gm-bottom-nav button:active{transform:scale(.96)}
 .generator-mobile-active .gm-bottom-nav .gm-icon{height:23px;width:23px}
+.generator-mobile-active .gm-bottom-nav button.active .gm-icon{stroke-width:2.15}
 .generator-mobile-active .gm-mode-desktop-button{display:none!important}
 .generator-mobile-active .gm-history #homeHistoryDisclosure{
   display:block!important;position:relative!important;width:100%;margin:0;
@@ -154,6 +183,29 @@
 }
 .generator-mobile-active .gm-layout-options button.active{background:#216fb2;color:#fff;border-color:#216fb2}
 .generator-mobile-active .gm-privacy{color:#738a9d;font-size:11px;line-height:1.5;margin:15px 3px}
+.generator-mobile-active .gm-legal-footer{
+  display:grid;gap:12px;margin:29px 2px 0;padding:20px 2px 4px;
+  border-top:1px solid rgba(83,125,163,.18);
+}
+.generator-mobile-active .gm-legal-footer>span{
+  font-size:11px;font-weight:700;color:#697f93;
+}
+.generator-mobile-active .gm-legal-footer nav{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 15px;
+}
+.generator-mobile-active .gm-legal-footer a{
+  display:inline-block;padding:5px 0;color:#47708e;
+  font-size:11px;line-height:1.4;text-decoration:none;
+  text-underline-offset:3px;
+}
+.generator-mobile-active .gm-legal-footer a:hover,
+.generator-mobile-active .gm-legal-footer a:focus-visible{
+  color:#125f9d;text-decoration:underline;
+}
+@media(hover:none){
+  .generator-mobile-active .gm-legal-footer a{text-decoration:underline;text-decoration-color:rgba(71,112,142,.30)}
+}
+
 .generator-mobile-active .workspace{
   display:grid;grid-template-columns:minmax(0,1fr);gap:12px;
   width:100%;padding:17px 0 0;
@@ -232,13 +284,14 @@
 @media(max-width:390px){
   .generator-mobile-active .shell{padding-inline:8px}
   .generator-mobile-active .gm-view{padding-inline:2px}
-  .generator-mobile-active .gm-bottom-nav{padding-inline:4px}
-  .generator-mobile-active .gm-bottom-nav button{font-size:9px}
+  .generator-mobile-active .gm-bottom-nav{width:calc(100vw - 16px);padding:6px;gap:2px;border-radius:25px}
+  .generator-mobile-active .gm-bottom-nav button{font-size:9px;min-height:58px;border-radius:18px}
   .generator-mobile-active .gm-chip{max-width:56%;font-size:9px}
   .generator-mobile-active .gm-panel{padding:15px}
 }
 @media(prefers-reduced-motion:reduce){
-  .generator-mobile-active .gm-progress span{transition:none}
+  .generator-mobile-active .gm-progress span,
+  .generator-mobile-active .gm-bottom-nav button{transition:none}
 }
 @media(prefers-reduced-transparency:reduce){
   .generator-mobile-active .gm-header,
