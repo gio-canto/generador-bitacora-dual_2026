@@ -3,6 +3,11 @@ import { cleanup, fireEvent, render } from "@testing-library/react";
 import App from "../src/App.jsx";
 import { GENERATOR_LAYOUT_KEY } from "../src/services/generator-mobile.js";
 
+vi.stubGlobal("IntersectionObserver", class {
+  observe() {}
+  disconnect() {}
+});
+
 const originalMatchMedia = window.matchMedia;
 afterEach(() => {
   cleanup();
