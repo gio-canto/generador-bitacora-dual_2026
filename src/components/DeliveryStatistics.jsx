@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import AnimatedValue from "./AnimatedValue.jsx";
 import StudentInsights from "./StudentInsights.jsx";
+import DualMilestones from "./DualMilestones.jsx";
 import StatisticsHero from "./StatisticsHero.jsx";
 import {calculateStudentInsights} from "../services/student-insights.js";
 import { calculateDeliveryStatistics, calculateDualLifetimeStatistics, genderLabels, percent } from "../services/statistics.js";
@@ -9,7 +10,7 @@ import "../delivery-statistics.css";
 
 const fmt = (n, digits = 0) => Number(n || 0).toLocaleString("es-MX", { maximumFractionDigits:digits });
 const hours = value => value == null ? "—" : fmt(value, 1) + " h";
-const STAT_SECTIONS=[["summary","Resumen"],["attendance","Asistencia"],["companies","Empresas"],["groups","Grupos"],["students","Alumnos"],["history","Histórico"]];
+const STAT_SECTIONS=[["summary","Resumen"],["attendance","Asistencia"],["companies","Empresas"],["groups","Grupos"],["students","Alumnos"],["milestones","Hitos"],["history","Histórico"]];
 const COLORS = ["#0071e3","#d97979","#e3a244","#929aa6","#8b75c3","#2a9e92","#cf7ea5"];
 
 function Breakdown({ items, empty = "Sin datos en el periodo" }) {
@@ -253,7 +254,8 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
           {id:"companies",title:"Empresas",detail:fmt(data.byCompanyPerformance.filter(r=>r.activeStudents>0).length)+" activas",accent:"#bf8770",number:"02"},
           {id:"groups",title:"Grupos",detail:fmt(data.byGroupPerformance.filter(r=>r.activeStudents>0).length)+" grupos",accent:"#9c8ab7",number:"03"},
           {id:"students",title:"Alumnos",detail:fmt(data.students.length)+" registrados",accent:"#497bb4",number:"04"},
-          {id:"history",title:"Histórico",detail:hours(lifetime.totalHours)+" acumuladas",accent:"#687e8d",number:"05"},
+          {id:"milestones",title:"Hitos",detail:"480 h · 840 h",accent:"#31927b",number:"05"},
+          {id:"history",title:"Histórico",detail:hours(lifetime.totalHours)+" acumuladas",accent:"#687e8d",number:"06"},
         ].map(item=><button type="button" key={item.id} className="ds-shortcut-card"
           onClick={()=>{setSection(item.id);setFiltersOpen(false);}}>
           <span className="ds-shortcut-number" style={{color:item.accent}}>{item.number}</span>
@@ -415,6 +417,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
       </div>
       <p className="ds-lifetime-caption">Histórico de todas las semanas, incluidas las pendientes y las de alumnos desistidos.</p>
     </section>}
+    {section==="milestones"&&<DualMilestones state={state} specialty={specialty} company={company} onReportStudent={onReportStudent}/>}
     {section==="students"&&<StudentInsights state={state} period={period} weekId={weekId} month={month}
       specialty={specialty} company={company} onReportStudent={onReportStudent}/>}
     </div>
