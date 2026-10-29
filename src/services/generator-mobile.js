@@ -143,6 +143,7 @@ export function startGeneratorMobile() {
       // Preserve the same editor DOM; only switch its surrounding presentation.
       moveSharedNodes(active);
       document.body.classList.toggle("generator-mobile-active", active);
+      window.dispatchEvent(new Event("bitacora-generator-layout"));
       if (!active && history) history.open = false;
     }
     mobile.querySelectorAll("[data-gm-mode]").forEach((button) => {
@@ -216,6 +217,7 @@ export function startGeneratorMobile() {
     else if (breakpoint.removeListener) breakpoint.removeListener(onBreakpoint);
     moveSharedNodes(false);
     document.body.classList.remove("generator-mobile-active");
+    window.dispatchEvent(new Event("bitacora-generator-layout"));
     delete shell.dataset.mobileView;
   };
 }
