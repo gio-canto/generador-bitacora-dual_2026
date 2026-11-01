@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.60.0 · Mensajes, eventos y centro de avisos · 2026-10-31
+
+- Nuevo motor de mensajes configurado en `src/data/generator-messages.json`: presentaciones pestaña, mediana y completa, fechas exactas/anuales o periodos, destinatarios por plantel/especialidad, video YouTube opcional y enlaces HTTPS.
+- Memoria de anuncios por identificador, revisión, perfil y frecuencia; los mensajes no se repiten después de vistos conforme a su configuración. Su estado es local y no se envía a un servidor.
+- Confirmación opcional de última bitácora en el paso final: después de descargar correctamente el PDF muestra la felicitación de conclusión sin alterar la bitácora.
+- El centro de avisos de Registro Dual amplía la campanita a entregas próximas/vencidas, revisiones pendientes, faltas recurrentes, hitos de 480/840 horas, estadísticas incompletas y respaldo local, con filtros, lectura persistente y navegación.
+- Campanada local sintetizada, ajustable y sujeta a restricciones de reproducción automática del navegador. No se reproduce un audio externo.
+- Catálogo de «Sin labores» ampliado con códigos 25–27 para fumigación, ausencia de responsable y falta de actividades programadas, además de nuevas expresiones para eventos, suspensiones y mantenimiento. Sin cambios al protocolo Data Matrix.
+- Debug añade editor visual de configuración, importación de archivo/texto, exportación de JSON, validación, vista previa y simulaciones de condiciones y memoria; laboratorio de alertas con datos ficticios.
+- Documentación y pruebas ampliadas. Se conserva el editor original de escritorio y la presentación móvil actual.
+
 ## 0.59.1 · Documentación y trazabilidad de la clasificación · 2026-10-31
 
 - Se amplía la guía de clasificación de motivos con catálogo de archivos, propiedades JSON, resolución de coincidencias, prioridad de motivos manuales, código 63 y limitaciones del reconocimiento.
