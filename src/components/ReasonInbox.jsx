@@ -1,83 +1,109 @@
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { Bell, CheckCircle, WarningCircle, X } from "@phosphor-icons/react";
-import { pendingReasonReviews, reasonsForReview } from "../services/reason-reviews.js";
+import {useEffect,useMemo,useRef,useState} from "react";
+import {createPortal} from "react-dom";
+import {Bell,CheckCircle,WarningCircle,X,SpeakerHigh,SpeakerSlash} from "@phosphor-icons/react";
+import {pendingReasonReviews,reasonsForReview} from "../services/reason-reviews.js";
+import {getRegistryNotifications,getSeenInbox,markInboxSeen,isInboxSoundOn,setInboxSound,playInboxBell} from "../services/registry-notifications.js";
 import "../delivery-reason-inbox.css";
 
-function ReviewItem({ item, onReview }) {
-  const [selected, setSelected] = useState("63");
-  const reasons = reasonsForReview(item.status);
+function ReviewItem({item,onReview}){
+  const [selected,setSelected]=useState("63");
   return <li className="dual-inbox-item">
-    <div className="dual-inbox-entry-heading">
-      <strong>{item.student}</strong>
-      <span>{item.week} · {item.day}</span>
-    </div>
-    <p>{item.status === "falta" ? "Falta" : "Sin labores"} · Otro motivo</p>
-    <label>
-      <span>Clasificación después de revisar la bitácora</span>
-      <select value={selected} onChange={event=>setSelected(event.target.value)}
-        aria-label={"Clasificar motivo de " + item.student + " · " + item.day}>
+    <div className="dual-inbox-entry-heading"><strong>{item.student}</strong><span>{item.week} · {item.day}</span></div>
+    <p>{item.status==="falta"?"Falta":"Sin labores"} · Otro motivo</p>
+    <label><span>Motivo</span>
+      <select value={selected} onChange={e=>setSelected(e.target.value)}
+        aria-label={"Motivo de "+item.student+" · "+item.day}>
         <option value="63">Conservar como Otro motivo</option>
-        {reasons.map(reason=><option key={reason.id} value={String(reason.code)}>{reason.label}</option>)}
+        {reasonsForReview(item.status).map(reason=><option key={reason.id} value={reason.code}>{reason.label}</option>)}
       </select>
     </label>
-    <button type="button" className="btn primary"
-      onClick={()=>onReview({...item,code:Number(selected)})}>
-      {selected === "63" ? "Revisado: conservar Otro motivo" : "Guardar clasificación"}
+    <button type="button" className="btn primary" onClick={()=>onReview({...item,code:Number(selected)})}>
+      {selected==="63"?"Conservar como otro":"Guardar"}
     </button>
   </li>;
 }
 
-export default function ReasonInbox({ state, backupPending = false, onReview, onBackup }) {
-  const [open, setOpen] = useState(false);
-  const trigger = useRef(null), panel = useRef(null);
-  const reviews = pendingReasonReviews(state);
-  const total = reviews.length + (backupPending ? 1 : 0);
+export default function ReasonInbox({state,backupPending=false,onReview,onBackup,onNavigate}){
+  const [open,setOpen]=useState(false);
+  const [filter,setFilter]=useState("all");
+  const [sound,setSound]=useState(()=>isInboxSoundOn(typeof window!=="undefined"?window.localStorage:null));
+  const [seen,setSeen]=useState(()=>getSeenInbox(typeof window!=="undefined"?window.localStorage:null));
+  const trigger=useRef(null),panel=useRef(null),attempted=useRef(new Set());
+  const reviews=useMemo(()=>pendingReasonReviews(state),[state]);
+  const messages=useMemo(()=>getRegistryNotifications(state,{backupPending}),[state,backupPending]);
+  const unread=messages.filter(item=>!seen[item.id]);
+  const listed=filter==="all"?messages:filter==="new"?unread:messages.filter(m=>m.severity===filter);
   useEffect(()=>{
-    if (!open) return;
-    const keydown = event=>{if(event.key === "Escape")setOpen(false);};
-    document.addEventListener("keydown", keydown);
+    if(!sound)return;
+    const newItems=messages.filter(x=>!seen[x.id]&&!attempted.current.has(x.id));
+    if(!newItems.length)return;
+    for(const item of newItems)attempted.current.add(item.id);
+    let cancelled=false;
+    const ring=async()=>{if(cancelled)return;const ok=await playInboxBell();if(ok)document.removeEventListener("pointerdown",ring);};
+    ring();
+    document.addEventListener("pointerdown",ring,{once:true});
+    return ()=>{cancelled=true;document.removeEventListener("pointerdown",ring);};
+  },[messages,sound]);
+  useEffect(()=>{
+    if(!open)return;
+    markInboxSeen(window.localStorage,messages);
+    setSeen(getSeenInbox(window.localStorage));
+    const keydown=e=>{if(e.key==="Escape")setOpen(false);};
+    document.addEventListener("keydown",keydown);
     panel.current?.focus({preventScroll:true});
     return ()=>document.removeEventListener("keydown",keydown);
   },[open]);
+  const close=()=>{setOpen(false);trigger.current?.focus();};
+  const navigate=item=>{
+    if(item.action==="backup"){onBackup?.();return;}
+    if(item.action==="reasons"){const section=document.getElementById("dualReasonReviewSection");if(section){section.open=true;section.scrollIntoView({behavior:"smooth"});}return;}
+    close();onNavigate?.(item.action,item.weekId);
+  };
   return <>
-    <button ref={trigger} type="button" className="btn dual-inbox-trigger"
-      aria-label={"Avisos internos" + (total ? ": " + total + " pendiente(s)" : "")}
-      aria-haspopup="dialog" aria-expanded={open}
-      title="Avisos internos" onClick={()=>setOpen(value=>!value)}>
+    <button ref={trigger} type="button" className="btn dual-inbox-trigger" title="Avisos"
+      aria-label={"Avisos internos: "+messages.length+" pendiente(s)"}
+      aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(x=>!x)}>
       <Bell size={19} aria-hidden="true"/>
-      {total > 0 && <span className="dual-inbox-counter">{total > 99 ? "99+" : total}</span>}
+      {messages.length>0&&<span className="dual-inbox-counter">{messages.length>99?"99+":messages.length}</span>}
+      {unread.length>0&&<span className="dual-inbox-unread-dot" aria-label={unread.length+" nuevos"}/>}
     </button>
-    {open && createPortal(<div className="dual-inbox-backdrop" onMouseDown={event=>{
-      if(event.target === event.currentTarget) {setOpen(false);trigger.current?.focus();}
-    }}>
-      <section className="dual-inbox-panel" role="dialog" aria-modal="true"
-        aria-label="Avisos internos" ref={panel} tabIndex={-1}>
+    {open&&createPortal(<div className="dual-inbox-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)close();}}>
+      <section className="dual-inbox-panel" role="dialog" aria-modal="true" aria-label="Avisos" ref={panel} tabIndex={-1}>
         <header className="dual-inbox-header">
-          <div><span className="delivery-kicker">Registro Dual</span><h2>Avisos internos</h2></div>
-          <button type="button" className="btn" onClick={()=>{setOpen(false);trigger.current?.focus();}}
-            aria-label="Cerrar avisos"><X size={18}/></button>
+          <div><h2>Avisos</h2><span className="dual-inbox-subcount">{messages.length} activos</span></div>
+          <button type="button" className="btn" onClick={close} aria-label="Cerrar avisos"><X size={18}/></button>
         </header>
         <div className="dual-inbox-content">
-          {backupPending && <div className="dual-inbox-backup">
-            <WarningCircle size={21}/><div><strong>Respaldo pendiente</strong>
-            <p>Descarga una copia JSON del registro para conservar tus cambios.</p>
-            <button type="button" className="btn" onClick={onBackup}>Guardar respaldo</button></div>
+          <div className="dual-inbox-filters" aria-label="Filtrar avisos">
+            {[["all","Todos"],["urgent","Urgentes"],["followup","Seguimiento"],["info","Información"]].map(([key,label])=>
+              <button key={key} type="button" aria-pressed={filter===key}
+                className={filter===key?"active":""} onClick={()=>setFilter(key)}>{label}</button>)}
+          </div>
+          {listed.length? <ul className="dual-inbox-alert-list">
+            {listed.map(item=><li key={item.id} className={"dual-inbox-alert "+item.severity}>
+              <div><strong>{item.title}</strong>{!seen[item.id]&&<span className="dual-inbox-new">Nuevo</span>}</div>
+              <p>{item.description}</p>
+              <button type="button" className="btn" onClick={()=>navigate(item)}>
+                {item.action==="backup"?"Guardar respaldo":item.action==="reasons"?"Revisar motivos":"Ver detalles"}
+              </button>
+            </li>)}
+          </ul>:<div className="dual-inbox-empty" role="status">
+            <CheckCircle size={24}/><p>Sin avisos en esta categoría.</p>
           </div>}
-          {reviews.length ? <>
-            <p className="dual-inbox-explanation">
-              {reviews.length} jornada{reviews.length === 1 ? "" : "s"} por revisar.
-              El Data Matrix conserva el código «Otro motivo», pero no el texto de la justificación.
-              Consulta la bitácora antes de cambiar su clasificación.
-            </p>
-            <ul className="dual-inbox-list">
-              {reviews.map(item=><ReviewItem key={item.key} item={item} onReview={onReview}/>)}
-            </ul>
-          </> : <div className="dual-inbox-empty" role="status">
-            <CheckCircle size={26}/><p>No hay motivos «Otros» pendientes de revisión.</p>
-          </div>}
+          {reviews.length>0&&<details id="dualReasonReviewSection" className="dual-inbox-reason-details">
+            <summary>Clasificar motivos ({reviews.length})</summary>
+            <p className="dual-inbox-explanation">Consulta la bitácora antes de reclasificar.</p>
+            <ul className="dual-inbox-list">{reviews.map(item=><ReviewItem key={item.key} item={item} onReview={onReview}/>)}</ul>
+          </details>}
+          <div className="dual-inbox-sound">
+            <button type="button" className="btn" onClick={()=>{setInboxSound(window.localStorage,!sound);setSound(!sound);}}>
+              {sound?<SpeakerHigh size={17}/>:<SpeakerSlash size={17}/>}
+              {sound?"Sonido activado":"Sonido silenciado"}
+            </button>
+            <button type="button" className="btn" onClick={()=>playInboxBell()}>Probar campana</button>
+          </div>
         </div>
       </section>
-    </div>, document.body)}
+    </div>,document.body)}
   </>;
 }

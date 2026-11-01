@@ -11,6 +11,8 @@ Este directorio contiene la documentación mantenible del proyecto. Las notas hi
 | Quiero agregar o cambiar un motivo frecuente de falta | [MOTIVOS_FRECUENTES_FALTA.md](MOTIVOS_FRECUENTES_FALTA.md) |
 | Quiero agregar o cambiar un motivo de Sin labores | [MOTIVOS_FRECUENTES_SIN_LABORES.md](MOTIVOS_FRECUENTES_SIN_LABORES.md) |
 | Quiero configurar palabras clave, entender el reconocimiento o revisar «Otros» | [CLASIFICACION_MOTIVOS_V059.md](CLASIFICACION_MOTIVOS_V059.md) |
+| Quiero crear avisos y eventos para el generador | [MENSAJES_GENERADOR.md](MENSAJES_GENERADOR.md) |
+| Quiero consultar y probar alertas administrativas | [CENTRO_AVISOS.md](CENTRO_AVISOS.md) |
 | Voy a modificar código | [ARQUITECTURA.md](ARQUITECTURA.md) |
 | Necesito entender almacenamiento o respaldos | [DATOS_Y_CACHE.md](DATOS_Y_CACHE.md) |
 | Voy a probar una modificación | [PRUEBAS.md](PRUEBAS.md) |

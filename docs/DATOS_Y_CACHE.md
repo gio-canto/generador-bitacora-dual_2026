@@ -52,6 +52,14 @@ El perfil recuerda datos recurrentes como:
 
 No sustituye al historial y no debe contener actividades semanales como fuente canónica.
 
+## Comunicados del generador (0.60)
+
+El registro de mensajes vistos está en `bitacora-generator-messages-seen-v1` (almacenamiento local). Los comunicados de frecuencia por sesión utilizan `bitacora-generator-messages-session-v1` (`sessionStorage`). Cada marca indica ID, revisión y perfil o dispositivo; puede incorporar el año según la frecuencia. No se añade información de estas marcas al Data Matrix, PDF ni al respaldo de bitácoras.
+
+## Avisos de Registro Dual (0.60)
+
+Los identificadores de notificaciones consultadas se almacenan en `bitacora-dual-inbox-seen-v1`. La preferencia de sonido se guarda en `bitacora-dual-inbox-sound-v1`. Ambas claves son locales y **no** se exportan como datos escolares. Los avisos se recalculan a partir de las semanas, fechas y estadísticas vigentes. No hay una nueva versión del esquema de registro de entregas.
+
 ## Registro de entrega
 
 Clave actual:

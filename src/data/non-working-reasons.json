@@ -17,7 +17,12 @@
       "cerraron por mantenimiento",
       "empresa cerrada por mantenimiento",
       "cierre por mantenimiento",
-      "suspendieron por mantenimiento"
+      "suspendieron por mantenimiento",
+      "limpieza general de las instalaciones",
+      "limpieza profunda del local",
+      "repararon las oficinas",
+      "estaban reparando las oficinas",
+      "mantenimiento general del edificio"
     ]
   },
   {
@@ -60,7 +65,17 @@
       "cierre temporal de la empresa",
       "cierre de operaciones",
       "empresa cerrada temporalmente",
-      "no abrio la empresa"
+      "no abrio la empresa",
+      "nos pidieron no ir a trabajar",
+      "nos indicaron que no asistieramos",
+      "nos dijeron que no fueramos a trabajar",
+      "no teniamos que presentarnos a trabajar",
+      "nos dieron el dia libre",
+      "nos dieron descanso en la empresa",
+      "no nos permitieron asistir a laborar",
+      "nos avisaron que no debiamos presentarnos",
+      "nos suspendieron las actividades de la jornada",
+      "nos mandaron a descansar"
     ]
   },
   {
@@ -146,7 +161,16 @@
       "reunion general de la empresa",
       "celebracion de la empresa",
       "evento corporativo",
-      "aniversario de la empresa"
+      "aniversario de la empresa",
+      "fueron a un evento de la empresa",
+      "el personal asistio a un evento",
+      "el personal fue a un evento",
+      "participaron en una feria empresarial",
+      "asistieron a una exposicion",
+      "se fueron a una convencion",
+      "fueron a una conferencia del trabajo",
+      "asistieron a un congreso empresarial",
+      "el personal asistio a una feria"
     ]
   },
   {
@@ -159,7 +183,10 @@
       "acto institucional",
       "ceremonia institucional",
       "evento del organismo",
-      "actividad institucional interna"
+      "actividad institucional interna",
+      "el personal fue a un evento institucional",
+      "asistieron a un evento del organismo",
+      "evento oficial de la institucion"
     ]
   },
   {
@@ -330,7 +357,11 @@
       "balance anual",
       "cierre contable",
       "auditoria interna",
-      "conteo de mercancia"
+      "conteo de mercancia",
+      "estaban haciendo inventario",
+      "auditoria interna de la empresa",
+      "auditoria de operaciones",
+      "revision administrativa de inventarios"
     ]
   },
   {
@@ -383,7 +414,10 @@
       "revision de instalaciones",
       "simulacro de evacuacion",
       "dictamen de proteccion civil",
-      "evacuacion preventiva"
+      "evacuacion preventiva",
+      "inspeccion de proteccion civil",
+      "verificacion de proteccion civil",
+      "cierre por inspeccion de seguridad"
     ]
   },
   {
@@ -428,7 +462,65 @@
       "curso de capacitacion para el personal",
       "jornada de capacitacion del personal",
       "formacion interna",
-      "capacitacion sin actividades para alumnos"
+      "capacitacion sin actividades para alumnos",
+      "curso para todos los trabajadores",
+      "capacitaron al personal",
+      "el personal estaba en capacitacion"
     ]
+  },
+  {
+    "id": "fumigation_sanitation",
+    "label": "Fumigación o sanitización",
+    "text": "La empresa suspendió las actividades por fumigación, sanitización o desinfección de las instalaciones.",
+    "code": 25,
+    "keywords": [
+      "fumigaron el lugar",
+      "fumigaron las instalaciones",
+      "fumigaron la empresa",
+      "estaban fumigando",
+      "fumigacion del edificio",
+      "fumigacion del local",
+      "fumigacion de la empresa",
+      "desinfectaron las instalaciones",
+      "sanitizacion de las instalaciones",
+      "hicieron sanitizacion",
+      "desinfeccion general de oficinas"
+    ],
+    "priority": 25
+  },
+  {
+    "id": "supervisor_absence",
+    "label": "Ausencia de personal responsable",
+    "text": "No se realizaron actividades porque no se presentó el personal responsable de supervisar la jornada.",
+    "code": 26,
+    "keywords": [
+      "no se presento el encargado",
+      "el encargado no se presento",
+      "no estaba nuestro instructor",
+      "no habia instructor",
+      "falto nuestro supervisor",
+      "el supervisor estaba ausente",
+      "ausencia del encargado",
+      "no se presento el responsable"
+    ],
+    "priority": 12
+  },
+  {
+    "id": "no_assigned_work",
+    "label": "Sin actividades programadas",
+    "text": "No se asignaron actividades para la jornada de formación dual.",
+    "code": 27,
+    "keywords": [
+      "no habia actividades programadas",
+      "no nos asignaron trabajo",
+      "no habia pedidos para atender",
+      "no tuvimos actividades asignadas",
+      "no habia trabajo para nosotros",
+      "no se programaron actividades",
+      "sin actividades asignadas",
+      "no habia labores para alumnos",
+      "no tuvimos tareas asignadas"
+    ],
+    "priority": 10
   }
 ]

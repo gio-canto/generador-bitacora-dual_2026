@@ -173,6 +173,18 @@ La coincidencia exacta siempre tiene prioridad.
 - Comprobar el bloque `BD26|4` + `S5:` al generar y decodificar, manteniendo los códigos anteriores.
 - Revisar manualmente las causas que no tengan coincidencia y el funcionamiento de la campanita en móvil (390/430 px) y escritorio.
 
+## Mensajes, campanita y Debug (0.60)
+
+- Validar el JSON antes de exportar: identificadores únicos, tipos de activación, fechas, destinatarios, enlaces HTTPS, IDs de YouTube y botón de cierre.
+- Probar pestaña, ventana mediana y pantalla completa en móvil y escritorio; cierre por botón y Escape, foco y ausencia de superposición con diálogos actuales.
+- Simular fechas exactas, fechas anuales y periodos; cruzar planteles y especialidades.
+- Confirmar que un anuncio visto no se abre de nuevo con frecuencia `once`, y que un incremento de `revision` permite mostrarlo.
+- Verificar que **última bitácora** sólo se emite después de un PDF generado con éxito y que no cambia el documento ni los datos.
+- Revisar que los nuevos motivos de fumigación, suspensiones, eventos y ausencia de responsables se reconocen sin alterar códigos anteriores.
+- En Registro Dual, comprobar fechas vencidas y próximas, sin datos, faltas recurrentes, hitos y respaldo; filtros, navegación y que al resolver un problema desaparezca el aviso.
+- Comprobar audio activado/silenciado y que el bloqueo de reproducción automática no impida usar la bandeja.
+- En Debug, importar archivo/texto, crear y editar, generar texto, exportar el JSON, mostrar mensajes y simular lectura sin modificar las preferencias reales.
+
 ## Cambios de catálogos
 
 Para una escuela nueva:

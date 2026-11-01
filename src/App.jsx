@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { startProfile } from "./components/Profile.jsx";
 import DeliveryRegistry from "./components/DeliveryRegistry.jsx";
+import GeneratorMessageHost from "./components/GeneratorMessageHost.jsx";
 import { startSpelling } from "./services/spelling.js";
 import shell from "./legacy/shell.html?raw";
 import { startEditor } from "./legacy/editor.js";
@@ -82,6 +83,6 @@ export default function App() {
     );
   }
 
-  return <div dangerouslySetInnerHTML={{ __html: shell }} />;
+  return <><div dangerouslySetInnerHTML={{ __html: shell }} /><GeneratorMessageHost /></>;
 }
 if (import.meta.hot) import.meta.hot.accept(() => location.reload());

@@ -2589,7 +2589,15 @@ export function startEditor() {
         canvas.width = 1;
         canvas.height = 1;
         const delivered = await deliverPdf(blob, safeFileName());
-        if (delivered !== "cancelled" && saved) showDeliveryTips();
+        if (delivered !== "cancelled" && saved) {
+          showDeliveryTips();
+          if ($("#generatorFinalDual")?.checked) {
+            window.dispatchEvent(new CustomEvent("bitacora-final-bitacora",{detail:{
+              school:$("#school")?.value||"",specialty:$("#specialty")?.value||""
+            }}));
+            $("#generatorFinalDual").checked=false;
+          }
+        }
       } catch (err) {
         console.error(err);
         notify(
@@ -2655,6 +2663,7 @@ export function startEditor() {
       $("#pdfBtn").onclick = downloadPdf;
       $("#mobilePdf").onclick = downloadPdf;
       $("#mobileSave").onclick = saveRecord;
+      $("#generatorMessagesBtn")?.addEventListener("click",()=>window.dispatchEvent(new Event("bitacora-open-messages")));
       $("#weekBtn").onclick = generateWeek;
       $("#addDayBtn").onclick = () => {
         if (entries.length >= MAX_DAYS) {

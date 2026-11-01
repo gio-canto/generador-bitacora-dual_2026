@@ -2291,7 +2291,8 @@ export default function DeliveryRegistry({ onClose }) {
         <div className="delivery-top-actions">
           {started && view !== "scanner" && <ReasonInbox state={state}
             backupPending={backupReminderOpen}
-            onBackup={()=>saveBackup(state,true)} onReview={saveReasonReview}/>}
+            onBackup={()=>saveBackup(state,true)} onReview={saveReasonReview}
+            onNavigate={(section,weekId)=>{if(weekId)setActiveWeekId(weekId);setView(section);}}/>}
           {started&&view!=="scanner"&&<button className="btn delivery-quick-trigger" type="button"
             aria-label="Abrir accesos rápidos" aria-expanded={quickOpen}
             aria-controls="delivery-quick-sidebar" onClick={()=>setQuickOpen(value=>!value)}>
