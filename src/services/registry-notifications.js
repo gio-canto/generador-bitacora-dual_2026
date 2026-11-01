@@ -75,7 +75,9 @@ export function getRegistryNotifications(state,{now=new Date(),backupPending=fal
   return result.sort((a,b)=>(level[a.severity]-level[b.severity])||a.title.localeCompare(b.title,"es"));
 }
 let audioContext=null;
-export async function playInboxBell(){
+export async function playInboxBell({tone="normal"}={}){
+  // Opciones de prueba en Debug; la bandeja utiliza el timbre normal.
+  const notes=tone==="soft"?[698]:tone==="double"?[784,1046,784,1046]:[784,1046];
   const Audio=typeof window!=="undefined"&&(window.AudioContext||window.webkitAudioContext);
   if(!Audio)return false;
   try{
@@ -83,11 +85,11 @@ export async function playInboxBell(){
     if(audioContext.state==="suspended")await audioContext.resume();
     if(audioContext.state!=="running")return false;
     const now=audioContext.currentTime;
-    for(const [i,hz] of [784,1046].entries()){
+    for(const [i,hz] of notes.entries()){
       const osc=audioContext.createOscillator(),gain=audioContext.createGain();
       osc.type="sine";osc.frequency.setValueAtTime(hz,now+i*.13);
       gain.gain.setValueAtTime(.0001,now+i*.13);
-      gain.gain.exponentialRampToValueAtTime(.06,now+i*.13+.014);
+      gain.gain.exponentialRampToValueAtTime(tone==="soft"?.026:.06,now+i*.13+.014);
       gain.gain.exponentialRampToValueAtTime(.0001,now+i*.13+.38);
       osc.connect(gain);gain.connect(audioContext.destination);
       osc.start(now+i*.13);osc.stop(now+i*.13+.4);
