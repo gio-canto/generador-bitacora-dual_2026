@@ -244,3 +244,18 @@ a{color:var(--blue)}
 @media(prefers-reduced-transparency:reduce){
   .debug-topbar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}
 }
+
+/* v0.60.4 · escenarios visuales dentro de Vista adaptable. */
+.debug-graduation-stage{border:1px solid rgba(183,147,77,.52);border-radius:19px;overflow:hidden;
+ background:linear-gradient(145deg,rgba(255,247,220,.95),rgba(228,241,255,.95));padding:12px;margin-bottom:12px}
+.debug-graduation-stage .shell{width:100%;max-width:none;padding:0;display:block}
+.debug-graduation-stage .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;
+ padding:13px 16px;margin:0 0 10px;border-radius:14px;font-size:13px}
+.debug-graduation-stage .gm-home{padding:15px;min-height:120px}
+.debug-graduation-stage .gm-home h3{font-size:clamp(17px,4vw,25px);margin:12px 0 9px}
+.debug-graduation-stage .gm-home p{font-size:13px;line-height:1.5;color:#596d82}
+.debug-graduation-stage .gm-panel{padding:15px;border:1px solid rgba(188,160,97,.3);border-radius:14px;
+ background:rgba(255,255,255,.75);color:#334e6d;font-size:13px}
+.debug-frame-wrap{overscroll-behavior:contain}
+.debug-frame{max-width:none}
+@media(max-width:620px){.debug-graduation-stage{padding:7px}.debug-graduation-stage .gm-home{padding:10px}}
