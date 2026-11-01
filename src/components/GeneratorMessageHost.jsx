@@ -3,12 +3,13 @@ import {createPortal} from "react-dom";
 import {readProfileData,readActiveProfileId} from "../services/profile.js";
 import config from "../data/generator-messages.json";
 import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation} from "../services/generator-message-rules.js";
+import {youtubeCelebrationUrl,requestYoutubeAudio,sendYoutubeCommand} from "../services/youtube-celebration.js";
 import "../generator-messages.css";
 import "../generator-graduation.css";
 
 const currentContext=()=>({profile:readProfileData(),profileId:readActiveProfileId(),date:mexicoDate(),
   storage:window.localStorage,sessionStorage:window.sessionStorage});
-const safeEmbed=id=>/^[A-Za-z0-9_-]{11}$/.test(id||"") ? "https://www.youtube-nocookie.com/embed/"+id : "";
+
 const busy=()=>Boolean(document.querySelector(
   "dialog[open], #tourLayer:not([hidden]), #virtualEaster:not([hidden]), .calendar-easter.show"
 ));
@@ -18,7 +19,10 @@ export function GeneratorMessageCard({event,onClose}){
   // El usuario puede activar el sonido con los controles del reproductor.
   const container=useRef(null);
   const videoFrame=useRef(null);
-  const [audioOn,setAudioOn]=useState(false);
+  const audioTimers=useRef([]);
+  const playing=useRef(false);
+  const [audioRequested,setAudioRequested]=useState(false);
+  const dualCelebration=event.celebration?.kind==="dual";
   const isTab=event.presentation==="tab";
   useEffect(()=>{
     if(isTab)return;
@@ -29,19 +33,47 @@ export function GeneratorMessageCard({event,onClose}){
     return ()=>{document.removeEventListener("keydown",keyboard);if(prior?.isConnected)prior.focus?.();};
   },[event.id,onClose,isTab]);
   const content=event.content||{};
-  const videoSrc=safeEmbed(content.youtubeId);
-  // El autoplay empieza silenciado; el audio sólo se habilita por una acción del usuario.
-  // YouTube acepta comandos de su API mediante postMessage con enablejsapi=1.
+  const videoSrc=youtubeCelebrationUrl(content.youtubeId,{
+    loop:Boolean(event.celebration?.loopVideo)
+  });
   const activateAudio=()=>{
-    const player=videoFrame.current?.contentWindow;
-    if(!player)return;
-    const command=func=>player.postMessage(JSON.stringify({event:"command",func,args:func==="setVolume"?[90]:[]}),
-      "https://www.youtube-nocookie.com");
-    command("setVolume");
-    command("unMute");
-    setAudioOn(true);
+    if(requestYoutubeAudio(videoFrame.current)){
+      sendYoutubeCommand(videoFrame.current,"playVideo");
+      setAudioRequested(true);
+    }
   };
-  return <div className={"generator-message-layer generator-message-"+event.presentation+(event.trigger?.type==="graduation"?" generator-message-graduation":"")}
+  const playerLoaded=()=>{
+    if(!event.celebration?.autoplayAudio)return;
+    // El iframe inicia sin sonido para que el video sí cargue; al estar listo
+    // se solicita audio automáticamente. El navegador puede bloquearlo.
+    const attempt=()=>requestYoutubeAudio(videoFrame.current);
+    audioTimers.current.push(window.setTimeout(attempt,250));
+    audioTimers.current.push(window.setTimeout(()=>{
+      if(!playing.current){
+        sendYoutubeCommand(videoFrame.current,"mute");
+        sendYoutubeCommand(videoFrame.current,"playVideo");
+      }
+    },1800));
+  };
+  useEffect(()=>{
+    const youtubeMessage=e=>{
+      if(e.source!==videoFrame.current?.contentWindow ||
+         !["https://www.youtube.com","https://www.youtube-nocookie.com"].includes(e.origin))return;
+      try{
+        const payload=typeof e.data==="string"?JSON.parse(e.data):e.data;
+        if(payload?.event==="onReady"&&event.celebration?.autoplayAudio)
+          requestYoutubeAudio(videoFrame.current);
+        if(payload?.event==="onStateChange"&&payload.info===1)playing.current=true;
+      }catch{/* mensajes de terceros no pertinentes */}
+    };
+    window.addEventListener("message",youtubeMessage);
+    return ()=>{
+      audioTimers.current.forEach(id=>window.clearTimeout(id));
+      audioTimers.current=[];
+      window.removeEventListener("message",youtubeMessage);
+    };
+  },[event.id,event.revision,event.celebration?.autoplayAudio]);
+  return <div className={"generator-message-layer generator-message-"+event.presentation+(dualCelebration?" generator-message-graduation":"")}
     onMouseDown={e=>{if(!isTab && e.target===e.currentTarget)onClose();}}>
     <section ref={container} tabIndex={-1} className="generator-message-card"
       role={isTab?"status":"dialog"} aria-modal={!isTab} aria-label={content.title}>
@@ -51,16 +83,15 @@ export function GeneratorMessageCard({event,onClose}){
       </header>
       {videoSrc && event.presentation!=="tab" && <div className="generator-message-media">
         <div className="generator-message-video">
-          <iframe ref={videoFrame} src={videoSrc+"?autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1"}
+          <iframe ref={videoFrame} src={videoSrc} onLoad={playerLoaded}
             title={"Video: "+content.title}
             allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
             loading="eager" referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen/>
         </div>
         <div className="generator-message-media-controls">
-          <span>El video inicia sin sonido.</span>
-          <button type="button" onClick={activateAudio} disabled={audioOn}>
-            {audioOn?"Audio activado":"Activar audio"}
+          <button type="button" onClick={activateAudio}>
+            {audioRequested?"Reactivar audio":"Activar audio"}
           </button>
         </div>
       </div>}
