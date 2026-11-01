@@ -356,6 +356,10 @@ function normalizeDelivery(value) {
       ? { statistics: { version: 5, entries: value.statistics.entries.map((day) => ({
           status: day.status, minutes: day.minutes, reasonCode: day.reasonCode,
           reasonId: clean(day.reasonId, 80),
+          ...(["kept", "classified"].includes(day.reasonReview) ? {
+            reasonReview: day.reasonReview,
+            reasonReviewedAt: clean(day.reasonReviewedAt, 40),
+          } : {}),
         })) } } : {}),
   };
 }
