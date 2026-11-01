@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.5-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.6-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.6 · Graduación como efecto de página completa
+
+La graduación se simula desde **Debug → Efemérides** igual que las demás fechas: al mostrar un día dentro del periodo cambia temporalmente el aspecto de **toda la página de Debug**, conservando sus barras, tarjetas y herramientas. En los días programados también se presenta el video de felicitación. **Limpiar visual** restaura la apariencia original sin alterar datos ni preferencias.
+
+Se eliminan la maqueta/panel de graduación, el acceso independiente en Vista adaptable y los botones redundantes. Las fechas y nombres se toman de `src/data/generator-messages.json`: el mismo sistema admite nuevas generaciones, escuelas y eventos aún desactivados sin configurar fechas fijas en el código de Debug. En Vista adaptable, el escenario **Efemérides** contiene estas pruebas.
 
 ## v0.60.5 · Felicitaciones compartidas y modo graduación en Debug
 
