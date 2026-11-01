@@ -38,7 +38,9 @@ describe("v0.60.2 · calendario de graduación",()=>{
   });
   it("muestra el video sólo el jueves 22 y viernes 23; recuerda cada día por separado",()=>{
     expect(days.map(date=>eligibleMessages(config,{date,profile,trigger:"graduation",ignoreSeen:true}).length))
-      .toEqual([0,0,0,1,1]);
+      .toEqual([0,0,0,0,0]);
+    expect(days.map(date=>eligibleMessages(config,{date,profile,trigger:"final-bitacora",ignoreSeen:true})
+      .filter(x=>x.trigger.type==="graduation").length)).toEqual([0,0,0,1,1]);
     const browser=storage(),session=storage(),ctx={profile,profileId:"alumno-1",storage:browser,
       sessionStorage:session,trigger:"graduation"};
     expect(eligibleMessages(config,{...ctx,date:"2027-07-22"})).toHaveLength(1);
