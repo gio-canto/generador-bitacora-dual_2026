@@ -295,3 +295,11 @@ Consulta [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Descargar/copiar el JSON válido y comprobar que se indique la necesidad de hacer el commit manual.
 - Revisar que el FAQ muestre la 0.60.3 y las versiones nuevas posteriores a la 0.50.45, conservando el historial antiguo.
 
+
+## Reproductor y Debug adaptable (0.60.4)
+
+- Verificar que la ventana de graduación no tenga barra de desplazamiento horizontal en 320, 390, 430, 768 y 1280 px.
+- Comprobar que YouTube inicia sin audio y que «Activar audio» funciona tras un clic, hasta el volumen 90%, condicionado por el propio reproductor.
+- Confirmar que el tema de graduación conserva encabezado, navegación inferior, botones, paneles y sus acciones, cambiando solamente la paleta.
+- En Debug → Vista adaptable seleccionar Debug completo y abrir todos los escenarios: graduación, mensajes, editor, efemérides, notificaciones, campana, avisos, PDF y cámara.
+- Probar que los simuladores funcionan dentro del marco en diversos anchos, sin bucles de iframes ni modificación de registros reales.
