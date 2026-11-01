@@ -188,3 +188,9 @@ El estado `no_entregado` puede guardarse con un resumen de jornadas, horas y mé
 Los códigos de falta `20..28` corresponden a las tres fases independientes de Prototipos y Proyectos de Emprendimiento, Festival Académico y ENAC. Los códigos `1..19` conservan su significado. El Data Matrix estadístico sigue usando códigos de causa de 6 bits, sin cambiar el esquema ni la versión `S5`.
 
 La acción **Crear y capturar jornadas** crea primero la semana y luego abre la captura manual progresiva de cada alumno aplicable (martes a viernes), permitiendo corregir datos previos o registrar nuevos. Cada registro guardado mediante este recorrido usa `source: "manual"`, aun si su procedencia anterior era cámara. No se sobrescriben las demás entregas si se omite un alumno o se interrumpe el recorrido. `no_entregado` puede contener horas de actividad sin contabilizarse como entrega realizada; `no_aplica` queda excluido. Se mantiene el esquema local v9.
+
+## Preferencias de graduación y omisión (0.60.2)
+
+La configuración de graduaciones se publica en `src/data/generator-messages.json`; sus fechas y planteles no se guardan como datos de alumnos. La lectura diaria se conserva usando la clave existente `bitacora-generator-messages-seen-v1`, con sufijo de fecha para `once-per-day`.
+
+La nueva clave `bitacora-dual-inbox-ignored-v1` almacena el identificador del aviso, la semana y una huella de la ronda registral. Se utiliza exclusivamente para mostrar u ocultar alertas; no cambia, sincroniza ni reemplaza el respaldo del Registro Dual. Borrar el almacenamiento del navegador restablece estas preferencias.
