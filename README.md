@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.59.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,16 @@
 </div>
 
 ---
+
+## v0.60.0 · Mensajes, eventos y centro de avisos
+
+El generador incorpora mensajes configurables mediante [`generator-messages.json`](src/data/generator-messages.json), con tres presentaciones (pestaña, ventana mediana y pantalla completa), fechas exactas y anuales, filtro por escuela y especialidad, enlaces HTTPS y videos opcionales de YouTube. Los mensajes cerrados se recuerdan por perfil y revisión en el navegador. La felicitación por finalizar Educación Dual se activa únicamente después de generar el PDF y marcar la opción de **última bitácora**.
+
+Registro Dual amplía **Avisos**: vencimientos, entregas tardías, motivos «Otros», faltas repetidas, jornadas sin estadísticas, hitos de horas y respaldos. Los avisos leídos se distinguen de asuntos pendientes; la campanita tiene sonido configurable y no modifica datos escolares.
+
+[Debug](debug/) permite editar/importar/exportar el JSON de mensajes y probar las presentaciones, fechas, destinatarios, lectura, audio, alertas y nuevas expresiones de «Sin labores», con datos de prueba aislados.
+
+[Manual de mensajes](docs/MENSAJES_GENERADOR.md) · [Centro de avisos](docs/CENTRO_AVISOS.md)
 
 ## v0.59.1 · Documentación y trazabilidad de la clasificación
 
