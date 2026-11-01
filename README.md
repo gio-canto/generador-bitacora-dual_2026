@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.2-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.3-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.3 · Estudio visual de eventos y FAQ actualizado
+
+El **Editor de eventos** de [Debug](debug/) ahora usa siete pasos y controles diseñados para la interfaz del sistema: tarjetas, selección de destinatarios, listas emergentes, calendarios con selección múltiple y opciones avanzadas. Parte automáticamente de los **eventos reales incluidos en `src/data/generator-messages.json`**: no requiere importar el JSON actual ni reintroducir datos. Se puede modificar cualquier evento, duplicarlo y probarlo incluso si está desactivado. La vista de graduación se prueba con sus fechas y planteles configurados.
+
+La exportación conserva **todos los eventos del archivo**, editados o no. El responsable debe descargar o copiar el JSON, sustituirlo en el repositorio y hacer su **propio commit**. Debug no publica cambios en GitHub. La sección **Notas de actualización** del [FAQ](faq/) se sincroniza con los cambios desde la versión 0.50.46 hasta la 0.60.3, conservando las notas históricas anteriores.
 
 ## v0.60.2 · Graduación y seguimiento ampliado
 
