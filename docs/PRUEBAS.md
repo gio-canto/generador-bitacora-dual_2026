@@ -321,3 +321,13 @@ Consulta [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Usar «Limpiar visual» y confirmar que la página vuelve a su aspecto original, sin modificar registros ni memorias reales.
 - Verificar que Vista adaptable no tenga una pestaña ni botón exclusivo de graduación, y que Debug completo → Efemérides permita probarlo.
 
+
+## Graduación posterior al PDF final (0.60.7)
+
+- Durante el periodo de graduación, confirmar que el tema visual aparece aunque el usuario aún no descargue el PDF; no abrir video al ingresar.
+- Fuera de `videoDates`, el PDF final muestra la despedida general; dentro de las fechas, después de generar correctamente un PDF marcado como última bitácora, muestra únicamente la despedida de graduación.
+- Repetir la descarga del PDF después de cerrar la felicitación y comprobar que no aparece la despedida general como sustituta.
+- Probar otro plantel, día fuera de periodo y generación futura; comprobar límites, filtros y prioridad sin mensaje doble.
+- En Debug → Efemérides, activar tema por fecha y pulsar «Simular entrega de última bitácora» para abrir el video sin afectar registros reales.
+- Comprobar que el editor crea graduaciones con `showOn: "final-bitacora"`, permite cambiarlo y exporta el atributo en el JSON completo. Verificar que graduaciones históricas sin `showOn` conservan su comportamiento.
+
