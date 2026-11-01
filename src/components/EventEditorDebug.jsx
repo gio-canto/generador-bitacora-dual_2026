@@ -229,7 +229,7 @@ export default function EventEditorDebug(){
         });
         else update({trigger:type==="date"?{type,date:"2026-12-01"}:{type}});
       }} items={[
-        {id:"on-open",title:"Al abrir el generador",description:"Mensaje de bienvenida o encuesta",icon:PlayCircle},
+        {id:"on-open",title:"Al abrir el generador",description:"Bienvenida o encuesta",icon:PlayCircle},
         {id:"date",title:"Por fecha",description:"Comunicado en días establecidos",icon:CalendarBlank},
         {id:"final-bitacora",title:"Al generar la última bitácora",description:"Después de confirmar el PDF",icon:ClipboardText},
         {id:"graduation",title:"Graduación con fechas de video",description:"Tema visual y felicitación",icon:GraduationCap}
