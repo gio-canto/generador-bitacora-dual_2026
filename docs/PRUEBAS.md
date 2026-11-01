@@ -331,3 +331,12 @@ Consulta [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - En Debug → Efemérides, activar tema por fecha y pulsar «Simular entrega de última bitácora» para abrir el video sin afectar registros reales.
 - Comprobar que el editor crea graduaciones con `showOn: "final-bitacora"`, permite cambiarlo y exporta el atributo en el JSON completo. Verificar que graduaciones históricas sin `showOn` conservan su comportamiento.
 
+
+## Control de concurrencia de Pages (0.60.8)
+
+El flujo `.github/workflows/pages.yml` usa un grupo de concurrencia común para ejecuciones de la misma referencia. Los pushes de `main` no deben generar despliegues simultáneos. Se conserva `cancel-in-progress: false` para no interrumpir una publicación activa.
+
+Tras completar los tests y el build, se compara nuevamente `GITHUB_SHA` con `refs/heads/main`; sólo se publica un artefacto vigente. La salida `needs.build.outputs.publish` controla la ejecución del trabajo de despliegue. Los PR no publican.
+
+Para verificar un fallo de GitHub Pages, se requiere el mensaje del paso exacto `Publicar` de la ejecución de `main`. El éxito del PR sólo valida tests y compilación. Si falla la configuración del sitio, los permisos del entorno `github-pages`, la disponibilidad del servicio o el paso de despliegue, debe consultarse su registro específico.
+
