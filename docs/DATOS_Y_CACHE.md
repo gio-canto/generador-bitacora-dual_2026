@@ -82,8 +82,17 @@ El estado contiene, entre otros:
 - estadísticas diarias capturadas manualmente o procedentes del Data Matrix;
 - campos heredados de utilización sin atribución automática desde el padrón;
 - estado de entrega: a tiempo, a destiempo, no entregado o **No aplica**.
+- decisión opcional de revisión de causas «Otro motivo» en cada jornada con estadísticas (`reasonReview`, `reasonReviewedAt`).
 
 **No aplica** se conserva como un estado explícito por alumno y semana. Indica que esa persona no tenía obligación de entregar en ese periodo, por lo que se excluye del denominador utilizado para calcular el porcentaje de cumplimiento.
+
+## Revisión administrativa de causas (0.59)
+
+La campanita identifica por **alumno, semana y jornada** los códigos `63` asociados a `falta` o `sin_labores`. El identificador está formado por esos datos; no se crea un registro global de notificaciones ni se sincroniza entre dispositivos. Los casos ya marcados como `reasonReview: "kept"` no aparecen como pendientes.
+
+Al clasificar un motivo válido, se conserva en la jornada `reasonCode`, `reasonId`, `reasonReview: "classified"` y `reasonReviewedAt` (fecha/hora ISO). Si el administrador confirma «Conservar Otro motivo», se guarda código `63` junto con `reasonReview: "kept"` y fecha de revisión. El almacenamiento y los respaldos siguen usando **schemaVersion 9**, sin migración ni nueva clave. Estas marcas son información administrativa; **no** forman parte del Data Matrix S5 y no modifican la justificación impresa.
+
+Si el dato es reemplazado por una nueva captura, la marca puede dejar de existir y el sistema volver a considerarlo pendiente. Un PDF sin estadísticas S5 no permite recuperar la causa mediante el lector. Consulta [guía de clasificación](CLASIFICACION_MOTIVOS_V059.md).
 
 ## Respaldo portátil
 
@@ -121,7 +130,7 @@ Cuando cambie un esquema persistente:
 
 El Data Matrix contiene información necesaria para identificar la bitácora y su periodo.
 
-El formato actual conserva el encabezado `BD26|4` con identidad, especialidad, empresa y fechas. Añade opcionalmente `S5:` seguido de 14 caracteres Base64URL (10 bytes) con estados, minutos y códigos numéricos de causas para cuatro jornadas. La codificación ocupa un solo bloque añadido al final y los lectores antiguos siguen leyendo los siete campos originales. Los códigos anteriores carecen de las estadísticas nuevas y se mantienen sin datos para esos indicadores. El género nunca se incluye en Data Matrix.
+El formato actual conserva el encabezado `BD26|4` con identidad, especialidad, empresa y fechas. Añade opcionalmente `S5:` seguido de 14 caracteres Base64URL (10 bytes) con estados, minutos y códigos numéricos de causas para cuatro jornadas. La codificación ocupa un solo bloque añadido al final y los lectores antiguos siguen leyendo los siete campos originales. Los códigos anteriores carecen de las estadísticas nuevas y se mantienen sin datos para esos indicadores. El género nunca se incluye en Data Matrix. **Tampoco** contiene el texto de la justificación, el estado de revisión del administrador ni su fecha. El código de causa `63` se interpreta como «Otro motivo» y requiere consultar el documento original antes de reclasificar.
 
 El contenido del Data Matrix no debe incluir secretos ni información innecesaria. Tampoco debe copiarse en diagnósticos públicos.
 
