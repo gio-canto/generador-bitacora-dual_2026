@@ -6,7 +6,7 @@ import EventEditorDebug from "./components/EventEditorDebug.jsx";
 import DebugInboxLab from "./components/DebugInboxLab.jsx";
 import {GeneratorMessageCard} from "./components/GeneratorMessageHost.jsx";
 import eventConfig from "./data/generator-messages.json";
-import {activeGraduation} from "./services/generator-message-rules.js";
+import {graduationPreviewForDate,graduationPreviewDates} from "./services/debug-graduation.js";
 import "./generator-graduation.css";
 
 import {
@@ -429,13 +429,7 @@ function DebugPage() {
       now: date,
       storage: {getItem:()=>null,setItem:()=>{}},
     });
-    const selected=graduationEvents.find(event=>event.id===eventId);
-    // En Debug también se prueban graduaciones aún no publicadas y otros
-    // planteles. No se modifican los destinatarios del archivo original.
-    const testConfig=selected?{version:1,events:[{
-      ...selected,enabled:true,audience:{schools:"all",specialties:"all"}
-    }]}:null;
-    const matched=testConfig?activeGraduation(testConfig,{date:value,profile:{}}):null;
+    const matched=graduationPreviewForDate(eventConfig,eventId,value);
     setGraduationPreview(matched);
     setAdaptivePreview(matched?.trigger?.videoDates?.includes(value)?matched:null);
   };
@@ -647,7 +641,7 @@ function DebugPage() {
           </div>}
           {graduationEvents.length>0&&<div className="debug-presets" aria-label="Fechas de graduación">
             {graduationEvents.filter(event=>event.id===graduationEventId).flatMap(event=>
-              [...new Set([event.trigger.startDate,...(event.trigger.videoDates||[])])].map(day=>
+              graduationPreviewDates(event).map(day=>
                 <button type="button" className="debug-preset" key={event.id+day}
                   onClick={()=>previewCalendar(day,event.id)}>
                   {day===event.trigger.startDate?"Inicio · ":"Video · "}{day}
