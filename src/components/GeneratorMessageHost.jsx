@@ -12,7 +12,9 @@ const busy=()=>Boolean(document.querySelector(
   "dialog[open], #tourLayer:not([hidden]), #virtualEaster:not([hidden]), .calendar-easter.show"
 ));
 export function GeneratorMessageCard({event,onClose}){
-  const [video,setVideo]=useState(false);
+  // YouTube inicia la reproducción al montar el modal, silenciado para
+  // cumplir las restricciones de autoplay de Safari y Chromium.
+  // El usuario puede activar el sonido con los controles del reproductor.
   const container=useRef(null);
   const isTab=event.presentation==="tab";
   useEffect(()=>{
@@ -33,9 +35,11 @@ export function GeneratorMessageCard({event,onClose}){
         <button type="button" className="generator-message-close" onClick={onClose} aria-label="Cerrar mensaje">×</button>
       </header>
       {content.youtubeId && event.presentation!=="tab" && <div className="generator-message-video">
-        {video ? <iframe src={safeEmbed(content.youtubeId)+"?autoplay=0"} title={"Video: "+content.title}
-          allow="encrypted-media; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen/> : <button type="button" onClick={()=>setVideo(true)}>Reproducir video de YouTube</button>}
+        <iframe src={safeEmbed(content.youtubeId)+"?autoplay=1&mute=1&playsinline=1&rel=0"}
+          title={"Video: "+content.title}
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          loading="eager" referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen/>
       </div>}
       <h2>{content.title}</h2>
       <p>{content.body}</p>
