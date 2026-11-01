@@ -32,7 +32,7 @@ Ejemplos:
 
 `src/data/` contiene configuración compartida de escuelas y empresas.
 
-No almacena datos individuales de alumnos.
+No almacena datos individuales de alumnos. Además de escuelas y empresas, define los catálogos editables de **Falta** (`absence-reasons.json`) y **Sin labores** (`non-working-reasons.json`), incluidos sus códigos Data Matrix y frases de reconocimiento.
 
 ### Generador heredado
 
@@ -57,6 +57,7 @@ Aunque React monta la aplicación, esta zona no es una migración declarativa co
 
 - `Profile.jsx`: perfil local.
 - `DeliveryRegistry.jsx`: registro de entrega.
+- `ReasonInbox.jsx`: campanita de avisos internos y revisión de «Otro motivo» por alumno/semana/jornada.
 
 El corrector ortográfico se ejecuta en un Web Worker y combina `dictionary-es` con `src/services/spelling-dictionary.js`. Este último incorpora vocabulario técnico y extrae automáticamente palabras de los catálogos de escuelas y empresas.
 
@@ -68,12 +69,16 @@ La landing vive en `src/presentation.jsx`.
 
 Una regla que afecte al PDF o Data Matrix puede existir también en el flujo heredado; antes de modificarla busca sus dos implementaciones y mantenlas consistentes.
 
+Para clasificación de motivos, `reason-classifier.js` normaliza y compara justificaciones escritas **localmente por el alumno**; `matrix-statistics.js` genera o interpreta los códigos de causa de cada jornada. `reason-reviews.js` identifica los casos con código `63` y actualiza la decisión administrativa de manera independiente; `delivery-registry.js` conserva esos campos en los respaldos JSON.
+
 ## Flujo del generador
 
 ```text
 Catálogos
    ↓
-Formulario → validación → borrador/historial
+Formulario → detección local de motivo (Falta/Sin labores)
+   ↓
+Validación → borrador/historial
    ↓
 Vista previa
    ↓
@@ -99,7 +104,9 @@ Resolver periodo/semana
         ↓
 Cola de sesión
         ↓
-Confirmar → persistir entrega
+Confirmar → persistir entrega y códigos S5
+        ↓
+Avisos internos: código 63 → revisión administrativa
         ↓
 JSON / CSV / reportes PDF
 ```
@@ -117,6 +124,8 @@ Reglas:
 - actualiza generación y lectura;
 - conserva pruebas de versiones anteriores;
 - documenta la migración.
+
+**Clasificación 0.59:** los códigos de causa ya disponibles siguen interpretándose con los catálogos por tipo de jornada. El código `63` representa «Otro motivo»; no transporta el texto de la justificación. Las revisiones administrativas se guardan localmente y no cambian el código impreso ni el formato del Data Matrix. Consulta [Clasificación de motivos y avisos](CLASIFICACION_MOTIVOS_V059.md).
 
 ## Persistencia
 
