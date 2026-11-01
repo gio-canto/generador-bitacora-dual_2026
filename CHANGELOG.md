@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.60.5 · Felicitaciones compartidas, bucle y pruebas de graduación · 2026-10-31
+
+- La despedida por última bitácora y la felicitación de cuarta generación usan atributos comunes de celebración: presentación completa, mismo video de YouTube, estilo, bucle y solicitud de audio automático.
+- El mensaje de última bitácora señala expresamente su conclusión; el mensaje de cuarta generación menciona ese cierre condicionalmente para no atribuirlo a todos los alumnos.
+- El video `YUC4FH3tSOk` usa `loop=1` y `playlist=YUC4FH3tSOk` para reproducirse en bucle hasta cerrar la ventana; el iframe deja de existir al cerrar el aviso.
+- Al cargar, el sistema solicita automáticamente `setVolume(90)` y `unMute` mediante la API de YouTube. Si el navegador bloquea el sonido, la reproducción puede mantenerse silenciada; el botón **Activar audio** sigue disponible. Se retira la leyenda explicativa de audio.
+- Se evita presentar simultáneamente la felicitación general de última bitácora y el evento de graduación cuando coincide con un día de video.
+- Debug incorpora el tema y video de graduación directamente en **Efemérides**, con pruebas de inicio de periodo, jueves y viernes de felicitación, y acciones para repetir o cerrar la simulación.
+- Versión, documentación y pruebas de la nueva experiencia actualizadas.
+
 ## 0.60.4 · Reproductor, graduación y Vista adaptable · 2026-10-31
 
 - Se evita el desplazamiento horizontal en el diálogo de felicitación mediante límites de anchura, `box-sizing`, dimensionado seguro del reproductor y recorte horizontal del contenedor.
