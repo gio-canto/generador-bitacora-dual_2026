@@ -303,3 +303,12 @@ Consulta [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Confirmar que el tema de graduación conserva encabezado, navegación inferior, botones, paneles y sus acciones, cambiando solamente la paleta.
 - En Debug → Vista adaptable seleccionar Debug completo y abrir todos los escenarios: graduación, mensajes, editor, efemérides, notificaciones, campana, avisos, PDF y cámara.
 - Probar que los simuladores funcionan dentro del marco en diversos anchos, sin bucles de iframes ni modificación de registros reales.
+
+## Felicitaciones y graduación como efeméride (0.60.5)
+
+- Comprobar que la última bitácora y la graduación usan el mismo ID de video, modo visual, bucle y atributos de audio, sin cambiar la programación de julio de 2027.
+- Confirmar que la despedida general solamente se activa tras el PDF final y no se superpone al evento especial del CBTis 134 en días de felicitación.
+- Comprobar `loop=1&playlist=YUC4FH3tSOk`, que el video termina al cerrar el aviso y que el botón «Activar audio» permanece.
+- Comprobar solicitud de audio al 90 % al cargar; si el navegador lo impide, verificar recuperación de reproducción silenciada. Probar manualmente en Chrome, Safari y Firefox.
+- Desde Debug → Efemérides probar 19, 22 y 23 de julio, abrir y cerrar video y desactivar el tema sin alterar datos escolares.
+
