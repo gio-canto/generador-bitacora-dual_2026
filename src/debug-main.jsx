@@ -392,39 +392,52 @@ function DebugPage() {
   const [cameraOutput, setCameraOutput] = useState("Sin prueba manual.");
   const [iframeWidth, setIframeWidth] = useState("390");
   const [iframePage, setIframePage] = useState("../");
-  const [iframeScene, setIframeScene] = useState("graduation");
+  const [iframeScene, setIframeScene] = useState("calendar");
   const sceneOnLoad=new URLSearchParams(window.location.search).get("debug-scene")||"";
   const nestedPreview=new URLSearchParams(window.location.search).has("debug-preview");
   const [adaptivePreview,setAdaptivePreview]=useState(null);
-  const [showGraduationTest,setShowGraduationTest]=useState(false);
+  const [graduationPreview,setGraduationPreview]=useState(null);
+  const graduationEvents=eventConfig.events.filter(event=>event.trigger?.type==="graduation");
+  const [graduationEventId,setGraduationEventId]=useState(()=>graduationEvents[0]?.id||"");
   const [actionOutput, setActionOutput] = useState("");
   const calendarStop = useRef(null);
   const env = useMemo(environmentSnapshot, []);
   const passed = tests.filter((item) => item.pass).length;
-  const graduationSample=eventConfig.events.find(x=>x.trigger.type==="graduation");
-  const graduationActive=activeGraduation(eventConfig,{
-    date:calendarDate,profile:{school:"cbtis-134",specialty:"Programación"}
-  });
+
 
   useEffect(
     () => () => {
       calendarStop.current?.();
+      document.body.classList.remove("debug-graduation-preview");
     },
     [],
   );
+  useEffect(()=>{
+    document.body.classList.toggle("debug-graduation-preview",Boolean(graduationPreview));
+    return ()=>document.body.classList.remove("debug-graduation-preview");
+  },[graduationPreview]);
 
-  const previewCalendar = (value = calendarDate) => {
+  // La misma fecha de prueba aplica las efemérides y, si corresponde, el
+  // tema de graduación sobre TODO Debug, no sobre una maqueta independiente.
+  const previewCalendar = (value = calendarDate, eventId = graduationEventId) => {
     calendarStop.current?.();
     const date = dateFromInput(value);
+    setCalendarDate(value);
     const state = getCalendarState(date);
     setCalendarState(state);
     calendarStop.current = startCalendarEasterEggs({
       now: date,
-      storage: {
-        getItem: () => null,
-        setItem: () => {},
-      },
+      storage: {getItem:()=>null,setItem:()=>{}},
     });
+    const selected=graduationEvents.find(event=>event.id===eventId);
+    // En Debug también se prueban graduaciones aún no publicadas y otros
+    // planteles. No se modifican los destinatarios del archivo original.
+    const testConfig=selected?{version:1,events:[{
+      ...selected,enabled:true,audience:{schools:"all",specialties:"all"}
+    }]}:null;
+    const matched=testConfig?activeGraduation(testConfig,{date:value,profile:{}}):null;
+    setGraduationPreview(matched);
+    setAdaptivePreview(matched?.trigger?.videoDates?.includes(value)?matched:null);
   };
 
   useEffect(()=>{
@@ -435,11 +448,11 @@ function DebugPage() {
       calendar:"debug-calendar",pdf:"debug-pdf",camera:"debug-camera"
     }[sceneOnLoad];
     if(sceneOnLoad==="graduation"){
-      const event=eventConfig.events.find(x=>x.trigger.type==="graduation");
+      const event=graduationEvents[0];
       if(event){
-        setCalendarDate(event.trigger.videoDates?.[0]||event.trigger.startDate);
-        setShowGraduationTest(true);
-        setAdaptivePreview(event);
+        setGraduationEventId(event.id);
+        const selectedDate=event.trigger.videoDates?.[0]||event.trigger.startDate;
+        previewCalendar(selectedDate,event.id);
       }
     }
     if(sceneOnLoad==="messages"){
@@ -457,11 +470,8 @@ function DebugPage() {
   const resetCalendar = () => {
     calendarStop.current?.();
     calendarStop.current = null;
-    document
-      .querySelectorAll("[class*='calendar-season-'],[class*='calendar-event-']")
-      .forEach(() => {});
     setCalendarState(getCalendarState(dateFromInput(calendarDate)));
-    setShowGraduationTest(false);
+    setGraduationPreview(null);
     setAdaptivePreview(null);
   };
 
@@ -624,43 +634,29 @@ function DebugPage() {
               </button>
             ))}
           </div>
-          <div className="debug-graduation-controls">
-            <strong>Graduación Dual · CBTis 134</strong>
-            <p>Prueba el diseño por fechas y vuelve a abrir el video sin modificar la fecha real ni las bitácoras.</p>
-            <div className="debug-presets">
-              {[
-                ["2027-07-19","Inicio del tema"],
-                ["2027-07-22","Jueves · Felicitación"],
-                ["2027-07-23","Viernes · Felicitación"]
-              ].map(([date,label])=><button type="button" key={date} className="debug-preset" onClick={()=>{
-                setCalendarDate(date);setShowGraduationTest(true);previewCalendar(date);
-              }}>{label}</button>)}
+          {graduationEvents.length>1&&<div className="debug-row">
+            <div className="debug-field">
+              <label htmlFor="debug-graduation-event">Graduación para probar</label>
+              <select id="debug-graduation-event" value={graduationEventId}
+                onChange={e=>{setGraduationEventId(e.target.value);resetCalendar();}}>
+                {graduationEvents.map(event=><option key={event.id} value={event.id}>
+                  {event.graduation?.label||event.content.title}
+                </option>)}
+              </select>
             </div>
-            <div className="debug-row">
-              <button type="button" className="debug-button primary" onClick={()=>{
-                setShowGraduationTest(true);previewCalendar(calendarDate);
-              }}>Probar tema de graduación</button>
-              <button type="button" className="debug-button" onClick={()=>{
-                if(graduationSample)setAdaptivePreview(graduationSample);
-              }}>Reproducir felicitación</button>
-              <button type="button" className="debug-button" onClick={resetCalendar}>Cerrar prueba</button>
-            </div>
-            {showGraduationTest&&<>
-              <p role="status" className="debug-note">
-                {graduationActive?"Tema activo para la fecha elegida.":"Fuera del periodo configurado para CBTis 134."}
-              </p>
-              {graduationActive&&<div className="debug-graduation-stage generator-graduation-active" aria-label="Tema de graduación simulado">
-                <div className="shell">
-                  <div className="topbar"><strong>Generador de Bitácora Dual</strong><span>Inicio</span></div>
-                  <div className="gm-home">
-                    <h3>{graduationActive.graduation?.label||graduationActive.content.title}</h3>
-                    <p>Así cambia la paleta sin sustituir los paneles ni la navegación del generador.</p>
-                    <div className="gm-panel">Continuar captura · Mis bitácoras</div>
-                  </div>
-                </div>
-              </div>}
-            </>}
-          </div>
+          </div>}
+          {graduationEvents.length>0&&<div className="debug-presets" aria-label="Fechas de graduación">
+            {graduationEvents.filter(event=>event.id===graduationEventId).flatMap(event=>
+              [...new Set([event.trigger.startDate,...(event.trigger.videoDates||[])])].map(day=>
+                <button type="button" className="debug-preset" key={event.id+day}
+                  onClick={()=>previewCalendar(day,event.id)}>
+                  {day===event.trigger.startDate?"Inicio · ":"Video · "}{day}
+                </button>))}
+          </div>}
+          {graduationPreview&&<p className="debug-note" role="status">
+            Vista de graduación activa: {graduationPreview.graduation?.label||graduationPreview.content.title}.
+            {graduationPreview.trigger.videoDates?.includes(calendarDate)?" Felicitación en pantalla.":""}
+          </p>}
           <pre className="debug-output">{JSON.stringify(calendarState, null, 2)}</pre>
         </Card>
         <Card id="debug-editor" title="Editor de eventos" description="Importa, modifica, prueba y exporta el JSON de mensajes." wide>
@@ -781,7 +777,6 @@ function DebugPage() {
             {iframePage==="./"&&<div className="debug-field">
               <label htmlFor="frame-scene">Experiencia visual</label>
               <select id="frame-scene" value={iframeScene} onChange={event=>setIframeScene(event.target.value)}>
-                <option value="graduation">Graduación · video y tema</option>
                 <option value="messages">Mensajes emergentes</option>
                 <option value="editor">Editor visual de eventos</option>
                 <option value="calendar">Efemérides</option>
@@ -792,10 +787,6 @@ function DebugPage() {
                 <option value="camera">Escáner y cámara</option>
               </select>
             </div>}
-            <button className="debug-button" type="button"
-              onClick={()=>{setIframePage("./");setIframeScene("graduation");}}>
-              Probar graduación
-            </button>
           </div>
           <div className="debug-frame-wrap">
             <iframe
