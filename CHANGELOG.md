@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.60.7 · Despedida de graduación después del PDF final · 2026-10-31
+
+- Se actualiza el mensaje de la cuarta generación en `generator-messages.json` con despedida en primera persona: «Gracias por todo. Un año después, estamos aquí…». La revisión aumenta para reconocer el texto nuevo.
+- La graduación conserva su rango de diseño (19–23 de julio de 2027) y sus fechas de video (22–23). La ventana con video ya no se abre al entrar al generador: aparece después de generar exitosamente el PDF de la **última bitácora** y confirmar dicha condición.
+- Se agrega `trigger.showOn: "final-bitacora"` como activación reusable para futuras graduaciones. Los eventos históricos sin ese atributo conservan el comportamiento anterior, evitando romper JSON existentes.
+- Al generar el PDF final, una graduación que coincide con la fecha, el plantel y la especialidad tiene prioridad sobre la despedida general. No se presentan ambas ni reaparece la genérica si el mensaje de graduación ya fue visto.
+- En Debug, seleccionar una fecha activa sólo el tema; se añade «Simular entrega de última bitácora» para abrir la despedida cuando corresponda. El editor de eventos muestra y exporta esta opción para nuevas generaciones.
+- Pruebas y documentación sincronizadas; la captura, el PDF y los datos escolares no cambian.
+
 ## 0.60.6 · Graduación integrada a Efemérides · 2026-10-31
 
 - La simulación de graduación ahora cambia los colores y superficies de **toda la página de Debug** como los otros efectos por fecha; no utiliza una maqueta del generador ni un panel de graduación.
