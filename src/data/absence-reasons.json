@@ -3,168 +3,404 @@
     "id": "medical_appointment",
     "label": "Cita médica",
     "text": "Inasistencia debida a una cita médica previamente programada que coincidió con el horario de actividades.",
-    "code": 1
+    "code": 1,
+    "keywords": [
+      "cita medica",
+      "consulta medica",
+      "consulta con el doctor",
+      "consulta con la doctora",
+      "cita con especialista",
+      "cita con el dentista",
+      "cita odontologica",
+      "revision medica",
+      "consulta dental"
+    ],
+    "priority": 22
   },
   {
     "id": "medical_attention",
     "label": "Atención médica",
     "text": "Inasistencia por motivos médicos que requirieron recibir atención de salud durante el horario de actividades.",
-    "code": 2
+    "code": 2,
+    "keywords": [
+      "urgencias medicas",
+      "servicio de urgencias",
+      "hospitalizacion",
+      "ingrese al hospital",
+      "atencion hospitalaria",
+      "atencion medica de emergencia",
+      "me atendieron en urgencias"
+    ],
+    "priority": 22
   },
   {
     "id": "illness",
     "label": "Enfermedad",
     "text": "Inasistencia debida a una enfermedad o malestar de salud que impidió asistir con normalidad.",
-    "code": 3
+    "code": 3,
+    "keywords": [
+      "me enferme",
+      "estuve enfermo",
+      "estuve enferma",
+      "fiebre",
+      "gripe",
+      "influenza",
+      "infeccion estomacal",
+      "gastroenteritis",
+      "dolor de cabeza intenso",
+      "malestar de salud",
+      "incapacidad medica",
+      "covid",
+      "dengue",
+      "varicela"
+    ]
   },
   {
     "id": "commute_accident",
     "label": "Accidente en el camino",
     "text": "Inasistencia debida a un accidente ocurrido durante el trayecto hacia la empresa, lo que impidió llegar con normalidad.",
-    "code": 4
+    "code": 4,
+    "keywords": [
+      "accidente en el camino",
+      "accidente en el trayecto",
+      "choque camino al trabajo",
+      "accidente vial rumbo",
+      "accidente de transito hacia"
+    ],
+    "priority": 22
   },
   {
     "id": "work_accident",
     "label": "Accidente laboral",
     "text": "Inasistencia relacionada con un accidente laboral que requirió atención y evitó continuar con las actividades programadas.",
-    "code": 5
+    "code": 5,
+    "keywords": [
+      "accidente laboral",
+      "accidente de trabajo",
+      "accidente en la empresa",
+      "lesion durante el trabajo"
+    ],
+    "priority": 22
   },
   {
     "id": "family_emergency",
     "label": "Emergencia familiar",
     "text": "Inasistencia debida a una emergencia familiar que requirió atención inmediata y me impidió asistir con normalidad.",
-    "code": 6
+    "code": 6,
+    "keywords": [
+      "emergencia familiar",
+      "urgencia familiar",
+      "fallecimiento de familiar",
+      "defuncion de familiar",
+      "hospitalizaron a mi familiar",
+      "funeral de un familiar",
+      "emergencia en casa"
+    ],
+    "priority": 22
   },
   {
     "id": "family_matters",
     "label": "Asuntos familiares",
     "text": "Inasistencia debida a asuntos familiares que requirieron mi atención personal y me impidieron asistir con normalidad.",
-    "code": 7
+    "code": 7,
+    "keywords": [
+      "asunto familiar",
+      "asuntos familiares",
+      "compromiso familiar",
+      "situacion familiar",
+      "cuidar a un familiar"
+    ]
   },
   {
     "id": "university_admission_exam",
     "label": "Examen de ingreso a la universidad",
     "text": "Inasistencia por la presentación de un examen de ingreso a la universidad programado durante el horario de actividades.",
-    "code": 8
+    "code": 8,
+    "keywords": [
+      "examen de admision",
+      "examen de ingreso a la universidad",
+      "examen de ingreso universitario",
+      "presentar el exani",
+      "presentar la paa",
+      "presentar el sat",
+      "examen de la unam",
+      "examen de la buap",
+      "examen universitario",
+      "prueba de admision"
+    ]
   },
   {
     "id": "extraordinary_exam",
     "label": "Examen extraordinario",
     "text": "Inasistencia por la presentación de un examen extraordinario escolar programado durante el horario de actividades.",
-    "code": 9
+    "code": 9,
+    "keywords": [
+      "examen extraordinario",
+      "evaluacion extraordinaria",
+      "examen de regularizacion",
+      "examen de recuperacion",
+      "recursamiento",
+      "evaluacion de recuperacion"
+    ]
   },
   {
     "id": "school_activity",
     "label": "Actividad escolar",
     "text": "Inasistencia por participación en una actividad escolar que coincidió con el horario establecido.",
-    "code": 10
+    "code": 10,
+    "keywords": [
+      "actividad escolar",
+      "evento escolar",
+      "representacion del plantel",
+      "actividad academica",
+      "salida escolar",
+      "visita academica",
+      "ceremonia escolar",
+      "evento de la escuela"
+    ]
   },
   {
     "id": "school_procedure",
     "label": "Trámite escolar",
     "text": "Inasistencia por la realización de un trámite escolar necesario que coincidió con el horario establecido.",
-    "code": 11
+    "code": 11,
+    "keywords": [
+      "tramite escolar",
+      "inscripcion escolar",
+      "reinscripcion",
+      "solicitud de constancia escolar",
+      "entrega de documentos escolares",
+      "gestion en servicios escolares",
+      "tramite de beca escolar"
+    ]
   },
   {
     "id": "personal_procedure",
     "label": "Trámite personal u oficial",
     "text": "Inasistencia por la realización de un trámite personal u oficial que no fue posible efectuar fuera del horario correspondiente.",
-    "code": 12
+    "code": 12,
+    "keywords": [
+      "tramite personal",
+      "tramite oficial",
+      "cita en el sat",
+      "cita del ine",
+      "tramite de pasaporte",
+      "tramite ante el registro civil",
+      "tramite bancario",
+      "tramite de licencia"
+    ]
   },
   {
     "id": "transport",
     "label": "Problemas de transporte",
     "text": "Inasistencia debida a problemas de transporte durante el traslado que impidieron llegar a tiempo a la empresa.",
-    "code": 13
+    "code": 13,
+    "keywords": [
+      "no hubo transporte",
+      "falta de transporte",
+      "fallo el transporte",
+      "transporte publico suspendido",
+      "se descompuso el autobus",
+      "no paso el camion",
+      "problemas de transporte",
+      "bloqueo de transporte"
+    ]
   },
   {
     "id": "demonstrations",
     "label": "Manifestaciones",
     "text": "Inasistencia debida a manifestaciones o bloqueos en la vía pública que impidieron realizar con normalidad el traslado hacia la empresa.",
-    "code": 14
+    "code": 14,
+    "keywords": [
+      "manifestacion",
+      "protesta social",
+      "bloqueo carretero",
+      "marcha de protesta",
+      "planton",
+      "cierre de vialidades por protesta",
+      "bloquearon la carretera"
+    ]
   },
   {
     "id": "natural_disaster",
     "label": "Desastres naturales",
     "text": "Inasistencia debida a condiciones derivadas de un desastre natural que afectaron la seguridad, el traslado o la posibilidad de asistir.",
-    "code": 15
+    "code": 15,
+    "keywords": [
+      "desastre natural",
+      "deslave",
+      "derrumbe",
+      "incendio forestal",
+      "inundacion por desastre",
+      "afectaciones por sismo",
+      "desastre ambiental"
+    ]
   },
   {
     "id": "bad_weather",
     "label": "Huracán",
     "text": "Inasistencia debida a condiciones derivadas del mal clima.",
-    "code": 16
+    "code": 16,
+    "keywords": [
+      "huracan",
+      "tormenta tropical",
+      "ciclon tropical",
+      "alerta por huracan",
+      "lluvias torrenciales",
+      "temporal de lluvias",
+      "vientos fuertes por tormenta",
+      "depresion tropical"
+    ]
   },
   {
     "id": "social_unrest",
     "label": "Disturbios sociales",
     "text": "Inasistencia debida a disturbios sociales o situaciones de riesgo en la zona que hicieron inseguro o imposible el traslado hacia la empresa.",
-    "code": 17
+    "code": 17,
+    "keywords": [
+      "disturbios sociales",
+      "enfrentamientos",
+      "situacion de violencia",
+      "inseguridad en la zona",
+      "riesgo de seguridad",
+      "disturbios en la ciudad"
+    ]
   },
   {
     "id": "personal",
     "label": "Motivos personales",
     "text": "Inasistencia por motivos personales que requirieron mi atención y me impidieron asistir con normalidad.",
-    "code": 18
+    "code": 18,
+    "keywords": [
+      "motivos personales",
+      "asuntos personales",
+      "situacion personal",
+      "compromiso personal",
+      "causa personal"
+    ]
   },
   {
     "id": "social",
     "label": "Motivos sociales",
     "text": "Inasistencia por un compromiso de carácter social que coincidió con el horario previsto de actividades.",
-    "code": 19
+    "code": 19,
+    "keywords": [
+      "compromiso social",
+      "evento social",
+      "boda familiar",
+      "evento comunitario",
+      "actividad social"
+    ]
   },
   {
     "id": "prototypes_entrepreneurship_local",
     "label": "Prototipos y Emprendimiento · Local",
     "text": "Participación en el Concurso Nacional de Prototipos y Proyectos de Emprendimiento, fase local.",
-    "code": 20
+    "code": 20,
+    "keywords": [
+      "prototipos fase local",
+      "prototipos etapa local",
+      "concurso de prototipos local",
+      "emprendimiento fase local"
+    ],
+    "priority": 50
   },
   {
     "id": "prototypes_entrepreneurship_state",
     "label": "Prototipos y Emprendimiento · Estatal",
     "text": "Participación en el Concurso Nacional de Prototipos y Proyectos de Emprendimiento, fase estatal.",
-    "code": 21
+    "code": 21,
+    "keywords": [
+      "prototipos fase estatal",
+      "prototipos etapa estatal",
+      "concurso de prototipos estatal",
+      "emprendimiento fase estatal"
+    ],
+    "priority": 50
   },
   {
     "id": "prototypes_entrepreneurship_national",
     "label": "Prototipos y Emprendimiento · Nacional",
     "text": "Participación en el Concurso Nacional de Prototipos y Proyectos de Emprendimiento, fase nacional.",
-    "code": 22
+    "code": 22,
+    "keywords": [
+      "prototipos fase nacional",
+      "prototipos etapa nacional",
+      "concurso de prototipos nacional",
+      "emprendimiento fase nacional"
+    ],
+    "priority": 50
   },
   {
     "id": "academic_festival_local",
     "label": "Festival Académico · Local",
     "text": "Participación en el Festival Académico, fase local.",
-    "code": 23
+    "code": 23,
+    "keywords": [
+      "festival academico local",
+      "festival academico fase local",
+      "festival academico etapa local"
+    ],
+    "priority": 50
   },
   {
     "id": "academic_festival_state",
     "label": "Festival Académico · Estatal",
     "text": "Participación en el Festival Académico, fase estatal.",
-    "code": 24
+    "code": 24,
+    "keywords": [
+      "festival academico estatal",
+      "festival academico fase estatal",
+      "festival academico etapa estatal"
+    ],
+    "priority": 50
   },
   {
     "id": "academic_festival_national",
     "label": "Festival Académico · Nacional",
     "text": "Participación en el Festival Académico, fase nacional.",
-    "code": 25
+    "code": 25,
+    "keywords": [
+      "festival academico nacional",
+      "festival academico fase nacional",
+      "festival academico etapa nacional"
+    ],
+    "priority": 50
   },
   {
     "id": "enac_local",
     "label": "ENAC · Local",
     "text": "Participación en el Encuentro Nacional de Arte y Cultura (ENAC), fase local.",
-    "code": 26
+    "code": 26,
+    "keywords": [
+      "enac local",
+      "enac fase local",
+      "encuentro nacional de arte y cultura fase local"
+    ],
+    "priority": 50
   },
   {
     "id": "enac_state",
     "label": "ENAC · Estatal",
     "text": "Participación en el Encuentro Nacional de Arte y Cultura (ENAC), fase estatal.",
-    "code": 27
+    "code": 27,
+    "keywords": [
+      "enac estatal",
+      "enac fase estatal",
+      "encuentro nacional de arte y cultura fase estatal"
+    ],
+    "priority": 50
   },
   {
     "id": "enac_national",
     "label": "ENAC · Nacional",
     "text": "Participación en el Encuentro Nacional de Arte y Cultura (ENAC), fase nacional.",
-    "code": 28
+    "code": 28,
+    "keywords": [
+      "enac nacional",
+      "enac fase nacional",
+      "encuentro nacional de arte y cultura fase nacional"
+    ],
+    "priority": 50
   }
 ]
