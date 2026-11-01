@@ -108,7 +108,10 @@
       "asuntos familiares",
       "compromiso familiar",
       "situacion familiar",
-      "cuidar a un familiar"
+      "cuidar a un familiar",
+      "motivos familiares",
+      "problema familiar",
+      "situacion en mi familia"
     ]
   },
   {
@@ -249,7 +252,16 @@
       "lluvias torrenciales",
       "temporal de lluvias",
       "vientos fuertes por tormenta",
-      "depresion tropical"
+      "depresion tropical",
+      "huracan otis",
+      "huracan john",
+      "huracan manuel",
+      "huracan ingrid",
+      "huracan pauline",
+      "huracan erick",
+      "ciclon",
+      "alerta meteorologica",
+      "tormenta severa"
     ]
   },
   {
