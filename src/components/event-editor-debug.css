@@ -48,3 +48,21 @@
 .debug-wizard-result{padding:12px;border-radius:12px;background:#eef5ff;color:#16518b;font-size:13px}
 @media(max-width:700px){.debug-wizard-steps button{font-size:0;flex-direction:column}.debug-wizard-steps button span{font-size:12px}.debug-audience-checks{grid-template-columns:1fr}}
 @media(max-width:480px){.debug-audience-grid{grid-template-columns:1fr}.debug-wizard-steps{gap:4px}.debug-wizard-steps button{min-height:43px;border-radius:11px}}
+
+.debug-graduation-days{border:1px solid #e1dfd1;border-radius:16px;display:grid;gap:8px;background:#fdfbf6;padding:15px;max-height:340px;overflow:auto}
+.debug-graduation-days legend{font-size:13px;font-weight:700;color:#6d522c;padding:0 5px}
+.debug-graduation-days label{display:flex!important;gap:10px;align-items:center;font-size:13px!important;font-weight:500!important}
+.debug-graduation-days input{width:auto!important;flex:none}
+.debug-graduation-preview{border:1px solid rgba(180,146,68,.45);border-radius:22px;overflow:hidden;
+ background:linear-gradient(140deg,#f8fbff,#f9f4e7 62%,#f8fbff);
+ box-shadow:0 10px 28px rgba(63,84,110,.10)}
+.debug-graduation-preview header{padding:15px;display:flex;justify-content:space-between;
+ background:rgba(255,255,255,.77);border-bottom:1px solid rgba(171,139,73,.25)}
+.debug-graduation-preview header span{font-size:12px;color:#806636}
+.debug-graduation-preview section{padding:20px}
+.debug-graduation-preview small{display:inline-block;color:#84642b;border:1px solid rgba(171,139,73,.35);
+ border-radius:999px;background:rgba(255,253,242,.8);padding:7px 11px;letter-spacing:.045em}
+.debug-graduation-preview h3{font-size:clamp(19px,4vw,29px);color:#293f62;margin:14px 0 8px}
+.debug-graduation-preview p{font-size:13px;color:#576578}
+.debug-graduation-mock-panel{border:1px solid rgba(178,157,99,.36);padding:14px;background:rgba(255,255,255,.8);
+ border-radius:14px;margin-top:16px;font-size:13px;color:#47617f}
