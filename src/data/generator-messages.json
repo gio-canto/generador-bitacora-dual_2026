@@ -80,7 +80,7 @@
     },
     {
       "id": "graduacion-cbtis134-dual-generacion4-2027",
-      "revision": 2,
+      "revision": 3,
       "enabled": true,
       "presentation": "fullscreen",
       "trigger": {
@@ -90,7 +90,8 @@
         "videoDates": [
           "2027-07-22",
           "2027-07-23"
-        ]
+        ],
+        "showOn": "final-bitacora"
       },
       "audience": {
         "schools": [
@@ -100,7 +101,7 @@
       },
       "content": {
         "title": "¡Felicidades a la cuarta generación de Educación Dual!",
-        "body": "Gracias por su compromiso y por haber utilizado el Generador de Bitácora Dual. Si esta fue su última bitácora Dual, también celebramos el cierre de esta etapa. Les deseamos éxito en lo que viene.",
+        "body": "Gracias por todo. Un año después, estamos aquí. Tantas aventuras, tantas cosas vividas, y esta será la última vez que nos veremos. Espero haberte ayudado; fue un gusto acompañarte en estas horas de desgracia y alegría.",
         "youtubeId": "YUC4FH3tSOk",
         "action": null
       },
