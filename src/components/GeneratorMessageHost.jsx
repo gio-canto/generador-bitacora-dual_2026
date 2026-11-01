@@ -4,6 +4,7 @@ import {readProfileData,readActiveProfileId} from "../services/profile.js";
 import config from "../data/generator-messages.json";
 import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation} from "../services/generator-message-rules.js";
 import "../generator-messages.css";
+import "../generator-graduation.css";
 
 const currentContext=()=>({profile:readProfileData(),profileId:readActiveProfileId(),date:mexicoDate(),
   storage:window.localStorage,sessionStorage:window.sessionStorage});
