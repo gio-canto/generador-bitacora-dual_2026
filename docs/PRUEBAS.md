@@ -31,7 +31,8 @@ La suite incluye pruebas sobre:
 - estados de entrega;
 - reportes;
 - diagnóstico del escáner;
-- regresiones de interfaz.
+- regresiones de interfaz;
+- detección de motivos, catálogos configurables y revisión de códigos «Otros» mediante `tests/v059-reason-classification.test.js`.
 
 Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regla.
 
@@ -45,6 +46,10 @@ Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regl
 - en **Falta** y **Sin labores**, probar motivos frecuentes, edición libre del texto y confirmación antes de reemplazar una justificación personalizada;
 - al modificar `src/data/absence-reasons.json` o `src/data/non-working-reasons.json`, comprobar IDs únicos, etiquetas/textos válidos y que el orden del selector coincida con el orden del catálogo;
 - al pasar de **Falta** a **Sin labores**, comprobar que no se borre el texto anterior y que se solicite confirmación para sustituirlo con un motivo del nuevo estado;
+- escribir citas, concursos, huracanes y festividades: comprobar el motivo detectado sin reemplazar la justificación;
+- verificar una causa desconocida y una negación: deben permanecer en «Otro motivo» si no hay coincidencia confiable;
+- seleccionar manualmente el motivo y modificar la justificación: conservar la clasificación elegida;
+- confirmar que ninguna festividad clasifique por sí sola una jornada como **Día inhábil**;
 - editar actividades;
 - ejecutar el corrector con un término institucional y vocabulario técnico conocido; confirmar que no los marque como error y que siga detectando faltas reales;
 - revisar contador/espacio;
@@ -117,7 +122,13 @@ Prueba:
 - filtros y agrupación;
 - JSON;
 - CSV;
-- tres tipos de reporte PDF.
+- tres tipos de reporte PDF;
+- campanita con contador de casos «Otro motivo» y recordatorio de respaldo cuando aplica;
+- revisión por alumno, semana y día, comparando siempre con la bitácora real antes de decidir;
+- **Conservar como Otro motivo** debe retirarlo de pendientes sin convertirlo en una causa específica;
+- **Guardar clasificación** debe actualizar solo el código/ID de esa jornada, sin alterar horas ni fecha de entrega;
+- reabrir Registro Dual, exportar/importar JSON y verificar que se mantienen las revisiones;
+- probar un código anterior sin bloque estadístico: no asignar causas inventadas.
 
 ### Escáner
 
@@ -152,6 +163,15 @@ Cubre al menos:
 - una coincidencia confirmada no debe requerir confirmación repetida durante la misma sesión.
 
 La coincidencia exacta siempre tiene prioridad.
+
+## Cambios de palabras clave y motivos
+
+- Validar códigos únicos y estables (1–62) dentro de cada catálogo; el `63` queda reservado para «Otro motivo».
+- Verificar que `keywords` contiene frases específicas, sin duplicados ni conceptos demasiado generales.
+- Probar coincidencias con y sin acentos, mayúsculas, frases negadas, prioridades y dos posibles causas simultáneas.
+- Comprobar que un motivo detectado para **Falta** nunca se obtiene consultando el catálogo de **Sin labores** y viceversa.
+- Comprobar el bloque `BD26|4` + `S5:` al generar y decodificar, manteniendo los códigos anteriores.
+- Revisar manualmente las causas que no tengan coincidencia y el funcionamiento de la campanita en móvil (390/430 px) y escritorio.
 
 ## Cambios de catálogos
 

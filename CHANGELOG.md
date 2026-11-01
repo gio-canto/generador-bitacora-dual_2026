@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.59.1 · Documentación y trazabilidad de la clasificación · 2026-10-31
+
+- Se amplía la guía de clasificación de motivos con catálogo de archivos, propiedades JSON, resolución de coincidencias, prioridad de motivos manuales, código 63 y limitaciones del reconocimiento.
+- Se documenta la revisión de casos «Otro motivo» desde la campanita: identificación por alumno/semana/jornada, reclasificación o conservación, y necesidad de verificar la bitácora original.
+- Se actualizan las guías vivas de arquitectura, almacenamiento y pruebas para incluir flujo del generador, Data Matrix BD26|4-S5, persistencia de revisiones y matriz de regresiones.
+- Se armoniza la documentación de versionado con la secuencia 0.59.x y se sincroniza la versión pública en código, dependencias, README y prueba del generador de avisos.
+- Actualización documental: **sin cambio en reglas de clasificación ni en el formato o datos existentes**.
+
 ## 0.59.0 · Clasificación de motivos y avisos internos · 2026-10-31
 
 - El editor del alumno reconoce motivos de **Falta** y **Sin labores** por frases configurables en los dos JSON existentes, sin enviar justificaciones a servidores.

@@ -1,7 +1,7 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
-export const VERSION = "0.59.0";
-export const RELEASE = "Reconocimiento de motivos y avisos internos";
+export const VERSION = "0.59.1";
+export const RELEASE = "Documentación completa de clasificación de motivos";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
