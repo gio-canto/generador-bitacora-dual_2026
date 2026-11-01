@@ -4,6 +4,45 @@ import {pendingReasonReviews} from "./reason-reviews.js";
 
 export const INBOX_SEEN_KEY="bitacora-dual-inbox-seen-v1";
 export const INBOX_SOUND_KEY="bitacora-dual-inbox-sound-v1";
+export const INBOX_IGNORED_KEY="bitacora-dual-inbox-ignored-v1";
+// Una nueva semana (lunes) o una nueva captura/revisión permite reabrir
+// advertencias recurrentes; no elimina faltas, entregas ni evidencia.
+const weekToken=(date=new Date())=>{
+  const utc=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
+  utc.setUTCDate(utc.getUTCDate()-(utc.getUTCDay()+6)%7);
+  return utc.toISOString().slice(0,10);
+};
+export const registryCaptureToken=state=>
+  (state?.weeks||[]).map(week=>{
+    const deliveries=Object.entries(week.deliveries||{}).map(([id,entry])=>
+      id+":"+(entry?.registeredAt||entry?.deliveredAt||"")+":"+(entry?.status||"")+":"+
+      (entry?.statistics?.entries?.length||0)+":"+
+      (entry?.statistics?.entries||[]).map(e=>e.reasonCode||0).join(",")).sort().join("|");
+    return week.id+":"+week.startDate+":"+week.dueAt+":"+deliveries;
+  }).sort().join("~");
+export function readIgnoredInbox(storage){
+  try {const data=JSON.parse(storage?.getItem(INBOX_IGNORED_KEY)||"{}");
+    return data&&typeof data==="object"&&!Array.isArray(data)?data:{};}
+  catch{return {};}
+}
+export function ignoreInboxNotice(storage,notice,state,{now=new Date()}={}){
+  const current=readIgnoredInbox(storage);
+  const value={week:weekToken(now),round:registryCaptureToken(state),
+    recurring:notice.severity!=="info",at:Date.now()};
+  try{storage?.setItem(INBOX_IGNORED_KEY,JSON.stringify({...current,[notice.id]:value}));}
+  catch{/* el navegador puede bloquear almacenamiento */}
+}
+export function visibleInboxNotices(notices,storage,state,{now=new Date()}={}){
+  const ignored=readIgnoredInbox(storage),week=weekToken(now),round=registryCaptureToken(state);
+  return notices.filter(notice=>{
+    const mark=ignored[notice.id];
+    if(!mark)return true;
+    // Avisos de seguimiento y urgentes reaparecen al cambiar la semana o
+    // la captura; los informativos permanecen ocultos mientras sean idénticos.
+    return mark.recurring&&(mark.week!==week||mark.round!==round);
+  });
+}
+
 const days=2*86400000;
 export const getSeenInbox=(storage)=>{try{return JSON.parse(storage?.getItem(INBOX_SEEN_KEY)||"{}")||{}}catch{return {}}};
 export const markInboxSeen=(storage,notifications)=>{
@@ -52,13 +91,23 @@ export function getRegistryNotifications(state,{now=new Date(),backupPending=fal
     "Los códigos antiguos o las capturas sin estadísticas no permiten atribuir horas.","info","statistics"));
   const model=calculateDualMilestones(state);
   for(const student of model.students){
-    if(student.professionalReached)result.push(notice("milestone:840:"+student.id,
-      "Hito de 840 horas",student.name+" alcanzó 840 horas registradas.","info","statistics"));
-    else if(student.socialReached)result.push(notice("milestone:480:"+student.id,
-      "Hito de 480 horas",student.name+" alcanzó 480 horas registradas.","info","statistics"));
-    else if(student.hasData && student.socialRemainingHours<=40)
-      result.push(notice("milestone:near:"+student.id,"Próximo hito de horas",
-        student.name+" está a "+student.socialRemainingHours.toFixed(1)+" h de 480.","info","statistics"));
+    const targets=[
+      [480,"socialReached"],[840,"professionalReached"],
+      [1000,"expandedReached"],[1504,"theoreticalLimitReached"]
+    ];
+    for(const [hours,key] of targets){
+      if(!student[key])continue;
+      result.push(notice("milestone:"+hours+":"+student.id,
+        hours===1504?"Referencia teórica de 1,504 horas":"Hito de "+hours.toLocaleString("es-MX")+" horas",
+        student.name+" alcanzó "+hours.toLocaleString("es-MX")+" horas registradas."+
+          (hours===1504?" No implica un límite de captura ni acreditación automática.":""),
+        "info","statistics"));
+    }
+    if(student.hasData&&!student.theoreticalLimitReached&&student.nextRemainingHours<=40)
+      result.push(notice("milestone:near:"+student.id+":"+student.nextTargetHours,
+        "Próximo hito de horas",student.name+" está a "+
+        student.nextRemainingHours.toFixed(1)+" h de "+
+        student.nextTargetHours.toLocaleString("es-MX")+".","info","statistics"));
   }
   const repeated=new Map();
   for(const week of state?.weeks||[])for(const [studentId,delivery] of Object.entries(week.deliveries||{})){
