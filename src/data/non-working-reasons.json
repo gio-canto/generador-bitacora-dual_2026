@@ -12,7 +12,12 @@
       "mantenimiento de oficinas",
       "mantenimiento del local",
       "fumigacion de instalaciones",
-      "reparacion de infraestructura"
+      "reparacion de infraestructura",
+      "cerro por mantenimiento",
+      "cerraron por mantenimiento",
+      "empresa cerrada por mantenimiento",
+      "cierre por mantenimiento",
+      "suspendieron por mantenimiento"
     ]
   },
   {
@@ -86,7 +91,16 @@
       "alerta ciclonica",
       "depresion tropical",
       "fenomeno meteorologico tropical",
-      "suspension por tormenta"
+      "suspension por tormenta",
+      "huracan otis",
+      "huracan john",
+      "huracan manuel",
+      "huracan ingrid",
+      "huracan pauline",
+      "huracan erick",
+      "ciclon",
+      "alerta de tormenta tropical",
+      "aviso de huracan"
     ],
     "priority": 18
   },
@@ -240,7 +254,29 @@
       "jueves santo",
       "viernes santo",
       "carnaval",
-      "dia de la bandera"
+      "dia de la bandera",
+      "2 de noviembre",
+      "1 de noviembre",
+      "dia de los fieles difuntos",
+      "dia de san valentin",
+      "14 de febrero",
+      "dia del nino",
+      "dia de la nina",
+      "dia de los abuelos",
+      "dia de la abuela",
+      "dia del bombero",
+      "dia de la enfermera",
+      "dia del policia",
+      "dia del servidor publico",
+      "dia del contador publico",
+      "dia de la primavera",
+      "dia de la santa cruz",
+      "dia de muertos 2026",
+      "dia del artista",
+      "dia del artesano",
+      "dia del periodista",
+      "dia de la enfermeria",
+      "dia de la juventud"
     ],
     "priority": 15
   },
@@ -329,7 +365,11 @@
       "falla tecnica",
       "falla de red interna",
       "fallo el sistema",
-      "problema de infraestructura tecnologica"
+      "problema de infraestructura tecnologica",
+      "error del servidor",
+      "falla de internet",
+      "fallaron los sistemas",
+      "no funcionaban los servidores"
     ]
   },
   {
@@ -358,7 +398,10 @@
       "violencia en la zona",
       "enfrentamiento en la zona",
       "incidente de seguridad",
-      "inseguridad en la zona"
+      "inseguridad en la zona",
+      "bloqueo por inseguridad",
+      "cierre por riesgo",
+      "situacion de riesgo"
     ]
   },
   {
