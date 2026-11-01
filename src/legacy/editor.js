@@ -19,6 +19,7 @@ import {actingSigner} from "../domain/signing.js";
 import schools from "../data/schools.json";
 import absenceReasons from "../data/absence-reasons.json";
 import nonWorkingReasons from "../data/non-working-reasons.json";
+import { classifyReason } from "../services/reason-classifier.js";
 import { parseBackup } from "../services/storage.js";
 import { notify, notifyImported } from "../services/rare-notification.jsx";
 import { createMatrixPayload } from "../services/delivery-registry.js";
@@ -69,6 +70,26 @@ export function startEditor() {
     function reasonIdForText(status, text) {
       const normalized = String(text || "").trim();
       return reasonsForStatus(status).find((item) => item.text === normalized)?.id || "";
+    }
+    function refreshReasonClassification(entry) {
+      if (!["falta", "sin_labores"].includes(entry?.status)) return null;
+      // La selección manual, incluso si se retoca la redacción, tiene prioridad.
+      if (!entry.reasonMode && entry.reasonId) entry.reasonMode = "manual";
+      if (entry.reasonMode === "manual") return reasonForId(entry.status, entry.reasonId);
+      const found = classifyReason(entry.status, entry.activity);
+      entry.reasonId = found?.id || "";
+      entry.reasonMode = "auto";
+      return found;
+    }
+    function updateReasonIndicator(host, index) {
+      const entry = entries[index];
+      const hint = host.querySelector(`[data-reason-detection="${index}"]`);
+      if (!hint || !entry) return;
+      const reason = reasonForId(entry.status, entry.reasonId);
+      hint.textContent = entry.reasonMode === "manual" && reason
+        ? "Motivo seleccionado manualmente: " + reason.label
+        : reason ? "Detectado automáticamente: " + reason.label
+        : "Sin coincidencia confiable: se registrará como Otro motivo.";
     }
     function showStatusNotice(status) {
       const message = STATUS_NOTICES[status];
@@ -813,17 +834,19 @@ export function startEditor() {
               : e.status === "inhabil"
                 ? INHABIL_JUSTIFICATION
                 : "Puedes usar **negritas**, *cursivas* y listas con -";
-        const absenceReasonId = e.reasonId || reasonIdForText(e.status, e.activity);
+        const detectedReason = refreshReasonClassification(e);
+        const absenceReasonId = e.reasonId || detectedReason?.id || reasonIdForText(e.status, e.activity);
         const absenceReasonOptions = reasonsForStatus(e.status).map(
           (item) =>
             `<option value="${escapeHtml(item.id)}" ${item.id === absenceReasonId ? "selected" : ""}>${escapeHtml(item.label)}</option>`,
         ).join("");
         const absenceReasonControl =
           ["falta", "sin_labores"].includes(e.status)
-            ? `<div class="absence-reason"><div class="absence-reason-head"><label for="absenceReason-${i}">Motivo frecuente</label><span>Opcional</span></div><select id="absenceReason-${i}" data-absence-reason="${i}"><option value="">Selecciona un motivo para usarlo como base…</option>${absenceReasonOptions}</select><small>El texto se colocará en la justificación y podrás modificarlo libremente.</small></div>`
+            ? `<div class="absence-reason"><div class="absence-reason-head"><label for="absenceReason-${i}">Motivo frecuente</label><span>Opcional</span></div><select id="absenceReason-${i}" data-absence-reason="${i}"><option value="">Selecciona un motivo para usarlo como base…</option>${absenceReasonOptions}</select><small>El texto se colocará en la justificación y podrás modificarlo libremente.</small><small data-reason-detection="${i}" aria-live="polite"></small></div>`
             : "";
         card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Área</label><input data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" ${e.status !== "laboral" ? "disabled" : ""}></div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
         host.appendChild(card);
+        updateReasonIndicator(host, i);
       });
       host.querySelectorAll("[data-key]").forEach((input) => {
         const handler = () => {
@@ -835,7 +858,7 @@ export function startEditor() {
               previous = entries[i].status,
               next = input.value;
             entries[i].status = next;
-            if (previous !== next) entries[i].reasonId = "";
+            if (previous !== next) { entries[i].reasonId = ""; entries[i].reasonMode = "auto"; }
             if (next === "inhabil") entries[i].activity = INHABIL_JUSTIFICATION;
             else if (
               previous === "inhabil" &&
@@ -881,8 +904,10 @@ export function startEditor() {
             const reasonSelect = host.querySelector(
               `[data-absence-reason="${i}"]`,
             );
+            refreshReasonClassification(entries[i]);
             if (reasonSelect)
-              reasonSelect.value = entries[i].reasonId || reasonIdForText(entries[i].status, input.value);
+              reasonSelect.value = entries[i].reasonId || "";
+            updateReasonIndicator(host, i);
           }
           if (k === "area") {
             const commonAreas = [
@@ -912,6 +937,11 @@ export function startEditor() {
           if (!preset) {
             if (!select.value) {
               entries[i].reasonId = "";
+              entries[i].reasonMode = "auto";
+              refreshReasonClassification(entries[i]);
+              const updated = host.querySelector(`[data-absence-reason="${i}"]`);
+              if (updated) updated.value = entries[i].reasonId || "";
+              updateReasonIndicator(host, i);
               markDirty();
             }
             return;
@@ -937,10 +967,12 @@ export function startEditor() {
             before = buildPageModel();
           entries[i].activity = preset.text;
           entries[i].reasonId = preset.id;
+          entries[i].reasonMode = "manual";
           const after = buildPageModel();
           if (!after.fits && after.bottom >= before.bottom - 0.01) {
             entries[i].activity = previous;
             entries[i].reasonId = currentPresetId;
+            entries[i].reasonMode = currentPresetId ? "manual" : "auto";
             select.value = currentPresetId;
             notifySpaceLimit();
             return;
@@ -949,6 +981,7 @@ export function startEditor() {
             `textarea[data-index="${i}"][data-key="activity"]`,
           );
           if (textarea) textarea.value = preset.text;
+          updateReasonIndicator(host, i);
           markDirty();
           updatePreview();
           refreshLineLimits();
