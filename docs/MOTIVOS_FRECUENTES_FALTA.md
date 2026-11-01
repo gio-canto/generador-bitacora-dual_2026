@@ -10,13 +10,15 @@ No es necesario editar `src/legacy/editor.js` para agregar, cambiar, ordenar o r
 
 ## Estructura
 
-Cada motivo tiene tres campos:
+Cada motivo conserva sus campos originales y admite palabras clave adicionales:
 
 ```json
 {
   "id": "medical_appointment",
   "label": "Cita médica",
-  "text": "Inasistencia debida a una cita médica previamente programada que coincidió con el horario de actividades."
+  "text": "Inasistencia debida a una cita médica previamente programada que coincidió con el horario de actividades.",
+  "code": 1,
+  "keywords": ["cita médica", "consulta médica", "consulta con el doctor"]
 }
 ```
 
@@ -25,6 +27,10 @@ Cada motivo tiene tres campos:
 | `id` | Identificador interno estable. Debe ser único y usar minúsculas, números o guion bajo. |
 | `label` | Texto corto que ve el alumno en el selector. |
 | `text` | Justificación que se copia al campo editable cuando se elige el motivo. |
+| `code` | Código estable para el Data Matrix. No lo cambies en motivos ya publicados. |
+| `keywords` | Frases que el alumno puede escribir y que identifican el motivo. |
+| `priority` | Prioridad opcional ante coincidencias con otros motivos. |
+| `excludeKeywords` | Frases opcionales que descartan una coincidencia. |
 
 ## Agregar un motivo
 
@@ -62,7 +68,9 @@ Después:
 "label": "Incidente de transporte"
 ```
 
-No cambies el `id` sólo por cambiar el nombre visible.
+No cambies el `id` ni el `code` sólo por cambiar el nombre visible.
+
+La v0.59 reconoce las justificaciones del alumno con `keywords`; no modifica el texto que escribió ni altera un motivo elegido manualmente.
 
 ## Cambiar la justificación
 
