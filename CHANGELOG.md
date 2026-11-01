@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.60.3 · Estudio visual de eventos y FAQ actualizado · 2026-10-31
+
+- El Editor de eventos de Debug se divide en siete pasos: eventos, destinatarios, activación, calendario, mensaje, pruebas y publicación. Muestra únicamente los controles relevantes en cada pantalla, con estilo propio del sistema, sin selectores ni calendarios nativos.
+- La configuración inicial se toma **automáticamente** de `src/data/generator-messages.json` incluido en la versión; muestra los eventos ya cargados, con sus valores, ID, fecha, planteles, videos y estados de activación. Se evita exigir que el administrador importe nuevamente los datos publicados.
+- Se pueden crear, duplicar, modificar, desactivar y eliminar eventos en una **copia de trabajo**, con opción para restaurar el JSON original. Las operaciones no escriben en el servidor.
+- Debug permite probar **todos los eventos ya existentes**, incluso borradores desactivados, forzando la vista previa real. El simulador considera fecha, escuela, especialidad, frecuencia y memoria de lectura; permite ensayar el diseño de graduación sin modificar el calendario real ni la información del alumno.
+- La publicación sigue siendo manual: descargar o copiar el JSON completo, reemplazar `src/data/generator-messages.json` y hacer commit en GitHub. El editor no tiene permisos de escritura ni publica contenido.
+- El FAQ incorpora las notas faltantes de las versiones posteriores a 0.50.0-beta.45, mantiene el historial anterior y presenta la 0.60.3 como versión actual.
+- Se amplían las pruebas para verificar la conservación de eventos, la navegación del asistente y la simulación sin efectos secundarios sobre el almacenamiento real.
+
 ## 0.60.2 · Graduación, hitos y avisos omitibles · 2026-10-31
 
 - Nuevo activador `graduation`: periodo de inicio a fin para cambiar visualmente el generador y lista de días exactos para mostrar el mensaje de felicitación con video de YouTube. Recuerdo local por día (`once-per-day`); el video se carga silenciado para favorecer la reproducción automática.

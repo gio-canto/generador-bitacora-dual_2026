@@ -283,3 +283,15 @@ Consulta [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Comprobar cálculo, vista por alumno y PDF con 480/840/1,000/1,504 horas; superar 1,504 no recorta ni bloquea horas.
 - Omitir un aviso y verificar reaparición al pasar a otra semana o efectuar una captura; el informativo puede permanecer oculto.
 - Confirmar que los avisos y graduaciones no modifiquen las bitácoras ni sus respaldos.
+
+## Estudio de eventos en siete pasos (0.60.3)
+
+- Confirmar que Debug inicia con todos los eventos del archivo `generator-messages.json`, sus textos, fechas, plantel y video originales.
+- Modificar un único mensaje, exportar y comprobar que los demás se conservan idénticos, incluidos los desactivados.
+- Verificar navegación por los siete pasos y controles visuales de plantel, especialidades, frecuencia, calendario exacto, rango y fechas múltiples.
+- Probar directamente desde la lista los mensajes ya cargados, incluidos los desactivados, sin alterar la configuración original.
+- Simular graduación del CBTis 134 el 22 y 23 de julio de 2027, el periodo visual del 19 al 23, y un perfil que no coincida.
+- Marcar un aviso como visto en Debug y restablecer la simulación; verificar que el almacenamiento escolar no cambie.
+- Descargar/copiar el JSON válido y comprobar que se indique la necesidad de hacer el commit manual.
+- Revisar que el FAQ muestre la 0.60.3 y las versiones nuevas posteriores a la 0.50.45, conservando el historial antiguo.
+
