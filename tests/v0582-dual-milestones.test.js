@@ -33,7 +33,8 @@ describe("Hitos de horas v0.58.2",()=>{
    expect(milestoneProgress(840*60-1).professionalReached).toBe(false);
    expect(milestoneProgress(840*60).professionalReached).toBe(true);
    expect(milestoneProgress(480*60).nextRemainingHours).toBe(360);
-   expect(milestoneProgress(840*60).nextRemainingHours).toBe(0);
+   expect(milestoneProgress(840*60).nextRemainingHours).toBe(160);
+   expect(milestoneProgress(840*60).professionalRemainingHours).toBe(0);
    expect(milestoneProgress(480*60).progressPercent).toBeCloseTo(480/840*100,5);
  });
  it("detecta alumnos que cumplen ambos hitos, solo el primero o ninguno",()=>{
