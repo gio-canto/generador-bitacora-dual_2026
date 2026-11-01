@@ -869,7 +869,17 @@ export function saveManualDelivery(week, studentId, status, { statistics = null,
         registeredAt,
         source: "manual",
         usageSource,
-        ...(statistics ? {statistics} : {}),
+        ...(statistics ? {statistics:{
+          ...statistics,
+          entries:statistics.entries.map((day,index)=>{
+            const previous = week.deliveries?.[studentId]?.statistics?.entries?.[index];
+            return previous && previous.status === day.status &&
+              previous.reasonCode === day.reasonCode && previous.reasonReview
+              ? {...day, reasonReview:previous.reasonReview,
+                  reasonReviewedAt:previous.reasonReviewedAt}
+              : day;
+          }),
+        }} : {}),
       },
     },
   };
