@@ -83,7 +83,7 @@ export default function GeneratorMessageHost(){
     window.addEventListener("bitacora-profile",begin);
     window.addEventListener("bitacora-open-messages",showList);
     window.addEventListener("focus",focus);
-    return ()=>{window.clearTimeout(initial);
+    return ()=>{window.clearTimeout(initial);window.clearInterval(poll);
       window.removeEventListener("bitacora-final-bitacora",final);
       window.removeEventListener("bitacora-profile",begin);
       window.removeEventListener("bitacora-open-messages",showList);
