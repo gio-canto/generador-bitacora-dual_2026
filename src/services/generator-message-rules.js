@@ -134,6 +134,11 @@ export function finalBitacoraMessages(config,options={}){
   const scheduled=eligibleMessages(config,{...options,trigger:"final-bitacora",ignoreSeen:true})
     .some(event=>event.trigger?.type==="graduation");
   if(scheduled)return [];
+  // Compatibilidad con graduaciones antiguas cuyo video se abrió por fecha:
+  // no mostrar después una despedida adicional tras ese mismo PDF.
+  const legacyScheduled=eligibleMessages(config,{...options,trigger:"graduation",ignoreSeen:true})
+    .some(event=>event.trigger?.type==="graduation");
+  if(legacyScheduled)return [];
   return eligibleMessages(config,{...options,trigger:"final-bitacora"})
     .filter(event=>event.trigger?.type!=="graduation");
 }
