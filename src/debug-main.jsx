@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./debug.css";
 import "./calendar-easter-eggs.css";
+import EventEditorDebug from "./components/EventEditorDebug.jsx";
+import DebugInboxLab from "./components/DebugInboxLab.jsx";
 
 import {
   VERSION,
@@ -580,6 +582,14 @@ function DebugPage() {
             ))}
           </div>
           <pre className="debug-output">{JSON.stringify(calendarState, null, 2)}</pre>
+        </Card>
+
+        <Card title="Editor de eventos" description="Importa, modifica, prueba y exporta el JSON de mensajes." wide>
+          <EventEditorDebug />
+        </Card>
+
+        <Card title="Centro de avisos" description="Simula pendientes, motivos, hitos, respaldos y sonido sin datos reales." wide>
+          <DebugInboxLab base={sampleDeliveryState()} />
         </Card>
 
         <Card
