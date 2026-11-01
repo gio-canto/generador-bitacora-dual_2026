@@ -9,9 +9,11 @@ const TRIGGERS = ["on-open", "date", "final-bitacora"];
 const iso = value => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) &&
   !Number.isNaN(Date.parse(value + "T12:00:00Z")) &&
   new Date(value + "T12:00:00Z").toISOString().slice(0,10) === value;
-export const mexicoDate = (at = new Date()) => new Intl.DateTimeFormat("en-CA", {
-  timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit"
-}).format(at);
+export const mexicoDate = (at = new Date()) => {
+  const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(at);
+  const data=Object.fromEntries(parts.filter(x=>x.type!=="literal").map(x=>[x.type,x.value]));
+  return data.year+"-"+data.month+"-"+data.day;
+};
 const normalized = value => String(value || "").trim().toLocaleLowerCase("es-MX")
   .normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const listValid = input => input === "all" || Array.isArray(input) &&
