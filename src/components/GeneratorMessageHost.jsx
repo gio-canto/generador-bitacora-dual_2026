@@ -67,6 +67,12 @@ export default function GeneratorMessageHost(){
   const enqueue=useCallback((kind,extra={})=>{
     const ctx={...currentContext(),...extra};
     context.current=ctx;
+    // Si ese día se presenta el video de graduación, no duplicar la despedida
+    // genérica al descargar la última bitácora.
+    if(kind==="final-bitacora"){
+      const grad=activeGraduation(config,ctx);
+      if(grad?.trigger?.videoDates?.includes(ctx.date))return;
+    }
     const entries=eligibleMessages(config,{...ctx,trigger:kind});
     const known=new Set([activeRef.current?.id,...queue.current.map(x=>x.id)]);
     for(const entry of entries)if(!known.has(entry.id)){queue.current.push(entry);known.add(entry.id);}
