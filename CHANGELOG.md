@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.59.0 · Clasificación de motivos y avisos internos · 2026-10-31
+
+- El editor del alumno reconoce motivos de **Falta** y **Sin labores** por frases configurables en los dos JSON existentes, sin enviar justificaciones a servidores.
+- Catálogos ampliados con expresiones para consultas médicas, exámenes, concursos, emergencias, huracanes, fenómenos naturales, cierres de empresas, festividades y días de conmemoración.
+- Cuando un texto no tiene coincidencia confiable se registra con el código 63 (**Otro motivo**), sin inventar clasificaciones. El alumno puede seleccionar manualmente otro motivo y mantener su redacción.
+- La campanita de **Avisos internos** de Registro Dual muestra los motivos 63 pendientes de cada alumno, semana y jornada. Permite reclasificar según el catálogo correspondiente o marcar **Revisado: conservar Otro motivo**.
+- Las revisiones se almacenan en el registro local y sus respaldos JSON, y se reflejan en las estadísticas sin cambiar horas ni estados de entrega.
+- Se conserva el Data Matrix BD26|4 / S5 y sus códigos actuales. El Data Matrix no contiene la redacción; la revisión administrativa requiere consultar la bitácora física o PDF.
+- Día de Muertos y otras festividades no se convierten automáticamente en día inhábil escolar: el estado de la jornada sigue eligiéndolo el alumno.
+- Pruebas del reconocedor, de la persistencia de la revisión y de la compatibilidad estadística.
+
+
 ## 0.58.2-beta.1 · Hitos de 480 y 840 horas de Educación Dual · 2026-10-29
 
 - Se incorpora la pestaña **Datos → Hitos** a la navegación móvil y de escritorio, con accesos desde el Resumen.
