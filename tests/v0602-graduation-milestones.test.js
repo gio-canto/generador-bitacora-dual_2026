@@ -42,12 +42,12 @@ describe("v0.60.2 · calendario de graduación",()=>{
     expect(days.map(date=>eligibleMessages(config,{date,profile,trigger:"final-bitacora",ignoreSeen:true})
       .filter(x=>x.trigger.type==="graduation").length)).toEqual([0,0,0,1,1]);
     const browser=storage(),session=storage(),ctx={profile,profileId:"alumno-1",storage:browser,
-      sessionStorage:session,trigger:"graduation"};
-    expect(eligibleMessages(config,{...ctx,date:"2027-07-22"})).toHaveLength(1);
+      sessionStorage:session,trigger:"final-bitacora"};
+    expect(eligibleMessages(config,{...ctx,date:"2027-07-22"}).filter(e=>e.trigger.type==="graduation")).toHaveLength(1);
     markMessageSeen(graduation,{...ctx,date:"2027-07-22"});
     expect(hasSeenMessage(graduation,{...ctx,date:"2027-07-22"})).toBe(true);
-    expect(eligibleMessages(config,{...ctx,date:"2027-07-22"})).toHaveLength(0);
-    expect(eligibleMessages(config,{...ctx,date:"2027-07-23"})).toHaveLength(1);
+    expect(eligibleMessages(config,{...ctx,date:"2027-07-22"}).filter(e=>e.trigger.type==="graduation")).toHaveLength(0);
+    expect(eligibleMessages(config,{...ctx,date:"2027-07-23"}).filter(e=>e.trigger.type==="graduation")).toHaveLength(1);
   });
   it("rechaza días fuera del periodo o repetidos",()=>{
     const invalid=structuredClone(config);
