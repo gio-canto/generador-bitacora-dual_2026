@@ -31,3 +31,7 @@ El filtro permite mostrar todos, urgentes, seguimiento o información. Los acces
 Debug (`/debug/`) contiene un laboratorio que simula entregas vencidas, jornadas desconocidas, estadísticas incompletas, hitos, respaldos, campanada y textos de `Sin labores`, usando alumnos ficticios y memoria aislada. No se emplea la base real.
 
 [Pruebas](PRUEBAS.md) · [Datos y respaldos](DATOS_Y_CACHE.md)
+
+## Ajustes de la campanita v0.60.1
+
+Las barras superior e inferior de Registro Dual usan estilos Liquid Glass y transiciones accesibles; el escritorio conserva su estructura original. El laboratorio de Debug ahora permite probar tres tonos de campana (normal, suave y doble) y muestra si el navegador bloquea Web Audio. La campanita real conserva el tono normal y las preferencias guardadas de sonido.
