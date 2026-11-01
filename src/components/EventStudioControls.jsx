@@ -1,6 +1,6 @@
 
 import {useEffect,useId,useRef,useState} from "react";
-import {Check,CaretDown,CaretLeft,CaretRight,CalendarDays,X,Upload,Copy} from "@phosphor-icons/react";
+import {Check,CaretDown,CaretLeft,CaretRight,CalendarBlank,X,Upload,Copy} from "@phosphor-icons/react";
 
 export function StudioField({label,value,onChange,placeholder="",multiline=false,rows=4,help="",disabled=false}){
   const id=useId();
@@ -102,7 +102,7 @@ export function StudioCalendar({label,value,onChange,multiple=false,min="",max="
       <div className="es-calendar-header">
         <button type="button" onClick={()=>shift(-1)} disabled={Boolean(min&&previous<min.slice(0,7)+"-01")}
           aria-label="Mes anterior"><CaretLeft size={19}/></button>
-        <strong><CalendarDays size={17}/>{monthName}</strong>
+        <strong><CalendarBlank size={17}/>{monthName}</strong>
         <button type="button" onClick={()=>shift(1)} disabled={Boolean(max&&next>max)}
           aria-label="Mes siguiente"><CaretRight size={19}/></button>
       </div>
