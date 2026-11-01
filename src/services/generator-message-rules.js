@@ -4,8 +4,8 @@ import defaultMessages from "../data/generator-messages.json";
 export const MESSAGE_SEEN_KEY = "bitacora-generator-messages-seen-v1";
 export const MESSAGE_SESSION_KEY = "bitacora-generator-messages-session-v1";
 export const MESSAGE_PRESENTATIONS = ["tab", "medium", "fullscreen"];
-export const MESSAGE_FREQUENCIES = ["once", "once-per-device", "once-per-year", "once-per-session", "always"];
-const TRIGGERS = ["on-open", "date", "final-bitacora"];
+export const MESSAGE_FREQUENCIES = ["once", "once-per-device", "once-per-year", "once-per-day", "once-per-session", "always"];
+const TRIGGERS = ["on-open", "date", "final-bitacora", "graduation"];
 const iso = value => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) &&
   !Number.isNaN(Date.parse(value + "T12:00:00Z")) &&
   new Date(value + "T12:00:00Z").toISOString().slice(0,10) === value;
@@ -43,7 +43,17 @@ export function validateMessageConfig(config) {
     if (!validYoutubeId(event?.content?.youtubeId)) errors.push(at+"ID de YouTube incorrecto.");
     if (event?.content?.action?.url && !validSurveyUrl(event.content.action.url)) errors.push(at+"Enlace no seguro.");
     const trigger=event?.trigger || {};
-    if(trigger.type==="date" && !iso(trigger.date) && !/^\d\d-\d\d$/.test(trigger.annualDate || "")) errors.push(at+"Fecha del evento inválida.");
+    if(trigger.type==="date" && !iso(trigger.date) && !/^\\d\\d-\\d\\d$/.test(trigger.annualDate || "")) errors.push(at+"Fecha del evento inválida.");
+    if(trigger.type==="graduation"){
+      if(!iso(trigger.startDate)||!iso(trigger.endDate)||trigger.startDate>trigger.endDate)
+        errors.push(at+"Periodo de graduación inválido.");
+      if(!Array.isArray(trigger.videoDates)||!trigger.videoDates.length||
+        trigger.videoDates.some(d=>!iso(d)||d<trigger.startDate||d>trigger.endDate)||
+        new Set(trigger.videoDates).size!==trigger.videoDates.length)
+        errors.push(at+"Selecciona fechas de video únicas dentro del periodo.");
+      if(event.presentation!=="fullscreen" && event.presentation!=="medium")
+        errors.push(at+"La graduación requiere ventana mediana o completa.");
+    }
     if (trigger.startDate && !iso(trigger.startDate)) errors.push(at+"Inicio inválido.");
     if (trigger.endDate && !iso(trigger.endDate)) errors.push(at+"Fin inválido.");
     if (trigger.startDate && trigger.endDate && trigger.startDate > trigger.endDate) errors.push(at+"Periodo invertido.");
@@ -66,11 +76,12 @@ function matchesTrigger(event,trigger,date){
   if(spec.type !== trigger) return false;
   if(spec.startDate && date < spec.startDate || spec.endDate && date > spec.endDate) return false;
   if(spec.type==="date") return spec.date === date || spec.annualDate===date.slice(5);
+  if(spec.type==="graduation") return spec.videoDates?.includes(date)===true;
   return true;
 }
 export const messageSeenToken = (event,profileId="",date="") => {
   const scope=event.frequency==="once-per-device" ? "device" : profileId || "unassigned";
-  const year=event.frequency==="once-per-year" ? ":"+date.slice(0,4) : "";
+  const year=event.frequency==="once-per-year" ? ":"+date.slice(0,4) : event.frequency==="once-per-day" ? ":"+date : "";
   return event.id + ":" + event.revision + ":" + scope + year;
 };
 function readBag(storage,key){
@@ -95,4 +106,13 @@ export function eligibleMessages(config,{trigger="on-open",profile={},profileId=
     matchesTrigger(event,trigger,date) &&
     (ignoreSeen || !hasSeenMessage(event,{storage,sessionStorage,profileId,date})))
     .sort((a,b)=>(b.priority||0)-(a.priority||0) || a.id.localeCompare(b.id));
+}
+
+/** Configuración visual independiente de la lectura: activa el tema durante todo
+ * el intervalo, aunque la felicitación con video aparezca sólo en las fechas elegidas. */
+export function activeGraduation(config,{profile={},date=mexicoDate()}={}){
+  if(validateMessageConfig(config).length)return null;
+  return config.events.filter(e=>e.enabled&&e.trigger?.type==="graduation"&&
+    date>=e.trigger.startDate&&date<=e.trigger.endDate&&matchesAudience(e,profile))
+    .sort((a,b)=>(b.priority||0)-(a.priority||0))[0]||null;
 }
