@@ -10,13 +10,15 @@ Es independiente de `src/data/absence-reasons.json`, que corresponde al estado *
 
 ## Agregar, editar o quitar motivos
 
-Cada objeto del catálogo tiene solamente tres campos:
+Cada objeto conserva los campos iniciales y permite reglas de clasificación:
 
 ```json
 {
   "id": "facility_maintenance",
   "label": "Mantenimiento de instalaciones",
-  "text": "La empresa suspendió las actividades por trabajos de mantenimiento en sus instalaciones durante el horario previsto."
+  "text": "La empresa suspendió las actividades por trabajos de mantenimiento en sus instalaciones durante el horario previsto.",
+  "code": 1,
+  "keywords": ["mantenimiento de instalaciones", "cierre por mantenimiento"]
 }
 ```
 
@@ -25,6 +27,8 @@ Cada objeto del catálogo tiene solamente tres campos:
 - **Cambiar el texto:** modifica sólo `text`. El alumno podrá editarlo después de elegir el motivo.
 - **Ordenar:** mueve el objeto completo dentro del archivo JSON. El selector respeta ese orden.
 - **Eliminar:** borra el objeto completo y corrige la coma si es necesario.
+
+El `code` se utiliza en el Data Matrix y debe seguir siendo único y estable. `keywords` define expresiones reconocibles en las justificaciones. `priority` y `excludeKeywords` son opcionales.
 
 El `id` debe ser único y contener sólo minúsculas, números o guiones bajos. El `text` debe ser legible y tener al menos cuatro palabras. Evita incluir datos personales o afirmar autorizaciones que no constan.
 
