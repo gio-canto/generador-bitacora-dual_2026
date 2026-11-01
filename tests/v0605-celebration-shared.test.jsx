@@ -21,7 +21,7 @@ describe("0.60.5 · despedida compartida",()=>{
     expect(generic.content.youtubeId).toBe("YUC4FH3tSOk");
     expect(graduation.content.youtubeId).toBe(generic.content.youtubeId);
     expect(generic.content.body).toContain("última bitácora");
-    expect(graduation.content.body).toContain("última bitácora");
+    expect(graduation.content.body).toContain("la última vez que nos veremos");
     const byGraduation=eligibleMessages(config,{trigger:"final-bitacora",
       date:"2027-07-22",profile:{school:"cbtis-134",specialty:"Programación"},ignoreSeen:true})
       .filter(x=>x.trigger.type==="graduation");
