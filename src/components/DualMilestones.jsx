@@ -37,6 +37,28 @@ export default function DualMilestones({state,specialty="",company="",onReportSt
        </div>
        <p>840 horas en total · 480 + 360 adicionales</p>
      </article>
+     <article className="ds-milestone-summary-card">
+       <span>Hito 3 · Seguimiento ampliado</span>
+       <strong>{number(model.expandedReached)} <small>/ {number(model.totalStudents)}</small></strong>
+       <div className="ds-milestone-progress" role="progressbar"
+         aria-label="Alumnos que alcanzaron las 1,000 horas"
+         aria-valuenow={model.expandedReached} aria-valuemin={0}
+         aria-valuemax={model.totalStudents||1}>
+         <span style={{width:100*model.expandedReached/Math.max(1,model.totalStudents)+"%"}}/>
+       </div>
+       <p>1,000 horas acumuladas</p>
+     </article>
+     <article className="ds-milestone-summary-card ds-milestone-professional">
+       <span>Referencia · Límite teórico</span>
+       <strong>{number(model.theoreticalLimitReached)} <small>/ {number(model.totalStudents)}</small></strong>
+       <div className="ds-milestone-progress" role="progressbar"
+         aria-label="Alumnos que alcanzaron las 1,504 horas"
+         aria-valuenow={model.theoreticalLimitReached} aria-valuemin={0}
+         aria-valuemax={model.totalStudents||1}>
+         <span style={{width:100*model.theoreticalLimitReached/Math.max(1,model.totalStudents)+"%"}}/>
+       </div>
+       <p>1,504 horas · referencia, sin bloqueo</p>
+     </article>
    </div>
    <div className="ds-milestones-metadata">
      <span>{number(model.socialOnly)} completaron solo el primer hito</span>
@@ -48,7 +70,9 @@ export default function DualMilestones({state,specialty="",company="",onReportSt
        <span className="ds-lifetime-caption">Ordenados por horas acumuladas</span>
      </div>
      {model.students.length?model.students.map(row=>{
-       const status=row.professionalReached?"840 h alcanzadas":
+       const status=row.theoreticalLimitReached?"1,504 h alcanzadas":
+         row.expandedReached?"1,000 h alcanzadas":
+         row.professionalReached?"840 h alcanzadas":
          row.socialReached?"480 h alcanzadas":row.hasData?"En progreso":"Sin registros";
        return <article className="ds-milestone-person" key={row.id}>
          <div className="ds-milestone-person-top">
@@ -71,14 +95,16 @@ export default function DualMilestones({state,specialty="",company="",onReportSt
            <span style={{width:row.progressPercent+"%"}}/>
          </div>
          <div className="ds-milestone-person-bottom">
-           <span>{row.professionalReached?"Ambos hitos completados":
-             row.socialReached?asHours(row.professionalRemainingHours)+" para el segundo hito":
-             asHours(row.socialRemainingHours)+" para el primer hito"}</span>
+           <span>{row.theoreticalLimitReached?"Alcanzó la referencia teórica":
+             row.expandedReached?asHours(row.theoreticalLimitRemainingHours)+" hasta 1,504 h":
+             row.professionalReached?asHours(row.expandedRemainingHours)+" hasta 1,000 h":
+             row.socialReached?asHours(row.professionalRemainingHours)+" hasta 840 h":
+             asHours(row.socialRemainingHours)+" hasta 480 h"}</span>
            <span>{number(row.weeksWithData)} semanas con datos</span>
          </div>
        </article>;
      }):<p className="ds-empty">No hay alumnos para esta selección.</p>}
    </section>
-   <p className="ds-milestone-footnote">Los hitos son referencias de horas registradas; su reconocimiento oficial depende de las disposiciones y validaciones del plantel. El cálculo histórico no cambia al seleccionar una semana o mes, pero sí respeta los filtros de especialidad y empresa.</p>
+   <p className="ds-milestone-footnote">Los cuatro umbrales son referencias de seguimiento. Las 1,504 horas representan un límite teórico de comparación, no un tope automático; su reconocimiento oficial depende de las disposiciones y validaciones del plantel. El cálculo histórico no cambia al seleccionar una semana o mes, pero sí respeta los filtros de especialidad y empresa.</p>
  </section>;
 }
