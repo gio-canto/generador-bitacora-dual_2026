@@ -68,6 +68,8 @@ import {generateStudentDossierPdf} from "../services/student-dossier-report.js";
 import {generateStatisticsReportPdf} from "../services/statistics-report.js";
 import {calculateStudentInsights} from "../services/student-insights.js";
 import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
+import ReasonInbox from "./ReasonInbox.jsx";
+import { decideReasonReview } from "../services/reason-reviews.js";
 import RegistryQuickSidebar from "./RegistryQuickSidebar.jsx";
 import {acknowledgeBackupReminder,observeBackupActivity,shouldRemindBackup} from "../services/backup-reminder.js";
 import { parseStudentSpreadsheet } from "../services/student-spreadsheet.js";
@@ -603,6 +605,17 @@ export default function DeliveryRegistry({ onClose }) {
     return saved;
   };
 
+
+  const saveReasonReview = (item) => {
+    try {
+      commit(current => decideReasonReview(current, item));
+      notify("success", "Motivo revisado",
+        item.code === 63 ? "Se conserva como Otro motivo." : "Clasificación actualizada en las estadísticas.");
+    } catch(error) {
+      showNotice("error", "No se pudo guardar la clasificación",
+        error?.message || "Vuelve a intentarlo.");
+    }
+  };
 
   const saveBackup=(savedState=state,showMessage=false)=>{
     try{
@@ -1945,6 +1958,10 @@ export default function DeliveryRegistry({ onClose }) {
     const lateCount = scanQueue.filter(
       (item) => item.status === "entregado_tarde",
     ).length;
+    const otherReasons = scanQueue.reduce((total,item)=>total+
+      (item.statistics?.entries || []).filter(day=>
+        (day.status === "falta" || day.status === "sin_labores") &&
+        day.reasonCode === 63).length,0);
     notify(
       scanQueue.length ? "success" : "info",
       scanQueue.length ? "Registro terminado" : "Sin nuevas lecturas",
@@ -1952,6 +1969,7 @@ export default function DeliveryRegistry({ onClose }) {
         ? scanQueue.length +
             " entregas registradas" +
             (lateCount ? " · " + lateCount + " a destiempo" : "") +
+            (otherReasons ? " · " + otherReasons + " motivos por revisar en la campanita" : "") +
             " · Archivo guardado"
         : "No se registraron entregas en esta sesión.",
     );
@@ -2271,6 +2289,9 @@ export default function DeliveryRegistry({ onClose }) {
           <span className="delivery-mobile-app-name">Registro Dual</span>
         </button>
         <div className="delivery-top-actions">
+          {started && view !== "scanner" && <ReasonInbox state={state}
+            backupPending={backupReminderOpen}
+            onBackup={()=>saveBackup(state,true)} onReview={saveReasonReview}/>}
           {started&&view!=="scanner"&&<button className="btn delivery-quick-trigger" type="button"
             aria-label="Abrir accesos rápidos" aria-expanded={quickOpen}
             aria-controls="delivery-quick-sidebar" onClick={()=>setQuickOpen(value=>!value)}>
