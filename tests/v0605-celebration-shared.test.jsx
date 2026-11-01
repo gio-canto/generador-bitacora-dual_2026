@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import React from "react";
 import {readFileSync} from "node:fs";
-import {afterEach,describe,expect,it,vi,act} from "vitest";
-import {cleanup,fireEvent,render,screen} from "@testing-library/react";
+import {afterEach,describe,expect,it,vi} from "vitest";
+import {act,cleanup,fireEvent,render,screen} from "@testing-library/react";
 import config from "../src/data/generator-messages.json";
 import {eligibleMessages,validateMessageConfig} from "../src/services/generator-message-rules.js";
 import {GeneratorMessageCard} from "../src/components/GeneratorMessageHost.jsx";
