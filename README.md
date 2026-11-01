@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.4-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.5-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,14 @@
 </div>
 
 ---
+
+## v0.60.5 · Felicitaciones compartidas y modo graduación en Debug
+
+La felicitación de **última bitácora Dual** y la de **cuarta generación del CBTis 134** comparten la presentación de celebración, el video `YUC4FH3tSOk`, bucle hasta cerrar y ajustes de audio. Se mantienen sus activaciones específicas: la primera sólo después de confirmar y generar la última bitácora; la segunda los días 22 y 23 de julio de 2027, con tema especial del 19 al 23. El sistema evita superponer ambas felicitaciones.
+
+El video intenta activar el audio automáticamente al cargar mediante la API de YouTube, con volumen de 90 %. Los navegadores pueden impedirlo y la reproducción continúa silenciada si es necesario. Se mantiene el botón **Activar audio**, sin leyenda adicional.
+
+**Debug → Efemérides** permite ejecutar el tema de graduación y repetir la felicitación por días, como los efectos especiales del calendario, sin cambiar registros reales.
 
 ## v0.60.4 · Reproducción, graduación y Vista adaptable
 

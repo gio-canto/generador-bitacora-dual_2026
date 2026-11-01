@@ -18,7 +18,9 @@ describe("v0.60.4 · reproductor y modal de graduación",()=>{
     expect(src).toContain("autoplay=1");
     expect(src).toContain("mute=1");
     expect(src).toContain("enablejsapi=1");
-    expect(screen.getByText("El video inicia sin sonido.")).toBeTruthy();
+    expect(src).toContain("loop=1");
+    expect(src).toContain("playlist=YUC4FH3tSOk");
+    expect(screen.queryByText("El video inicia sin sonido.")).toBeNull();
     expect(screen.getByRole("button",{name:"Activar audio"})).toBeTruthy();
     expect(screen.getByRole("button",{name:"Cerrar mensaje"})).toBeTruthy();
     fireEvent.click(screen.getByRole("button",{name:"Cerrar mensaje"}));

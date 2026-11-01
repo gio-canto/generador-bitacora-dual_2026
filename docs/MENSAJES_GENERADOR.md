@@ -85,3 +85,12 @@ Los videos de YouTube se cargan con `autoplay=1&mute=1&playsinline=1&enablejsapi
 
 En **Debug → Vista adaptable** se puede elegir **Debug completo**, seleccionar una experiencia visual y simularla a anchos de 320 a 1280 px. Están incluidos graduación, mensajes, editor de eventos, efemérides, notificaciones, campana, avisos, PDF y cámara. Los controles dentro del iframe son interactivos. La graduación puede ensayarse en cualquier momento, independientemente de las fechas de publicación. Las simulaciones no modifican las bitácoras reales.
 
+
+## Felicitaciones compartidas (0.60.5)
+
+Los eventos `fin-dual` y `graduacion-cbtis134-dual-generacion4-2027` conservan sus IDs y activadores, pero emplean los mismos atributos `celebration: {"kind":"dual","loopVideo":true,"autoplayAudio":true}`. Los dos reproducen `YUC4FH3tSOk` con la estética de celebración. **La última bitácora** sólo se confirma al generar el PDF con la opción final marcada; la felicitación de cuarta generación conserva las fechas del 22 y 23 de julio de 2027. En esos dos días la lógica de mensajes evita que el evento general se superponga al de graduación.
+
+El bucle de YouTube utiliza `loop=1` y `playlist` con el mismo video; termina cuando se cierra la ventana y se desmonta el reproductor. Para el audio, el video empieza cargando silenciado y el programa solicita `setVolume(90)` y `unMute` automáticamente cuando se carga el reproductor. Si el navegador bloquea esta operación, se intenta mantener el video reproduciéndose sin sonido. **No es posible garantizar sonido automático en todos los navegadores**: la política del dispositivo y YouTube prevalecen. Se conserva el botón «Activar audio», sin texto de instrucciones adicional.
+
+Desde **Debug → Efemérides** se puede simular el periodo de graduación y reproducir nuevamente su video usando el JSON publicado. Los botones de 19, 22 y 23 de julio de 2027 no modifican la fecha real ni las bitácoras. Las pruebas quedan aisladas de la memoria normal de mensajes leídos.
+
