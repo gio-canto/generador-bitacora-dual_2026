@@ -37,6 +37,8 @@ export default function DebugInboxLab({base}){
   const [storage,setStorage]=useState(storageFactory);
   const [revision,setRevision]=useState(0);
   const [sample,setSample]=useState("La empresa suspendió actividades porque fumigaron el lugar.");
+  const [tone,setTone]=useState("normal");
+  const [soundReport,setSoundReport]=useState("");
   const state=useMemo(()=>mockState(base,flags),[base,flags]);
   const notices=useMemo(()=>getRegistryNotifications(state,{now:new Date("2026-11-02T12:00:00Z"),backupPending:flags.backup}),[state,flags.backup]);
   const seen=getSeenInbox(storage);
@@ -49,10 +51,18 @@ export default function DebugInboxLab({base}){
         </label>)}
     </div>
     <div className="debug-row">
-      <button className="debug-button" onClick={()=>playInboxBell()}>Probar sonido de campana</button>
+      <label className="debug-field" style={{maxWidth:220}}>Sonido
+        <select aria-label="Tipo de campanada" value={tone} onChange={e=>setTone(e.target.value)}>
+          <option value="normal">Campana normal</option><option value="soft">Campana suave</option><option value="double">Campana doble</option>
+        </select></label>
+      <button className="debug-button primary" onClick={async()=>{
+        const played=await playInboxBell({tone});
+        setSoundReport(played?"Campanada reproducida.":"El navegador bloqueó el sonido o el dispositivo no admite Web Audio.");
+      }}>Escuchar campana</button>
       <button className="debug-button" onClick={()=>{markInboxSeen(storage,notices);setRevision(x=>x+1);}}>Simular lectura</button>
       <button className="debug-button" onClick={()=>{setStorage(storageFactory());setRevision(x=>x+1);}}>Restablecer simulación</button>
     </div>
+    {soundReport&&<p role="status">{soundReport}</p>}
     <div className="debug-test-list">
       {notices.length?notices.map(n=><div className="debug-test pass" key={n.id}>
         <strong>{n.title} · {n.severity} · {seen[n.id]?"Visto":"Nuevo"}</strong>
