@@ -6,25 +6,12 @@
 import { getGeneratorGreeting } from "./generator-greeting.js";
 import { startGeneratorMobileAvatar } from "../components/GeneratorMobileAvatar.jsx";
 
-export const GENERATOR_LAYOUT_KEY = "bitacora_dual_generator_layout_v1";
-export const GENERATOR_LAYOUTS = ["auto", "mobile", "desktop"];
 const VIEW_NAMES = ["home", "capture", "history", "profile", "more"];
-
-function preferredLayout() {
-  try {
-    const value = localStorage.getItem(GENERATOR_LAYOUT_KEY);
-    return GENERATOR_LAYOUTS.includes(value) ? value : "auto";
-  } catch {
-    return "auto";
-  }
-}
+// La presentación depende del ancho real de pantalla, nunca de una preferencia heredada.
 function currentBreakpoint() {
   return typeof matchMedia === "function"
     ? matchMedia("(max-width: 760px)")
     : { matches: typeof innerWidth === "number" && innerWidth <= 760 };
-}
-function safeWriteLayout(layout) {
-  try { localStorage.setItem(GENERATOR_LAYOUT_KEY, layout); } catch {}
 }
 function displayDate(value, index) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return `Día ${index + 1}`;
@@ -49,7 +36,7 @@ export function startGeneratorMobile() {
     element.parentNode.insertBefore(anchor, element);
     return { element, anchor };
   });
-  let layout = preferredLayout();
+  // La primera vista es Inicio, aunque el borrador siga disponible en Capturar.
   const breakpoint = currentBreakpoint();
   let active = false;
   let view = "home";
@@ -158,7 +145,7 @@ export function startGeneratorMobile() {
     updateProgress();
   }
   function syncLayout() {
-    const next = layout === "mobile" || (layout === "auto" && breakpoint.matches);
+    const next = breakpoint.matches;
     if (next !== active) {
       active = next;
       // Preserve the same editor DOM; only switch its surrounding presentation.
@@ -167,28 +154,13 @@ export function startGeneratorMobile() {
       window.dispatchEvent(new Event("bitacora-generator-layout"));
       if (!active && history) history.open = false;
     }
-    mobile.querySelectorAll("[data-gm-mode]").forEach((button) => {
-      const selected = button.dataset.gmMode === layout;
-      button.classList.toggle("active", selected);
-      button.setAttribute("aria-pressed", String(selected));
-    });
     mobile.setAttribute("aria-hidden", String(!active));
     if (active) changeView(view);
     updateDayTabs();
   }
-  function setLayout(next) {
-    if (!GENERATOR_LAYOUTS.includes(next)) return;
-    layout = next;
-    safeWriteLayout(next);
-    syncLayout();
-  }
   function handleNavigation(event) {
-    const button = event.target.closest?.("[data-gm-nav],[data-gm-action],[data-gm-mode]");
+    const button = event.target.closest?.("[data-gm-nav],[data-gm-action]");
     if (!button || !mobile.contains(button)) return;
-    if (button.dataset.gmMode) {
-      setLayout(button.dataset.gmMode);
-      return;
-    }
     const target = button.dataset.gmNav;
     if (target) {
       changeView(target);
@@ -212,15 +184,12 @@ export function startGeneratorMobile() {
     }
   }
   mobile.addEventListener("click", handleNavigation);
-  const desktopModeButton = document.getElementById("generatorModeBtn");
-  const onDesktopModeClick = () => { setLayout("mobile"); changeView("home"); };
-  desktopModeButton?.addEventListener("click", onDesktopModeClick);
   const onExternalReview = () => { if (active) changeView("capture"); };
   window.addEventListener("bitacora-open-pdf-review", onExternalReview);
   window.addEventListener("bitacora-edit-name", onExternalReview);
   const onStepChange = () => { updateProgress(); if (active) changeView("capture"); };
   window.addEventListener("bitacora-step-change", onStepChange);
-  const onBreakpoint = () => { if (layout === "auto") syncLayout(); };
+  const onBreakpoint = () => { syncLayout(); };
   if (breakpoint.addEventListener) breakpoint.addEventListener("change", onBreakpoint);
   else if (breakpoint.addListener) breakpoint.addListener(onBreakpoint);
   syncLayout();
@@ -235,7 +204,6 @@ export function startGeneratorMobile() {
     daysObserver.disconnect();
     dayHost?.removeEventListener("change", onDayDateChange);
     mobile.removeEventListener("click", handleNavigation);
-    desktopModeButton?.removeEventListener("click", onDesktopModeClick);
     window.removeEventListener("bitacora-open-pdf-review", onExternalReview);
     window.removeEventListener("bitacora-edit-name", onExternalReview);
     window.removeEventListener("bitacora-step-change", onStepChange);
