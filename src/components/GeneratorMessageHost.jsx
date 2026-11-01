@@ -63,7 +63,10 @@ export function GeneratorMessageCard({event,onClose}){
         const payload=typeof e.data==="string"?JSON.parse(e.data):e.data;
         if(payload?.event==="onReady"&&event.celebration?.autoplayAudio)
           requestYoutubeAudio(videoFrame.current);
-        if(payload?.event==="onStateChange"&&payload.info===1)playing.current=true;
+        if(payload?.event==="onStateChange"){
+          if(payload.info===1)playing.current=true;
+          if(payload.info===0||payload.info===2)playing.current=false;
+        }
       }catch{/* mensajes de terceros no pertinentes */}
     };
     window.addEventListener("message",youtubeMessage);
