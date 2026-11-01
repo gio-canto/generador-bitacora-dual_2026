@@ -21,9 +21,10 @@ describe("0.60.5 · despedida compartida",()=>{
     expect(generic.content.youtubeId).toBe("YUC4FH3tSOk");
     expect(graduation.content.youtubeId).toBe(generic.content.youtubeId);
     expect(generic.content.body).toContain("última bitácora");
-    expect(graduation.content.body).toContain("última bitácora");
-    const byGraduation=eligibleMessages(config,{trigger:"graduation",
-      date:"2027-07-22",profile:{school:"cbtis-134",specialty:"Programación"},ignoreSeen:true});
+    expect(graduation.content.body).toContain("la última vez que nos veremos");
+    const byGraduation=eligibleMessages(config,{trigger:"final-bitacora",
+      date:"2027-07-22",profile:{school:"cbtis-134",specialty:"Programación"},ignoreSeen:true})
+      .filter(x=>x.trigger.type==="graduation");
     const byFinal=eligibleMessages(config,{trigger:"final-bitacora",
       date:"2027-05-20",profile:{school:"otro",specialty:"Programación"},ignoreSeen:true});
     expect(byGraduation.map(x=>x.id)).toEqual([graduation.id]);
@@ -80,7 +81,7 @@ describe("0.60.5 · Debug como efemérides",()=>{
     expect(src).toContain('classList.toggle("debug-graduation-preview"');
     expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value)");
     expect(src).toContain("graduationPreviewDates(event)");
-    expect(src).toContain("setAdaptivePreview(matched?.trigger?.videoDates?.includes(value)?matched:null)");
+    expect(src).toContain('matched.trigger.showOn!=="final-bitacora"?matched:null');
     expect(src).toContain('document.body.classList.remove("debug-graduation-preview")');
     expect(src).not.toContain("debug-graduation-controls");
     expect(src).not.toContain("debug-graduation-stage");

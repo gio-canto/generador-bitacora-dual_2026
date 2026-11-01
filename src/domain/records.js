@@ -1,7 +1,7 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
-export const VERSION = "0.60.6";
-export const RELEASE = "Graduación adaptable como efeméride de página completa";
+export const VERSION = "0.60.7";
+export const RELEASE = "Despedida programada tras la última bitácora";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {

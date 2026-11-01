@@ -37,7 +37,7 @@ const initialDate=event=>event?.trigger?.videoDates?.[0]||
 const newEvent=(graduation=false)=>graduation?({
   id:"graduacion-"+Date.now().toString(36),revision:1,enabled:false,
   presentation:"fullscreen",trigger:{type:"graduation",startDate:"2027-07-19",endDate:"2027-07-23",
-    videoDates:["2027-07-22","2027-07-23"]},
+    videoDates:["2027-07-22","2027-07-23"],showOn:"final-bitacora"},
   audience:{schools:["cbtis-134"],specialties:"all"},
   content:{title:"¡Felicidades por concluir Educación Dual!",body:"Gracias por formar parte de esta generación.",
     youtubeId:null,action:null},
@@ -92,8 +92,10 @@ export default function EventEditorDebug(){
   const ctx={profile,profileId:"debug-perfil",date:simDate,storage:simMemory,sessionStorage:simMemory};
   const simulatedConfig=useMemo(()=>({...config,events:config.events.map((event,index)=>
     index===selected?{...event,enabled:true}:event)}),[config,selected]);
+  const simulatedTrigger=current?.trigger.type==="graduation"&&current.trigger.showOn==="final-bitacora"
+    ? "final-bitacora":current?.trigger.type;
   const eligible=current?eligibleMessages(simulatedConfig,{
-    ...ctx,trigger:current.trigger.type,ignoreSeen:true
+    ...ctx,trigger:simulatedTrigger,ignoreSeen:true
   }).some(e=>e.id===current.id):false;
   const seen=current&&hasSeenMessage(current,ctx);
   const themeActive=Boolean(current?.trigger.type==="graduation"&&activeGraduation(simulatedConfig,ctx)?.id===current.id);
@@ -223,7 +225,7 @@ export default function EventEditorDebug(){
       <StudioChoices label="Momento de activación" value={current.trigger.type} onChange={type=>{
         if(type===current.trigger.type)return;
         if(type==="graduation")update({
-          trigger:{type,startDate:"2027-07-19",endDate:"2027-07-23",videoDates:["2027-07-22","2027-07-23"]},
+          trigger:{type,startDate:"2027-07-19",endDate:"2027-07-23",videoDates:["2027-07-22","2027-07-23"],showOn:"final-bitacora"},
           presentation:"fullscreen",frequency:"once-per-day",
           graduation:current.graduation||{label:"Generación Dual",theme:"celebration"}
         });
@@ -234,6 +236,14 @@ export default function EventEditorDebug(){
         {id:"final-bitacora",title:"Al generar la última bitácora",description:"Después de confirmar el PDF",icon:ClipboardText},
         {id:"graduation",title:"Graduación con fechas de video",description:"Tema visual y felicitación",icon:GraduationCap}
       ]}/>
+      {current.trigger.type==="graduation"&&<StudioChoices
+        label="¿Cuándo mostrar la felicitación?"
+        value={current.trigger.showOn||"date"}
+        onChange={showOn=>detail("trigger",{showOn})}
+        items={[
+          {id:"final-bitacora",title:"Después de la última bitácora",description:"Tras confirmar y generar el PDF"},
+          {id:"date",title:"Al abrir en las fechas elegidas",description:"Comportamiento de versiones anteriores"}
+        ]}/>}
       <StudioSelect label="¿Cuántas veces?" value={current.frequency} items={frequencyItems}
         onChange={frequency=>update({frequency})}/>
       <div className="es-hint">La graduación puede usar varios días de video. Cada día se recuerda por separado si eliges «Una vez por día».</div>
@@ -251,7 +261,7 @@ export default function EventEditorDebug(){
             onChange={date=>detail("trigger",{date})}/>}
       </>}
       {current.trigger.type==="graduation"&&<>
-        <div className="es-hint"><strong>Dos momentos distintos:</strong> durante el periodo se muestra el diseño de graduación; sólo los días elegidos se presenta la felicitación con video.</div>
+        <div className="es-hint"><strong>Dos momentos distintos:</strong> durante el periodo cambia el diseño del generador. El video sólo aparece en los días elegidos{current.trigger.showOn==="final-bitacora"?", después de generar la última bitácora.":"."}</div>
         <div className="es-calendar-pair">
           <StudioCalendar label="Inicio de graduación" value={current.trigger.startDate||""}
             onChange={startDate=>detail("trigger",{startDate})}/>
@@ -310,6 +320,8 @@ export default function EventEditorDebug(){
           <StudioSelect label="Plantel de prueba" value={simSchool} items={schoolOptions} onChange={setSimSchool}/>
           <StudioSelect label="Especialidad de prueba" value={simSpecialty} items={specialtyOptions} onChange={setSimSpecialty}/>
           <div className="es-status">
+            {current.trigger.type==="graduation"&&current.trigger.showOn==="final-bitacora"&&
+              <small>Prueba del aviso después del PDF de la última bitácora.</small>}
             <strong>{eligible?"Coincide con las reglas":"No coincide con las reglas"}</strong>
             <small>{seen?"Visto en esta simulación":"Todavía no visto"} · {current.enabled?"Evento publicado activo":"Evento desactivado: prueba forzada"}</small>
           </div>

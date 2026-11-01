@@ -38,6 +38,7 @@ describe("0.60.6 · graduación como efeméride de página completa",()=>{
     expect(src).toContain('document.body.classList.remove("debug-graduation-preview")');
     expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value)");
     expect(src).toContain("setGraduationPreview(null)");
+    expect(src).toContain("Simular entrega de última bitácora");
     expect(src).not.toContain("showGraduationTest");
     expect(src).not.toContain("debug-graduation-controls");
     expect(src).not.toContain('value="graduation"');

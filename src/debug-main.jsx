@@ -431,7 +431,8 @@ function DebugPage() {
     });
     const matched=graduationPreviewForDate(eventConfig,eventId,value);
     setGraduationPreview(matched);
-    setAdaptivePreview(matched?.trigger?.videoDates?.includes(value)?matched:null);
+    setAdaptivePreview(matched?.trigger?.videoDates?.includes(value)&&
+      matched.trigger.showOn!=="final-bitacora"?matched:null);
   };
 
   useEffect(()=>{
@@ -647,10 +648,17 @@ function DebugPage() {
                   {day===event.trigger.startDate?"Inicio · ":"Video · "}{day}
                 </button>))}
           </div>}
-          {graduationPreview&&<p className="debug-note" role="status">
-            Vista de graduación activa: {graduationPreview.graduation?.label||graduationPreview.content.title}.
-            {graduationPreview.trigger.videoDates?.includes(calendarDate)?" Felicitación en pantalla.":""}
-          </p>}
+          {graduationPreview&&<div className="debug-row">
+            <p className="debug-note" role="status">
+              Vista de graduación activa: {graduationPreview.graduation?.label||graduationPreview.content.title}.
+            </p>
+            {graduationPreview.trigger.showOn==="final-bitacora"&&
+              graduationPreview.trigger.videoDates?.includes(calendarDate)&&
+              <button type="button" className="debug-button"
+                onClick={()=>setAdaptivePreview(graduationPreview)}>
+                Simular entrega de última bitácora
+              </button>}
+          </div>}
           <pre className="debug-output">{JSON.stringify(calendarState, null, 2)}</pre>
         </Card>
         <Card id="debug-editor" title="Editor de eventos" description="Importa, modifica, prueba y exporta el JSON de mensajes." wide>

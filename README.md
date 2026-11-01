@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.6-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.7-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.7 · Video de graduación después de la última bitácora
+
+El mensaje de la cuarta generación se actualizó a una despedida en primera persona que comienza **«Gracias por todo. Un año después, estamos aquí…»**. El tema visual sigue activo durante el rango de graduación; el video se presenta **únicamente después de confirmar que se trata de la última bitácora y generar correctamente su PDF**, dentro de los días elegidos. Ya no aparece automáticamente al abrir el generador.
+
+El formato reusable añade `trigger.showOn: "final-bitacora"` a la graduación. El editor visual usa esta regla por defecto al crear generaciones nuevas y permite conservar el comportamiento anterior en eventos históricos. Si coinciden la despedida general y una graduación programada, se muestra sólo la correspondiente. Debug permite **simular la entrega de última bitácora** para reproducir el video; elegir la fecha sólo activa la apariencia especial. Se mantienen el tema temporal, video en bucle, cierre y reglas de audiencia.
 
 ## v0.60.6 · Graduación como efecto de página completa
 
