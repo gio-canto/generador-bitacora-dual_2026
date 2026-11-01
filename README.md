@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.7-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.8-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.8 · Publicación controlada en GitHub Pages
+
+Se ajustó el flujo `.github/workflows/pages.yml` para **serializar todas las publicaciones de `main`** y evitar que los trabajos de commits diferentes intenten desplegar al mismo tiempo. También se añadió una segunda verificación del SHA actual de `main`, después de las pruebas y la compilación y antes de subir el artefacto. Las ejecuciones de commits sustituidos se omiten y se conserva el botón manual de ejecución.
+
+Este cambio es preventivo y responde a un riesgo identificado en el flujo. **La causa específica del fallo previo de GitHub Pages no está confirmada** sin consultar el registro del trabajo fallido. No se modificaron bitácoras, formularios, estadísticas ni reglas de graduación.
 
 ## v0.60.7 · Video de graduación después de la última bitácora
 

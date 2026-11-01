@@ -10,9 +10,10 @@ on:
 permissions:
   contents: read
 
-# Un evento atrasado de un commit anterior no debe cancelar al SHA vigente.
+# Los pushes de main comparten grupo para impedir despliegues simultáneos.
+# Las solicitudes PR tienen refs propios. No se interrumpe una publicación activa.
 concurrency:
-  group: pages-${{ github.ref }}-${{ github.sha }}
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -20,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       stale: ${{ steps.fresh.outputs.stale }}
+      publish: ${{ steps.publish.outputs.ok }}
     steps:
       - uses: actions/checkout@v4
 
@@ -52,13 +54,26 @@ jobs:
       - run: npm run build
         if: steps.fresh.outputs.stale == 'false'
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Confirmar versión antes de publicar
+        id: publish
         if: github.ref == 'refs/heads/main' && steps.fresh.outputs.stale == 'false'
+        shell: bash
+        run: |
+          latest="$(git ls-remote origin refs/heads/main | cut -f1)"
+          if [[ "$latest" == "$GITHUB_SHA" ]]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "Main tiene un commit más reciente; no se publica el artefacto anterior."
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.publish.outputs.ok == 'true'
         with:
           path: dist
 
   deploy:
-    if: github.ref == 'refs/heads/main' && needs.build.outputs.stale == 'false'
+    if: github.ref == 'refs/heads/main' && needs.build.outputs.publish == 'true'
     needs: build
     permissions:
       pages: write

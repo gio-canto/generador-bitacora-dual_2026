@@ -71,7 +71,8 @@ describe("v0.60.3 · editor visual y configuración real",()=>{
 describe("v0.60.3 · FAQ público",()=>{
   it("actualiza notas recientes conservando el historial anterior",()=>{
     const html=readFileSync("faq/index.html","utf8");
-    expect(html).toContain("Versión 0.60.7");
+    expect(html).toContain("Versión 0.60.8");
+    expect(html).toContain("0.60.7 · Despedida");
     expect(html).toContain("0.60.6 · Graduación");
     expect(html).toContain("0.60.5 · Felicitaciones");
     expect(html).toContain("0.60.4 · Videos");

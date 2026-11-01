@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.60.8 · Control de concurrencia en GitHub Pages · 2026-10-31
+
+- Las ejecuciones de publicación de `main` comparten un grupo de concurrencia; no se cancelan publicaciones activas y se evita ejecutar varios despliegues simultáneos por diferencias de SHA.
+- Después de `npm test` y `npm run build`, se vuelve a verificar que el commit siga siendo el vigente en `main`. Sólo entonces se sube el artefacto y se habilita el trabajo de despliegue.
+- Las verificaciones para pull requests siguen aisladas, sin desplegar el sitio; `workflow_dispatch` conserva la posibilidad de ejecutar el despliegue desde GitHub Actions.
+- No cambian las funciones de la versión 0.60.7 ni sus datos; se agrega una prueba estática para evitar regresiones del workflow.
+- La corrección mitiga conflictos de publicación, pero no atribuye sin evidencia el fallo anterior a una causa específica.
+
 ## 0.60.7 · Despedida de graduación después del PDF final · 2026-10-31
 
 - Se actualiza el mensaje de la cuarta generación en `generator-messages.json` con despedida en primera persona: «Gracias por todo. Un año después, estamos aquí…». La revisión aumenta para reconocer el texto nuevo.
