@@ -21,15 +21,9 @@ README.md
 
 ## Esquema actual
 
-Durante la etapa beta se utiliza:
+El proyecto utilizó sufijos como `0.58.2-beta.1` en publicaciones anteriores. Desde la **0.59.0** se utiliza la secuencia `0.59.x` (por ejemplo, `0.59.1`). Mantén el formato de la versión vigente e incrementa el último segmento al publicar una nueva revisión, incluida una actualización documental pública.
 
-```text
-0.52.0-beta.N
-```
-
-`N` aumenta de forma consecutiva con cada publicación integrada a `main`.
-
-No reutilices un número ya publicado y no cambies el significado de una versión existente.
+No reutilices un número ya publicado ni cambies el significado de una versión anterior. La ausencia del sufijo `-beta` no constituye, por sí sola, una declaración de certificación institucional o madurez productiva.
 
 ## Qué debe hacer cada versión
 
