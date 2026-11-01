@@ -51,6 +51,7 @@ export default function EventEditorDebug(){
   const [source,setSource]=useState("");
   const [result,setResult]=useState("");
   const [preview,setPreview]=useState(null);
+  const [themePreview,setThemePreview]=useState(false);
   const [date,setDate]=useState("2026-12-01");
   const [school,setSchool]=useState(schools[0]?.id||"");
   const [specialty,setSpecialty]=useState(uniqueSpecialties[0]||"");
@@ -97,6 +98,7 @@ export default function EventEditorDebug(){
     const item=preset?graduationPreset():newMessage();
     setConfig(prev=>({...prev,events:[...prev.events,item]}));
     setSelected(config.events.length);setStep(1);setShowAdvanced(false);setResult("");
+    if(preset)setDate("2027-07-22");
   };
   const onClone=()=>{
     if(!current)return;
@@ -129,7 +131,11 @@ export default function EventEditorDebug(){
       </div>
       <div className="debug-event-list" role="list">
         {config.events.map((event,index)=><button key={event.id+"-"+index} type="button"
-          className={selected===index?"active":""} onClick={()=>{setSelected(index);setStep(1);setMulti(false);}}>
+          className={selected===index?"active":""} onClick={()=>{
+            setSelected(index);setStep(1);setMulti(false);
+            if(event.trigger.type==="graduation")
+              setDate(event.trigger.videoDates?.[0]||event.trigger.startDate||date);
+          }}>
           <strong>{event.content?.title||event.id}</strong>
           <small>{event.enabled?"Activo":"Desactivado"} · {event.presentation}</small>
         </button>)}
@@ -317,6 +323,21 @@ export default function EventEditorDebug(){
           <label>Especialidad <select value={specialty} onChange={e=>setSpecialty(e.target.value)}>
             {uniqueSpecialties.map(s=><option key={s}>{s}</option>)}</select></label>
         </div>
+        {current?.trigger.type==="graduation"&&<>
+          <button className="debug-button" onClick={()=>setThemePreview(x=>!x)}>
+            {themePreview?"Ocultar tema":"Probar diseño de graduación"}
+          </button>
+          {themePreview&&<div className="debug-graduation-preview" aria-label="Vista previa del diseño de graduación">
+            <header><strong>Generador de Bitácora Dual</strong><span>Inicio</span></header>
+            <section>
+              <small>GRADUACIÓN · EDUCACIÓN DUAL</small>
+              <h3>{current.graduation?.label||"Generación Dual"}</h3>
+              <p>Durante el periodo configurado cambia la apariencia del generador.
+                El video de felicitación se presenta únicamente en los días señalados.</p>
+              <div className="debug-graduation-mock-panel">Bitácora en progreso · Capturar</div>
+            </section>
+          </div>}
+        </>}
         <p role="status">Evento seleccionado: <strong>{matching?"Coincide":"No coincide"}</strong>
           {seen?" · Ya visto en esta prueba":""}
           {current?.trigger.type==="graduation"&&
