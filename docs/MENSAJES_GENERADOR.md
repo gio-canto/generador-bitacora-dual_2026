@@ -101,3 +101,14 @@ En **Debug → Efemérides**, introduce una fecha y pulsa «Mostrar» o utiliza 
 
 No hay una sección ni pestaña independiente de graduación. En Vista adaptable se usa la escena **Efemérides** de Debug completo. El motor admite varios eventos, distintas escuelas y graduaciones aún desactivadas, únicamente para las simulaciones: se fuerza el evento seleccionado en una configuración temporal, sin alterar el JSON publicado, los perfiles o las fechas reales. Cuando existan varios eventos, Debug permite elegir cuál simular.
 
+
+## Activación después de la última bitácora (0.60.7)
+
+**Comportamiento vigente para el evento de graduación publicado:** durante el intervalo `startDate`–`endDate`, el tema visual se aplica al generador de quienes cumplan la audiencia. **El video no aparece al abrir la página.** Solamente se muestra cuando se cumplen simultáneamente estos requisitos: (1) la fecha pertenece a `videoDates`; (2) el alumno está en el plantel/especialidad correspondiente; (3) seleccionó **«Esta es mi última bitácora de Educación Dual»**; (4) el PDF se generó y entregó exitosamente. Una nueva descarga después de haber visto el aviso no duplica la despedida general. En días distintos de los programados, el PDF final conserva la despedida general.
+
+El esquema de graduación añade `trigger.showOn: "final-bitacora"`. Éste es el valor **predeterminado para graduaciones nuevas** en Debug → Editor de eventos. Se puede elegir `"date"` para mostrar la felicitación al abrir en las fechas elegidas. Los JSON de graduaciones publicados anteriormente que no contienen `showOn` mantienen el comportamiento anterior y siguen siendo válidos. El rango y los días se pueden configurar para otras escuelas, generaciones o ciclos sin modificar código.
+
+La cuarta generación del CBTis 134 conserva el video `YUC4FH3tSOk`, fechas 19–23 de julio de 2027 y días de video 22–23; se actualiza el texto a una despedida de agradecimiento por las experiencias compartidas.
+
+Desde **Debug → Efemérides**, elegir una fecha aplica el tema completo y **no** abre la felicitación automáticamente cuando `showOn` indica PDF final. En los días de video aparece «Simular entrega de última bitácora», que reproduce el mismo mensaje sin alterar las bitácoras reales ni guardarlo como visto.
+
