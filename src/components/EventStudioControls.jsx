@@ -1,6 +1,6 @@
 
 import {useEffect,useId,useRef,useState} from "react";
-import {Check,ChevronDown,ChevronLeft,ChevronRight,CalendarDays,X,Upload,Copy} from "@phosphor-icons/react";
+import {Check,CaretDown,CaretLeft,CaretRight,CalendarDays,X,Upload,Copy} from "@phosphor-icons/react";
 
 export function StudioField({label,value,onChange,placeholder="",multiline=false,rows=4,help="",disabled=false}){
   const id=useId();
@@ -45,7 +45,7 @@ export function StudioSelect({label,items,value,onChange,help}){
   return <div ref={ref} className="es-field es-select-wrap">
     <span className="es-label">{label}</span>
     <button type="button" className="es-select-trigger" aria-haspopup="listbox" aria-expanded={open}
-      onClick={()=>setOpen(x=>!x)}>{selected?.title||"Seleccionar"}<ChevronDown size={17} aria-hidden="true"/></button>
+      onClick={()=>setOpen(x=>!x)}>{selected?.title||"Seleccionar"}<CaretDown size={17} aria-hidden="true"/></button>
     {open&&<div className="es-select-list" role="listbox" aria-label={label}>
       {items.map(item=><button key={item.id} type="button" role="option"
         aria-selected={item.id===value} className={item.id===value?"is-selected":""}
@@ -101,10 +101,10 @@ export function StudioCalendar({label,value,onChange,multiple=false,min="",max="
     <div className="es-calendar" aria-label={label}>
       <div className="es-calendar-header">
         <button type="button" onClick={()=>shift(-1)} disabled={Boolean(min&&previous<min.slice(0,7)+"-01")}
-          aria-label="Mes anterior"><ChevronLeft size={19}/></button>
+          aria-label="Mes anterior"><CaretLeft size={19}/></button>
         <strong><CalendarDays size={17}/>{monthName}</strong>
         <button type="button" onClick={()=>shift(1)} disabled={Boolean(max&&next>max)}
-          aria-label="Mes siguiente"><ChevronRight size={19}/></button>
+          aria-label="Mes siguiente"><CaretRight size={19}/></button>
       </div>
       <div className="es-calendar-grid">
         {weekdays.map((d,i)=><span key={i} className="es-weekday">{d}</span>)}
