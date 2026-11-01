@@ -45,6 +45,8 @@ export function validateMessageConfig(config) {
     const trigger=event?.trigger || {};
     if(trigger.type==="date" && !iso(trigger.date) && !/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(trigger.annualDate || "")) errors.push(at+"Fecha del evento inválida.");
     if(trigger.type==="graduation"){
+      if(trigger.showOn!=null && !["final-bitacora","date"].includes(trigger.showOn))
+        errors.push(at+"Momento de felicitación inválido.");
       if(!iso(trigger.startDate)||!iso(trigger.endDate)||trigger.startDate>trigger.endDate)
         errors.push(at+"Periodo de graduación inválido.");
       if(!Array.isArray(trigger.videoDates)||!trigger.videoDates.length||
@@ -73,7 +75,11 @@ function matchesAudience(event,profile={}){
 }
 function matchesTrigger(event,trigger,date){
   const spec=event.trigger || {};
-  if(spec.type !== trigger) return false;
+  // Compatibilidad: graduaciones anteriores, sin showOn, se mostraban en la
+  // fecha al abrir. Las nuevas sólo aparecen tras confirmar y generar el PDF.
+  const expected=spec.type==="graduation" && spec.showOn==="final-bitacora"
+    ? "final-bitacora" : spec.type;
+  if(expected !== trigger) return false;
   if(spec.startDate && date < spec.startDate || spec.endDate && date > spec.endDate) return false;
   if(spec.type==="date") return spec.date === date || spec.annualDate===date.slice(5);
   if(spec.type==="graduation") return spec.videoDates?.includes(date)===true;
@@ -115,4 +121,19 @@ export function activeGraduation(config,{profile={},date=mexicoDate()}={}){
   return config.events.filter(e=>e.enabled&&e.trigger?.type==="graduation"&&
     date>=e.trigger.startDate&&date<=e.trigger.endDate&&matchesAudience(e,profile))
     .sort((a,b)=>(b.priority||0)-(a.priority||0))[0]||null;
+}
+
+/** Prioriza la despedida programada sobre la genérica al terminar la última
+ * bitácora. Nunca se presentan dos despedidas para un mismo PDF. */
+export function finalBitacoraMessages(config,options={}){
+  const graduation=eligibleMessages(config,{...options,trigger:"final-bitacora"})
+    .filter(event=>event.trigger?.type==="graduation");
+  if(graduation.length)return graduation.slice(0,1);
+  // Si la graduación aplicable ya fue vista hoy, tampoco mostrar una despedida
+  // genérica al volver a descargar el mismo PDF.
+  const scheduled=eligibleMessages(config,{...options,trigger:"final-bitacora",ignoreSeen:true})
+    .some(event=>event.trigger?.type==="graduation");
+  if(scheduled)return [];
+  return eligibleMessages(config,{...options,trigger:"final-bitacora"})
+    .filter(event=>event.trigger?.type!=="graduation");
 }
