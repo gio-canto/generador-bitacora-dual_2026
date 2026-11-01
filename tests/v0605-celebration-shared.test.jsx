@@ -75,15 +75,16 @@ describe("0.60.5 · audio y reproductor",()=>{
   });
 });
 describe("0.60.5 · Debug como efemérides",()=>{
-  it("incluye botones para tema, video y días del JSON, sin alterar los registros",()=>{
+  it("aplica el tema de graduación a toda la página desde Efemérides, sin panel especial",()=>{
     const src=readFileSync("src/debug-main.jsx","utf8");
-    expect(src).toContain("Probar tema de graduación");
-    expect(src).toContain("Reproducir felicitación");
-    expect(src).toContain("Inicio del tema");
-    expect(src).toContain("Jueves · Felicitación");
-    expect(src).toContain("Viernes · Felicitación");
-    expect(src).toContain('setShowGraduationTest(true)');
-    expect(src).toContain("activeGraduation(eventConfig");
-    expect(src).toContain("setAdaptivePreview(null)");
+    expect(src).toContain('classList.toggle("debug-graduation-preview"');
+    expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value)");
+    expect(src).toContain("graduationPreviewDates(event)");
+    expect(src).toContain("setAdaptivePreview(matched?.trigger?.videoDates?.includes(value)?matched:null)");
+    expect(src).toContain('document.body.classList.remove("debug-graduation-preview")');
+    expect(src).not.toContain("debug-graduation-controls");
+    expect(src).not.toContain("debug-graduation-stage");
+    expect(src).not.toContain("CBTis 134");
+    expect(src).not.toContain("Probar tema de graduación");
   });
 });
