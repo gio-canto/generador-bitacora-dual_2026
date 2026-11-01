@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Bell, CheckCircle, WarningCircle, X } from "@phosphor-icons/react";
 import { pendingReasonReviews, reasonsForReview } from "../services/reason-reviews.js";
 import "../delivery-reason-inbox.css";
@@ -47,7 +48,7 @@ export default function ReasonInbox({ state, backupPending = false, onReview, on
       <Bell size={19} aria-hidden="true"/>
       {total > 0 && <span className="dual-inbox-counter">{total > 99 ? "99+" : total}</span>}
     </button>
-    {open && <div className="dual-inbox-backdrop" onMouseDown={event=>{
+    {open && createPortal(<div className="dual-inbox-backdrop" onMouseDown={event=>{
       if(event.target === event.currentTarget) {setOpen(false);trigger.current?.focus();}
     }}>
       <section className="dual-inbox-panel" role="dialog" aria-modal="true"
@@ -77,6 +78,6 @@ export default function ReasonInbox({ state, backupPending = false, onReview, on
           </div>}
         </div>
       </section>
-    </div>}
+    </div>, document.body)}
   </>;
 }
