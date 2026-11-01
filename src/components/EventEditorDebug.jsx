@@ -2,7 +2,7 @@ import {useMemo,useState} from "react";
 import {GeneratorMessageCard} from "./GeneratorMessageHost.jsx";
 import {
   getDefaultMessageConfig,validateMessageConfig,eligibleMessages,
-  markMessageSeen,hasSeenMessage
+  markMessageSeen,hasSeenMessage,activeGraduation
 } from "../services/generator-message-rules.js";
 import schools from "../data/schools.json";
 import "./event-editor-debug.css";
@@ -20,6 +20,22 @@ const newMessage=()=>({
   priority:0,frequency:"once",dismissible:true
 });
 const steps=["Eventos","Destinatarios","Cuándo","Mensaje","Revisar"];
+const daysInPeriod=(start,end)=>{
+  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(start||"")||!/^\\d{4}-\\d{2}-\\d{2}$/.test(end||"")||start>end)return [];
+  const result=[],cursor=new Date(start+"T12:00:00Z"),endDate=new Date(end+"T12:00:00Z");
+  for(let i=0;i<45&&cursor<=endDate;i++,cursor.setUTCDate(cursor.getUTCDate()+1))
+    result.push(cursor.toISOString().slice(0,10));
+  return result;
+};
+const graduationPreset=()=>({
+  ...newMessage(),id:"graduacion-"+Date.now().toString(36),enabled:false,presentation:"fullscreen",
+  trigger:{type:"graduation",startDate:"2027-07-19",endDate:"2027-07-23",
+    videoDates:["2027-07-22","2027-07-23"]},
+  audience:{schools:["cbtis-134"],specialties:"all"},frequency:"once-per-day",
+  content:{title:"¡Felicidades por concluir Educación Dual!",body:"Gracias por formar parte de esta generación.",
+    youtubeId:null,action:null},
+  graduation:{label:"Generación de Educación Dual",theme:"celebration"}
+});
 const audienceMode=({schools:target="all",specialties="all"}={})=>
   target==="all"&&specialties==="all"?"all":
   target==="all"?"specialty":specialties==="all"?"school":"school-specialty";
@@ -35,6 +51,7 @@ export default function EventEditorDebug(){
   const [source,setSource]=useState("");
   const [result,setResult]=useState("");
   const [preview,setPreview]=useState(null);
+  const [themePreview,setThemePreview]=useState(false);
   const [date,setDate]=useState("2026-12-01");
   const [school,setSchool]=useState(schools[0]?.id||"");
   const [specialty,setSpecialty]=useState(uniqueSpecialties[0]||"");
@@ -77,10 +94,11 @@ export default function EventEditorDebug(){
   });
   const matching=current?matches().some(x=>x.id===current.id):false;
   const seen=current?hasSeenMessage(current,{storage:testStorage,sessionStorage:testStorage,profileId,date}):false;
-  const startNew=()=>{
-    const item=newMessage();
+  const startNew=(preset=false)=>{
+    const item=preset?graduationPreset():newMessage();
     setConfig(prev=>({...prev,events:[...prev.events,item]}));
     setSelected(config.events.length);setStep(1);setShowAdvanced(false);setResult("");
+    if(preset)setDate("2027-07-22");
   };
   const onClone=()=>{
     if(!current)return;
@@ -103,7 +121,8 @@ export default function EventEditorDebug(){
     </div>
     {step===0&&<div className="debug-wizard-panel">
       <div className="debug-row">
-        <button className="debug-button primary" onClick={startNew}>Crear evento</button>
+        <button className="debug-button primary" onClick={()=>startNew(false)}>Crear evento</button>
+        <button className="debug-button" onClick={()=>startNew(true)}>Crear graduación</button>
         <button className="debug-button" disabled={!current} onClick={onClone}>Duplicar</button>
         <button className="debug-button danger" disabled={!current} onClick={()=>{
           if(!window.confirm("¿Eliminar este evento de la configuración?"))return;
@@ -112,7 +131,11 @@ export default function EventEditorDebug(){
       </div>
       <div className="debug-event-list" role="list">
         {config.events.map((event,index)=><button key={event.id+"-"+index} type="button"
-          className={selected===index?"active":""} onClick={()=>{setSelected(index);setStep(1);setMulti(false);}}>
+          className={selected===index?"active":""} onClick={()=>{
+            setSelected(index);setStep(1);setMulti(false);
+            if(event.trigger.type==="graduation")
+              setDate(event.trigger.videoDates?.[0]||event.trigger.startDate||date);
+          }}>
           <strong>{event.content?.title||event.id}</strong>
           <small>{event.enabled?"Activo":"Desactivado"} · {event.presentation}</small>
         </button>)}
@@ -181,10 +204,17 @@ export default function EventEditorDebug(){
         {[
           ["on-open","Al abrir el generador"],
           ["date","Por fecha"],
+          ["graduation","Graduación con fechas de video"],
           ["final-bitacora","Al generar la última bitácora"]
         ].map(([type,label])=><button type="button" key={type}
           aria-pressed={current.trigger.type===type} className={current.trigger.type===type?"active":""}
-          onClick={()=>update({trigger:type==="date"?{type,date:date}:{type}})}>
+          onClick={()=>{
+            if(type===current.trigger.type)return;
+            if(type==="graduation"){const preset=graduationPreset();
+              update({trigger:preset.trigger,presentation:"fullscreen",frequency:"once-per-day",
+                graduation:preset.graduation});}
+            else update({trigger:type==="date"?{type,date}:{type}});
+          }}>
           <strong>{label}</strong></button>)}
       </div>
       {current.trigger.type==="date"&&<div className="debug-event-fields">
@@ -197,21 +227,47 @@ export default function EventEditorDebug(){
           <label>Fecha <input type="date" value={current.trigger.date||""}
             onChange={e=>detail("trigger",{date:e.target.value})}/></label>}
       </div>}
-      <div className="debug-event-fields">
+      {current.trigger.type==="graduation"&&<>
+        <p>El diseño de graduación estará activo durante todo el periodo. El video aparecerá sólo en los días seleccionados.</p>
+        <div className="debug-event-fields">
+          <label>Inicio de la graduación
+            <input type="date" value={current.trigger.startDate||""}
+              onChange={e=>detail("trigger",{startDate:e.target.value})}/></label>
+          <label>Fin de la graduación
+            <input type="date" value={current.trigger.endDate||""}
+              onChange={e=>detail("trigger",{endDate:e.target.value})}/></label>
+        </div>
+        <fieldset className="debug-graduation-days">
+          <legend>Días para mostrar el video (elige uno o varios)</legend>
+          {daysInPeriod(current.trigger.startDate,current.trigger.endDate).map(day=>
+            <label key={day}><input type="checkbox" checked={(current.trigger.videoDates||[]).includes(day)}
+              onChange={e=>detail("trigger",{videoDates:e.target.checked?
+                [...new Set([...(current.trigger.videoDates||[]),day])].sort():
+                (current.trigger.videoDates||[]).filter(x=>x!==day)})}/>
+              {new Date(day+"T12:00:00Z").toLocaleDateString("es-MX",{timeZone:"UTC",weekday:"long",day:"numeric",month:"long",year:"numeric"})}</label>)}
+          {daysInPeriod(current.trigger.startDate,current.trigger.endDate).length===45&&
+            <p>El editor muestra los primeros 45 días. Puedes reducir el periodo o editar el JSON exportado.</p>}
+        </fieldset>
+      </>}
+      {current.trigger.type!=="graduation"&&<div className="debug-event-fields">
         <label>Inicio opcional <input type="date" value={current.trigger.startDate||""}
           onChange={e=>detail("trigger",{startDate:e.target.value||null})}/></label>
         <label>Fin opcional <input type="date" value={current.trigger.endDate||""}
           onChange={e=>detail("trigger",{endDate:e.target.value||null})}/></label>
-      </div>
+      </div>}
       <label>¿Cuántas veces? <select value={current.frequency} onChange={e=>update({frequency:e.target.value})}>
         <option value="once">Una vez por perfil</option>
         <option value="once-per-device">Una vez por dispositivo</option>
         <option value="once-per-year">Una vez cada año</option>
+        <option value="once-per-day">Una vez cada día programado</option>
         <option value="once-per-session">Una vez por sesión</option>
         <option value="always">Cada vez que se active</option>
       </select></label>
     </div>}
     {current&&step===3&&<div className="debug-wizard-panel">
+      {current.trigger.type==="graduation"&&<label>Nombre de la generación
+        <input value={current.graduation?.label||""}
+          onChange={e=>update({graduation:{...current.graduation,label:e.target.value,theme:"celebration"}})}/></label>}
       <label>Título <input value={current.content.title}
         onChange={e=>detail("content",{title:e.target.value})}/></label>
       <label>Texto <textarea rows="5" value={current.content.body}
@@ -221,7 +277,7 @@ export default function EventEditorDebug(){
           ["tab","Pestaña","Flotante"],
           ["medium","Mediano","Ventana"],
           ["fullscreen","Pantalla completa","Destacado"]
-        ].map(([mode,label,hint])=><button type="button" key={mode}
+        ].map(([mode,label,hint])=><button type="button" key={mode} disabled={current.trigger.type==="graduation"&&mode==="tab"}
           className={current.presentation===mode?"active":""} aria-pressed={current.presentation===mode}
           onClick={()=>update({presentation:mode})}><strong>{label}</strong><small>{hint}</small></button>)}
       </div>
@@ -267,7 +323,26 @@ export default function EventEditorDebug(){
           <label>Especialidad <select value={specialty} onChange={e=>setSpecialty(e.target.value)}>
             {uniqueSpecialties.map(s=><option key={s}>{s}</option>)}</select></label>
         </div>
-        <p role="status">Evento seleccionado: <strong>{matching?"Coincide":"No coincide"}</strong>{seen?" · Ya visto en esta prueba":""}</p>
+        {current?.trigger.type==="graduation"&&<>
+          <button className="debug-button" onClick={()=>setThemePreview(x=>!x)}>
+            {themePreview?"Ocultar tema":"Probar diseño de graduación"}
+          </button>
+          {themePreview&&<div className="debug-graduation-preview" aria-label="Vista previa del diseño de graduación">
+            <header><strong>Generador de Bitácora Dual</strong><span>Inicio</span></header>
+            <section>
+              <small>GRADUACIÓN · EDUCACIÓN DUAL</small>
+              <h3>{current.graduation?.label||"Generación Dual"}</h3>
+              <p>Durante el periodo configurado cambia la apariencia del generador.
+                El video de felicitación se presenta únicamente en los días señalados.</p>
+              <div className="debug-graduation-mock-panel">Bitácora en progreso · Capturar</div>
+            </section>
+          </div>}
+        </>}
+        <p role="status">Evento seleccionado: <strong>{matching?"Coincide":"No coincide"}</strong>
+          {seen?" · Ya visto en esta prueba":""}
+          {current?.trigger.type==="graduation"&&
+            (activeGraduation(config,{profile,date})?" · Tema de graduación activo":" · Tema fuera de periodo")}
+        </p>
         <div className="debug-row">
           <button className="debug-button" onClick={()=>setPreview(current)}>Vista previa</button>
           <button className="debug-button" onClick={()=>{

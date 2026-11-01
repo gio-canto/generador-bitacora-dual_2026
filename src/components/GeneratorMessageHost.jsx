@@ -2,8 +2,9 @@ import {useCallback,useEffect,useRef,useState} from "react";
 import {createPortal} from "react-dom";
 import {readProfileData,readActiveProfileId} from "../services/profile.js";
 import config from "../data/generator-messages.json";
-import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate} from "../services/generator-message-rules.js";
+import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation} from "../services/generator-message-rules.js";
 import "../generator-messages.css";
+import "../generator-graduation.css";
 
 const currentContext=()=>({profile:readProfileData(),profileId:readActiveProfileId(),date:mexicoDate(),
   storage:window.localStorage,sessionStorage:window.sessionStorage});
@@ -26,12 +27,12 @@ export function GeneratorMessageCard({event,onClose}){
     return ()=>{document.removeEventListener("keydown",keyboard);if(prior?.isConnected)prior.focus?.();};
   },[event.id,onClose,isTab]);
   const content=event.content||{};
-  return <div className={"generator-message-layer generator-message-"+event.presentation}
+  return <div className={"generator-message-layer generator-message-"+event.presentation+(event.trigger?.type==="graduation"?" generator-message-graduation":"")}
     onMouseDown={e=>{if(!isTab && e.target===e.currentTarget)onClose();}}>
     <section ref={container} tabIndex={-1} className="generator-message-card"
       role={isTab?"status":"dialog"} aria-modal={!isTab} aria-label={content.title}>
       <header className="generator-message-header">
-        <span>{event.presentation==="fullscreen"?"Mensaje especial":"Aviso"}</span>
+        <span>{event.trigger?.type==="graduation"?"Graduación Dual":event.presentation==="fullscreen"?"Mensaje especial":"Aviso"}</span>
         <button type="button" className="generator-message-close" onClick={onClose} aria-label="Cerrar mensaje">×</button>
       </header>
       {content.youtubeId && event.presentation!=="tab" && <div className="generator-message-video">
@@ -54,6 +55,7 @@ export default function GeneratorMessageHost(){
   const [active,setActive]=useState(null);
   const [historyOpen,setHistoryOpen]=useState(false);
   const [clock,setClock]=useState(0);
+  const [graduation,setGraduation]=useState(null);
   const queue=useRef([]);
   const context=useRef(null);
   const activeRef=useRef(null);
@@ -65,6 +67,12 @@ export default function GeneratorMessageHost(){
   const enqueue=useCallback((kind,extra={})=>{
     const ctx={...currentContext(),...extra};
     context.current=ctx;
+    // Si ese día se presenta el video de graduación, no duplicar la despedida
+    // genérica al descargar la última bitácora.
+    if(kind==="final-bitacora"){
+      const grad=activeGraduation(config,ctx);
+      if(grad?.trigger?.videoDates?.includes(ctx.date))return;
+    }
     const entries=eligibleMessages(config,{...ctx,trigger:kind});
     const known=new Set([activeRef.current?.id,...queue.current.map(x=>x.id)]);
     for(const entry of entries)if(!known.has(entry.id)){queue.current.push(entry);known.add(entry.id);}
@@ -77,17 +85,26 @@ export default function GeneratorMessageHost(){
     window.setTimeout(openNext,260);
   },[openNext]);
   useEffect(()=>{
-    const begin=()=>{enqueue("on-open");enqueue("date");};
+    const checkGraduation=()=>{
+      const ctx=currentContext();
+      const event=activeGraduation(config,ctx);
+      document.body.classList.toggle("generator-graduation-active",Boolean(event));
+      setGraduation(event);
+      enqueue("graduation");
+    };
+    const begin=()=>{enqueue("on-open");enqueue("date");checkGraduation();};
     const initial=window.setTimeout(begin,2400);
     const poll=window.setInterval(openNext,900);
+    const calendarPoll=window.setInterval(checkGraduation,60000);
     const final=e=>enqueue("final-bitacora",{profile:{...readProfileData(),...e.detail}});
     const showList=()=>{setHistoryOpen(true);setClock(x=>x+1);};
-    const focus=()=>{if(!document.hidden){enqueue("date");openNext();}};
+    const focus=()=>{if(!document.hidden){enqueue("date");checkGraduation();openNext();}};
     window.addEventListener("bitacora-final-bitacora",final);
     window.addEventListener("bitacora-profile",begin);
     window.addEventListener("bitacora-open-messages",showList);
     window.addEventListener("focus",focus);
-    return ()=>{window.clearTimeout(initial);window.clearInterval(poll);
+    return ()=>{window.clearTimeout(initial);window.clearInterval(poll);window.clearInterval(calendarPoll);
+      document.body.classList.remove("generator-graduation-active");
       window.removeEventListener("bitacora-final-bitacora",final);
       window.removeEventListener("bitacora-profile",begin);
       window.removeEventListener("bitacora-open-messages",showList);
@@ -100,6 +117,10 @@ export default function GeneratorMessageHost(){
     return visible.length>0;
   }):[];
   return createPortal(<>
+    {graduation&&<div className="generator-graduation-banner" role="status">
+      <span>Celebramos su formación dual</span>
+      <strong>{graduation.graduation?.label||graduation.content.title}</strong>
+    </div>}
     {active&&<GeneratorMessageCard key={active.id+active.revision} event={active} onClose={dismiss}/>}
     {historyOpen&&<div className="generator-message-layer generator-message-medium">
       <section className="generator-message-card" role="dialog" aria-modal="true" aria-label="Mis mensajes">

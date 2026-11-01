@@ -56,3 +56,14 @@ Debug muestra el **Editor de eventos** organizado en cinco pasos: **Eventos**, *
 Los videos se insertan al abrir el mensaje e intentan comenzar automáticamente **silenciados** mediante `autoplay=1&mute=1&playsinline=1`. YouTube o el navegador pueden bloquear la reproducción; el usuario puede activar audio en el reproductor. No se garantiza la reproducción automática con sonido.
 
 La presentación del generador se activa automáticamente por ancho de pantalla y la primera pestaña móvil es **Inicio**. Las opciones manuales de alternancia fueron retiradas.
+
+## Graduaciones programadas (0.60.2)
+
+Crea un evento desde **Debug → Editor de eventos → Crear graduación**. El asistente de cinco pasos permite indicar destinatarios, el **intervalo completo de celebración** y marcar varios **días del video** dentro de él. El tema visual aparece durante todo el intervalo; el mensaje de felicitación se muestra **solamente en los días elegidos**, una vez por perfil y día con frecuencia `once-per-day`. Cerrar el mensaje guarda la lectura del día en el navegador. Un segundo día elegido vuelve a mostrarlo, sin repetirlo continuamente.
+
+El activador utiliza `trigger.type: "graduation"`, `startDate`, `endDate` y `videoDates: ["AAAA-MM-DD", ...]`. Es necesario que cada fecha esté dentro del intervalo y que no existan repetidas. El evento puede tener `graduation: {"label":"Nombre visible","theme":"celebration"}`. La apariencia cambia cuando el evento está activo y el plantel/especialidad del perfil coincide, independientemente de haber visto el mensaje. Si el evento está desactivado, no modifica el diseño.
+
+**Ejemplo publicado:** `graduacion-cbtis134-dual-generacion4-2027`. CBTis No. 134, 19–23 de julio de 2027, video `YUC4FH3tSOk` el 22 (jueves) y el 23 (viernes). El criterio de destinatarios es el plantel. El perfil actual no almacena un identificador de generación, por lo que **no se valida de forma individual la pertenencia a la cuarta generación**. El texto es institucional y su publicación debe corresponder a los alumnos previstos.
+
+En los dos días del video no aparece una segunda despedida genérica después de marcar la última bitácora. Los eventos de graduación pueden clonarse o agregarse como entradas independientes. Puedes consultar y probar las reglas con cualquier fecha en Debug antes de exportar el JSON. El video usa la reproducción configurada en la 0.60.1, sujeta a restricciones del navegador.
+

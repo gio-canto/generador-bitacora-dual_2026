@@ -35,3 +35,11 @@ Debug (`/debug/`) contiene un laboratorio que simula entregas vencidas, jornadas
 ## Ajustes de la campanita v0.60.1
 
 Las barras superior e inferior de Registro Dual usan estilos Liquid Glass y transiciones accesibles; el escritorio conserva su estructura original. El laboratorio de Debug ahora permite probar tres tonos de campana (normal, suave y doble) y muestra si el navegador bloquea Web Audio. La campanita real conserva el tono normal y las preferencias guardadas de sonido.
+
+## Ignorar advertencias y nuevos hitos (0.60.2)
+
+Cada aviso tiene una acción **Omitir por ahora** si es urgente o de seguimiento; **Ocultar** para información. Una advertencia omitida se retira de la campana actual, pero **reaparece el lunes siguiente o al cambiar la ronda de capturas** (alta de semana, recepción o revisión registral). El estado se conserva localmente en `bitacora-dual-inbox-ignored-v1`. Se incluye **Mostrar omitidos** para recuperar los avisos antes de ese plazo. Los avisos informativos ocultos sólo reaparecen con un identificador nuevo, por ejemplo un hito distinto.
+
+Las horas acumuladas ahora incluyen **1,000 h** como hito adicional y **1,504 h** como referencia de límite teórico. Estos valores se incorporan a la campana, la pantalla Hitos y el PDF estadístico, junto a 480/840 h. El umbral teórico no limita los registros ni implica autorización o conclusión oficial.
+
+Debug prueba los cuatro umbrales y permite simular la omisión, el paso de semana y una nueva captura, sin modificar el registro real.

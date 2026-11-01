@@ -254,7 +254,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
           {id:"companies",title:"Empresas",detail:fmt(data.byCompanyPerformance.filter(r=>r.activeStudents>0).length)+" activas",accent:"#bf8770",number:"02"},
           {id:"groups",title:"Grupos",detail:fmt(data.byGroupPerformance.filter(r=>r.activeStudents>0).length)+" grupos",accent:"#9c8ab7",number:"03"},
           {id:"students",title:"Alumnos",detail:fmt(data.students.length)+" registrados",accent:"#497bb4",number:"04"},
-          {id:"milestones",title:"Hitos",detail:"480 h · 840 h",accent:"#31927b",number:"05"},
+          {id:"milestones",title:"Hitos",detail:"480 · 840 · 1,000 · 1,504 h",accent:"#31927b",number:"05"},
           {id:"history",title:"Histórico",detail:hours(lifetime.totalHours)+" acumuladas",accent:"#687e8d",number:"06"},
         ].map(item=><button type="button" key={item.id} className="ds-shortcut-card"
           onClick={()=>{setSection(item.id);setFiltersOpen(false);}}>

@@ -183,3 +183,10 @@ Si extraes lógica del legado hacia un módulo nuevo:
 5. documenta el cambio en arquitectura y CHANGELOG.
 
 No mantengas dos implementaciones divergentes de una misma regla.
+
+## Graduaciones y reaparición de avisos (0.60.2)
+
+`activeGraduation` y `eligibleMessages` en `generator-message-rules.js` distinguen el **intervalo de apariencia** de las **fechas de felicitación**. El tema se añade como clase del `body` y se retira fuera del periodo o al desmontar. `GeneratorMessageHost` comprueba el calendario, el perfil del plantel y el estado de lectura diariamente; no altera los PDF ni el editor heredado. El esquema JSON permanece en versión 1.
+
+`registry-notifications.js` calcula 480/840/1,000/1,504 h desde las mismas jornadas documentadas. La omisión de avisos se almacena separadamente de los registros con una marca de la semana actual y una huella de la ronda de captura. El lunes siguiente o una actualización del registro deja nuevamente visible la advertencia. Los informativos pueden ocultarse; los avisos nunca borran datos escolares.
+

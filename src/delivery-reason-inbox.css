@@ -57,3 +57,11 @@
 .dual-inbox-sound{margin-top:18px;border-top:1px solid #e8e8eb;padding-top:12px;display:flex;gap:7px;flex-wrap:wrap}
 .dual-inbox-sound .btn{font-size:12px;display:inline-flex;align-items:center;gap:6px}
 @media(max-width:520px){.dual-inbox-backdrop{padding:64px 8px 8px}.dual-inbox-panel{width:100%;max-height:calc(100dvh - 78px);border-radius:18px}.dual-inbox-header{padding:14px 14px 11px}.dual-inbox-content{padding:12px}}
+
+/* Omitir y recuperar avisos en Registro Dual */
+.dual-inbox-item-actions{display:flex!important;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-start!important}
+.dual-inbox-item-actions .btn:last-child{background:#f3f6f9;border-color:#d9e0e7;color:#4f6174}
+.dual-inbox-snoozed{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:15px;
+ padding:12px;border-radius:13px;background:#f4f6f9;border:1px solid #e1e7ee;
+ font:12px/1.45 system-ui;color:#536171}
+.dual-inbox-snoozed .btn{font-size:12px}

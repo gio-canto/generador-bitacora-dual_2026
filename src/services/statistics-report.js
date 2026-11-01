@@ -598,35 +598,41 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     label(ctx,"Hitos de horas · Educación Dual",55,374,31,C.ink,750,1125);
     panel(ctx,54,402,551,165,"480 h · Servicio social","Primer hito de seguimiento");
     label(ctx,fmt(report.milestones.socialReached)+" de "+fmt(report.milestones.totalStudents)+" alumnos",
-      80,523,27,C.blue,750,470);
+      80,509,25,C.blue,750,470);
+    label(ctx,"1,000 h · Hito ampliado: "+fmt(report.milestones.expandedReached)+" alumnos",
+      80,552,16,C.secondary,650,490);
     panel(ctx,626,402,560,165,"840 h · Prácticas profesionales","480 + 360 horas adicionales");
     label(ctx,fmt(report.milestones.professionalReached)+" de "+fmt(report.milestones.totalStudents)+" alumnos",
-      655,523,27,C.green,750,490);
+      655,509,25,C.green,750,490);
+    label(ctx,"1,504 h · Límite teórico: "+fmt(report.milestones.theoreticalLimitReached)+" alumnos",
+      655,552,16,C.secondary,650,490);
     panel(ctx,54,586,1132,960,"Progreso por alumno",
       "Horas acumuladas de todas las semanas con jornadas registradas");
-    label(ctx,"ALUMNO",82,691,15,C.secondary,730,490);
-    label(ctx,"HORAS",620,691,15,C.secondary,730,105);
-    label(ctx,"480 h",763,691,15,C.secondary,730,93);
-    label(ctx,"840 h",884,691,15,C.secondary,730,90);
-    label(ctx,"PRÓXIMO HITO",996,691,14,C.secondary,730,177);
+    label(ctx,"ALUMNO",82,691,15,C.secondary,730,395);
+    label(ctx,"HORAS",489,691,15,C.secondary,730,92);
+    label(ctx,"480",607,691,14,C.secondary,730,60);
+    label(ctx,"840",687,691,14,C.secondary,730,60);
+    label(ctx,"1,000",766,691,14,C.secondary,730,75);
+    label(ctx,"1,504",856,691,14,C.secondary,730,77);
+    label(ctx,"PRÓXIMO HITO",977,691,14,C.secondary,730,181);
     separator(ctx,80,709,1075);
     if(!rows.length)empty(ctx,88,773,1000,"Sin alumnos para este filtro");
     rows.forEach((student,index)=>{
       const y=750+index*37;
       if(index%2===0)rect(ctx,77,y-23,1080,34,8,"#f4f7fa");
-      label(ctx,student.name,87,y,15,C.ink,650,508);
-      label(ctx,fmt(student.hours,1)+" h",627,y,15,C.secondary,650,115);
-      label(ctx,student.socialReached?"Sí":"No",781,y,15,
-        student.socialReached?C.green:C.muted,650,72);
-      label(ctx,student.professionalReached?"Sí":"No",898,y,15,
-        student.professionalReached?C.green:C.muted,650,73);
-      label(ctx,student.professionalReached?"Completado":
+      label(ctx,student.name,87,y,14,C.ink,650,387);
+      label(ctx,fmt(student.hours,1)+" h",491,y,14,C.secondary,650,104);
+      for(const [left,reached] of [[615,student.socialReached],[695,student.professionalReached],
+        [780,student.expandedReached],[870,student.theoreticalLimitReached]]){
+        label(ctx,reached?"Sí":"No",left,y,14,reached?C.green:C.muted,650,63);
+      }
+      label(ctx,student.theoreticalLimitReached?"Referencia alcanzada":
         student.hasData?fmt(student.nextRemainingHours,1)+" h faltan":"Sin datos",
-        1002,y,14,C.secondary,600,161);
+        983,y,13,C.secondary,600,175);
     });
     label(ctx,"Alumnos "+(rows.length?offset+1:0)+"–"+(offset+rows.length)+" de "+
       report.milestones.totalStudents,85,1579,15,C.muted,550,1025);
-    label(ctx,"Hitos de referencia; reconocimiento sujeto a validación institucional.",
+    label(ctx,"1,504 h: límite teórico de referencia, no tope de captura ni acreditación automática.",
       85,1612,14,C.muted,500,1030);
     images.push(canvasToJpeg(canvas));
   }

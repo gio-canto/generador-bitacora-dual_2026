@@ -2,7 +2,8 @@ import {useEffect,useMemo,useRef,useState} from "react";
 import {createPortal} from "react-dom";
 import {Bell,CheckCircle,WarningCircle,X,SpeakerHigh,SpeakerSlash} from "@phosphor-icons/react";
 import {pendingReasonReviews,reasonsForReview} from "../services/reason-reviews.js";
-import {getRegistryNotifications,getSeenInbox,markInboxSeen,isInboxSoundOn,setInboxSound,playInboxBell} from "../services/registry-notifications.js";
+import {getRegistryNotifications,getSeenInbox,markInboxSeen,isInboxSoundOn,setInboxSound,playInboxBell,
+  visibleInboxNotices,ignoreInboxNotice,readIgnoredInbox,INBOX_IGNORED_KEY} from "../services/registry-notifications.js";
 import "../delivery-reason-inbox.css";
 
 function ReviewItem({item,onReview}){
@@ -26,16 +27,24 @@ function ReviewItem({item,onReview}){
 export default function ReasonInbox({state,backupPending=false,onReview,onBackup,onNavigate}){
   const [open,setOpen]=useState(false);
   const [filter,setFilter]=useState("all");
+  const [ignoredRevision,setIgnoredRevision]=useState(0);
+  const [clock,setClock]=useState(()=>new Date());
+  useEffect(()=>{
+    const timer=window.setInterval(()=>setClock(new Date()),60000);
+    return ()=>window.clearInterval(timer);
+  },[]);
   const [sound,setSound]=useState(()=>isInboxSoundOn(typeof window!=="undefined"?window.localStorage:null));
   const [seen,setSeen]=useState(()=>getSeenInbox(typeof window!=="undefined"?window.localStorage:null));
   const trigger=useRef(null),panel=useRef(null),attempted=useRef(new Set());
   const reviews=useMemo(()=>pendingReasonReviews(state),[state]);
-  const messages=useMemo(()=>getRegistryNotifications(state,{backupPending}),[state,backupPending]);
-  const unread=messages.filter(item=>!seen[item.id]);
-  const listed=filter==="all"?messages:filter==="new"?unread:messages.filter(m=>m.severity===filter);
+  const messages=useMemo(()=>getRegistryNotifications(state,{backupPending,now:clock}),[state,backupPending,clock]);
+  const visible=visibleInboxNotices(messages,window.localStorage,state,{now:clock});
+  const ignoredCount=messages.length-visible.length;
+  const unread=visible.filter(item=>!seen[item.id]);
+  const listed=filter==="all"?visible:filter==="new"?unread:visible.filter(m=>m.severity===filter);
   useEffect(()=>{
     if(!sound)return;
-    const newItems=messages.filter(x=>!seen[x.id]&&!attempted.current.has(x.id));
+    const newItems=visible.filter(x=>!seen[x.id]&&!attempted.current.has(x.id));
     if(!newItems.length)return;
     for(const item of newItems)attempted.current.add(item.id);
     let cancelled=false;
@@ -43,10 +52,10 @@ export default function ReasonInbox({state,backupPending=false,onReview,onBackup
     ring();
     document.addEventListener("pointerdown",ring,{once:true});
     return ()=>{cancelled=true;document.removeEventListener("pointerdown",ring);};
-  },[messages,sound]);
+  },[messages,sound,ignoredRevision,clock]);
   useEffect(()=>{
     if(!open)return;
-    markInboxSeen(window.localStorage,messages);
+    markInboxSeen(window.localStorage,visible);
     setSeen(getSeenInbox(window.localStorage));
     const keydown=e=>{if(e.key==="Escape")setOpen(false);};
     document.addEventListener("keydown",keydown);
@@ -61,16 +70,16 @@ export default function ReasonInbox({state,backupPending=false,onReview,onBackup
   };
   return <>
     <button ref={trigger} type="button" className="btn dual-inbox-trigger" title="Avisos"
-      aria-label={"Avisos internos: "+messages.length+" pendiente(s)"}
+      aria-label={"Avisos internos: "+visible.length+" pendiente(s)"}
       aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(x=>!x)}>
       <Bell size={19} aria-hidden="true"/>
-      {messages.length>0&&<span className="dual-inbox-counter">{messages.length>99?"99+":messages.length}</span>}
+      {visible.length>0&&<span className="dual-inbox-counter">{visible.length>99?"99+":visible.length}</span>}
       {unread.length>0&&<span className="dual-inbox-unread-dot" aria-label={unread.length+" nuevos"}/>}
     </button>
     {open&&createPortal(<div className="dual-inbox-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)close();}}>
       <section className="dual-inbox-panel" role="dialog" aria-modal="true" aria-label="Avisos" ref={panel} tabIndex={-1}>
         <header className="dual-inbox-header">
-          <div><h2>Avisos</h2><span className="dual-inbox-subcount">{messages.length} activos</span></div>
+          <div><h2>Avisos</h2><span className="dual-inbox-subcount">{visible.length} activos{ignoredCount?", "+ignoredCount+" omitidos":""}</span></div>
           <button type="button" className="btn" onClick={close} aria-label="Cerrar avisos"><X size={18}/></button>
         </header>
         <div className="dual-inbox-content">
@@ -83,9 +92,15 @@ export default function ReasonInbox({state,backupPending=false,onReview,onBackup
             {listed.map(item=><li key={item.id} className={"dual-inbox-alert "+item.severity}>
               <div><strong>{item.title}</strong>{!seen[item.id]&&<span className="dual-inbox-new">Nuevo</span>}</div>
               <p>{item.description}</p>
-              <button type="button" className="btn" onClick={()=>navigate(item)}>
-                {item.action==="backup"?"Guardar respaldo":item.action==="reasons"?"Revisar motivos":"Ver detalles"}
-              </button>
+              <div className="dual-inbox-item-actions">
+                <button type="button" className="btn" onClick={()=>navigate(item)}>
+                  {item.action==="backup"?"Guardar respaldo":item.action==="reasons"?"Revisar motivos":"Ver detalles"}
+                </button>
+                <button type="button" className="btn" onClick={()=>{
+                  ignoreInboxNotice(window.localStorage,item,state,{now:clock});
+                  setIgnoredRevision(x=>x+1);
+                }}>{item.severity==="info"?"Ocultar":"Omitir por ahora"}</button>
+              </div>
             </li>)}
           </ul>:<div className="dual-inbox-empty" role="status">
             <CheckCircle size={24}/><p>Sin avisos en esta categoría.</p>
@@ -95,6 +110,13 @@ export default function ReasonInbox({state,backupPending=false,onReview,onBackup
             <p className="dual-inbox-explanation">Consulta la bitácora antes de reclasificar.</p>
             <ul className="dual-inbox-list">{reviews.map(item=><ReviewItem key={item.key} item={item} onReview={onReview}/>)}</ul>
           </details>}
+          {ignoredCount>0&&<div className="dual-inbox-snoozed">
+            <span>{ignoredCount} aviso(s) omitido(s). Las advertencias reaparecen la siguiente semana o ronda de captura.</span>
+            <button type="button" className="btn" onClick={()=>{
+              window.localStorage.removeItem(INBOX_IGNORED_KEY);
+              setIgnoredRevision(x=>x+1);
+            }}>Mostrar omitidos</button>
+          </div>}
           <div className="dual-inbox-sound">
             <button type="button" className="btn" onClick={()=>{setInboxSound(window.localStorage,!sound);setSound(!sound);}}>
               {sound?<SpeakerHigh size={17}/>:<SpeakerSlash size={17}/>}

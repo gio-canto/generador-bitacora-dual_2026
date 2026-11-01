@@ -72,6 +72,40 @@
       "priority": 5,
       "frequency": "once-per-device",
       "dismissible": true
+    },
+    {
+      "id": "graduacion-cbtis134-dual-generacion4-2027",
+      "revision": 1,
+      "enabled": true,
+      "presentation": "fullscreen",
+      "trigger": {
+        "type": "graduation",
+        "startDate": "2027-07-19",
+        "endDate": "2027-07-23",
+        "videoDates": [
+          "2027-07-22",
+          "2027-07-23"
+        ]
+      },
+      "audience": {
+        "schools": [
+          "cbtis-134"
+        ],
+        "specialties": "all"
+      },
+      "content": {
+        "title": "¡Felicidades a la cuarta generación de Educación Dual!",
+        "body": "Gracias por su compromiso y por haber utilizado el Generador de Bitácora Dual. Les deseamos éxito en la siguiente etapa.",
+        "youtubeId": "YUC4FH3tSOk",
+        "action": null
+      },
+      "graduation": {
+        "label": "Cuarta generación Dual · CBTis No. 134",
+        "theme": "celebration"
+      },
+      "priority": 110,
+      "frequency": "once-per-day",
+      "dismissible": true
     }
   ]
 }

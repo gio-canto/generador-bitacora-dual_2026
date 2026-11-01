@@ -1,7 +1,7 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
-export const VERSION = "0.60.1";
-export const RELEASE = "Navegación Liquid Glass y editor de eventos guiado";
+export const VERSION = "0.60.2";
+export const RELEASE = "Graduación, nuevos hitos y avisos posponibles";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
