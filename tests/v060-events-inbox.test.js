@@ -50,7 +50,7 @@ describe("v0.60 · eventos del generador",()=>{
     markMessageSeen(e,ctx);
     expect(hasSeenMessage(e,ctx)).toBe(true);
     expect(eligibleMessages(c,ctx)).toHaveLength(0);
-    e.revision=2;
+    e.revision+=1;
     expect(eligibleMessages(c,ctx)).toHaveLength(1);
     expect(validSurveyUrl("javascript:alert(1)")).toBe(false);
   });
