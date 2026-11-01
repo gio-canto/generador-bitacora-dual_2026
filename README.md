@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/beta-0.58.1--beta.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.59.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.59.0 · Motivos automáticos y avisos internos
+
+El alumno escribe una justificación y el generador identifica el motivo mediante expresiones configurables. Si no encuentra una coincidencia confiable, conserva **Otro motivo**. En **Registro Dual**, la campanita de avisos muestra los casos pendientes y permite al administrador clasificarlos después de consultar el documento. Los datos se conservan en los respaldos JSON. No se realiza OCR ni se cambian los estados oficiales de jornada.
+
+[Guía de clasificación y avisos](docs/CLASIFICACION_MOTIVOS_V059.md)
 
 ## v0.58.1-beta.1 · Generador Mobile — Adaptive Glass
 
