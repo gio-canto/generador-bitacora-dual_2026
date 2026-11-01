@@ -75,6 +75,7 @@ export default function GeneratorMessageHost(){
   useEffect(()=>{
     const begin=()=>{enqueue("on-open");enqueue("date");};
     const initial=window.setTimeout(begin,2400);
+    const poll=window.setInterval(openNext,900);
     const final=e=>enqueue("final-bitacora",{profile:{...readProfileData(),...e.detail}});
     const showList=()=>{setHistoryOpen(true);setClock(x=>x+1);};
     const focus=()=>{if(!document.hidden){enqueue("date");openNext();}};
