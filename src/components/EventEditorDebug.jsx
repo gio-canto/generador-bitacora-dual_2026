@@ -234,7 +234,7 @@ export default function EventEditorDebug(){
         {id:"final-bitacora",title:"Al generar la última bitácora",description:"Después de confirmar el PDF",icon:ClipboardText},
         {id:"graduation",title:"Graduación con fechas de video",description:"Tema visual y felicitación",icon:GraduationCap}
       ]}/>
-      <StudioSelect label="Frecuencia" value={current.frequency} items={frequencyItems}
+      <StudioSelect label="¿Cuántas veces?" value={current.frequency} items={frequencyItems}
         onChange={frequency=>update({frequency})}/>
       <div className="es-hint">La graduación puede usar varios días de video. Cada día se recuerda por separado si eliges «Una vez por día».</div>
     </div>}
