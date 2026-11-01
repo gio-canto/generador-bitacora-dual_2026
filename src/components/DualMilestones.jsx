@@ -99,7 +99,7 @@ export default function DualMilestones({state,specialty="",company="",onReportSt
              row.expandedReached?asHours(row.theoreticalLimitRemainingHours)+" hasta 1,504 h":
              row.professionalReached?asHours(row.expandedRemainingHours)+" hasta 1,000 h":
              row.socialReached?asHours(row.professionalRemainingHours)+" hasta 840 h":
-             asHours(row.socialRemainingHours)+" hasta 480 h"}</span>
+             asHours(row.socialRemainingHours)+" para el primer hito"}</span>
            <span>{number(row.weeksWithData)} semanas con datos</span>
          </div>
        </article>;
