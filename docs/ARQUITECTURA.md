@@ -113,6 +113,16 @@ JSON / CSV / reportes PDF
 
 La coincidencia aproximada es una ayuda de recuperación, no una decisión automática.
 
+## Mensajes y centro de avisos (0.60)
+
+`src/services/generator-message-rules.js` determina destinatarios, fechas, activadores y frecuencia de comunicados configurados en `src/data/generator-messages.json`. El componente React `GeneratorMessageHost.jsx` monta un portal fuera del editor heredado, evitando duplicar formularios o alterar la interfaz clásica. El editor envía un evento de última bitácora **únicamente después de la generación correcta del PDF** y con la casilla explícita marcada.
+
+`src/services/registry-notifications.js` calcula avisos administrativos desde el estado local de Registro Dual, con sonido generado por Web Audio cuando el navegador lo permite. `ReasonInbox.jsx` muestra la bandeja, filtros, clasificación de motivos y navegación; las marcas de lectura no cambian el JSON escolar.
+
+Debug (`src/debug-main.jsx`) integra `EventEditorDebug.jsx` y `DebugInboxLab.jsx`: crean, validan, prueban e importan/exportan configuraciones y escenarios simulados. No hacen commits ni escriben en las bases reales.
+
+Consulta [Mensajes del generador](MENSAJES_GENERADOR.md) y [Centro de avisos](CENTRO_AVISOS.md).
+
 ## Data Matrix
 
 El payload actual es versionado. El lector conserva compatibilidad con formatos anteriores cuando es razonable.
