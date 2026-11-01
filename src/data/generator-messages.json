@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "id": "fin-dual",
+      "revision": 1,
+      "enabled": true,
+      "presentation": "fullscreen",
+      "trigger": {
+        "type": "final-bitacora"
+      },
+      "audience": {
+        "schools": "all",
+        "specialties": "all"
+      },
+      "content": {
+        "title": "¡Felicidades por concluir tu formación dual!",
+        "body": "Gracias por haber utilizado el Generador de Bitácora Dual durante esta etapa de tu formación. Te deseamos mucho éxito en lo que viene.",
+        "youtubeId": null,
+        "action": null
+      },
+      "priority": 100,
+      "frequency": "once",
+      "dismissible": true
+    },
+    {
+      "id": "encuesta-uso",
+      "revision": 1,
+      "enabled": false,
+      "presentation": "medium",
+      "trigger": {
+        "type": "on-open",
+        "startDate": null,
+        "endDate": null
+      },
+      "audience": {
+        "schools": "all",
+        "specialties": "all"
+      },
+      "content": {
+        "title": "Cuéntanos tu experiencia",
+        "body": "Tu opinión nos ayuda a mejorar el Generador de Bitácora Dual.",
+        "youtubeId": null,
+        "action": {
+          "label": "Responder encuesta",
+          "url": null
+        }
+      },
+      "priority": 20,
+      "frequency": "once",
+      "dismissible": true
+    },
+    {
+      "id": "mensaje-especial",
+      "revision": 1,
+      "enabled": false,
+      "presentation": "tab",
+      "trigger": {
+        "type": "date",
+        "date": "2026-12-01"
+      },
+      "audience": {
+        "schools": "all",
+        "specialties": "all"
+      },
+      "content": {
+        "title": "Mensaje especial",
+        "body": "Escribe aquí el comunicado para los alumnos.",
+        "youtubeId": null,
+        "action": null
+      },
+      "priority": 5,
+      "frequency": "once-per-device",
+      "dismissible": true
+    }
+  ]
+}
