@@ -45,15 +45,17 @@ describe("v0.60.4 · reproductor y modal de graduación",()=>{
 describe("v0.60.4 · Vista adaptable de Debug",()=>{
   const source=readFileSync("src/debug-main.jsx","utf8");
   it("permite lanzar los escenarios gráficos desde el marco",()=>{
-    for(const scene of ["graduation","messages","editor","calendar","notifications","inbox","bell","pdf","camera"])
+    for(const scene of ["messages","editor","calendar","notifications","inbox","bell","pdf","camera"])
       expect(source).toContain('<option value="'+scene+'">');
     expect(source).toContain('<option value="./">Debug completo</option>');
     expect(source).toContain('debug-scene=');
     expect(source).toContain('nestedPreview');
+    expect(source).not.toContain('<option value="graduation">');
+    expect(source).not.toContain('onClick={()=>{setIframePage("./");setIframeScene("graduation");}}');
   });
   it("usa el aviso real y el video de graduación configurados en el JSON",()=>{
     expect(source).toContain("GeneratorMessageCard");
-    expect(source).toContain('eventConfig.events.find(x=>x.trigger.type==="graduation")');
+    expect(source).toContain('eventConfig.events.filter(event=>event.trigger?.type==="graduation")');
     expect(source).toContain("setAdaptivePreview(event)");
     expect(event.content.youtubeId).toBe("YUC4FH3tSOk");
   });

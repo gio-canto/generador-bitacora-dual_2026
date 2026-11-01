@@ -312,3 +312,12 @@ Consulta [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Comprobar solicitud de audio al 90 % al cargar; si el navegador lo impide, verificar recuperación de reproducción silenciada. Probar manualmente en Chrome, Safari y Firefox.
 - Desde Debug → Efemérides probar 19, 22 y 23 de julio, abrir y cerrar video y desactivar el tema sin alterar datos escolares.
 
+
+## Graduación global desde Efemérides (0.60.6)
+
+- Comprobar que seleccionar una fecha dentro del periodo cambia los colores en toda la página Debug, sin una maqueta o panel independiente; las áreas siguen siendo funcionales.
+- Verificar que las fechas se carguen desde el JSON y que al agregar una generación ficticia de otro plantel (incluso desactivada) pueda simularse sin cambios al código de la interfaz.
+- En el primer día del periodo, mostrar sólo el tema; en un día de video, mostrar la felicitación y mantener el tema después de cerrarla.
+- Usar «Limpiar visual» y confirmar que la página vuelve a su aspecto original, sin modificar registros ni memorias reales.
+- Verificar que Vista adaptable no tenga una pestaña ni botón exclusivo de graduación, y que Debug completo → Efemérides permita probarlo.
+

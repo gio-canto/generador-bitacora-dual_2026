@@ -94,3 +94,10 @@ El bucle de YouTube utiliza `loop=1` y `playlist` con el mismo video; termina cu
 
 Desde **Debug → Efemérides** se puede simular el periodo de graduación y reproducir nuevamente su video usando el JSON publicado. Los botones de 19, 22 y 23 de julio de 2027 no modifican la fecha real ni las bitácoras. Las pruebas quedan aisladas de la memoria normal de mensajes leídos.
 
+
+## Graduación como efeméride de página completa (0.60.6)
+
+En **Debug → Efemérides**, introduce una fecha y pulsa «Mostrar» o utiliza los accesos breves que se crean automáticamente desde el JSON de graduaciones. Si la fecha corresponde al periodo seleccionado, el tema se aplica a **toda la página Debug** (fondo, cabecera, tarjetas y controles) sin cambiar su distribución. En días programados para video también abre la felicitación; al cerrarla se conserva el tema. «Limpiar visual» quita ambos efectos.
+
+No hay una sección ni pestaña independiente de graduación. En Vista adaptable se usa la escena **Efemérides** de Debug completo. El motor admite varios eventos, distintas escuelas y graduaciones aún desactivadas, únicamente para las simulaciones: se fuerza el evento seleccionado en una configuración temporal, sin alterar el JSON publicado, los perfiles o las fechas reales. Cuando existan varios eventos, Debug permite elegir cuál simular.
+
