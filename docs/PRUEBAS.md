@@ -274,3 +274,12 @@ Una ejecución verde confirma la suite automatizada y la compilación, no la val
 En un PR explica qué verificaste. No adjuntes bitácoras reales; usa datos sintéticos.
 
 Consulta [../CONTRIBUTING.md](../CONTRIBUTING.md).
+
+## Graduación, hitos 1,000/1,504 y avisos (0.60.2)
+
+- Probar el 19–23 de julio de 2027 en CBTis 134: diseño activo durante los cinco días y video únicamente jueves 22 y viernes 23.
+- Verificar que el mensaje se recuerde por día y vuelva en el segundo; fuera del rango o en otro plantel no debe mostrarse.
+- Crear y probar graduaciones desde Debug: rango, días seleccionados, destinatarios, tema y exportación de JSON.
+- Comprobar cálculo, vista por alumno y PDF con 480/840/1,000/1,504 horas; superar 1,504 no recorta ni bloquea horas.
+- Omitir un aviso y verificar reaparición al pasar a otra semana o efectuar una captura; el informativo puede permanecer oculto.
+- Confirmar que los avisos y graduaciones no modifiquen las bitácoras ni sus respaldos.
