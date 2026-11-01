@@ -81,7 +81,7 @@ describe("0.60.5 · Debug como efemérides",()=>{
     expect(src).toContain('classList.toggle("debug-graduation-preview"');
     expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value)");
     expect(src).toContain("graduationPreviewDates(event)");
-    expect(src).toContain("setAdaptivePreview(matched?.trigger?.videoDates?.includes(value)?matched:null)");
+    expect(src).toContain('matched.trigger.showOn!=="final-bitacora"?matched:null');
     expect(src).toContain('document.body.classList.remove("debug-graduation-preview")');
     expect(src).not.toContain("debug-graduation-controls");
     expect(src).not.toContain("debug-graduation-stage");
