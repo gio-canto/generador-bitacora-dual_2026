@@ -62,15 +62,6 @@
       <button type="button" data-gm-action="save">Guardar bitácora<svg class="gm-icon"><use href="#gm-i-chevron"/></svg></button>
       <button type="button" data-gm-action="pdf">Generar o compartir PDF<svg class="gm-icon"><use href="#gm-i-chevron"/></svg></button>
     </div>
-    <h2 class="gm-subheading">Presentación</h2>
-    <div class="gm-panel">
-      <p class="gm-muted">Elige cómo quieres ver el generador. Los datos y el formulario son los mismos en todas las vistas.</p>
-      <div class="gm-layout-options" role="group" aria-label="Presentación del generador">
-        <button type="button" data-gm-mode="auto">Automático</button>
-        <button type="button" data-gm-mode="mobile">Móvil</button>
-        <button type="button" data-gm-mode="desktop">Escritorio</button>
-      </div>
-    </div>
     <p class="gm-privacy">Los borradores y registros permanecen en el navegador. Exporta un respaldo JSON para evitar pérdidas al borrar los datos de navegación.</p>
     <footer class="gm-legal-footer" aria-label="Información legal y del proyecto"><span>Generador de Bitácora Dual 2026</span><nav aria-label="Enlaces legales del generador"><a href="privacy/">Aviso de privacidad</a><a href="cookies/">Cookies</a><a href="terms/">Condiciones de uso</a><a href="accessibility/">Accesibilidad</a><a href="acknowledgements/">Agradecimientos</a></nav></footer>
   </section>
@@ -86,7 +77,7 @@
 <header class="topbar">
 <a aria-label="Ir al inicio" class="brand" href="#inicio"><img alt="Generador de Bitácora Dual" class="brand-logo" decoding="async" fetchpriority="high" src="Assets/Asset_logo.png"/></a>
 <div class="actions">
-<span class="pill" id="saveState">Nueva</span><button class="btn gm-mode-desktop-button" id="generatorModeBtn" type="button">Vista móvil</button>
+<span class="pill" id="saveState">Nueva</span>
 <details class="home-history" id="homeHistoryDisclosure"><summary aria-label="Consultar bitácoras anteriores"><span class="home-history-mark" aria-hidden="true">↺</span><strong><span class="history-label-wide">Bitácoras </span>anteriores</strong><span class="home-history-count" id="homeHistoryState">0</span><span class="home-history-chevron" aria-hidden="true">⌄</span></summary><div class="home-history-body"><div class="home-history-intro"><div><strong>Historial guardado</strong><p id="homeHistoryLatest">Consulta las semanas que ya guardaste.</p></div><small>Se conserva únicamente en este navegador.</small></div><div class="records home-records" id="homeRecords"></div></div></details>
 <button class="btn" id="tourBtn" type="button">Tutorial</button>
 <button class="btn" id="newBtn" type="button">Nueva bitácora</button>
