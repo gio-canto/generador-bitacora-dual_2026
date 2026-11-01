@@ -65,7 +65,7 @@ const sample=()=>({
         {status:"sin_labores",minutes:0,reasonCode:63,reasonId:""},
         {status:"inhabil",minutes:0,reasonCode:0},
       ]},
-    }}],
+    }}}],
 });
 describe("v0.59 · avisos y revisión del administrador",()=>{
   it("muestra cada Otro motivo pendiente con alumno, semana y día",()=>{
