@@ -2,7 +2,7 @@ import {useCallback,useEffect,useRef,useState} from "react";
 import {createPortal} from "react-dom";
 import {readProfileData,readActiveProfileId} from "../services/profile.js";
 import config from "../data/generator-messages.json";
-import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation} from "../services/generator-message-rules.js";
+import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation,finalBitacoraMessages} from "../services/generator-message-rules.js";
 import {youtubeCelebrationUrl,requestYoutubeAudio,sendYoutubeCommand} from "../services/youtube-celebration.js";
 import "../generator-messages.css";
 import "../generator-graduation.css";
@@ -123,13 +123,9 @@ export default function GeneratorMessageHost(){
   const enqueue=useCallback((kind,extra={})=>{
     const ctx={...currentContext(),...extra};
     context.current=ctx;
-    // Si ese día se presenta el video de graduación, no duplicar la despedida
-    // genérica al descargar la última bitácora.
-    if(kind==="final-bitacora"){
-      const grad=activeGraduation(config,ctx);
-      if(grad?.trigger?.videoDates?.includes(ctx.date))return;
-    }
-    const entries=eligibleMessages(config,{...ctx,trigger:kind});
+    const entries=kind==="final-bitacora"
+      ? finalBitacoraMessages(config,ctx)
+      : eligibleMessages(config,{...ctx,trigger:kind});
     const known=new Set([activeRef.current?.id,...queue.current.map(x=>x.id)]);
     for(const entry of entries)if(!known.has(entry.id)){queue.current.push(entry);known.add(entry.id);}
     queue.current.sort((a,b)=>(b.priority||0)-(a.priority||0));
