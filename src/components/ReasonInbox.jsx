@@ -56,7 +56,7 @@ export default function ReasonInbox({state,backupPending=false,onReview,onBackup
   const close=()=>{setOpen(false);trigger.current?.focus();};
   const navigate=item=>{
     if(item.action==="backup"){onBackup?.();return;}
-    if(item.action==="reasons"){document.getElementById("dualReasonReviewSection")?.scrollIntoView({behavior:"smooth"});return;}
+    if(item.action==="reasons"){const section=document.getElementById("dualReasonReviewSection");if(section){section.open=true;section.scrollIntoView({behavior:"smooth"});}return;}
     close();onNavigate?.(item.action,item.weekId);
   };
   return <>
