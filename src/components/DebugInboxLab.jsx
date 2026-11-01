@@ -1,5 +1,5 @@
 import {useMemo,useState} from "react";
-import {getRegistryNotifications,playInboxBell,markInboxSeen,getSeenInbox} from "../services/registry-notifications.js";
+import {getRegistryNotifications,playInboxBell,markInboxSeen,getSeenInbox,visibleInboxNotices,ignoreInboxNotice} from "../services/registry-notifications.js";
 import {classifyReason} from "../services/reason-classifier.js";
 import {calculateDualMilestones} from "../services/dual-milestones.js";
 import {studentIsActive} from "../services/delivery-registry.js";
@@ -39,8 +39,19 @@ export default function DebugInboxLab({base}){
   const [sample,setSample]=useState("La empresa suspendió actividades porque fumigaron el lugar.");
   const [tone,setTone]=useState("normal");
   const [soundReport,setSoundReport]=useState("");
-  const state=useMemo(()=>mockState(base,flags),[base,flags]);
-  const notices=useMemo(()=>getRegistryNotifications(state,{now:new Date("2026-11-02T12:00:00Z"),backupPending:flags.backup}),[state,flags.backup]);
+  const [nextWeek,setNextWeek]=useState(false);
+  const [extraCapture,setExtraCapture]=useState(false);
+  const state=useMemo(()=>{
+    const simulated=mockState(base,flags);
+    if(extraCapture)simulated.weeks[0].deliveries["debug-nueva-captura"]={
+      status:"entregado",registeredAt:"2026-11-04T18:00:00Z"};
+    return simulated;
+  },[base,flags,extraCapture]);
+  const date=new Date(nextWeek?"2026-11-09T12:00:00Z":"2026-11-02T12:00:00Z");
+  const notices=useMemo(()=>getRegistryNotifications(state,{now:date,backupPending:flags.backup}),
+    [state,flags.backup,nextWeek]);
+  const visible=visibleInboxNotices(notices,storage,state,{now:date});
+  const milestoneInfo=calculateDualMilestones(state);
   const seen=getSeenInbox(storage);
   const update=(k,on)=>setFlags(x=>({...x,[k]:on}));
   return <div className="debug-event-editor">
@@ -59,12 +70,24 @@ export default function DebugInboxLab({base}){
         const played=await playInboxBell({tone});
         setSoundReport(played?"Campanada reproducida.":"El navegador bloqueó el sonido o el dispositivo no admite Web Audio.");
       }}>Escuchar campana</button>
-      <button className="debug-button" onClick={()=>{markInboxSeen(storage,notices);setRevision(x=>x+1);}}>Simular lectura</button>
-      <button className="debug-button" onClick={()=>{setStorage(storageFactory());setRevision(x=>x+1);}}>Restablecer simulación</button>
+      <button className="debug-button" onClick={()=>{markInboxSeen(storage,visible);setRevision(x=>x+1);}}>Simular lectura</button>
+      <button className="debug-button" disabled={!visible.length} onClick={()=>{
+        ignoreInboxNotice(storage,visible[0],state,{now:date});setRevision(x=>x+1);
+      }}>Omitir primer aviso</button>
+      <button className="debug-button" onClick={()=>{setNextWeek(x=>!x);setRevision(x=>x+1);}}>
+        {nextWeek?"Volver a la semana inicial":"Simular semana siguiente"}
+      </button>
+      <button className="debug-button" onClick={()=>{setExtraCapture(x=>!x);setRevision(x=>x+1);}}>
+        {extraCapture?"Retirar captura simulada":"Simular nueva captura"}
+      </button>
+      <button className="debug-button" onClick={()=>{
+        setStorage(storageFactory());setNextWeek(false);setExtraCapture(false);setRevision(x=>x+1);
+      }}>Restablecer simulación</button>
     </div>
     {soundReport&&<p role="status">{soundReport}</p>}
+    <p role="status">Avisos visibles: {visible.length} de {notices.length}. Hitos simulados: 480 ({milestoneInfo.socialReached}), 840 ({milestoneInfo.professionalReached}), 1,000 ({milestoneInfo.expandedReached}) y 1,504 h ({milestoneInfo.theoreticalLimitReached}).</p>
     <div className="debug-test-list">
-      {notices.length?notices.map(n=><div className="debug-test pass" key={n.id}>
+      {visible.length?visible.map(n=><div className="debug-test pass" key={n.id}>
         <strong>{n.title} · {n.severity} · {seen[n.id]?"Visto":"Nuevo"}</strong>
         <span>{n.description} · destino: {n.action}</span>
       </div>):<p>Sin avisos con estas condiciones.</p>}
@@ -74,6 +97,6 @@ export default function DebugInboxLab({base}){
         <textarea rows="2" style={{width:"100%"}} value={sample} onChange={e=>setSample(e.target.value)}/></label>
       <p><strong>Resultado:</strong> {classifyReason("sin_labores",sample)?.label||"Otro motivo (63)"}</p>
     </div>
-    <small>Las simulaciones usan datos ficticios y memoria aislada. No se alteran alumnos, registros ni anuncios vistos.</small>
+    <small>Los avisos de seguimiento omitidos reaparecen en la semana siguiente o ante una nueva captura. Las simulaciones son ficticias y usan memoria aislada.</small>
   </div>;
 }
