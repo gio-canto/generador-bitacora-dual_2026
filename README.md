@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.2-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,14 @@
 </div>
 
 ---
+
+## v0.60.2 · Graduación y seguimiento ampliado
+
+- **Modo graduación** en el generador: un periodo para cambiar su apariencia y días concretos para mostrar una felicitación con video de YouTube. El primer evento está configurado para el CBTis No. 134 del **19 al 23 de julio de 2027**, con video de felicitación el **jueves 22 y viernes 23**, ID `YUC4FH3tSOk`. En Debug, el editor por pasos permite configurar más periodos y seleccionar los días del video.
+- **Hitos de 480, 840, 1,000 y 1,504 horas** en Registro Dual, estadísticas por alumno, PDF estadístico y campanita. Las 1,504 h son una referencia teórica; el sistema no bloquea capturas superiores.
+- **Avisos omitibles:** los de seguimiento y urgentes reaparecen al pasar a la siguiente semana o realizar una nueva ronda de captura. Los informativos pueden ocultarse sin modificar la información escolar. Debug permite ensayar la omisión y la reaparición.
+
+[Configuración de graduaciones](docs/MENSAJES_GENERADOR.md) · [Centro de avisos](docs/CENTRO_AVISOS.md)
 
 ## v0.60.1 · Navegación Liquid Glass y editor guiado
 
