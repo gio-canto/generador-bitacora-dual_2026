@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.60.4 · Reproductor, graduación y Vista adaptable · 2026-10-31
+
+- Se evita el desplazamiento horizontal en el diálogo de felicitación mediante límites de anchura, `box-sizing`, dimensionado seguro del reproductor y recorte horizontal del contenedor.
+- YouTube continúa intentando reproducirse al abrir la felicitación con `autoplay=1&mute=1`. El control **Activar audio** establece el volumen al 90% únicamente al pulsarlo. Se mantiene la opción de cierre y los controles nativos del video; la reproducción automática puede estar limitada por el navegador.
+- El tema de graduación ajusta colores, bordes y superficies del generador existente, sin reemplazar la estructura ni alterar PDF, captura, botones o navegación móvil.
+- **Vista adaptable** de Debug añade la página de depuración completa y escenarios específicos: graduación y video, mensajes, editor, efemérides, notificaciones, centro de avisos, campana, PDF y cámara. Los marcos cuentan con anchos de 320, 390, 430, 768, 1024 y 1280 px.
+- El escenario de graduación permite abrir repetidamente el mensaje del JSON publicado y comprobar el tema visual sin cambiar la fecha ni información escolar.
+- Documentación y pruebas automatizadas de interfaz ampliadas.
+
 ## 0.60.3 · Estudio visual de eventos y FAQ actualizado · 2026-10-31
 
 - El Editor de eventos de Debug se divide en siete pasos: eventos, destinatarios, activación, calendario, mensaje, pruebas y publicación. Muestra únicamente los controles relevantes en cada pantalla, con estilo propio del sistema, sin selectores ni calendarios nativos.
