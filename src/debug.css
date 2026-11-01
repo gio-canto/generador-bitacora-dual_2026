@@ -259,3 +259,13 @@ a{color:var(--blue)}
 .debug-frame-wrap{overscroll-behavior:contain}
 .debug-frame{max-width:none}
 @media(max-width:620px){.debug-graduation-stage{padding:7px}.debug-graduation-stage .gm-home{padding:10px}}
+
+/* Graduación en las pruebas de efemérides: usa la interfaz existente. */
+.debug-graduation-controls{margin-top:18px;border:1px solid rgba(178,148,86,.35);border-radius:18px;
+ background:linear-gradient(130deg,rgba(255,248,227,.88),rgba(239,247,255,.88));padding:16px;
+ display:grid;gap:12px}
+.debug-graduation-controls>strong{font-size:15px;color:#53617a}
+.debug-graduation-controls>p{margin:0;font-size:13px;color:#637389;line-height:1.5}
+.debug-graduation-controls .debug-presets{margin:0}
+.debug-graduation-controls .debug-graduation-stage{margin:0}
+@media(max-width:480px){.debug-graduation-controls{padding:11px}}
