@@ -67,3 +67,14 @@ El activador utiliza `trigger.type: "graduation"`, `startDate`, `endDate` y `vid
 
 En los dos días del video no aparece una segunda despedida genérica después de marcar la última bitácora. Los eventos de graduación pueden clonarse o agregarse como entradas independientes. Puedes consultar y probar las reglas con cualquier fecha en Debug antes de exportar el JSON. El video usa la reproducción configurada en la 0.60.1, sujeta a restricciones del navegador.
 
+
+## Editor visual guiado (0.60.3)
+
+Al abrir `/debug/` se carga automáticamente la configuración **publicada con esta versión** de `src/data/generator-messages.json`, incluyendo eventos desactivados, ID, revisión, prioridad, fechas, videos, destinatarios y textos. Si se modificó el JSON en GitHub después del último despliegue, es necesario actualizar el sitio para que el editor lea esa nueva versión. La configuración publicada no se sobrescribe desde Debug.
+
+El editor dispone de siete pasos: **Eventos**, **Destinatarios**, **Cuándo**, **Calendario**, **Mensaje**, **Pruebas** y **Publicar**. Usa controles visuales propios para seleccionar plantel, especialidades, fechas específicas, rangos y días múltiples de video; los campos de texto también están personalizados. La pestaña Eventos presenta **Modificar** y **Probar** para cada entrada cargada, incluida la graduación de 2027 y los borradores desactivados.
+
+La vista previa usa el componente de mensajes real. El simulador comprueba las reglas de activación y destinatarios con perfil y fecha ficticios, y la opción **Ver aviso real** permite ensayar contenidos incluso si el evento está desactivado. El simulador cuenta con su propia memoria de lectura; marcar un mensaje visto no afecta al navegador del alumno ni a los registros. El diseño de graduación puede visualizarse en un escenario acotado de Debug.
+
+La descarga genera el JSON **completo**, conservando los demás eventos sin modificaciones. Para publicar, se debe sustituir `src/data/generator-messages.json` en GitHub y confirmar el commit manualmente. Las opciones de importación por archivo o texto permanecen para trabajar con versiones alternativas, pero no se necesitan para empezar con los eventos publicados.
+
