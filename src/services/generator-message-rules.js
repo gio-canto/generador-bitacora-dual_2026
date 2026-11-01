@@ -43,7 +43,7 @@ export function validateMessageConfig(config) {
     if (!validYoutubeId(event?.content?.youtubeId)) errors.push(at+"ID de YouTube incorrecto.");
     if (event?.content?.action?.url && !validSurveyUrl(event.content.action.url)) errors.push(at+"Enlace no seguro.");
     const trigger=event?.trigger || {};
-    if(trigger.type==="date" && !iso(trigger.date) && !/^\\d\\d-\\d\\d$/.test(trigger.annualDate || "")) errors.push(at+"Fecha del evento inválida.");
+    if(trigger.type==="date" && !iso(trigger.date) && !/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(trigger.annualDate || "")) errors.push(at+"Fecha del evento inválida.");
     if(trigger.type==="graduation"){
       if(!iso(trigger.startDate)||!iso(trigger.endDate)||trigger.startDate>trigger.endDate)
         errors.push(at+"Periodo de graduación inválido.");
