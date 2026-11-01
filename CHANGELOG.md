@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.60.6 · Graduación integrada a Efemérides · 2026-10-31
+
+- La simulación de graduación ahora cambia los colores y superficies de **toda la página de Debug** como los otros efectos por fecha; no utiliza una maqueta del generador ni un panel de graduación.
+- Debug usa el motor de graduación actual y fechas recuperadas automáticamente del JSON publicado, incluidas futuras generaciones, otros planteles y eventos de prueba desactivados. Con varios eventos permite seleccionar el que se quiere comprobar.
+- El botón existente «Mostrar» y los accesos pequeños de las fechas permiten activar el tema; los días de video abren la felicitación correspondiente. «Limpiar visual» detiene los efectos y restaura la página.
+- Se retiran el panel de graduación, la pestaña específica y el botón «Probar graduación» de Vista adaptable. Las pruebas quedan agrupadas en **Efemérides** dentro de Debug completo.
+- La simulación no altera los perfiles de alumnos, la fecha real, la memoria de mensajes ni los registros; el funcionamiento de graduación y videos en el generador permanece igual.
+- Versión, documentación, FAQ y pruebas actualizados.
+
 ## 0.60.5 · Felicitaciones compartidas, bucle y pruebas de graduación · 2026-10-31
 
 - La despedida por última bitácora y la felicitación de cuarta generación usan atributos comunes de celebración: presentación completa, mismo video de YouTube, estilo, bucle y solicitud de audio automático.
