@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.60.2 · Graduación, hitos y avisos omitibles · 2026-10-31
+
+- Nuevo activador `graduation`: periodo de inicio a fin para cambiar visualmente el generador y lista de días exactos para mostrar el mensaje de felicitación con video de YouTube. Recuerdo local por día (`once-per-day`); el video se carga silenciado para favorecer la reproducción automática.
+- Ejemplo activo dirigido al CBTis No. 134: cuarta generación Dual, del 19 al 23 de julio de 2027, con video `YUC4FH3tSOk` únicamente el jueves 22 y el viernes 23. No se atribuye pertenencia individual a la generación; el filtro verificable es el plantel seleccionado.
+- Tema temporal de celebración en escritorio y móvil, con detalles visuales y banner no intrusivo; la vista previa de Debug permite comprobar las fechas y el diseño. La despedida genérica no se duplica cuando aparece el video de graduación.
+- Hitos de referencia para 1,000 horas y límite teórico de 1,504, junto a 480/840, en cálculos, estadísticas, vista por alumno, PDF y centro de avisos. No se recortan ni bloquean las horas capturadas.
+- Registro Dual permite omitir advertencias. Los avisos urgentes y de seguimiento reaparecen si cambia la semana o la información registrada; los informativos permanecen ocultos hasta cambiar su identificador. No se modifican las entregas.
+- Debug amplía el editor guiado con modo graduación, rango y selección múltiple de días para video, visualización del tema; laboratorio de advertencias con omisión, semana siguiente y nueva captura.
+- Documentación, versión y pruebas sincronizadas.
+
 ## 0.60.1 · Ajustes visuales y editor guiado · 2026-10-31
 
 - Efecto Liquid Glass refinado en navegación superior de Registro Dual y barra inferior de la presentación móvil: desenfoque, refracción suave, botón activo, transiciones y accesibilidad.
