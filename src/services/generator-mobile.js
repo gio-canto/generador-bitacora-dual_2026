@@ -205,6 +205,7 @@ export function startGeneratorMobile() {
     else if (action === "backup") document.getElementById("backupBtn")?.click();
     else if (action === "import") document.getElementById("importFile")?.click();
     else if (action === "tour") document.getElementById("tourBtn")?.click();
+    else if (action === "messages") window.dispatchEvent(new Event("bitacora-open-messages"));
     else if (action === "open-profile") {
       changeView("profile");
       profile?.querySelector("details > summary")?.click();
