@@ -9,7 +9,7 @@ import {getDefaultMessageConfig,validateMessageConfig,eligibleMessages,
 import {StudioField,StudioSwitch,StudioChoices,StudioSelect,StudioPills,
   StudioCalendar,StudioConfirmation} from "./EventStudioControls.jsx";
 import schools from "../data/schools.json";
-import "./event-editor-debug.css";
+import "./event-studio.css";
 
 const copy=value=>JSON.parse(JSON.stringify(value));
 const specialties=[...new Set(schools.flatMap(s=>s.specialties||[]))];
