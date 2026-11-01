@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.3-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.4-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.4 · Reproducción, graduación y Vista adaptable
+
+Los mensajes con YouTube conservan la reproducción inmediata **sin sonido**. El botón **Activar audio** habilita el volumen al 90% mediante la API de YouTube sólo después de una acción explícita del usuario. Los navegadores pueden impedir el inicio automático, pero no se activa sonido inesperadamente. La ventana mantiene el ancho del dispositivo y ya no presenta barras de desplazamiento horizontales.
+
+El tema de graduación conserva las mismas estructuras, paneles y navegación del generador y adapta únicamente colores, acentos y transparencias. Los controles siguen disponibles en móvil y escritorio. En [Debug](debug/), **Vista adaptable** incorpora la página de Debug completa y escenarios para graduación, mensajes, editor, efemérides, notificaciones, campana, centro de avisos, PDF y cámara, en varios anchos de pantalla y con datos de prueba.
 
 ## v0.60.3 · Estudio visual de eventos y FAQ actualizado
 
