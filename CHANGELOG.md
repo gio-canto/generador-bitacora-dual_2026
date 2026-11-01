@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.60.1 · Ajustes visuales y editor guiado · 2026-10-31
+
+- Efecto Liquid Glass refinado en navegación superior de Registro Dual y barra inferior de la presentación móvil: desenfoque, refracción suave, botón activo, transiciones y accesibilidad.
+- Generador móvil inicia en la pestaña **Inicio** y detecta automáticamente el dispositivo; se eliminan el botón «Vista móvil» y el selector manual de presentaciones para mantener una interfaz coherente.
+- El modal con video de YouTube inserta directamente el reproductor con `autoplay=1`, `mute=1` y `playsinline=1`; el navegador puede restringir la reproducción automática, y el sonido puede habilitarse desde los controles.
+- Nuevas transiciones sutiles en avisos, con respeto a `prefers-reduced-motion`.
+- Debug integra un editor de eventos en cinco pasos con tarjetas de alcance para todos los alumnos Dual, especialidades de todos los planteles, planteles concretos, combinación o selección múltiple; conserva importación, simulación, vista previa, validación y exportación.
+- Debug permite escuchar campanadas normal, suave y doble, con indicación de bloqueo de reproducción por el navegador.
+- Se mantienen los esquemas JSON, registros escolares, compatibilidad Data Matrix y generación PDF anteriores.
+
 ## 0.60.0 · Mensajes, eventos y centro de avisos · 2026-10-31
 
 - Nuevo motor de mensajes configurado en `src/data/generator-messages.json`: presentaciones pestaña, mediana y completa, fechas exactas/anuales o periodos, destinatarios por plantel/especialidad, video YouTube opcional y enlaces HTTPS.

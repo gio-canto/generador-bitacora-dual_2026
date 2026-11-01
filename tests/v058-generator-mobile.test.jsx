@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import App from "../src/App.jsx";
-import { GENERATOR_LAYOUT_KEY } from "../src/services/generator-mobile.js";
 
 vi.stubGlobal("IntersectionObserver", class {
   observe() {}
@@ -9,22 +8,27 @@ vi.stubGlobal("IntersectionObserver", class {
 });
 
 const originalMatchMedia = window.matchMedia;
+const adaptiveMedia = (initialSmall) => {
+  let small=initialSmall;
+  let listener=()=>{};
+  window.matchMedia=vi.fn(query=>({
+    media:query,
+    get matches(){return small;},
+    addEventListener:(name,handler)=>{if(name==="change")listener=handler;},
+    removeEventListener:vi.fn()
+  }));
+  return (next)=>{small=next;listener({matches:next});};
+};
 afterEach(() => {
   cleanup();
   window.matchMedia = originalMatchMedia;
-  localStorage.removeItem(GENERATOR_LAYOUT_KEY);
   document.body.classList.remove("generator-mobile-active");
 });
 
 describe("v0.58 — generador móvil sin duplicar el escritorio", () => {
   it("comparte el mismo formulario, historial y perfil en las dos vistas", () => {
     localStorage.clear();
-    window.matchMedia = vi.fn((query) => ({
-      matches: query.includes("max-width: 760px"),
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }));
+    const resize=adaptiveMedia(true);
     render(<App />);
     const byId = (id) => document.getElementById(id);
     expect(document.body.classList.contains("generator-mobile-active")).toBe(true);
@@ -44,26 +48,29 @@ describe("v0.58 — generador móvil sin duplicar el escritorio", () => {
     fireEvent.click(document.querySelector('.gm-bottom-nav [data-gm-nav="history"]'));
     expect(byId("homeHistoryDisclosure")?.open).toBe(true);
     fireEvent.click(document.querySelector('.gm-bottom-nav [data-gm-nav="more"]'));
-    fireEvent.click(document.querySelector('[data-gm-mode="desktop"]'));
+    resize(false);
     expect(document.body.classList.contains("generator-mobile-active")).toBe(false);
     expect(byId("homeHistoryDisclosure")?.closest(".topbar")).toBeTruthy();
     expect(byId("profileSlot")?.closest(".topbar")).toBeTruthy();
     expect(byId("student")).toBe(student);
     expect(byId("student").value).toBe("Estudiante de prueba");
-    expect(localStorage.getItem(GENERATOR_LAYOUT_KEY)).toBe("desktop");
+    expect(document.getElementById("generatorModeBtn")).toBeNull();
+    expect(document.querySelectorAll("[data-gm-mode]")).toHaveLength(0);
   });
 
   it("recupera la vista móvil sin reiniciar los datos", () => {
     localStorage.clear();
+    const resize=adaptiveMedia(false);
     render(<App />);
     expect(document.body.classList.contains("generator-mobile-active")).toBe(false);
     const student = document.getElementById("student");
     fireEvent.input(student, { target: { value: "Otro estudiante" } });
-    fireEvent.click(document.getElementById("generatorModeBtn"));
+    resize(true);
     expect(document.body.classList.contains("generator-mobile-active")).toBe(true);
     expect(document.getElementById("student")).toBe(student);
     expect(student.value).toBe("Otro estudiante");
     expect(document.querySelector(".gm-home")?.hidden).toBe(false);
+    expect(document.querySelector(".shell")?.dataset.mobileView).toBe("home");
     fireEvent.click(document.querySelector('.gm-bottom-nav [data-gm-nav="profile"]'));
     expect(document.querySelector(".gm-profile")?.hidden).toBe(false);
   });

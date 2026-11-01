@@ -299,6 +299,7 @@ export function startEditor() {
       currentId = null,
       dirty = false,
       logoImage = null;
+    let profileNameTimer, profileDefaultsTimer;
     const createId = () =>
       "bitacora-" + Date.now() + "-" + Math.random().toString(16).slice(2);
     function legacyProfileMatchIsUnique(activeId, activeName) {
@@ -2736,14 +2737,10 @@ export function startEditor() {
           updatePreview();
         });
       });
-      let profileNameTimer;
-      let profileDefaultsTimer;
       $("#student").addEventListener("input", () => {
         clearTimeout(profileNameTimer);
-        profileNameTimer = setTimeout(
-          () => rememberName($("#student").value),
-          400,
-        );
+        const name=$("#student")?.value||"";
+        profileNameTimer = setTimeout(() => rememberName(name),400);
         $("#elaboroName").value = $("#student").value.trim();
         updateStudentSignaturePreview();
       });
@@ -2970,6 +2967,8 @@ export function startEditor() {
     return () => {
       clearTimeout(previewTimer);
       clearTimeout(draftTimer);
+      clearTimeout(profileNameTimer);
+      clearTimeout(profileDefaultsTimer);
       previewObserver.disconnect();
     };
   })();

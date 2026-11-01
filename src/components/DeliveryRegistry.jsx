@@ -89,6 +89,7 @@ import "../delivery-unified-glass.css";
 import "../delivery-quick-sidebar.css";
 import "../delivery-desktop-restoration.css";
 import "../delivery-mobile-polish.css";
+import "../delivery-glass-navigation-v0601.css";
 
 const ZXING_SOURCES = [
   "https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js",

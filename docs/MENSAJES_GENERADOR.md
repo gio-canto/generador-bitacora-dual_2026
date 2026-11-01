@@ -48,3 +48,11 @@ La encuesta predeterminada está desactivada y sin URL real. Actívala únicamen
 En Debug se puede probar un perfil y una fecha, ver si coincide una condición, forzar una vista previa real y simular un anuncio visto sin alterar las preferencias de estudiantes. Importar o exportar JSON no realiza commits ni escribe el repositorio automáticamente. Después de reemplazar el archivo, ejecutar `npm run check` y revisar escritorio/móvil.
 
 [Arquitectura](ARQUITECTURA.md) · [Pruebas](PRUEBAS.md) · [Centro de avisos](CENTRO_AVISOS.md)
+
+## Actualización visual v0.60.1
+
+Debug muestra el **Editor de eventos** organizado en cinco pasos: **Eventos**, **Destinatarios**, **Cuándo**, **Mensaje** y **Revisar**. Los controles sólo muestran la información del paso activo. Se puede elegir entre todos los alumnos de Educación Dual (sin filtros), una especialidad en todos los planteles, un plantel completo, un plantel y especialidad, o varios criterios. Los filtros siguen almacenándose en `audience.schools` y `audience.specialties` sin modificar el esquema.
+
+Los videos se insertan al abrir el mensaje e intentan comenzar automáticamente **silenciados** mediante `autoplay=1&mute=1&playsinline=1`. YouTube o el navegador pueden bloquear la reproducción; el usuario puede activar audio en el reproductor. No se garantiza la reproducción automática con sonido.
+
+La presentación del generador se activa automáticamente por ancho de pantalla y la primera pestaña móvil es **Inicio**. Las opciones manuales de alternancia fueron retiradas.

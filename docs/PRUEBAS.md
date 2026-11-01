@@ -173,6 +173,15 @@ La coincidencia exacta siempre tiene prioridad.
 - Comprobar el bloque `BD26|4` + `S5:` al generar y decodificar, manteniendo los códigos anteriores.
 - Revisar manualmente las causas que no tengan coincidencia y el funcionamiento de la campanita en móvil (390/430 px) y escritorio.
 
+## Ajustes visuales y editor guiado (0.60.1)
+
+- Verificar barra superior de Registro Dual y navegación inferior móvil, contraste y espacios seguros (390, 430, 768, 1024 px), sin alterar la estructura de escritorio.
+- Comprobar que la primera vista móvil del generador sea Inicio aun con borradores previos y que el cambio de ancho active la vista adecuada sin duplicar campos.
+- Confirmar que el botón de cambio a Vista móvil y el selector de presentación se eliminaron.
+- Verificar editor Debug de cinco pasos, opciones de destinatarios, importación/exportación, reproducción de video y prueba de los tres tonos con y sin permiso de audio.
+- Revisar reproducción de YouTube automática silenciada o bloqueo permitido por navegador, y que el cierre detenga el iframe.
+- Probar movimiento reducido y transparencia reducida.
+
 ## Mensajes, campanita y Debug (0.60)
 
 - Validar el JSON antes de exportar: identificadores únicos, tipos de activación, fechas, destinatarios, enlaces HTTPS, IDs de YouTube y botón de cierre.

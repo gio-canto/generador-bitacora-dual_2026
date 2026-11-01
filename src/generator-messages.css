@@ -15,3 +15,28 @@
 .generator-message-history li strong{flex:1 1 150px}.generator-message-history li span{color:#67707b;font-size:12px}.generator-message-history li button{border:0;border-radius:10px;padding:9px 14px;cursor:pointer}
 @media(max-width:600px){.generator-message-layer{padding:12px}.generator-message-card{padding:20px;border-radius:18px}.generator-message-tab{padding:12px}.generator-message-fullscreen .generator-message-card{max-height:calc(100dvh - 24px)}}
 @media(prefers-reduced-motion:reduce){.generator-message-layer *{scroll-behavior:auto!important}}
+
+/* Transiciones de apertura y acentos sutiles en los avisos v0.60.1 */
+.generator-message-layer{animation:generatorMessageVeil .28s ease-out both}
+.generator-message-card{
+  position:relative;isolation:isolate;
+  animation:generatorMessageAppear .4s cubic-bezier(.17,.88,.3,1.06) both;
+  background:linear-gradient(155deg,#fff 15%,#f6faff 76%,#fff 100%);
+  box-shadow:0 24px 80px rgba(15,37,65,.24),inset 0 1px 0 rgba(255,255,255,.95);
+}
+.generator-message-card::before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  width:190px;height:190px;right:-90px;top:-115px;border-radius:50%;
+  background:radial-gradient(circle,rgba(137,191,247,.28),transparent 74%);
+}
+.generator-message-tab .generator-message-card{animation:generatorMessageTab .35s cubic-bezier(.2,.85,.22,1) both}
+.generator-message-video{box-shadow:0 14px 30px rgba(18,42,72,.18);border:1px solid rgba(255,255,255,.22)}
+.generator-message-close:hover{background:#e0ecfa;transform:rotate(12deg)}
+.generator-message-action:hover{filter:brightness(1.06)}
+.generator-message-card :is(.generator-message-close,.generator-message-action,.generator-message-secondary){
+  transition:transform .2s ease,background .2s ease,filter .2s ease;
+}
+@keyframes generatorMessageVeil{from{opacity:0}to{opacity:1}}
+@keyframes generatorMessageAppear{from{opacity:0;transform:translateY(20px) scale(.965)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes generatorMessageTab{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.generator-message-layer,.generator-message-card{animation:none!important}}

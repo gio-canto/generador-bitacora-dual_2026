@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,14 @@
 </div>
 
 ---
+
+## v0.60.1 · Navegación Liquid Glass y editor guiado
+
+Registro Dual mejora los efectos de vidrio translúcido, relieve y selección en las barras superior e inferior, con respeto a accesibilidad y movimiento reducido. El generador se abre en **Inicio** en pantallas móviles y elige automáticamente la interfaz por ancho: se retiran los controles manuales de cambio de modo.
+
+Los mensajes con video de YouTube intentan reproducirse directamente al abrir el modal, **silenciados** para ajustarse a las políticas del navegador; el alumno puede activar el sonido en el reproductor. Se añaden transiciones discretas. En [Debug](debug/) el editor de eventos ahora es un asistente de cinco pasos, con alcances para todos los alumnos Dual o filtros por especialidad y plantel, además de prueba de campanadas normal, suave y doble.
+
+Los archivos, PDF, Data Matrix, bitácoras y datos de Registro Dual permanecen compatibles.
 
 ## v0.60.0 · Mensajes, eventos y centro de avisos
 

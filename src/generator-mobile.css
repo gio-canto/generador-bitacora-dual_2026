@@ -1,6 +1,6 @@
 /* Generador Dual v0.58 — isolated Adaptive Glass mobile presentation.
    No desktop or Registro Dual selectors are altered. */
-.gm-mobile,.gm-day-tabs,.gm-mode-desktop-button{display:none}
+.gm-mobile,.gm-day-tabs{display:none}
 .generator-mobile-active{
   background:radial-gradient(ellipse at 4% 3%,#d9eafe 0,transparent 45%),
              radial-gradient(ellipse at 100% 72%,#f5e5e1 0,transparent 50%),#f5f8fc;
@@ -126,7 +126,6 @@
 .generator-mobile-active .gm-bottom-nav button:active{transform:scale(.96)}
 .generator-mobile-active .gm-bottom-nav .gm-icon{height:23px;width:23px}
 .generator-mobile-active .gm-bottom-nav button.active .gm-icon{stroke-width:2.15}
-.generator-mobile-active .gm-mode-desktop-button{display:none!important}
 .generator-mobile-active .gm-history #homeHistoryDisclosure{
   display:block!important;position:relative!important;width:100%;margin:0;
 }
@@ -278,9 +277,6 @@
 .generator-mobile-active .guard-shell{padding:22px}
 .generator-mobile-active .status-shell h2,.generator-mobile-active .guard-shell h2{font-size:25px}
 .generator-mobile-active .tour-card{width:min(360px,calc(100vw - 24px))}
-@media(max-width:760px){
-  body:not(.generator-mobile-active) .gm-mode-desktop-button{display:inline-flex}
-}
 @media(max-width:390px){
   .generator-mobile-active .shell{padding-inline:8px}
   .generator-mobile-active .gm-view{padding-inline:2px}
