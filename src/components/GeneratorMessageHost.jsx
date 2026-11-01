@@ -17,6 +17,8 @@ export function GeneratorMessageCard({event,onClose}){
   // cumplir las restricciones de autoplay de Safari y Chromium.
   // El usuario puede activar el sonido con los controles del reproductor.
   const container=useRef(null);
+  const videoFrame=useRef(null);
+  const [audioOn,setAudioOn]=useState(false);
   const isTab=event.presentation==="tab";
   useEffect(()=>{
     if(isTab)return;
@@ -27,6 +29,18 @@ export function GeneratorMessageCard({event,onClose}){
     return ()=>{document.removeEventListener("keydown",keyboard);if(prior?.isConnected)prior.focus?.();};
   },[event.id,onClose,isTab]);
   const content=event.content||{};
+  const videoSrc=safeEmbed(content.youtubeId);
+  // El autoplay empieza silenciado; el audio sólo se habilita por una acción del usuario.
+  // YouTube acepta comandos de su API mediante postMessage con enablejsapi=1.
+  const activateAudio=()=>{
+    const player=videoFrame.current?.contentWindow;
+    if(!player)return;
+    const command=func=>player.postMessage(JSON.stringify({event:"command",func,args:func==="setVolume"?[90]:[]}),
+      "https://www.youtube-nocookie.com");
+    command("setVolume");
+    command("unMute");
+    setAudioOn(true);
+  };
   return <div className={"generator-message-layer generator-message-"+event.presentation+(event.trigger?.type==="graduation"?" generator-message-graduation":"")}
     onMouseDown={e=>{if(!isTab && e.target===e.currentTarget)onClose();}}>
     <section ref={container} tabIndex={-1} className="generator-message-card"
@@ -35,12 +49,20 @@ export function GeneratorMessageCard({event,onClose}){
         <span>{event.trigger?.type==="graduation"?"Graduación Dual":event.presentation==="fullscreen"?"Mensaje especial":"Aviso"}</span>
         <button type="button" className="generator-message-close" onClick={onClose} aria-label="Cerrar mensaje">×</button>
       </header>
-      {content.youtubeId && event.presentation!=="tab" && <div className="generator-message-video">
-        <iframe src={safeEmbed(content.youtubeId)+"?autoplay=1&mute=1&playsinline=1&rel=0"}
-          title={"Video: "+content.title}
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          loading="eager" referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen/>
+      {videoSrc && event.presentation!=="tab" && <div className="generator-message-media">
+        <div className="generator-message-video">
+          <iframe ref={videoFrame} src={videoSrc+"?autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1"}
+            title={"Video: "+content.title}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            loading="eager" referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen/>
+        </div>
+        <div className="generator-message-media-controls">
+          <span>El video inicia sin sonido.</span>
+          <button type="button" onClick={activateAudio} disabled={audioOn}>
+            {audioOn?"Audio activado":"Activar audio"}
+          </button>
+        </div>
       </div>}
       <h2>{content.title}</h2>
       <p>{content.body}</p>
