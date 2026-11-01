@@ -3,7 +3,7 @@
   "events": [
     {
       "id": "fin-dual",
-      "revision": 1,
+      "revision": 2,
       "enabled": true,
       "presentation": "fullscreen",
       "trigger": {
@@ -15,13 +15,18 @@
       },
       "content": {
         "title": "¡Felicidades por concluir tu formación dual!",
-        "body": "Gracias por haber utilizado el Generador de Bitácora Dual durante esta etapa de tu formación. Te deseamos mucho éxito en lo que viene.",
-        "youtubeId": null,
+        "body": "Esta es tu última bitácora de Educación Dual. Gracias por haber utilizado el Generador de Bitácora Dual durante tu formación. ¡Felicidades por concluir esta etapa y mucho éxito en lo que viene!",
+        "youtubeId": "YUC4FH3tSOk",
         "action": null
       },
       "priority": 100,
       "frequency": "once",
-      "dismissible": true
+      "dismissible": true,
+      "celebration": {
+        "kind": "dual",
+        "loopVideo": true,
+        "autoplayAudio": true
+      }
     },
     {
       "id": "encuesta-uso",
@@ -75,7 +80,7 @@
     },
     {
       "id": "graduacion-cbtis134-dual-generacion4-2027",
-      "revision": 1,
+      "revision": 2,
       "enabled": true,
       "presentation": "fullscreen",
       "trigger": {
@@ -95,7 +100,7 @@
       },
       "content": {
         "title": "¡Felicidades a la cuarta generación de Educación Dual!",
-        "body": "Gracias por su compromiso y por haber utilizado el Generador de Bitácora Dual. Les deseamos éxito en la siguiente etapa.",
+        "body": "Gracias por su compromiso y por haber utilizado el Generador de Bitácora Dual. Si esta fue su última bitácora Dual, también celebramos el cierre de esta etapa. Les deseamos éxito en lo que viene.",
         "youtubeId": "YUC4FH3tSOk",
         "action": null
       },
@@ -105,7 +110,12 @@
       },
       "priority": 110,
       "frequency": "once-per-day",
-      "dismissible": true
+      "dismissible": true,
+      "celebration": {
+        "kind": "dual",
+        "loopVideo": true,
+        "autoplayAudio": true
+      }
     }
   ]
 }
