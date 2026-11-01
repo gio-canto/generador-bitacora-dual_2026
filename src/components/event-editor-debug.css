@@ -1,0 +1,10 @@
+.debug-event-editor{display:grid;gap:16px}.debug-event-list{display:flex;gap:8px;overflow:auto;padding:6px 0}
+.debug-event-list button{min-width:180px;max-width:240px;text-align:left;border:1px solid #dfe1e6;background:#fff;border-radius:12px;padding:12px;cursor:pointer;font-size:13px}
+.debug-event-list button.active{border-color:#1773db;background:#eff6ff}.debug-event-list small{display:block;font-size:11px;color:#606976;margin-top:5px}
+.debug-event-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.debug-event-fields label,.debug-event-transfer label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600}
+.debug-event-fields input,.debug-event-fields textarea,.debug-event-fields select,.debug-event-transfer textarea{font:14px system-ui;width:100%;border:1px solid #d7dce3;padding:10px;border-radius:9px;background:#fff}
+.debug-event-fields .span-all{grid-column:1/-1}.debug-event-fields .debug-event-check{flex-direction:row;align-items:center}.debug-event-check input{width:auto}
+.debug-event-test,.debug-event-transfer{border-top:1px solid #e0e4ea;padding-top:16px;display:grid;gap:12px}
+.debug-event-errors{white-space:pre-wrap;color:#a02420;background:#fff0ed;padding:12px;border-radius:10px}
+@media(max-width:550px){.debug-event-fields{grid-template-columns:minmax(0,1fr)}}
