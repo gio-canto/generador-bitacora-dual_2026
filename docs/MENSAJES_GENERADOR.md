@@ -78,3 +78,10 @@ La vista previa usa el componente de mensajes real. El simulador comprueba las r
 
 La descarga genera el JSON **completo**, conservando los demás eventos sin modificaciones. Para publicar, se debe sustituir `src/data/generator-messages.json` en GitHub y confirmar el commit manualmente. Las opciones de importación por archivo o texto permanecen para trabajar con versiones alternativas, pero no se necesitan para empezar con los eventos publicados.
 
+
+## Reproductor y Vista adaptable (0.60.4)
+
+Los videos de YouTube se cargan con `autoplay=1&mute=1&playsinline=1&enablejsapi=1` cuando abre la ventana. **El audio no inicia automáticamente**: el botón «Activar audio» envía las órdenes `setVolume(90)` y `unMute` sólo cuando el usuario lo selecciona; su funcionamiento también depende de que YouTube cargue correctamente y de las políticas del navegador. Se corrigió el ancho del modal para evitar desplazamientos horizontales.
+
+En **Debug → Vista adaptable** se puede elegir **Debug completo**, seleccionar una experiencia visual y simularla a anchos de 320 a 1280 px. Están incluidos graduación, mensajes, editor de eventos, efemérides, notificaciones, campana, avisos, PDF y cámara. Los controles dentro del iframe son interactivos. La graduación puede ensayarse en cualquier momento, independientemente de las fechas de publicación. Las simulaciones no modifican las bitácoras reales.
+

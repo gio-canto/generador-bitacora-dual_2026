@@ -4,6 +4,9 @@ import "./debug.css";
 import "./calendar-easter-eggs.css";
 import EventEditorDebug from "./components/EventEditorDebug.jsx";
 import DebugInboxLab from "./components/DebugInboxLab.jsx";
+import {GeneratorMessageCard} from "./components/GeneratorMessageHost.jsx";
+import eventConfig from "./data/generator-messages.json";
+import "./generator-graduation.css";
 
 import {
   VERSION,
@@ -369,9 +372,9 @@ function runSmokeTests() {
   return results;
 }
 
-function Card({ title, description, wide = false, children }) {
+function Card({ title, description, wide = false, id, children }) {
   return (
-    <section className={"debug-card" + (wide ? " wide" : "")}>
+    <section id={id} className={"debug-card" + (wide ? " wide" : "")}>
       <h2>{title}</h2>
       {description ? <p>{description}</p> : null}
       {children}
@@ -388,6 +391,10 @@ function DebugPage() {
   const [cameraOutput, setCameraOutput] = useState("Sin prueba manual.");
   const [iframeWidth, setIframeWidth] = useState("390");
   const [iframePage, setIframePage] = useState("../");
+  const [iframeScene, setIframeScene] = useState("graduation");
+  const sceneOnLoad=new URLSearchParams(window.location.search).get("debug-scene")||"";
+  const nestedPreview=new URLSearchParams(window.location.search).has("debug-preview");
+  const [adaptivePreview,setAdaptivePreview]=useState(null);
   const [actionOutput, setActionOutput] = useState("");
   const calendarStop = useRef(null);
   const env = useMemo(environmentSnapshot, []);
@@ -414,6 +421,29 @@ function DebugPage() {
     });
   };
 
+  useEffect(()=>{
+    if(!sceneOnLoad)return;
+    const targetId={
+      graduation:"debug-graduation",messages:"debug-editor",editor:"debug-editor",
+      inbox:"debug-inbox",bell:"debug-inbox",notifications:"debug-notifications",
+      calendar:"debug-calendar",pdf:"debug-pdf",camera:"debug-camera"
+    }[sceneOnLoad];
+    if(sceneOnLoad==="graduation"){
+      const event=eventConfig.events.find(x=>x.trigger.type==="graduation");
+      if(event)setAdaptivePreview(event);
+    }
+    if(sceneOnLoad==="messages"){
+      const event=eventConfig.events.find(x=>x.id==="fin-dual")||eventConfig.events[0];
+      if(event)setAdaptivePreview(event);
+    }
+    if(sceneOnLoad==="notifications"){
+      window.setTimeout(()=>notify("success","Vista adaptable","Notificación de prueba visual."),350);
+    }
+    if(sceneOnLoad==="calendar")window.setTimeout(()=>previewCalendar("2026-11-02"),350);
+    const timer=window.setTimeout(()=>document.getElementById(targetId)?.scrollIntoView({block:"start"}),500);
+    return ()=>window.clearTimeout(timer);
+  // Escenario fijo en el iframe al cargar; no altera el calendario ni los perfiles reales.
+  },[sceneOnLoad]);
   const resetCalendar = () => {
     calendarStop.current?.();
     calendarStop.current = null;
@@ -547,6 +577,7 @@ function DebugPage() {
 
         <Card
           title="Efemérides"
+          id="debug-calendar"
           description="Simula una fecha y ejecuta el motor real. Sólo incluye activadores por fecha."
           wide
         >
@@ -584,16 +615,31 @@ function DebugPage() {
           <pre className="debug-output">{JSON.stringify(calendarState, null, 2)}</pre>
         </Card>
 
-        <Card title="Editor de eventos" description="Importa, modifica, prueba y exporta el JSON de mensajes." wide>
+        {sceneOnLoad==="graduation"&&<Card id="debug-graduation" wide title="Graduación · tema activo">
+          <div className="debug-graduation-stage generator-graduation-active">
+            <div className="shell">
+              <div className="topbar"><strong>Generador de Bitácora Dual</strong><span>Inicio</span></div>
+              <div className="gm-home"><h3>Cuarta generación Dual</h3>
+                <p>Vista de prueba del tema, con las mismas dimensiones y componentes base del generador.</p>
+                <div className="gm-panel">Continuar captura · Mis bitácoras</div>
+              </div>
+            </div>
+          </div>
+          <button type="button" className="debug-button primary" onClick={()=>{
+            setAdaptivePreview(eventConfig.events.find(x=>x.trigger.type==="graduation"));
+          }}>Repetir felicitación</button>
+        </Card>}
+        <Card id="debug-editor" title="Editor de eventos" description="Importa, modifica, prueba y exporta el JSON de mensajes." wide>
           <EventEditorDebug />
         </Card>
 
-        <Card title="Centro de avisos" description="Simula pendientes, motivos, hitos, respaldos y sonido sin datos reales." wide>
+        <Card id="debug-inbox" title="Centro de avisos" description="Simula pendientes, motivos, hitos, respaldos y sonido sin datos reales." wide>
           <DebugInboxLab base={sampleDeliveryState()} />
         </Card>
 
         <Card
           title="Notificaciones"
+          id="debug-notifications"
           description="Ejecuta cada tipo de aviso."
         >
           <div className="debug-row">
@@ -606,6 +652,7 @@ function DebugPage() {
 
         <Card
           title="PDF"
+          id="debug-pdf"
           description="Genera archivos con datos de prueba."
         >
           <div className="debug-row">
@@ -621,6 +668,7 @@ function DebugPage() {
 
         <Card
           title="Escáner y cámara"
+          id="debug-camera"
           description="Comprueba acceso a cámara y diagnóstico del lector."
         >
           <div className="debug-row">
@@ -669,16 +717,18 @@ function DebugPage() {
           </div>
         </Card>
 
-        <Card
+        {!nestedPreview&&<Card
           title="Vista adaptable"
-          description="Carga una página real a un ancho fijo."
+          description="Prueba el sistema o cualquier efecto de Debug a tamaño de teléfono, tableta o escritorio."
           wide
         >
           <div className="debug-row">
             <div className="debug-field">
               <label htmlFor="frame-width">Ancho</label>
               <select id="frame-width" value={iframeWidth} onChange={(event) => setIframeWidth(event.target.value)}>
+                <option value="320">Teléfono pequeño · 320 px</option>
                 <option value="390">Teléfono · 390 px</option>
+                <option value="430">Teléfono grande · 430 px</option>
                 <option value="768">Tableta · 768 px</option>
                 <option value="1024">Horizontal · 1024 px</option>
                 <option value="1280">Escritorio · 1280 px</option>
@@ -689,22 +739,45 @@ function DebugPage() {
               <select id="frame-page" value={iframePage} onChange={(event) => setIframePage(event.target.value)}>
                 <option value="../">Generador</option>
                 <option value="../registro-entrega/">Registro de entregas</option>
+                <option value="./">Debug completo</option>
                 <option value="../faq/">FAQ</option>
                 <option value="../presentacion/">Presentación</option>
               </select>
             </div>
+            {iframePage==="./"&&<div className="debug-field">
+              <label htmlFor="frame-scene">Experiencia visual</label>
+              <select id="frame-scene" value={iframeScene} onChange={event=>setIframeScene(event.target.value)}>
+                <option value="graduation">Graduación · video y tema</option>
+                <option value="messages">Mensajes emergentes</option>
+                <option value="editor">Editor visual de eventos</option>
+                <option value="calendar">Efemérides</option>
+                <option value="notifications">Notificaciones</option>
+                <option value="inbox">Centro de avisos</option>
+                <option value="bell">Campana y sonidos</option>
+                <option value="pdf">Pruebas PDF</option>
+                <option value="camera">Escáner y cámara</option>
+              </select>
+            </div>}
+            <button className="debug-button" type="button"
+              onClick={()=>{setIframePage("./");setIframeScene("graduation");}}>
+              Probar graduación
+            </button>
           </div>
           <div className="debug-frame-wrap">
             <iframe
+              key={iframePage==="."||iframePage==="./"?iframeScene:iframePage}
               className="debug-frame"
               title="Vista adaptable de prueba"
-              src={iframePage + "?debug-preview=1"}
+              src={iframePage+"?debug-preview=1"+(iframePage==="./"?"&debug-scene="+encodeURIComponent(iframeScene):"")}
+              allow="autoplay; camera; fullscreen"
               style={{ width: iframeWidth + "px" }}
             />
           </div>
-        </Card>
+          <p className="debug-note">Los controles dentro del marco son funcionales. Los escenarios utilizan la configuración y el código publicados, sin modificar el registro real.</p>
+        </Card>}
       </div>
-
+      {adaptivePreview&&<GeneratorMessageCard key={adaptivePreview.id} event={adaptivePreview}
+        onClose={()=>setAdaptivePreview(null)}/>}
       <footer className="debug-footer">
         <span>Generador de Bitácora Dual 2026</span>
         <nav aria-label="Información legal y del proyecto">
