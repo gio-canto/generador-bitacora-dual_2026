@@ -61,6 +61,9 @@ describe("0.60.7 · despedida tras la última bitácora",()=>{
     expect(validateMessageConfig(historicConfig)).toEqual([]);
     expect(eligibleMessages(historicConfig,{date:"2027-07-22",profile,
       trigger:"graduation"}).map(x=>x.id)).toEqual([historic.id]);
+    const combined={...config,events:config.events.map(e=>
+      e.trigger?.type==="graduation"?historic:e)};
+    expect(finalBitacoraMessages(combined,{date:"2027-07-22",profile})).toEqual([]);
   });
   it("Debug conserva la prueba manual, nunca abre el video sólo por la fecha",()=>{
     const debug=readFileSync("src/debug-main.jsx","utf8");
