@@ -1,5 +1,6 @@
 import absenceReasons from "../data/absence-reasons.json";
 import nonWorkingReasons from "../data/non-working-reasons.json";
+import { classifyReason } from "./reason-classifier.js";
 
 // 4 jornadas, 19 bits por jornada y 4 bits de comprobación (10 bytes).
 // La codificación no contiene actividades, justificaciones ni datos personales.
@@ -28,7 +29,7 @@ export function reasonFromEntry(entry) {
   const matching = catalog.find(
     (item) => item.text.trim() === String(entry?.activity || "").trim(),
   );
-  return matching?.code || CUSTOM_REASON;
+  return matching?.code || classifyReason(entry?.status, entry?.activity)?.code || CUSTOM_REASON;
 }
 
 export function encodeWeekStatistics(entries) {

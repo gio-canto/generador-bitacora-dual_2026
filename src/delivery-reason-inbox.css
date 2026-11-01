@@ -1,0 +1,40 @@
+/* Bandeja de avisos propia del registro. Mantiene la topbar original. */
+.dual-inbox-trigger{position:relative;min-width:42px;justify-content:center}
+.dual-inbox-counter{position:absolute;top:-7px;right:-7px;min-width:19px;height:19px;padding:0 4px;
+ display:grid;place-items:center;border-radius:12px;background:#b3261e;color:#fff;
+ font-size:10px;font-weight:700;border:2px solid #fff;line-height:1}
+.dual-inbox-backdrop{position:fixed;inset:0;background:rgba(17,24,39,.28);z-index:10050;
+ display:flex;justify-content:flex-end;align-items:flex-start;padding:76px 18px 16px}
+.dual-inbox-panel{width:min(440px,100%);max-height:min(78vh,780px);background:#fff;color:#24262b;
+ border:1px solid rgba(0,0,0,.1);border-radius:22px;box-shadow:0 20px 70px rgba(0,0,0,.18);
+ display:flex;flex-direction:column;overflow:hidden;outline:none}
+.dual-inbox-header{display:flex;align-items:center;justify-content:space-between;gap:12px;
+ padding:20px 20px 16px;border-bottom:1px solid rgba(0,0,0,.09)}
+.dual-inbox-header h2{font-size:21px;margin:4px 0 0;font-weight:680}
+.dual-inbox-content{overflow-y:auto;padding:16px 18px 22px;overscroll-behavior:contain}
+.dual-inbox-explanation{font-size:13px;line-height:1.6;color:#5a5c64;margin:0 0 15px}
+.dual-inbox-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.dual-inbox-item{display:grid;gap:9px;border:1px solid #e5e7eb;background:#fafbfc;
+ border-radius:16px;padding:15px}
+.dual-inbox-entry-heading{display:flex;justify-content:space-between;align-items:start;
+ flex-wrap:wrap;gap:5px 10px}
+.dual-inbox-entry-heading strong{font-size:14px;overflow-wrap:anywhere}
+.dual-inbox-entry-heading span,.dual-inbox-item p{font-size:12px;color:#667085;margin:0}
+.dual-inbox-item label{display:grid;gap:6px;font-size:12px;color:#454954}
+.dual-inbox-item select{width:100%;height:39px;padding:0 10px;border-radius:10px;
+ background:white;border:1px solid #cbd0d8;color:#202124;font:inherit}
+.dual-inbox-item .btn{justify-self:start;max-width:100%;white-space:normal;text-align:left}
+.dual-inbox-backup{display:flex;align-items:flex-start;gap:12px;padding:14px;
+ background:#f5f7fa;border-radius:14px;margin-bottom:15px}
+.dual-inbox-backup p{margin:5px 0 9px;font-size:12px;line-height:1.45}
+.dual-inbox-backup strong{font-size:14px}
+.dual-inbox-empty{display:flex;align-items:center;gap:10px;color:#525866;
+ padding:20px 8px;font-size:13px}
+.dual-inbox-empty p{margin:0}
+@media(max-width:760px){
+ .dual-inbox-backdrop{padding:65px 10px 12px}
+ .dual-inbox-panel{max-height:calc(100dvh - 83px);border-radius:19px;width:100%}
+ .dual-inbox-header{padding:16px}
+ .dual-inbox-content{padding:14px}
+ .dual-inbox-trigger{min-width:38px;padding:8px}
+}

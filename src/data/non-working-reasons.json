@@ -3,144 +3,432 @@
     "id": "facility_maintenance",
     "label": "Mantenimiento de instalaciones",
     "text": "La empresa suspendió las actividades por trabajos de mantenimiento en sus instalaciones durante el horario previsto.",
-    "code": 1
+    "code": 1,
+    "keywords": [
+      "mantenimiento de instalaciones",
+      "reparacion de las instalaciones",
+      "reparaciones del edificio",
+      "mantenimiento del inmueble",
+      "mantenimiento de oficinas",
+      "mantenimiento del local",
+      "fumigacion de instalaciones",
+      "reparacion de infraestructura",
+      "cerro por mantenimiento",
+      "cerraron por mantenimiento",
+      "empresa cerrada por mantenimiento",
+      "cierre por mantenimiento",
+      "suspendieron por mantenimiento"
+    ]
   },
   {
     "id": "equipment_maintenance",
     "label": "Mantenimiento de equipo o maquinaria",
     "text": "No se realizaron labores debido a trabajos de mantenimiento de equipos o maquinaria de la empresa.",
-    "code": 2
+    "code": 2,
+    "keywords": [
+      "mantenimiento de maquinaria",
+      "mantenimiento de equipo",
+      "mantenimiento de equipos",
+      "reparacion de maquinaria",
+      "reparacion de equipo",
+      "calibracion de maquinaria",
+      "mantenimiento de computadoras"
+    ]
   },
   {
     "id": "labor_stoppage",
     "label": "Paro laboral",
     "text": "Las actividades de la empresa fueron suspendidas debido a un paro laboral durante la jornada prevista.",
-    "code": 3
+    "code": 3,
+    "keywords": [
+      "paro laboral",
+      "huelga",
+      "suspension por huelga",
+      "paro de trabajadores",
+      "paro sindical",
+      "paro de labores"
+    ]
   },
   {
     "id": "operational_suspension",
     "label": "Suspensión temporal de operaciones",
     "text": "La empresa suspendió temporalmente sus operaciones, por lo que no se realizaron las actividades programadas.",
-    "code": 4
+    "code": 4,
+    "keywords": [
+      "suspension de operaciones",
+      "suspension temporal de actividades",
+      "cierre temporal de la empresa",
+      "cierre de operaciones",
+      "empresa cerrada temporalmente",
+      "no abrio la empresa"
+    ]
   },
   {
     "id": "natural_disaster",
     "label": "Desastres naturales",
     "text": "Las actividades fueron suspendidas por afectaciones relacionadas con un desastre natural en la zona.",
-    "code": 5
+    "code": 5,
+    "keywords": [
+      "desastre natural",
+      "deslave",
+      "derrumbe",
+      "incendio forestal",
+      "desastre ambiental",
+      "afectaciones por desastre",
+      "inundacion severa"
+    ]
   },
   {
     "id": "hurricane",
     "label": "Huracán o tormenta tropical",
     "text": "La empresa suspendió sus actividades de manera preventiva debido a un huracán o una tormenta tropical.",
-    "code": 6
+    "code": 6,
+    "keywords": [
+      "huracan",
+      "tormenta tropical",
+      "ciclon tropical",
+      "alerta por huracan",
+      "alerta ciclonica",
+      "depresion tropical",
+      "fenomeno meteorologico tropical",
+      "suspension por tormenta",
+      "huracan otis",
+      "huracan john",
+      "huracan manuel",
+      "huracan ingrid",
+      "huracan pauline",
+      "huracan erick",
+      "ciclon",
+      "alerta de tormenta tropical",
+      "aviso de huracan"
+    ],
+    "priority": 18
   },
   {
     "id": "earthquake",
     "label": "Sismo",
     "text": "Las actividades fueron suspendidas debido a un sismo y a las medidas de seguridad correspondientes.",
-    "code": 7
+    "code": 7,
+    "keywords": [
+      "sismo",
+      "temblor",
+      "terremoto",
+      "replica sismica",
+      "alerta sismica",
+      "afectaciones por sismo"
+    ]
   },
   {
     "id": "heavy_rain_flood",
     "label": "Lluvias intensas o inundaciones",
     "text": "La empresa suspendió las actividades debido a lluvias intensas o inundaciones que afectaron sus instalaciones u operaciones.",
-    "code": 8
+    "code": 8,
+    "keywords": [
+      "lluvias intensas",
+      "lluvias torrenciales",
+      "fuertes lluvias",
+      "inundacion",
+      "calles inundadas",
+      "desbordamiento de rio",
+      "anegaciones",
+      "tormenta de lluvia"
+    ],
+    "priority": 18
   },
   {
     "id": "company_event",
     "label": "Evento de la empresa",
     "text": "No se realizaron las labores habituales porque la empresa destinó la jornada a un evento interno.",
-    "code": 9
+    "code": 9,
+    "keywords": [
+      "evento interno de la empresa",
+      "convivio de la empresa",
+      "reunion general de la empresa",
+      "celebracion de la empresa",
+      "evento corporativo",
+      "aniversario de la empresa"
+    ]
   },
   {
     "id": "institutional_event",
     "label": "Evento institucional",
     "text": "Las actividades habituales fueron suspendidas debido a un evento institucional organizado por la empresa u organismo receptor.",
-    "code": 10
+    "code": 10,
+    "keywords": [
+      "evento institucional",
+      "acto institucional",
+      "ceremonia institucional",
+      "evento del organismo",
+      "actividad institucional interna"
+    ]
   },
   {
     "id": "company_holiday",
     "label": "Día festivo interno de la empresa",
     "text": "La empresa no realizó actividades por una fecha festiva contemplada en su calendario interno de trabajo.",
-    "code": 11
+    "code": 11,
+    "keywords": [
+      "dia festivo de la empresa",
+      "festividad de la empresa",
+      "festivo interno",
+      "celebracion interna",
+      "aniversario institucional"
+    ]
   },
   {
     "id": "work_calendar_rest",
     "label": "Descanso del calendario laboral de la empresa",
     "text": "No hubo labores por un día de descanso previsto en el calendario laboral de la empresa, distinto del calendario escolar aplicable.",
-    "code": 12
+    "code": 12,
+    "keywords": [
+      "descanso del calendario laboral",
+      "dia de descanso de la empresa",
+      "descanso programado",
+      "jornada de descanso del trabajo"
+    ]
   },
   {
     "id": "collective_agreement_rest",
     "label": "Descanso por contrato colectivo o acuerdo laboral",
     "text": "La empresa suspendió actividades por un descanso establecido en su contrato colectivo o en un acuerdo laboral interno.",
-    "code": 13
+    "code": 13,
+    "keywords": [
+      "contrato colectivo",
+      "acuerdo sindical de descanso",
+      "descanso por acuerdo laboral",
+      "descanso pactado",
+      "descanso contractual"
+    ]
   },
   {
     "id": "sector_union_holiday",
     "label": "Festividad sectorial o sindical",
     "text": "La empresa no realizó actividades por una conmemoración sectorial o sindical contemplada en su organización laboral.",
-    "code": 14
+    "code": 14,
+    "keywords": [
+      "dia del trabajador del sector",
+      "celebracion sindical",
+      "dia del sindicato",
+      "festividad sindical",
+      "conmemoracion gremial"
+    ]
   },
   {
     "id": "local_company_holiday",
     "label": "Conmemoración local aplicada por la empresa",
     "text": "La empresa suspendió sus actividades por una conmemoración local reconocida en su calendario de trabajo.",
-    "code": 15
+    "code": 15,
+    "keywords": [
+      "dia de muertos",
+      "dia de los muertos",
+      "todos santos",
+      "dia de todos los santos",
+      "dia de las madres",
+      "dia de la madre",
+      "dia del padre",
+      "dia del maestro",
+      "dia de la maestra",
+      "dia del estudiante",
+      "dia del trabajador",
+      "dia del contador",
+      "dia del ingeniero",
+      "dia del medico",
+      "dia de la secretaria",
+      "dia del abogado",
+      "dia del empleado",
+      "dia de la virgen de guadalupe",
+      "12 de diciembre",
+      "dia de la guadalupana",
+      "feria local",
+      "fiesta patronal",
+      "fiesta del pueblo",
+      "festividad local",
+      "conmemoracion municipal",
+      "celebracion regional",
+      "tradicion de la comunidad",
+      "festividad religiosa",
+      "dia de la candelaria",
+      "dia de reyes",
+      "nochebuena",
+      "semana santa",
+      "jueves santo",
+      "viernes santo",
+      "carnaval",
+      "dia de la bandera",
+      "2 de noviembre",
+      "1 de noviembre",
+      "dia de los fieles difuntos",
+      "dia de san valentin",
+      "14 de febrero",
+      "dia del nino",
+      "dia de la nina",
+      "dia de los abuelos",
+      "dia de la abuela",
+      "dia del bombero",
+      "dia de la enfermera",
+      "dia del policia",
+      "dia del servidor publico",
+      "dia del contador publico",
+      "dia de la primavera",
+      "dia de la santa cruz",
+      "dia de muertos 2026",
+      "dia del artista",
+      "dia del artesano",
+      "dia del periodista",
+      "dia de la enfermeria",
+      "dia de la juventud"
+    ],
+    "priority": 15
   },
   {
     "id": "statutory_labor_holiday",
     "label": "Descanso obligatorio del calendario laboral",
     "text": "La empresa suspendió sus operaciones por un día de descanso obligatorio aplicable a su calendario laboral.",
-    "code": 16
+    "code": 16,
+    "keywords": [
+      "descanso obligatorio",
+      "feriado oficial laboral",
+      "dia festivo oficial",
+      "dia de la constitucion",
+      "natalicio de benito juarez",
+      "dia del trabajo",
+      "dia de la independencia",
+      "16 de septiembre",
+      "revolucion mexicana",
+      "20 de noviembre",
+      "1 de mayo",
+      "primero de mayo",
+      "navidad",
+      "25 de diciembre",
+      "ano nuevo",
+      "1 de enero"
+    ],
+    "priority": 15
   },
   {
     "id": "collective_vacation",
     "label": "Vacaciones colectivas de la empresa",
     "text": "La empresa permaneció cerrada por un periodo de vacaciones colectivas establecido en su calendario interno.",
-    "code": 17
+    "code": 17,
+    "keywords": [
+      "vacaciones colectivas",
+      "vacaciones de la empresa",
+      "periodo vacacional de la empresa",
+      "cierre vacacional",
+      "vacaciones del personal"
+    ]
   },
   {
     "id": "administrative_inventory",
     "label": "Inventario o cierre administrativo",
     "text": "La empresa suspendió las labores habituales para realizar inventario, cierre administrativo u otras tareas internas.",
-    "code": 18
+    "code": 18,
+    "keywords": [
+      "inventario",
+      "cierre administrativo",
+      "arqueo de inventario",
+      "balance anual",
+      "cierre contable",
+      "auditoria interna",
+      "conteo de mercancia"
+    ]
   },
   {
     "id": "power_services",
     "label": "Interrupción de energía o servicios",
     "text": "Las actividades fueron suspendidas por una interrupción del suministro eléctrico o de otros servicios esenciales.",
-    "code": 19
+    "code": 19,
+    "keywords": [
+      "se fue la luz",
+      "corte de luz",
+      "sin electricidad",
+      "falla electrica",
+      "corte de energia",
+      "corte de agua",
+      "sin agua en instalaciones",
+      "interrupcion del suministro electrico",
+      "sin internet en la empresa",
+      "falla en el suministro"
+    ],
+    "priority": 18
   },
   {
     "id": "technical_failure",
     "label": "Falla de sistemas o infraestructura",
     "text": "La empresa suspendió temporalmente las actividades por una falla técnica que impidió continuar con las labores.",
-    "code": 20
+    "code": 20,
+    "keywords": [
+      "falla del sistema",
+      "falla de sistemas",
+      "servidor caido",
+      "caida de servidores",
+      "falla tecnica",
+      "falla de red interna",
+      "fallo el sistema",
+      "problema de infraestructura tecnologica",
+      "error del servidor",
+      "falla de internet",
+      "fallaron los sistemas",
+      "no funcionaban los servidores"
+    ]
   },
   {
     "id": "civil_protection",
     "label": "Revisión o medidas de protección civil",
     "text": "Las actividades fueron suspendidas por una revisión de instalaciones o por medidas de protección civil.",
-    "code": 21
+    "code": 21,
+    "keywords": [
+      "proteccion civil",
+      "inspeccion de seguridad",
+      "revision de instalaciones",
+      "simulacro de evacuacion",
+      "dictamen de proteccion civil",
+      "evacuacion preventiva"
+    ]
   },
   {
     "id": "security_closure",
     "label": "Cierre preventivo por seguridad",
     "text": "La empresa suspendió las labores como medida preventiva ante una situación de seguridad en la zona.",
-    "code": 22
+    "code": 22,
+    "keywords": [
+      "cierre por seguridad",
+      "cierre preventivo",
+      "amenaza de seguridad",
+      "violencia en la zona",
+      "enfrentamiento en la zona",
+      "incidente de seguridad",
+      "inseguridad en la zona",
+      "bloqueo por inseguridad",
+      "cierre por riesgo",
+      "situacion de riesgo"
+    ]
   },
   {
     "id": "sanitary_contingency",
     "label": "Contingencia sanitaria",
     "text": "Las actividades fueron suspendidas debido a medidas preventivas o restricciones por una contingencia sanitaria.",
-    "code": 23
+    "code": 23,
+    "keywords": [
+      "contingencia sanitaria",
+      "cuarentena",
+      "brote epidemiologico",
+      "alerta sanitaria",
+      "restricciones sanitarias",
+      "suspension por contagios"
+    ]
   },
   {
     "id": "internal_training",
     "label": "Capacitación interna sin actividades para el alumno",
     "text": "La empresa destinó la jornada a una capacitación interna y no programó labores para el alumno en formación dual.",
-    "code": 24
+    "code": 24,
+    "keywords": [
+      "capacitacion interna",
+      "curso de capacitacion para el personal",
+      "jornada de capacitacion del personal",
+      "formacion interna",
+      "capacitacion sin actividades para alumnos"
+    ]
   }
 ]

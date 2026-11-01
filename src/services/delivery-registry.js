@@ -356,6 +356,10 @@ function normalizeDelivery(value) {
       ? { statistics: { version: 5, entries: value.statistics.entries.map((day) => ({
           status: day.status, minutes: day.minutes, reasonCode: day.reasonCode,
           reasonId: clean(day.reasonId, 80),
+          ...(["kept", "classified"].includes(day.reasonReview) ? {
+            reasonReview: day.reasonReview,
+            reasonReviewedAt: clean(day.reasonReviewedAt, 40),
+          } : {}),
         })) } } : {}),
   };
 }
@@ -865,7 +869,17 @@ export function saveManualDelivery(week, studentId, status, { statistics = null,
         registeredAt,
         source: "manual",
         usageSource,
-        ...(statistics ? {statistics} : {}),
+        ...(statistics ? {statistics:{
+          ...statistics,
+          entries:statistics.entries.map((day,index)=>{
+            const previous = week.deliveries?.[studentId]?.statistics?.entries?.[index];
+            return previous && previous.status === day.status &&
+              previous.reasonCode === day.reasonCode && previous.reasonReview
+              ? {...day, reasonReview:previous.reasonReview,
+                  reasonReviewedAt:previous.reasonReviewedAt}
+              : day;
+          }),
+        }} : {}),
       },
     },
   };
