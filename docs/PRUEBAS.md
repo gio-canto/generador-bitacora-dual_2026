@@ -375,3 +375,13 @@ Pruebas automáticas en `tests/v06010-final-pdf-flow.test.jsx`. Revisión manual
 - Debug permite simular el periodo y la entrega final sin selector de generación; el nombre institucional se edita exclusivamente en el evento.
 - Los eventos históricos con `audience.generations` pueden importarse sin imponer una coincidencia con el perfil; el filtro antiguo queda obsoleto.
 - Confirmar que descarga final móvil/PC, firmas, Data Matrix, Registro Dual y mensajes generales no sufren regresiones.
+
+## Pruebas v0.60.12 · Últimos pendientes
+
+- Avisos PNG: los tres tamaños y temas siguen funcionando; un diseño sin fecha ni semanas no muestra datos inventados.
+- Seleccionar un subconjunto de avisos guardados, descargar ZIP y comprobar que no incluye avisos no seleccionados; el límite de 25 es visible y no destruye la selección.
+- Exportar varios avisos guardados con formatos/temas diferentes y verificar que cada PNG conserva su configuración independiente; los automáticos usan el formato general elegido en vista previa.
+- Probar un texto demasiado largo en Debug y confirmar que aparece una razón de error, en lugar de descargar una imagen incompleta.
+- Debug → Editor de eventos: simular evento desactivado, fuera de fecha, de otro plantel, de otra especialidad, sin disparador y ya visto; verificar los diagnósticos.
+- Probar la vista adaptable en 390, 768 y 1280 px sin superposiciones. Mantener los mensajes emergentes y efemérides existentes; no modificar perfiles ni datos reales durante simulaciones.
+- Comprobar que los PDF finales móvil/escritorio, estadística, respaldo y registro de semanas no se alteran.

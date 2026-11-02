@@ -15,7 +15,8 @@ const sample=(kind,deadline,message)=>{
  return {kind:"reminder",title:"Entrega de bitácoras",
    message:"Entrega las semanas indicadas antes de la fecha límite.",
    weekLabels:["Semana 18","Semana 19"],
-   dueAt:new Date(deadline+"T18:00:00-06:00").toISOString(),footer:""};
+   dueAt:/^\d{4}-\d{2}-\d{2}$/.test(deadline)&&Number.isFinite(Date.parse(deadline+"T18:00:00-06:00"))
+     ?new Date(deadline+"T18:00:00-06:00").toISOString():"",footer:""};
 };
 
 /** Laboratorio independiente del registro real y de los diseños guardados. */
