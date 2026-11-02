@@ -6,6 +6,7 @@ import {
   downloadNoticePng,downloadNoticeBatch
 } from "../services/notice-png.js";
 import {loadDossierLogo} from "../services/student-dossier-report.js";
+import "./delivery-announcements-v06012.css";
 
 const initial={kind:"custom",title:"",subtitle:"",message:"",footer:"",
   audience:"all",audienceId:"",displayDate:"",dueAt:"",weekIds:[],weekLabels:[],

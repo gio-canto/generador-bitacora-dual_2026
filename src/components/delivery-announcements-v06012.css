@@ -1,0 +1,6 @@
+.delivery-png-saved-tools{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:9px 12px;border-radius:13px;border:1px solid #dce3ec;background:rgba(248,250,253,.82)}
+.delivery-png-saved-tools label{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;cursor:pointer}
+.delivery-png-saved-tools input,.delivery-png-saved-check input{width:17px;height:17px;accent-color:#126ac0;cursor:pointer}
+.delivery-png-saved-check{display:flex;align-items:center;padding:8px;cursor:pointer}
+.delivery-png-saved-tools .delivery-announcement-error{width:100%;margin:0}
+@media(max-width:560px){.delivery-png-saved-tools{align-items:stretch;flex-direction:column}.delivery-png-saved-tools .btn{width:100%}}

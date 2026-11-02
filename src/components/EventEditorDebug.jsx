@@ -4,8 +4,9 @@ import {CalendarBlank,ClipboardText,FileArrowDown,FileArrowUp,FloppyDisk,
   GraduationCap,Plus,PlayCircle,Trash,ArrowClockwise,Copy,CheckCircle,
   ArrowRight,ArrowLeft,Warning,Buildings,Users,Eye,Code,Confetti} from "@phosphor-icons/react";
 import {GeneratorMessageCard} from "./GeneratorMessageHost.jsx";
-import {getDefaultMessageConfig,validateMessageConfig,eligibleMessages,
+import {getDefaultMessageConfig,validateMessageConfig,
   hasSeenMessage,markMessageSeen,activeGraduation,messageEventWarnings} from "../services/generator-message-rules.js";
+import {diagnoseMessageEvent} from "../services/message-event-diagnostics.js";
 import {StudioField,StudioSwitch,StudioChoices,StudioSelect,StudioPills,
   StudioCalendar,StudioConfirmation} from "./EventStudioControls.jsx";
 import schools from "../data/schools.json";
@@ -95,9 +96,10 @@ export default function EventEditorDebug(){
     index===selected?{...event,enabled:true}:event)}),[config,selected]);
   const simulatedTrigger=current?.trigger.type==="graduation"&&current.trigger.showOn==="final-bitacora"
     ? "final-bitacora":current?.trigger.type;
-  const eligible=current?eligibleMessages(simulatedConfig,{
-    ...ctx,trigger:simulatedTrigger,ignoreSeen:true
-  }).some(e=>e.id===current.id):false;
+  const diagnosis=current?diagnoseMessageEvent(config,current,{
+    ...ctx,trigger:simulatedTrigger
+  }):null;
+  const eligible=diagnosis?.eligible===true;
   const seen=current&&hasSeenMessage(current,ctx);
   const themeActive=Boolean(current?.trigger.type==="graduation"&&activeGraduation(simulatedConfig,ctx)?.id===current.id);
   const update=patch=>setConfig(previous=>({...previous,events:previous.events.map((event,i)=>
@@ -326,13 +328,16 @@ export default function EventEditorDebug(){
           <div className="es-status">
             {current.trigger.type==="graduation"&&current.trigger.showOn==="final-bitacora"&&
               <small>Prueba del aviso después del PDF de la última bitácora.</small>}
-            <strong>{eligible?"Coincide con las reglas":"No coincide con las reglas"}</strong>
-            <small>{seen?"Visto en esta simulación":"Todavía no visto"} · {current.enabled?"Evento publicado activo":"Evento desactivado: prueba forzada"}</small>
+            <strong>{eligible?"Se mostraría al alumno":"No se mostraría al alumno"}</strong>
+            {diagnosis?.reasons.map((reason,index)=><small key={index} className="es-diagnostic-reason">
+              {reason}
+            </small>)}
+            <small>{seen?"Visto en esta simulación":"Todavía no visto"} · {current.enabled?"Publicado":"Desactivado"}</small>
           </div>
         </div>
       </div>
       <div className="es-actions">
-        <button className="es-button es-primary" type="button" onClick={()=>setPreview(current)}><PlayCircle size={17}/>Ver aviso real</button>
+        <button className="es-button es-primary" type="button" onClick={()=>setPreview(current)}><PlayCircle size={17}/>Vista previa forzada</button>
         {current.trigger.type==="graduation"&&<button type="button" className="es-button"
           onClick={()=>setTheme(x=>!x)}><GraduationCap size={17}/>{theme?"Ocultar graduación":"Probar diseño de graduación"}</button>}
         <button type="button" className="es-button" onClick={()=>{
