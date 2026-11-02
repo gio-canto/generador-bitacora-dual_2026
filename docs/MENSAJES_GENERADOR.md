@@ -145,3 +145,13 @@ Los eventos de efemérides, los anuncios PNG, los avisos administrativos y los P
 - El laboratorio Debug → Avisos PNG usa muestras ficticias y el mismo motor Canvas de producción; permite verificar contenido, texto que no cabe, fechas y estilos sin modificar registros, alumnos ni avisos reales.
 - El editor visual de eventos usa el motor real para diagnosticar si un mensaje emergente se mostraría en una fecha, plantel y especialidad simulados, y explica los casos negativos (desactivado, fuera de fecha, ya visto, disparador o destinatarios).
 - La vista previa forzada del editor puede abrir mensajes que no pasarían la validación contextual: la etiqueta explicita que es una prueba, no una activación real.
+
+## Estabilización final de avisos emergentes (0.60.13)
+
+- La despedida especial de una bitácora final desplaza temporalmente el aviso ordinario activo. El aviso se vuelve a la cola sin ser marcado como visto; se recupera después de terminar el PDF o cuando el resto de los diálogos permite mostrarlo.
+- La cola sólo conserva una entrada por evento, revisión, perfil y día; las solicitudes repetidas de PDF final agregan su continuación al mismo cierre.
+- Los mensajes en ventana mediana/completa y el historial inmovilizan el desplazamiento de fondo, capturan el foco inicial, lo mantienen dentro del diálogo con Tab / Shift+Tab, admiten Escape y lo restauran al cerrarse.
+- Las pestañas no bloqueantes siguen funcionando sin inmovilizar la página. Las áreas seguras de iOS/Android, el tamaño de botones y la reducción de movimiento se respetan en el CSS.
+- Al cerrar el video móvil, el botón «Continuar al PDF» reanuda la generación; en escritorio primero se entrega el PDF y después se abre la despedida. La descarga móvil conserva su enlace de recuperación.
+- Debug → Editor de eventos muestra el orden de las comunicaciones que cumplen los filtros del escenario antes de que se publiquen.
+- El historial de avisos PNG y los easter eggs del calendario permanecen independientes.

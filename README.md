@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.12-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.13-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,14 @@
 </div>
 
 ---
+
+## v0.60.13 · Avisos especiales y despedida final
+
+Los **avisos especiales emergentes** ahora tienen mejor navegación por teclado, cierre con Escape, recuperación del foco y bloqueo del desplazamiento de fondo mientras la ventana está abierta. Las ventanas usan zonas seguras y límites de altura en dispositivos pequeños, con animaciones respetuosas de la preferencia de movimiento reducido.
+
+Al generar la **última bitácora**, la despedida tiene prioridad sobre cualquier aviso ordinario abierto. El aviso interrumpido queda pendiente sin marcarse como visto y puede presentarse posteriormente. En móvil, el botón indica «Continuar al PDF» y la generación sigue ocurriendo al cerrar la despedida; las solicitudes repetidas comparten el cierre sin perder su continuación. El historial de mensajes también puede cerrarse con Escape.
+
+**Debug** muestra el orden y las prioridades de los mensajes que corresponden al escenario simulado, sin modificar alumnos ni registros. Se conservan las efemérides, video de YouTube, flujo PDF de escritorio y móvil, avisos PNG y Registro Dual.
 
 ## v0.60.12 · Avisos PNG y Debug
 

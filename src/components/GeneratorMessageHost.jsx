@@ -1,12 +1,13 @@
-import {useCallback,useEffect,useRef,useState} from "react";
+import {useCallback,useEffect,useId,useRef,useState} from "react";
 import {createPortal} from "react-dom";
 import {readProfileData,readActiveProfileId} from "../services/profile.js";
 import config from "../data/generator-messages.json";
 import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation,finalBitacoraMessages,historyMessages} from "../services/generator-message-rules.js";
-import {enqueueEventMessages,retainEventsForContext,takeNextEvent} from "../services/generator-event-queue.js";
+import {enqueueEventMessages,retainEventsForContext,takeNextEvent,prioritizeFinalEvent} from "../services/generator-event-queue.js";
 import {youtubeCelebrationUrl,requestYoutubeAudio,sendYoutubeCommand} from "../services/youtube-celebration.js";
 import {BEFORE_FINAL_PDF_EVENT} from "../services/final-pdf-flow.js";
 import "../generator-messages.css";
+import "../generator-messages-v06013.css";
 import "../generator-graduation.css";
 
 const currentContext=()=>({profile:readProfileData(),profileId:readActiveProfileId(),date:mexicoDate(),
@@ -15,25 +16,48 @@ const currentContext=()=>({profile:readProfileData(),profileId:readActiveProfile
 const busy=()=>Boolean(document.querySelector(
   "dialog[open], #tourLayer:not([hidden]), #virtualEaster:not([hidden]), .calendar-easter.show"
 ));
-export function GeneratorMessageCard({event,onClose}){
+const focusableSelector='button:not([disabled]),a[href],iframe,[tabindex]:not([tabindex="-1"])';
+function useMessageDialog(ref,enabled,onClose,id){
+  useEffect(()=>{
+    if(!enabled)return;
+    const previous=document.activeElement;
+    const overflow=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    ref.current?.focus();
+    const key=e=>{
+      if(e.key==="Escape"){e.preventDefault();onClose();return;}
+      if(e.key!=="Tab")return;
+      const elements=[...(ref.current?.querySelectorAll(focusableSelector)??[])]
+        .filter(el=>el.getAttribute("aria-hidden")!=="true");
+      if(!elements.length){e.preventDefault();ref.current?.focus();return;}
+      const first=elements[0],last=elements[elements.length-1];
+      if(e.shiftKey&&(document.activeElement===first||document.activeElement===ref.current)){
+        e.preventDefault();last.focus();
+      }else if(!e.shiftKey&&(document.activeElement===last||!ref.current?.contains(document.activeElement))){
+        e.preventDefault();first.focus();
+      }
+    };
+    document.addEventListener("keydown",key);
+    return ()=>{
+      document.removeEventListener("keydown",key);
+      document.body.style.overflow=overflow;
+      if(previous?.isConnected)previous.focus?.();
+    };
+  },[enabled,onClose,id]);
+}
+export function GeneratorMessageCard({event,onClose,onCloseLabel="Cerrar"}){
   // YouTube inicia la reproducción al montar el modal, silenciado para
   // cumplir las restricciones de autoplay de Safari y Chromium.
   // El usuario puede activar el sonido con los controles del reproductor.
   const container=useRef(null);
+  const titleId=useId();
   const videoFrame=useRef(null);
   const audioTimers=useRef([]);
   const playing=useRef(false);
   const [audioRequested,setAudioRequested]=useState(false);
   const dualCelebration=event.celebration?.kind==="dual";
   const isTab=event.presentation==="tab";
-  useEffect(()=>{
-    if(isTab)return;
-    const prior=document.activeElement;
-    container.current?.focus();
-    const keyboard=e=>{if(e.key==="Escape")onClose();};
-    document.addEventListener("keydown",keyboard);
-    return ()=>{document.removeEventListener("keydown",keyboard);if(prior?.isConnected)prior.focus?.();};
-  },[event.id,onClose,isTab]);
+  useMessageDialog(container,!isTab,onClose,event.id);
   const content=event.content||{};
   const videoSrc=youtubeCelebrationUrl(content.youtubeId,{
     loop:Boolean(event.celebration?.loopVideo)
@@ -81,7 +105,7 @@ export function GeneratorMessageCard({event,onClose}){
   return <div className={"generator-message-layer generator-message-"+event.presentation+(dualCelebration?" generator-message-graduation":"")}
     onMouseDown={e=>{if(!isTab && e.target===e.currentTarget)onClose();}}>
     <section ref={container} tabIndex={-1} className="generator-message-card"
-      role={isTab?"status":"dialog"} aria-modal={!isTab} aria-label={content.title}>
+      role={isTab?"status":"dialog"} aria-modal={!isTab||undefined} aria-labelledby={titleId}>
       <header className="generator-message-header">
         <span>{event.trigger?.type==="graduation"?"Graduación Dual":event.presentation==="fullscreen"?"Mensaje especial":"Aviso"}</span>
         <button type="button" className="generator-message-close" onClick={onClose} aria-label="Cerrar mensaje">×</button>
@@ -100,12 +124,36 @@ export function GeneratorMessageCard({event,onClose}){
           </button>
         </div>
       </div>}
-      <h2>{content.title}</h2>
+      <h2 id={titleId}>{content.title}</h2>
       <p>{content.body}</p>
       {content.action?.url && /^https:\/\//.test(content.action.url) &&
         <a className="generator-message-action" href={content.action.url}
           target="_blank" rel="noopener noreferrer" onClick={onClose}>{content.action.label||"Abrir enlace"}</a>}
-      {!isTab && <button type="button" className="generator-message-secondary" onClick={onClose}>Cerrar</button>}
+      {!isTab && <button type="button" className="generator-message-secondary" onClick={onClose}>{onCloseLabel}</button>}
+    </section>
+  </div>;
+}
+function GeneratorMessageHistory({messages,ctx,onClose,onOpen}){
+  const dialog=useRef(null);
+  const titleId=useId();
+  useMessageDialog(dialog,true,onClose,"history");
+  return <div className="generator-message-layer generator-message-medium"
+      onMouseDown={e=>{if(e.target===e.currentTarget)onClose();}}>
+    <section ref={dialog} tabIndex={-1} className="generator-message-card"
+      role="dialog" aria-modal="true" aria-labelledby={titleId}>
+      <header className="generator-message-header"><span>Mensajes</span>
+        <button className="generator-message-close" type="button" onClick={onClose}
+          aria-label="Cerrar mensajes">×</button>
+      </header>
+      <h2 id={titleId}>Mis mensajes</h2>
+      {messages.length?<ul className="generator-message-history">
+        {messages.map(message=><li key={message.id}>
+          <strong>{message.content.title}</strong>
+          <span>{hasSeenMessage(message,ctx)?"Visto":"Nuevo"}</span>
+          <button type="button" onClick={()=>onOpen(message)}>Abrir</button>
+        </li>)}
+      </ul>:<p>No hay mensajes para tu perfil en este momento.</p>}
+      <button className="generator-message-secondary" type="button" onClick={onClose}>Cerrar</button>
     </section>
   </div>;
 }
@@ -126,6 +174,31 @@ export default function GeneratorMessageHost(){
     queue.current=selected.queue;
     if(selected.next){activeRef.current=selected.next;setActive(selected.next);}
   },[]);
+  const showFinal=useCallback(item=>{
+    const interrupted=activeRef.current;
+    if(interrupted?.kind==="final-bitacora"){
+      // Dos solicitudes simultáneas no crean una segunda despedida ni
+      // dejan una descarga pendiente sin su callback de continuación.
+      const previous=interrupted.onClose;
+      interrupted.onClose=()=>{
+        previous?.();
+        item.onClose?.();
+      };
+      return;
+    }
+    const priorPending=queue.current.find(pending=>
+      pending.event.id===item.event.id&&pending.event.revision===item.event.revision&&
+      pending.ctx.profileId===item.ctx.profileId&&pending.ctx.date===item.ctx.date);
+    if(priorPending?.onClose){
+      const previous=priorPending.onClose;
+      const next=item.onClose;
+      item.onClose=()=>{previous();next?.();};
+    }
+    queue.current=prioritizeFinalEvent(queue.current,interrupted,item);
+    if(interrupted){activeRef.current=null;setActive(null);}
+    if(historyRef.current){historyRef.current=false;setHistoryOpen(false);}
+    openNext();
+  },[openNext]);
   const enqueue=useCallback((kind,extra={})=>{
     const ctx={...currentContext(),...extra};
     if(kind!=="final-bitacora")
@@ -133,9 +206,13 @@ export default function GeneratorMessageHost(){
     const entries=kind==="final-bitacora"
       ? finalBitacoraMessages(config,ctx)
       : eligibleMessages(config,{...ctx,trigger:kind});
-    queue.current=enqueueEventMessages(queue.current,entries,ctx,kind,activeRef.current);
-    openNext();
-  },[openNext]);
+    if(kind==="final-bitacora"&&entries.length){
+      showFinal({event:entries[0],ctx,kind});
+    }else{
+      queue.current=enqueueEventMessages(queue.current,entries,ctx,kind,activeRef.current);
+      openNext();
+    }
+  },[openNext,showFinal]);
   const dismiss=useCallback(()=>{
     const item=activeRef.current;
     if(!item)return;
@@ -176,9 +253,9 @@ export default function GeneratorMessageHost(){
       if(!event)return; // Sin evento elegible: el generador prosigue solo.
       detail.handled=true;
       const item={event,ctx,kind:"final-bitacora",onClose:detail.continueToPdf};
-      // Una despedida manual tiene prioridad sobre los avisos pendientes.
-      queue.current=[item,...queue.current];
-      openNext();
+      // La última bitácora interrumpe un aviso ordinario, que queda pendiente
+      // para después del PDF sin marcarse como visto.
+      showFinal(item);
     };
     const showList=()=>{if(activeRef.current)return;historyRef.current=true;setHistoryOpen(true);};
     const focus=()=>{if(!document.hidden){enqueue("date");checkGraduation();openNext();}};
@@ -195,34 +272,30 @@ export default function GeneratorMessageHost(){
       window.removeEventListener("bitacora-profile",begin);
       window.removeEventListener("bitacora-open-messages",showList);
       window.removeEventListener("focus",focus);
+      // Si el anfitrión se desmonta durante la espera, no dejar el PDF bloqueado.
+      activeRef.current?.onClose?.();
+      for(const item of queue.current)item.onClose?.();
+      activeRef.current=null;queue.current=[];
     };
-  },[enqueue,openNext]);
+  },[enqueue,openNext,showFinal]);
   const ctx=historyOpen?currentContext():null;
   const available=historyOpen?historyMessages(config,ctx):[];
-  const closeHistory=()=>{historyRef.current=false;setHistoryOpen(false);openNext();};
+  const closeHistory=()=>{historyRef.current=false;setHistoryOpen(false);window.setTimeout(openNext,0);};
+  const openFromHistory=message=>{
+    historyRef.current=false;setHistoryOpen(false);
+    const item={event:message,ctx,kind:"history"};
+    activeRef.current=item;setActive(item);
+  };
   return createPortal(<>
     {graduation&&<div className="generator-graduation-banner" role="status">
       <span>Celebramos su formación dual</span>
       <strong>{graduation.graduation?.label||graduation.content.title}</strong>
     </div>}
-    {active&&<GeneratorMessageCard key={active.event.id+active.event.revision} event={active.event} onClose={dismiss}/>}
-    {historyOpen&&<div className="generator-message-layer generator-message-medium">
-      <section className="generator-message-card" role="dialog" aria-modal="true" aria-label="Mis mensajes">
-        <header className="generator-message-header"><span>Mensajes</span>
-          <button className="generator-message-close" onClick={closeHistory} aria-label="Cerrar mensajes">×</button>
-        </header>
-        <h2>Mis mensajes</h2>
-        {available.length ? <ul className="generator-message-history">
-          {available.map(message=><li key={message.id}><strong>{message.content.title}</strong>
-            <span>{hasSeenMessage(message,ctx)?"Visto":"Nuevo"}</span>
-            <button type="button" onClick={()=>{
-              historyRef.current=false;setHistoryOpen(false);
-              const item={event:message,ctx,kind:"history"};
-              activeRef.current=item;setActive(item);
-            }}>Abrir</button>
-          </li>)}
-        </ul> : <p>No hay mensajes para tu perfil en este momento.</p>}
-      </section>
-    </div>}
+    {active&&<GeneratorMessageCard key={active.event.id+active.event.revision}
+      event={active.event} onClose={dismiss}
+      onCloseLabel={active.onClose?"Continuar al PDF":queue.current.length?"Siguiente aviso":"Cerrar"}/>}
+    {historyOpen&&<GeneratorMessageHistory messages={available} ctx={ctx}
+      onClose={closeHistory} onOpen={openFromHistory}/>}
+
   </>,document.body);
 }

@@ -385,3 +385,15 @@ Pruebas automáticas en `tests/v06010-final-pdf-flow.test.jsx`. Revisión manual
 - Debug → Editor de eventos: simular evento desactivado, fuera de fecha, de otro plantel, de otra especialidad, sin disparador y ya visto; verificar los diagnósticos.
 - Probar la vista adaptable en 390, 768 y 1280 px sin superposiciones. Mantener los mensajes emergentes y efemérides existentes; no modificar perfiles ni datos reales durante simulaciones.
 - Comprobar que los PDF finales móvil/escritorio, estadística, respaldo y registro de semanas no se alteran.
+
+## Pruebas v0.60.13 · Avisos especiales (cierre de pendientes)
+
+- Abrir un aviso ordinario y solicitar el PDF final: la despedida debe presentarse antes del anuncio pendiente, sin marcar el anuncio como visto.
+- Cerrar el video en Android/iPhone: solamente entonces debe continuar la creación del PDF final. Dos solicitudes repetidas nunca deben perder sus callbacks.
+- Abrir el video sin conexión a YouTube: debe seguir existiendo el botón para cerrarlo y continuar al PDF.
+- Verificar en 390 px, 768 px y escritorio que las ventanas, el video, los botones y las zonas seguras no se salen de la pantalla ni tapan el cierre.
+- Tab y Shift+Tab deben permanecer dentro de un diálogo abierto. Escape debe cerrarlo y devolver el foco anterior. El historial debe responder igual.
+- Los avisos de pestaña no deben bloquear el desplazamiento de la página. Los cuadros de diálogo sí lo bloquean, y lo restauran al cerrarse.
+- Debug debe listar mensajes según su prioridad en la fecha, escuela, especialidad y disparador simulados, y no modificar datos de alumnos.
+- Revisar PWA en modo standalone: regreso de segundo plano, cierre del video, uso de botón «Guardar o abrir PDF», bloqueo de descargas automáticas y repetición de solicitudes.
+- Mantener bitácoras, firmas, Data Matrix, estadísticas, anuncios PNG y eventos de graduación sin regresiones. Estas pruebas físicas deben realizarse en dispositivos reales, no se consideran verificadas por CI.
