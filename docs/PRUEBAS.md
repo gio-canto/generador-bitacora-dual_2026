@@ -340,3 +340,15 @@ Tras completar los tests y el build, se compara nuevamente `GITHUB_SHA` con `ref
 
 Para verificar un fallo de GitHub Pages, se requiere el mensaje del paso exacto `Publicar` de la ejecución de `main`. El éxito del PR sólo valida tests y compilación. Si falla la configuración del sitio, los permisos del entorno `github-pages`, la disponibilidad del servicio o el paso de despliegue, debe consultarse su registro específico.
 
+
+## Control de eventos v0.60.9
+
+Se agregan las pruebas de `tests/v0609-events-cleanup.test.js`. En la revisión manual:
+
+- Cambiar el perfil cuando haya un aviso pendiente; éste no debe mostrarse en el perfil nuevo.
+- Generar una despedida y registrar otro evento antes de cerrarla; verificar que la lectura pertenece al perfil que la inició.
+- Crear dos avisos idénticos para la misma fecha; verificar que sólo se abre el de mayor prioridad.
+- Verificar que dos avisos diferentes en la misma fecha se conservan.
+- Probar la graduación y la última bitácora sin duplicar despedidas.
+- Revisar el historial antes y después de ver el mensaje de graduación.
+- Confirmar que el PDF, las bitácoras, el calendario de efemérides y Registro Dual siguen sin cambios.

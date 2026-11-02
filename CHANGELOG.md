@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.60.9 · Depuración del sistema de eventos · 2026-11-02
+
+- La cola de mensajes ahora guarda el perfil y fecha originales para registrar la lectura correctamente aunque lleguen otros eventos.
+- Los avisos pendientes del perfil o día anterior se descartan sin perder un cierre final confirmado.
+- Se evita mostrar simultáneamente mensajes de contenido idéntico y se mantiene una sola despedida al generar la última bitácora.
+- El historial no permite abrir por primera vez las despedidas de graduación o última bitácora.
+- El editor advierte coincidencias entre mensajes activos y se refuerza la validación de prioridades, estado y fechas.
+- Se agregan pruebas para duplicados, graduación, historial y cambios de perfil.
+- No se modifican bitácoras, datos escolares, generación de PDF ni entregas.
+
+
 ## 0.60.8 · Control de concurrencia en GitHub Pages · 2026-10-31
 
 - Las ejecuciones de publicación de `main` comparten un grupo de concurrencia; no se cancelan publicaciones activas y se evita ejecutar varios despliegues simultáneos por diferencias de SHA.
