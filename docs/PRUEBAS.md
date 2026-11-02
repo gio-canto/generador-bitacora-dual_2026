@@ -352,3 +352,16 @@ Se agregan las pruebas de `tests/v0609-events-cleanup.test.js`. En la revisión 
 - Probar la graduación y la última bitácora sin duplicar despedidas.
 - Revisar el historial antes y después de ver el mensaje de graduación.
 - Confirmar que el PDF, las bitácoras, el calendario de efemérides y Registro Dual siguen sin cambios.
+
+## Pruebas de la última bitácora (0.60.10)
+
+Pruebas automáticas en `tests/v06010-final-pdf-flow.test.jsx`. Revisión manual necesaria:
+
+- Móvil: marcar la última bitácora, pulsar PDF, comprobar que no se construye el PDF antes de cerrar la despedida y que la descarga se intenta después.
+- Móvil sin YouTube: cerrar el mensaje con texto visible y continuar hasta descargar el PDF.
+- Móvil sin mensaje elegible (ya visto o desactivado): generar PDF sin bloqueo.
+- iOS Safari, Android Chrome y PWA: comprobar enlace «Guardar o abrir PDF» y «Compartir PDF» si está disponible; repetir cuando se bloqueen popups o permisos.
+- Computadora: comprobar que descarga primero y muestra la despedida después sin diálogo de recomendaciones encima.
+- PDF normal sin marcar última bitácora: debe conservar la descarga y las recomendaciones anteriores.
+- Dos pulsaciones rápidas no deben generar dos PDFs ni dos despedidas.
+- Error de Data Matrix o imagen JPEG: comprobar notificación y que la bitácora permanezca disponible para reintento.
