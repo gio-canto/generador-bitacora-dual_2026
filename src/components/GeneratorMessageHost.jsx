@@ -2,7 +2,8 @@ import {useCallback,useEffect,useRef,useState} from "react";
 import {createPortal} from "react-dom";
 import {readProfileData,readActiveProfileId} from "../services/profile.js";
 import config from "../data/generator-messages.json";
-import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation,finalBitacoraMessages} from "../services/generator-message-rules.js";
+import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation,finalBitacoraMessages,historyMessages} from "../services/generator-message-rules.js";
+import {enqueueEventMessages,retainEventsForContext,takeNextEvent} from "../services/generator-event-queue.js";
 import {youtubeCelebrationUrl,requestYoutubeAudio,sendYoutubeCommand} from "../services/youtube-celebration.js";
 import "../generator-messages.css";
 import "../generator-graduation.css";
@@ -110,52 +111,66 @@ export function GeneratorMessageCard({event,onClose}){
 export default function GeneratorMessageHost(){
   const [active,setActive]=useState(null);
   const [historyOpen,setHistoryOpen]=useState(false);
-  const [clock,setClock]=useState(0);
   const [graduation,setGraduation]=useState(null);
   const queue=useRef([]);
-  const context=useRef(null);
   const activeRef=useRef(null);
+  const historyRef=useRef(false);
   const openNext=useCallback(()=>{
-    if(activeRef.current || busy())return;
-    const next=queue.current.shift();
-    if(next){activeRef.current=next;setActive(next);}
+    if(activeRef.current||historyRef.current||busy())return;
+    const ctx=currentContext();
+    const selected=takeNextEvent(queue.current,{
+      profileId:ctx.profileId,date:ctx.date,
+      wasSeen:(event,snapshot)=>hasSeenMessage(event,snapshot)
+    });
+    queue.current=selected.queue;
+    if(selected.next){activeRef.current=selected.next;setActive(selected.next);}
   },[]);
   const enqueue=useCallback((kind,extra={})=>{
     const ctx={...currentContext(),...extra};
-    context.current=ctx;
+    if(kind!=="final-bitacora")
+      queue.current=retainEventsForContext(queue.current,ctx);
     const entries=kind==="final-bitacora"
       ? finalBitacoraMessages(config,ctx)
       : eligibleMessages(config,{...ctx,trigger:kind});
-    const known=new Set([activeRef.current?.id,...queue.current.map(x=>x.id)]);
-    for(const entry of entries)if(!known.has(entry.id)){queue.current.push(entry);known.add(entry.id);}
-    queue.current.sort((a,b)=>(b.priority||0)-(a.priority||0));
+    queue.current=enqueueEventMessages(queue.current,entries,ctx,kind,activeRef.current);
     openNext();
   },[openNext]);
   const dismiss=useCallback(()=>{
-    if(activeRef.current)markMessageSeen(activeRef.current,context.current||currentContext());
+    const item=activeRef.current;
+    if(!item)return;
+    markMessageSeen(item.event,item.ctx);
     activeRef.current=null;setActive(null);
     window.setTimeout(openNext,260);
   },[openNext]);
   useEffect(()=>{
     const checkGraduation=()=>{
-      const ctx=currentContext();
-      const event=activeGraduation(config,ctx);
+      const event=activeGraduation(config,currentContext());
       document.body.classList.toggle("generator-graduation-active",Boolean(event));
       setGraduation(event);
       enqueue("graduation");
     };
-    const begin=()=>{enqueue("on-open");enqueue("date");checkGraduation();};
+    const begin=()=>{
+      const ctx=currentContext();
+      queue.current=retainEventsForContext(queue.current,ctx);
+      if(activeRef.current?.kind!=="final-bitacora" &&
+         activeRef.current?.ctx.profileId!==undefined &&
+         activeRef.current.ctx.profileId!==ctx.profileId){
+        activeRef.current=null;setActive(null);
+      }
+      enqueue("on-open");enqueue("date");checkGraduation();
+    };
     const initial=window.setTimeout(begin,2400);
     const poll=window.setInterval(openNext,900);
     const calendarPoll=window.setInterval(checkGraduation,60000);
     const final=e=>enqueue("final-bitacora",{profile:{...readProfileData(),...e.detail}});
-    const showList=()=>{setHistoryOpen(true);setClock(x=>x+1);};
+    const showList=()=>{if(activeRef.current)return;historyRef.current=true;setHistoryOpen(true);};
     const focus=()=>{if(!document.hidden){enqueue("date");checkGraduation();openNext();}};
     window.addEventListener("bitacora-final-bitacora",final);
     window.addEventListener("bitacora-profile",begin);
     window.addEventListener("bitacora-open-messages",showList);
     window.addEventListener("focus",focus);
-    return ()=>{window.clearTimeout(initial);window.clearInterval(poll);window.clearInterval(calendarPoll);
+    return ()=>{
+      window.clearTimeout(initial);window.clearInterval(poll);window.clearInterval(calendarPoll);
       document.body.classList.remove("generator-graduation-active");
       window.removeEventListener("bitacora-final-bitacora",final);
       window.removeEventListener("bitacora-profile",begin);
@@ -164,26 +179,28 @@ export default function GeneratorMessageHost(){
     };
   },[enqueue,openNext]);
   const ctx=historyOpen?currentContext():null;
-  const available=historyOpen?config.events.filter(event=>{
-    const visible=eligibleMessages({...config,events:[event]},{...ctx,trigger:event.trigger.type,ignoreSeen:true});
-    return visible.length>0;
-  }):[];
+  const available=historyOpen?historyMessages(config,ctx):[];
+  const closeHistory=()=>{historyRef.current=false;setHistoryOpen(false);openNext();};
   return createPortal(<>
     {graduation&&<div className="generator-graduation-banner" role="status">
       <span>Celebramos su formación dual</span>
       <strong>{graduation.graduation?.label||graduation.content.title}</strong>
     </div>}
-    {active&&<GeneratorMessageCard key={active.id+active.revision} event={active} onClose={dismiss}/>}
+    {active&&<GeneratorMessageCard key={active.event.id+active.event.revision} event={active.event} onClose={dismiss}/>}
     {historyOpen&&<div className="generator-message-layer generator-message-medium">
       <section className="generator-message-card" role="dialog" aria-modal="true" aria-label="Mis mensajes">
         <header className="generator-message-header"><span>Mensajes</span>
-          <button className="generator-message-close" onClick={()=>setHistoryOpen(false)} aria-label="Cerrar mensajes">×</button>
+          <button className="generator-message-close" onClick={closeHistory} aria-label="Cerrar mensajes">×</button>
         </header>
         <h2>Mis mensajes</h2>
         {available.length ? <ul className="generator-message-history">
           {available.map(message=><li key={message.id}><strong>{message.content.title}</strong>
             <span>{hasSeenMessage(message,ctx)?"Visto":"Nuevo"}</span>
-            <button type="button" onClick={()=>{setHistoryOpen(false);activeRef.current=message;context.current=ctx;setActive(message);}}>Abrir</button>
+            <button type="button" onClick={()=>{
+              historyRef.current=false;setHistoryOpen(false);
+              const item={event:message,ctx,kind:"history"};
+              activeRef.current=item;setActive(item);
+            }}>Abrir</button>
           </li>)}
         </ul> : <p>No hay mensajes para tu perfil en este momento.</p>}
       </section>
