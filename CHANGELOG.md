@@ -1,6 +1,16 @@
 # Notas de versión
 
-## 0.60.11 · Graduación dirigida por generación · 2026-11-02
+## 0.60.11.1 · Corrección: generación asignada por plantel · 2026-11-02
+
+- Se retira el campo «Generación Dual» de los perfiles de alumno, incluidos formulario y presentación.
+- La escuela determina el nombre de generación en el evento institucional de graduación, no en los datos del estudiante. La visualización depende del plantel, especialidad y fechas del evento.
+- El CBTis 134 mantiene el mensaje de su cuarta generación para julio de 2027, sin requerir que los alumnos seleccionen una generación.
+- Se eliminan la selección de generaciones en Debug, las claves por alumno y el catálogo auxiliar de generaciones; Debug conserva simulaciones de fechas, planteles y especialidades.
+- Compatibilidad: no se modifican bitácoras ni registros y un perfil antiguo puede leerse aunque todavía contenga un campo heredado, que deja de utilizarse.
+- Se actualizan las pruebas y documentación de la versión anterior.
+
+
+## 0.60.11 · Graduación dirigida por generación (sustituida por 0.60.11.1) · 2026-11-02
 
 - Se incorpora una generación Dual opcional a cada perfil, conservada en el almacenamiento existente sin migraciones destructivas.
 - Las felicitaciones pueden filtrarse por plantel, especialidad y generación. La cuarta generación del CBTis 134 de 2027 sólo se dirige a `cbtis134-dual-4-2027`.

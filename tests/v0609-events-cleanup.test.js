@@ -4,7 +4,7 @@ import {eligibleMessages,markMessageSeen,hasSeenMessage,finalBitacoraMessages,
   historyMessages,messageEventWarnings,validateMessageConfig} from "../src/services/generator-message-rules.js";
 import {enqueueEventMessages,retainEventsForContext,takeNextEvent} from "../src/services/generator-event-queue.js";
 
-const profile={school:"cbtis-134",specialty:"Programación",generation:"cbtis134-dual-4-2027"};
+const profile={school:"cbtis-134",specialty:"Programación"};
 const storage=()=>{const bag=new Map();return {
   getItem:key=>bag.get(key)||null,setItem:(key,value)=>bag.set(key,value)
 };};

@@ -10,7 +10,7 @@ const storage=()=>{const items=new Map();return{
   getItem:k=>items.get(k)||null,setItem:(k,v)=>items.set(k,v),removeItem:k=>items.delete(k)
 };};
 const person={id:"alumno-prueba",name:"Persona de prueba",specialty:"Programación",company:"Empresa"};
-const profile={school:"cbtis-134",specialty:"Programación",generation:"cbtis134-dual-4-2027"};
+const profile={school:"cbtis-134",specialty:"Programación"};
 const config=getDefaultMessageConfig();
 const graduation=config.events.find(x=>x.trigger.type==="graduation");
 const days=["2027-07-19","2027-07-20","2027-07-21","2027-07-22","2027-07-23"];
