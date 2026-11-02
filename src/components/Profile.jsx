@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { Blobatar } from "blobatar/react";
 import schools from "../data/schools.json";
 import companies from "../data/companies.json";
+import messageConfig from "../data/generator-messages.json";
+import {graduationCohorts} from "../services/graduation-cohorts.js";
 import {
   readProfileData,
   rememberProfile,
@@ -162,6 +164,8 @@ export function Profile() {
     schools.find((item) => item.name === form.school) || schools[0] || {};
   const selectedCompany =
     companies.find((item) => item.name === form.company) || null;
+  const availableGenerations=graduationCohorts(messageConfig,form.school);
+  const selectedGeneration=availableGenerations.find(item=>item.id===profile.generation);
   const representatives = selectedCompany?.representatives || [];
   const instructors = selectedCompany?.instructors || [];
   const representativeMatches = representatives.some(
@@ -209,6 +213,7 @@ export function Profile() {
     setForm((current) => ({
       ...current,
       school: schoolName,
+      generation: "",
       specialty: school.specialties?.includes(current.specialty)
         ? current.specialty
         : school.specialties?.[0] || "",
@@ -555,6 +560,10 @@ export function Profile() {
                   <dd>{shown(profile.specialty)}</dd>
                 </div>
                 <div>
+                  <dt>Generación Dual</dt>
+                  <dd>{selectedGeneration?.label||shown(profile.generation)}</dd>
+                </div>
+                <div>
                   <dt>Semestre y grupo</dt>
                   <dd>
                     {shown(
@@ -710,6 +719,21 @@ export function Profile() {
                     </option>
                   ))}
                 </select>
+              </label>
+              <label>
+                Generación de Educación Dual (opcional)
+                <select id="profileGeneration" value={form.generation||""}
+                  onChange={update("generation")}>
+                  <option value="">Sin asignar</option>
+                  {availableGenerations.map(item=><option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>)}
+                  {form.generation&&!availableGenerations.some(item=>item.id===form.generation)&&
+                    <option value={form.generation}>Generación guardada ({form.generation})</option>}
+                </select>
+                <small className="profile-field-hint">
+                  Se utiliza únicamente para mostrar mensajes dirigidos a tu generación. No modifica las bitácoras.
+                </small>
               </label>
               <div className="profile-form-grid">
                 <label>

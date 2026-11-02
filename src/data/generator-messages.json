@@ -97,7 +97,10 @@
         "schools": [
           "cbtis-134"
         ],
-        "specialties": "all"
+        "specialties": "all",
+        "generations": [
+          "cbtis134-dual-4-2027"
+        ]
       },
       "content": {
         "title": "¡Felicidades a la cuarta generación de Educación Dual!",
