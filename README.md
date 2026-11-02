@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.11.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.12-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,13 @@
 </div>
 
 ---
+
+## v0.60.12 · Avisos PNG y Debug
+
+- El generador de **avisos PNG** permite seleccionar diseños guardados y descargarlos juntos en ZIP, con un máximo de 25 archivos por lote. Cada PNG guardado conserva su formato y paleta elegidos al guardarlo, incluso al exportarlo junto a otros; los automáticos continúan usando el formato/estilo seleccionado en la vista previa.
+- En la sección Avisos PNG de Debug hay un laboratorio aislado para probar fechas límite con semanas, avisos de versión, avisos personalizados y avisos demasiado largos. Permite cambiar entre publicación vertical, cuadrado e historia y los estilos existentes sin alterar avisos guardados ni datos reales.
+- El editor de eventos dentro de Debug muestra **por qué un mensaje aparecería o no**: activación, fecha, plantel, especialidad, lectura y prioridad. La vista previa forzada sigue disponible para revisar eventos desactivados, identificada como tal.
+- Se conserva la retícula institucional de los PNG, firmas opcionales, logo, sin textos de relleno, y la interfaz móvil/escritorio existente. El formato de bitácoras, PDF, Registro Dual y calendario no cambian.
 
 ## v0.60.11.1 · Graduación institucional por plantel
 

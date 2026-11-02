@@ -6,6 +6,7 @@ import {
   downloadNoticePng,downloadNoticeBatch
 } from "../services/notice-png.js";
 import {loadDossierLogo} from "../services/student-dossier-report.js";
+import "./delivery-announcements-v06012.css";
 
 const initial={kind:"custom",title:"",subtitle:"",message:"",footer:"",
   audience:"all",audienceId:"",displayDate:"",dueAt:"",weekIds:[],weekLabels:[],
@@ -32,6 +33,7 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
  const [form,setForm]=useState(initial);
  const [editing,setEditing]=useState("");
  const [selected,setSelected]=useState("");
+ const [savedSelection,setSavedSelection]=useState([]);
  const [format,setFormat]=useState("post");
  const [theme,setTheme]=useState("editorial");
  const [logo,setLogo]=useState(null);
@@ -59,6 +61,12 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
      audience:"all",audienceId:""},
  ],[overview.deadlines]);
  const gallery=useMemo(()=>[...automatic,...saved],[automatic,saved]);
+ const savedSelectionSet=useMemo(()=>new Set(savedSelection),[savedSelection]);
+ const pickedSaved=saved.filter(entry=>savedSelectionSet.has(entry.id));
+ useEffect(()=>{
+   const ids=new Set(saved.map(item=>item.id));
+   setSavedSelection(previous=>previous.filter(id=>ids.has(id)));
+ },[saved]);
  const current=gallery.find(item=>item.id===selected)||automatic[0]||saved[0]||null;
  const audienceLabel=entry=>{
    if(!entry||entry.audience==="all"||!entry.audience)return "";
@@ -110,6 +118,9 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
  };
  const pick=(entry)=>{
    setSelected(entry.id);setTab("automatic");setError("");setNotice("");
+   if(saved.some(item=>item.id===entry.id)){
+     setFormat(entry.format||"post");setTheme(entry.theme||"editorial");
+   }
  };
  const edit=(entry)=>{
    setEditing(entry.id);setForm({...initial,...entry,dueAt:toLocalInput(entry.dueAt)});
@@ -147,11 +158,22 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
    }catch(err){setError(err?.message||"No se pudo descargar el PNG.");}
    finally{setBusy("");}
  };
- const downloadAll=async(items)=>{
+ const downloadNoticePngEntry=async(entry)=>{
+   if(busy)return;
+   setBusy("one");setError("");setNotice("");
+   try{
+     await downloadNoticePng({...entry,audienceLabel:audienceLabel(entry)},{
+       logo,format:entry.format,theme:entry.theme
+     });
+     setNotice("PNG descargado con su diseño guardado.");
+   }catch(err){setError(err?.message||"No se pudo descargar el PNG.");}
+   finally{setBusy("");}
+ };
+ const downloadAll=async(items,options={})=>{
    if(!items.length||busy)return;
    setBusy("batch");setError("");setNotice("");
    try{
-     const result=await downloadNoticeBatch(items,{logo,format,theme});
+     const result=await downloadNoticeBatch(items,{logo,format,theme,...options});
      setNotice(result.count+" avisos descargados en ZIP.");
    }catch(err){setError(err?.message||"No se pudo generar el ZIP.");}
    finally{setBusy("");}
@@ -194,20 +216,44 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
            No hay plazos próximos en los siguientes siete días. Puedes descargar el aviso de versión o crear uno manual.</p>}
          <div className="delivery-announcement-top">
            <h2>Avisos guardados</h2>
-           {saved.length>0&&<button type="button" className="btn" disabled={!!busy||!logo}
-             onClick={()=>downloadAll(saved.map(s=>({...s,audienceLabel:audienceLabel(s)})))}>
+           {saved.length>0&&<button type="button" className="btn"
+             disabled={!!busy||!logo||saved.length>25}
+             title={saved.length>25?"Selecciona hasta 25 avisos para exportar.":undefined}
+             onClick={()=>downloadAll(saved.map(s=>({...s,audienceLabel:audienceLabel(s)})),{preserveItemStyle:true})}>
              Descargar guardados · ZIP
            </button>}
          </div>
+         {saved.length>0&&<div className="delivery-png-saved-tools">
+           <label><input type="checkbox" aria-label="Seleccionar todos los avisos guardados"
+             checked={savedSelection.length===saved.length}
+             onChange={e=>setSavedSelection(e.target.checked?saved.map(s=>s.id):[])}/>
+             Seleccionar todos</label>
+           <button type="button" className="btn"
+             disabled={!!busy||!logo||!pickedSaved.length||pickedSaved.length>25}
+             onClick={()=>downloadAll(pickedSaved.map(s=>({...s,audienceLabel:audienceLabel(s)})),
+               {preserveItemStyle:true})}>
+             Descargar seleccionados · ZIP ({pickedSaved.length})
+           </button>
+           {pickedSaved.length>25&&<p role="alert" className="delivery-announcement-error">
+             Selecciona un máximo de 25 avisos por ZIP.
+           </p>}
+         </div>}
          {saved.length?<div className="delivery-png-picks">{saved.map(entry=>
            <article className={"delivery-png-pick"+(current?.id===entry.id?" selected":"")} key={entry.id}>
+             <label className="delivery-png-saved-check">
+               <input type="checkbox" aria-label={"Seleccionar aviso "+entry.title}
+                 checked={savedSelectionSet.has(entry.id)}
+                 onChange={e=>setSavedSelection(previous=>e.target.checked?
+                   [...previous.filter(id=>id!==entry.id),entry.id]:
+                   previous.filter(id=>id!==entry.id))}/>
+             </label>
              <button type="button" className="delivery-png-pick-select" onClick={()=>pick(entry)}>
                <small>{entry.kind==="release"?"Novedad":"Aviso"} · {audienceLabel(entry)||"General"}</small>
                <strong>{entry.title}</strong><span>{entry.message}</span>
              </button>
              <div className="delivery-png-pick-actions">
                <button type="button" className="btn" disabled={!!busy||!logo}
-                 onClick={()=>download({...entry,audienceLabel:audienceLabel(entry)})}>PNG</button>
+                 onClick={()=>downloadNoticePngEntry(entry)}>PNG</button>
                <button type="button" className="btn" onClick={()=>edit(entry)}>Editar</button>
                <button type="button" className="btn" onClick={()=>{
                  if(window.confirm("¿Eliminar este diseño guardado?"))
@@ -305,7 +351,9 @@ export default function DeliveryAnnouncements({state,onSave,onBack}){
      </div>
      <aside className="delivery-png-preview" aria-label="Vista previa PNG">
        <div className="delivery-announcement-top"><h2>Vista previa</h2>
-         <span className="delivery-announcements-muted">Imagen final</span></div>
+         <span className="delivery-announcements-muted">
+           {NOTICE_FORMATS.find(item=>item.id===format)?.width} × {NOTICE_FORMATS.find(item=>item.id===format)?.height} px
+         </span></div>
        <div className="delivery-png-options">
          <label>Formato
            <select aria-label="Formato PNG" value={format} onChange={e=>setFormat(e.target.value)}>

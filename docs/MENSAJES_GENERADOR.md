@@ -137,3 +137,11 @@ Los eventos de efemérides, los anuncios PNG, los avisos administrativos y los P
 - Las propiedades antiguas `profile.generation` y `event.audience.generations` quedan descontinuadas. Se ignoran en el motor y se omiten del perfil al guardarlo; no se borran las bitácoras ni perfiles históricos.
 - Para futuras generaciones se registra un nuevo evento dirigido al plantel y fechas específicas, con el nombre institucional que la escuela determine.
 - Debug permite simular fecha, plantel y especialidad, así como la última bitácora, sin guardar cambios de alumnos.
+
+## Avisos PNG y diagnóstico de eventos v0.60.12
+
+- Los avisos visuales descargables PNG son independientes de los mensajes emergentes. El estudio de PNG mantiene los formatos 1080 × 1350, 1080 × 1080 y 1080 × 1920, con el logotipo y firmas opcionales. Los avisos automáticos de fechas y versión siguen disponibles.
+- En Avisos guardados se pueden seleccionar algunos diseños y descargar un ZIP (máximo 25 por archivo). Cada PNG del lote mantiene el formato y tema guardados; el formato de vista previa se utiliza para los avisos automáticos.
+- El laboratorio Debug → Avisos PNG usa muestras ficticias y el mismo motor Canvas de producción; permite verificar contenido, texto que no cabe, fechas y estilos sin modificar registros, alumnos ni avisos reales.
+- El editor visual de eventos usa el motor real para diagnosticar si un mensaje emergente se mostraría en una fecha, plantel y especialidad simulados, y explica los casos negativos (desactivado, fuera de fecha, ya visto, disparador o destinatarios).
+- La vista previa forzada del editor puede abrir mensajes que no pasarían la validación contextual: la etiqueta explicita que es una prueba, no una activación real.

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./debug.css";
 import "./calendar-easter-eggs.css";
 import EventEditorDebug from "./components/EventEditorDebug.jsx";
+import DebugNoticeLab from "./components/DebugNoticeLab.jsx";
 import DebugInboxLab from "./components/DebugInboxLab.jsx";
 import {GeneratorMessageCard} from "./components/GeneratorMessageHost.jsx";
 import eventConfig from "./data/generator-messages.json";
@@ -444,6 +445,7 @@ function DebugPage() {
     if(!sceneOnLoad)return;
     const targetId={
       graduation:"debug-calendar",messages:"debug-editor",editor:"debug-editor",
+      avisos:"debug-avisos",
       inbox:"debug-inbox",bell:"debug-inbox",notifications:"debug-notifications",
       calendar:"debug-calendar",pdf:"debug-pdf",camera:"debug-camera"
     }[sceneOnLoad];
@@ -691,6 +693,10 @@ function DebugPage() {
           <EventEditorDebug />
         </Card>
 
+        <Card id="debug-avisos" title="Avisos PNG" description="Prueba los formatos, estilos y avisos con datos ficticios; muestra si el texto cabe antes de exportar." wide>
+          <DebugNoticeLab />
+        </Card>
+
         <Card id="debug-inbox" title="Centro de avisos" description="Simula pendientes, motivos, hitos, respaldos y sonido sin datos reales." wide>
           <DebugInboxLab base={sampleDeliveryState()} />
         </Card>
@@ -807,6 +813,7 @@ function DebugPage() {
               <select id="frame-scene" value={iframeScene} onChange={event=>setIframeScene(event.target.value)}>
                 <option value="messages">Mensajes emergentes</option>
                 <option value="editor">Editor visual de eventos</option>
+                <option value="avisos">Avisos PNG</option>
                 <option value="calendar">Efemérides</option>
                 <option value="notifications">Notificaciones</option>
                 <option value="inbox">Centro de avisos</option>

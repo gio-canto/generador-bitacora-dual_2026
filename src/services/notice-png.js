@@ -331,13 +331,21 @@ function zipFiles(files){
  push32(size);push32(start);push16(0);
  return new Uint8Array(writer);
 }
+/** Guarda cada aviso con su formato/estilo original si el lote es de diseños guardados. */
+export function noticeBatchStyle(item,options={}){
+ if(options.preserveItemStyle)return {
+   format:NOTICE_FORMATS.some(f=>f.id===item?.format)?item.format:"post",
+   theme:NOTICE_THEMES.some(t=>t.id===item?.theme)?item.theme:"editorial"
+ };
+ return {format:options.format||item?.format,theme:options.theme||item?.theme};
+}
 export async function downloadNoticeBatch(items,options={}){
  if(!items.length)throw Error("No hay avisos para descargar.");
  if(items.length>25)throw Error("Para descargar por lote, selecciona un máximo de 25 avisos.");
  const logo=options.logo||await loadDossierLogo();
  const results=[];
  for(let i=0;i<items.length;i++){
-   const art=await renderNoticePng(items[i],{logo,format:options.format,theme:options.theme});
+   const art=await renderNoticePng(items[i],{logo,...noticeBatchStyle(items[i],options)});
    results.push({...art,filename:String(i+1).padStart(2,"0")+"-"+art.filename});
  }
  const archive=zipFiles(results);

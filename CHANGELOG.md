@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.60.12 · Avisos PNG y Debug · 2026-11-02
+
+- Los avisos guardados pueden seleccionarse y exportarse en ZIP de hasta 25 PNG por lote. El ZIP respeta el formato y estilo original de cada diseño; los avisos automáticos pueden seguir exportándose en el formato elegido.
+- Los botones PNG de los diseños guardados mantienen el estilo y formato que tenía cada aviso al guardarlo; el botón de vista previa permite ensayar otras variantes.
+- Debug incorpora un laboratorio aislado de avisos PNG con vista previa real, tres formatos y paletas, fechas y un escenario deliberadamente demasiado largo para verificar errores de espacio.
+- El editor de mensajes especiales explica los motivos por los que un evento no aparecería en una simulación, respetando las reglas de fecha, audiencia, activación y repetición.
+- Se conservan anuncios automáticos, firmas voluntarias, logos, texto limpio y compatibilidad móvil/escritorio. El motor PDF y Registro Dual no se modifican.
+
+
 ## 0.60.11.1 · Corrección: generación asignada por plantel · 2026-11-02
 
 - Se retira el campo «Generación Dual» de los perfiles de alumno, incluidos formulario y presentación.
