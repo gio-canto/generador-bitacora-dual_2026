@@ -5,7 +5,7 @@ import {CalendarBlank,ClipboardText,FileArrowDown,FileArrowUp,FloppyDisk,
   ArrowRight,ArrowLeft,Warning,Buildings,Users,Eye,Code,Confetti} from "@phosphor-icons/react";
 import {GeneratorMessageCard} from "./GeneratorMessageHost.jsx";
 import {getDefaultMessageConfig,validateMessageConfig,eligibleMessages,
-  hasSeenMessage,markMessageSeen,activeGraduation} from "../services/generator-message-rules.js";
+  hasSeenMessage,markMessageSeen,activeGraduation,messageEventWarnings} from "../services/generator-message-rules.js";
 import {StudioField,StudioSwitch,StudioChoices,StudioSelect,StudioPills,
   StudioCalendar,StudioConfirmation} from "./EventStudioControls.jsx";
 import schools from "../data/schools.json";
@@ -86,6 +86,7 @@ export default function EventEditorDebug(){
   const [memoryRevision,setMemoryRevision]=useState(0);
   const fileRef=useRef(null);
   const errors=useMemo(()=>validateMessageConfig(config),[config]);
+  const warnings=useMemo(()=>messageEventWarnings(config),[config]);
   const current=config.events[selected];
   const changed=JSON.stringify(config)!==JSON.stringify(published);
   const profile={school:simSchool,specialty:simSpecialty};
@@ -373,6 +374,7 @@ export default function EventEditorDebug(){
         <strong>{errors.length?errors.length+" errores por corregir":"Configuración válida"}</strong>
         {errors.map((error,i)=><p key={i}><Warning size={15}/>{error}</p>)}
         {!errors.length&&<p>Se exportarán los {config.events.length} eventos, incluidos los que no modificaste.</p>}
+        {warnings.map((warning,i)=><p key={"warning-"+i}><Warning size={15}/>{warning}</p>)}
       </div>
       <div className="es-publish">
         <strong>El commit lo haces tú en GitHub</strong>

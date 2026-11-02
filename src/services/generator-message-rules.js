@@ -17,7 +17,22 @@ export const mexicoDate = (at = new Date()) => {
 const normalized = value => String(value || "").trim().toLocaleLowerCase("es-MX")
   .normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const listValid = input => input === "all" || Array.isArray(input) &&
-  input.length > 0 && input.every(x=>typeof x==="string" && x.trim());
+  input.length > 0 && input.every(x=>typeof x==="string" && x.trim()) &&
+  new Set(input.map(normalized)).size===input.length;
+const annualDateValid=value=>/^(0[1-9]|1[0-2])-([0-2][0-9]|3[01])$/.test(value||"") &&
+  iso("2000-"+value);
+const priorityOrder=(a,b)=>(b.priority||0)-(a.priority||0) || a.id.localeCompare(b.id);
+const contentKey=event=>[normalized(event.content?.title),normalized(event.content?.body),
+  event.content?.youtubeId||"",event.content?.action?.url||""].join("|");
+function uniqueContents(events){
+  const seen=new Set();
+  return events.filter(event=>{
+    const key=contentKey(event);
+    if(seen.has(key))return false;
+    seen.add(key);
+    return true;
+  });
+}
 export const validSurveyUrl = value => {
   try {const url=new URL(value);return url.protocol==="https:" && !!url.hostname && !url.username && !url.password;}
   catch{return false;}
@@ -34,6 +49,8 @@ export function validateMessageConfig(config) {
     else if(ids.has(event.id)) errors.push(at+"ID duplicado.");
     else ids.add(event.id);
     if (!Number.isInteger(event?.revision) || event.revision < 1) errors.push(at+"Revisión inválida.");
+    if(typeof event?.enabled!=="boolean")errors.push(at+"Estado de activación inválido.");
+    if(!Number.isInteger(event?.priority)||event.priority<0)errors.push(at+"Prioridad inválida.");
     if (!MESSAGE_PRESENTATIONS.includes(event?.presentation)) errors.push(at+"Presentación no válida.");
     if (!TRIGGERS.includes(event?.trigger?.type)) errors.push(at+"Activador no válido.");
     if (!MESSAGE_FREQUENCIES.includes(event?.frequency)) errors.push(at+"Frecuencia no válida.");
@@ -43,7 +60,10 @@ export function validateMessageConfig(config) {
     if (!validYoutubeId(event?.content?.youtubeId)) errors.push(at+"ID de YouTube incorrecto.");
     if (event?.content?.action?.url && !validSurveyUrl(event.content.action.url)) errors.push(at+"Enlace no seguro.");
     const trigger=event?.trigger || {};
-    if(trigger.type==="date" && !iso(trigger.date) && !/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(trigger.annualDate || "")) errors.push(at+"Fecha del evento inválida.");
+    if(trigger.type==="date" &&
+      ((!iso(trigger.date) && !annualDateValid(trigger.annualDate)) ||
+       (trigger.date!=null && trigger.annualDate!=null)))
+      errors.push(at+"Fecha del evento inválida.");
     if(trigger.type==="graduation"){
       if(trigger.showOn!=null && !["final-bitacora","date"].includes(trigger.showOn))
         errors.push(at+"Momento de felicitación inválido.");
@@ -108,10 +128,10 @@ export function markMessageSeen(event,{storage,sessionStorage,profileId="",date=
 }
 export function eligibleMessages(config,{trigger="on-open",profile={},profileId="",date=mexicoDate(),storage,sessionStorage,ignoreSeen=false}={}){
   if(validateMessageConfig(config).length)return [];
-  return config.events.filter(event=>event.enabled && matchesAudience(event,profile) &&
+  return uniqueContents(config.events.filter(event=>event.enabled && matchesAudience(event,profile) &&
     matchesTrigger(event,trigger,date) &&
     (ignoreSeen || !hasSeenMessage(event,{storage,sessionStorage,profileId,date})))
-    .sort((a,b)=>(b.priority||0)-(a.priority||0) || a.id.localeCompare(b.id));
+    .sort(priorityOrder));
 }
 
 /** Configuración visual independiente de la lectura: activa el tema durante todo
@@ -120,7 +140,7 @@ export function activeGraduation(config,{profile={},date=mexicoDate()}={}){
   if(validateMessageConfig(config).length)return null;
   return config.events.filter(e=>e.enabled&&e.trigger?.type==="graduation"&&
     date>=e.trigger.startDate&&date<=e.trigger.endDate&&matchesAudience(e,profile))
-    .sort((a,b)=>(b.priority||0)-(a.priority||0))[0]||null;
+    .sort(priorityOrder)[0]||null;
 }
 
 /** Prioriza la despedida programada sobre la genérica al terminar la última
@@ -140,5 +160,49 @@ export function finalBitacoraMessages(config,options={}){
     .some(event=>event.trigger?.type==="graduation");
   if(legacyScheduled)return [];
   return eligibleMessages(config,{...options,trigger:"final-bitacora"})
-    .filter(event=>event.trigger?.type!=="graduation");
+    .filter(event=>event.trigger?.type!=="graduation").slice(0,1);
 }
+
+/** No publicar en el historial despedidas finales todavía no presentadas. */
+export function historyMessages(config,ctx={}){
+  if(validateMessageConfig(config).length)return [];
+  const date=ctx.date||mexicoDate();
+  return uniqueContents(config.events.filter(event=>{
+    if(!event.enabled || !matchesAudience(event,ctx.profile))return false;
+    const finalEvent=event.trigger?.type==="final-bitacora" ||
+      (event.trigger?.type==="graduation"&&event.trigger.showOn==="final-bitacora");
+    return finalEvent?hasSeenMessage(event,{...ctx,date}):
+      matchesTrigger(event,event.trigger?.type,date);
+  }).sort(priorityOrder));
+}
+const overlaps=(a,b)=>a==="all"||b==="all"||
+  a.some(value=>b.some(other=>normalized(value)===normalized(other)));
+const sharedPublic=(a,b)=>overlaps(a.audience.schools,b.audience.schools)&&
+  overlaps(a.audience.specialties,b.audience.specialties);
+
+/** Advertencias no destructivas para el editor y los eventos antiguos. */
+export function messageEventWarnings(config){
+  if(!Array.isArray(config?.events))return [];
+  const warnings=[];
+  for(let i=0;i<config.events.length;i++){
+    const a=config.events[i];
+    if(!a?.enabled||!a.audience)continue;
+    for(let j=i+1;j<config.events.length;j++){
+      const b=config.events[j];
+      if(!b?.enabled||!b.audience||!sharedPublic(a,b))continue;
+      const matchingTrigger=a.trigger?.type===b.trigger?.type &&
+        (a.trigger?.type==="date"
+          ? (a.trigger.date&&a.trigger.date===b.trigger?.date)||
+            (a.trigger.annualDate&&a.trigger.annualDate===b.trigger?.annualDate)
+          : a.trigger?.type==="on-open"||a.trigger?.type==="final-bitacora");
+      const sharedGraduation=a.trigger?.type==="graduation"&&b.trigger?.type==="graduation"&&
+        a.trigger.showOn===b.trigger.showOn &&
+        a.trigger.videoDates?.some(date=>b.trigger.videoDates?.includes(date));
+      if((matchingTrigger||sharedGraduation)&&
+          (contentKey(a)===contentKey(b)||sharedGraduation))
+        warnings.push("Coincidencia entre "+a.id+" y "+b.id+": revisa fechas, público y contenido.");
+    }
+  }
+  return warnings;
+}
+

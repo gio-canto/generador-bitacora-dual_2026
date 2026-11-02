@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.8-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.9-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.9 · Depuración de eventos
+
+La cola de mensajes conserva el perfil y la fecha de cada aviso. Se descartan avisos pendientes de perfiles o días anteriores, se eliminan duplicados con contenido idéntico y las despedidas finales aparecen únicamente en el historial después de haberse mostrado. El editor informa de coincidencias entre eventos activos; las reglas de graduación y la compatibilidad con configuraciones anteriores permanecen.
+
+Esta primera etapa **no cambia el PDF ni su descarga**. La reproducción del video antes de iniciar la descarga móvil es una modificación posterior, separada para evitar regresiones.
 
 ## v0.60.8 · Publicación controlada en GitHub Pages
 

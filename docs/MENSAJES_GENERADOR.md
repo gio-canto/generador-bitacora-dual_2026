@@ -112,3 +112,11 @@ La cuarta generación del CBTis 134 conserva el video `YUC4FH3tSOk`, fechas 19�
 
 Desde **Debug → Efemérides**, elegir una fecha aplica el tema completo y **no** abre la felicitación automáticamente cuando `showOn` indica PDF final. En los días de video aparece «Simular entrega de última bitácora», que reproduce el mismo mensaje sin alterar las bitácoras reales ni guardarlo como visto.
 
+
+## Depuración del motor (0.60.9)
+
+Cada aviso de la cola conserva sus datos de activación (`event`, `ctx`, `kind`) para que el perfil, la fecha y el almacenamiento de lectura sean siempre los originales. Al cambiar de perfil o día se retiran los pendientes de apertura o calendario; los cierres finales no se descartan.
+
+Los avisos coincidentes con título, cuerpo, video y enlace idénticos se muestran una sola vez por prioridad. El editor informa conflictos entre eventos activos sin modificar ni eliminar configuraciones históricas. Las despedidas finales se recuperan en el historial sólo después de ser vistas.
+
+Los eventos de efemérides, los anuncios PNG, los avisos administrativos y los PDF siguen siendo motores independientes. El flujo móvil de video antes de descarga no forma parte de esta etapa.
