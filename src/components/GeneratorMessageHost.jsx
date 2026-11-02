@@ -27,7 +27,7 @@ function useMessageDialog(ref,enabled,onClose,id){
     const key=e=>{
       if(e.key==="Escape"){e.preventDefault();onClose();return;}
       if(e.key!=="Tab")return;
-      const elements=[...ref.current?.querySelectorAll(focusableSelector)||[]]
+      const elements=[...(ref.current?.querySelectorAll(focusableSelector)??[])]
         .filter(el=>el.getAttribute("aria-hidden")!=="true");
       if(!elements.length){e.preventDefault();ref.current?.focus();return;}
       const first=elements[0],last=elements[elements.length-1];
@@ -177,8 +177,22 @@ export default function GeneratorMessageHost(){
   const showFinal=useCallback(item=>{
     const interrupted=activeRef.current;
     if(interrupted?.kind==="final-bitacora"){
-      queue.current=enqueueEventMessages(queue.current,[item.event],item.ctx,item.kind,interrupted);
+      // Dos solicitudes simultáneas no crean una segunda despedida ni
+      // dejan una descarga pendiente sin su callback de continuación.
+      const previous=interrupted.onClose;
+      interrupted.onClose=()=>{
+        previous?.();
+        item.onClose?.();
+      };
       return;
+    }
+    const priorPending=queue.current.find(pending=>
+      pending.event.id===item.event.id&&pending.event.revision===item.event.revision&&
+      pending.ctx.profileId===item.ctx.profileId&&pending.ctx.date===item.ctx.date);
+    if(priorPending?.onClose){
+      const previous=priorPending.onClose;
+      const next=item.onClose;
+      item.onClose=()=>{previous();next?.();};
     }
     queue.current=prioritizeFinalEvent(queue.current,interrupted,item);
     if(interrupted){activeRef.current=null;setActive(null);}
