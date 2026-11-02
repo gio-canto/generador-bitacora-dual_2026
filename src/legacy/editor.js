@@ -24,6 +24,7 @@ import { parseBackup } from "../services/storage.js";
 import { notify, notifyImported } from "../services/rare-notification.jsx";
 import { createMatrixPayload } from "../services/delivery-registry.js";
 import {prepareLetterPage,LETTER_PDF_POINTS} from "../services/print-sheet.js";
+import {requiresFarewellBeforePdf,waitForFinalFarewell} from "../services/final-pdf-flow.js";
 export function startEditor() {
   "use strict";
   return (() => {
@@ -2521,6 +2522,51 @@ export function startEditor() {
       setTimeout(() => URL.revokeObjectURL(url), 3000);
       return "downloaded";
     }
+    // Conserva un enlace real como alternativa al intento automático en Safari.
+    let finalPdfUrl=null;
+    function startMobileFinalDelivery(blob,name){
+      if(finalPdfUrl)URL.revokeObjectURL(finalPdfUrl);
+      const url=URL.createObjectURL(blob);
+      finalPdfUrl=url;
+      const dialog=$("#finalPdfReadyDialog");
+      const download=$("#finalPdfDownload");
+      const share=$("#finalPdfShare");
+      const file=new File([blob],name,{type:"application/pdf"});
+      if(download){
+        download.href=url;
+        download.download=name;
+        if(/iPhone|iPad|iPod/i.test(navigator.userAgent))
+          download.target="_blank";
+        else download.removeAttribute("target");
+      }
+      if(share){
+        const supported=Boolean(navigator.share&&
+          (!navigator.canShare||navigator.canShare({files:[file]})));
+        share.hidden=!supported;
+        share.onclick=async()=>{
+          try{
+            await navigator.share({files:[file],title:"Bitácora semanal"});
+          }catch(err){
+            if(err?.name!=="AbortError")
+              notify("error","No se pudo compartir","Usa el botón Guardar o abrir PDF.");
+          }
+        };
+      }
+      // El click intenta iniciar la descarga; el diálogo posterior permite
+      // retomarla con un gesto explícito si el navegador la bloquea.
+      const anchor=document.createElement("a");
+      anchor.href=url;
+      anchor.download=name;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      if(dialog){
+        requestAnimationFrame(()=>{
+          if(typeof dialog.showModal==="function"&&!dialog.open)dialog.showModal();
+        });
+      }
+      return "attempted";
+    }
     function showDeliveryTips() {
       const d = $("#deliveryDialog");
       if (!d) return;
@@ -2554,7 +2600,11 @@ export function startEditor() {
         );
       });
     }
+    let pdfRequestActive=false;
     async function downloadPdf() {
+      if(pdfRequestActive)return;
+      pdfRequestActive=true;
+      try{
       if (!checkIdentity()) return;
       const check = validateWeekEntries();
       if (!check.ok) {
@@ -2571,6 +2621,10 @@ export function startEditor() {
         return;
       }
       const saved = persistRecord(collectRecord(), true);
+      const isFinal=Boolean($("#generatorFinalDual")?.checked);
+      const mobileFinal=requiresFarewellBeforePdf({
+        mobile:isMobileLike(),final:isFinal,saved
+      });
       const b = $("#pdfBtn"),
         mb = $("#mobilePdf"),
         old = b.textContent,
@@ -2578,6 +2632,14 @@ export function startEditor() {
       b.disabled = mb.disabled = true;
       b.textContent = mb.textContent = "Generando…";
       try {
+        if(mobileFinal){
+          b.textContent=mb.textContent="Esperando despedida…";
+          await waitForFinalFarewell({
+            school:$("#school")?.value||"",
+            specialty:$("#specialty")?.value||""
+          });
+          b.textContent=mb.textContent="Generando…";
+        }
         const canvas = document.createElement("canvas");
         const rendered = drawPdfPage(canvas, 11.81);
         if (!rendered.matrixReady)
@@ -2589,14 +2651,21 @@ export function startEditor() {
           blob = new Blob([bytes], { type: "application/pdf" });
         canvas.width = 1;
         canvas.height = 1;
-        const delivered = await deliverPdf(blob, safeFileName());
-        if (delivered !== "cancelled" && saved) {
-          showDeliveryTips();
-          if ($("#generatorFinalDual")?.checked) {
-            window.dispatchEvent(new CustomEvent("bitacora-final-bitacora",{detail:{
-              school:$("#school")?.value||"",specialty:$("#specialty")?.value||""
-            }}));
+        const delivered=mobileFinal
+          ? startMobileFinalDelivery(blob,safeFileName())
+          : await deliverPdf(blob,safeFileName());
+        if(delivered!=="cancelled"&&saved){
+          if(isFinal){
+            if(!mobileFinal){
+              // En escritorio: primero la descarga y después la despedida.
+              // No abrir el diálogo de recomendaciones sobre el video.
+              window.dispatchEvent(new CustomEvent("bitacora-final-bitacora",{detail:{
+                school:$("#school")?.value||"",specialty:$("#specialty")?.value||""
+              }}));
+            }
             $("#generatorFinalDual").checked=false;
+          }else{
+            showDeliveryTips();
           }
         }
       } catch (err) {
@@ -2612,6 +2681,9 @@ export function startEditor() {
         b.textContent = old;
         mb.textContent = oldm;
         b.disabled = mb.disabled = false;
+      }
+      }finally{
+        pdfRequestActive=false;
       }
     }
     function restoreAuthorities() {
@@ -2912,6 +2984,7 @@ export function startEditor() {
         }
       };
       $("#deliveryClose").onclick = () => $("#deliveryDialog").close();
+      $("#finalPdfClose")?.addEventListener("click",()=>$("#finalPdfReadyDialog")?.close());
       window.addEventListener("pagehide", () => saveDraftNow());
       document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") saveDraftNow();
