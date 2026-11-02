@@ -19,6 +19,13 @@ export function enqueueEventMessages(queue,events,ctx,kind,active=null){
   return result.sort((a,b)=>(b.event.priority||0)-(a.event.priority||0) ||
     a.event.id.localeCompare(b.event.id));
 }
+/** Una despedida final desplaza temporalmente avisos ordinarios sin marcarlos como vistos. */
+export function prioritizeFinalEvent(queue,active,finalItem){
+  const pending=active&&active.kind!=="final-bitacora"
+    ?enqueueEventMessages(queue,[active.event],active.ctx,active.kind):[...queue];
+  const key=eventQueueKey(finalItem);
+  return [finalItem,...pending.filter(item=>eventQueueKey(item)!==key)];
+}
 export function takeNextEvent(queue,{profileId="",date="",wasSeen=()=>false}={}){
   const remaining=[...queue];
   while(remaining.length){

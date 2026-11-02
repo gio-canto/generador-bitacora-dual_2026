@@ -4,7 +4,7 @@ import {CalendarBlank,ClipboardText,FileArrowDown,FileArrowUp,FloppyDisk,
   GraduationCap,Plus,PlayCircle,Trash,ArrowClockwise,Copy,CheckCircle,
   ArrowRight,ArrowLeft,Warning,Buildings,Users,Eye,Code,Confetti} from "@phosphor-icons/react";
 import {GeneratorMessageCard} from "./GeneratorMessageHost.jsx";
-import {getDefaultMessageConfig,validateMessageConfig,
+import {getDefaultMessageConfig,validateMessageConfig,eligibleMessages,
   hasSeenMessage,markMessageSeen,activeGraduation,messageEventWarnings} from "../services/generator-message-rules.js";
 import {diagnoseMessageEvent} from "../services/message-event-diagnostics.js";
 import {StudioField,StudioSwitch,StudioChoices,StudioSelect,StudioPills,
@@ -100,6 +100,8 @@ export default function EventEditorDebug(){
     ...ctx,trigger:simulatedTrigger
   }):null;
   const eligible=diagnosis?.eligible===true;
+  const selectedOrder=eligibleMessages(config,{...ctx,trigger:simulatedTrigger});
+  const selectedPosition=selectedOrder.findIndex(event=>event.id===current?.id);
   const seen=current&&hasSeenMessage(current,ctx);
   const themeActive=Boolean(current?.trigger.type==="graduation"&&activeGraduation(simulatedConfig,ctx)?.id===current.id);
   const update=patch=>setConfig(previous=>({...previous,events:previous.events.map((event,i)=>
@@ -332,10 +334,19 @@ export default function EventEditorDebug(){
             {diagnosis?.reasons.map((reason,index)=><small key={index} className="es-diagnostic-reason">
               {reason}
             </small>)}
+            {selectedPosition>=0&&<small>
+              Orden en la cola: {selectedPosition+1} de {selectedOrder.length} mensajes de este disparador
+            </small>}
             <small>{seen?"Visto en esta simulación":"Todavía no visto"} · {current.enabled?"Publicado":"Desactivado"}</small>
           </div>
         </div>
       </div>
+      {selectedOrder.length>0&&<div className="es-validation" aria-label="Orden de mensajes simulados">
+        <strong>Orden de mensajes para este escenario</strong>
+        {selectedOrder.map((event,index)=><p key={event.id}>
+          {index+1}. {event.content.title} · Prioridad {event.priority}
+        </p>)}
+      </div>}
       <div className="es-actions">
         <button className="es-button es-primary" type="button" onClick={()=>setPreview(current)}><PlayCircle size={17}/>Vista previa forzada</button>
         {current.trigger.type==="graduation"&&<button type="button" className="es-button"
