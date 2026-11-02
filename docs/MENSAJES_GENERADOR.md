@@ -120,3 +120,11 @@ Cada aviso de la cola conserva sus datos de activación (`event`, `ctx`, `kind`)
 Los avisos coincidentes con título, cuerpo, video y enlace idénticos se muestran una sola vez por prioridad. El editor informa conflictos entre eventos activos sin modificar ni eliminar configuraciones históricas. Las despedidas finales se recuperan en el historial sólo después de ser vistas.
 
 Los eventos de efemérides, los anuncios PNG, los avisos administrativos y los PDF siguen siendo motores independientes. El flujo móvil de video antes de descarga no forma parte de esta etapa.
+
+## Flujo de última bitácora v0.60.10
+
+- En móvil, luego de validar y guardar el registro, `waitForFinalFarewell` emite `bitacora-final-bitacora-before-pdf`. El anfitrión React responde sólo si existe una despedida aplicable; la marca de lectura se guarda cuando el usuario cierra la ventana.
+- El motor PDF no empieza antes del cierre de la despedida. Si no hay mensaje elegible, o si el anfitrión React no está disponible, continúa inmediatamente.
+- Tras la generación, se intenta descargar el PDF y se presenta un enlace directo para recuperarlo en iOS/Android. La opción de compartir requiere interacción del usuario para cumplir las restricciones del navegador.
+- En escritorio se conserva el flujo anterior de generación/descarga, y luego se emite `bitacora-final-bitacora`. El diálogo de recomendaciones se reserva a las bitácoras normales.
+- La descarga cancelada no se marca como finalizada. Un error al generar permite reintentar sin perder el registro; el video que se cerró no se vuelve a mostrar por esa descarga.

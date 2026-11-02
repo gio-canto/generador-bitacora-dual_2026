@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.60.10 · Despedida y descarga inteligente · 2026-11-02
+
+- En celulares, la última bitácora muestra primero la felicitación disponible; el PDF sólo se genera cuando se cierra ese mensaje. Si el video no carga, el alumno puede cerrar la ventana y continuar sin perder el archivo.
+- En computadora la descarga sigue inmediatamente después de validar y generar el PDF; la despedida se abre después, sin competir con el diálogo de recomendaciones.
+- El PDF final móvil intenta descargarse automáticamente y conserva una ventana con enlace directo de «Guardar o abrir PDF» y «Compartir PDF» cuando lo permita el navegador.
+- Si la felicitación ya fue vista o no está habilitada, se genera el archivo sin imponer esperas.
+- Se previenen dobles pulsaciones y se mantiene intacto el formato, historial, Data Matrix, firmas y Registro Dual.
+- Se incluyen pruebas para el protocolo de cierre, la selección de dispositivos y la no duplicación de felicitaciones.
+
+
 ## 0.60.9 · Depuración del sistema de eventos · 2026-11-02
 
 - La cola de mensajes ahora guarda el perfil y fecha originales para registrar la lectura correctamente aunque lleguen otros eventos.

@@ -5,6 +5,7 @@ import config from "../data/generator-messages.json";
 import {eligibleMessages,markMessageSeen,hasSeenMessage,mexicoDate,activeGraduation,finalBitacoraMessages,historyMessages} from "../services/generator-message-rules.js";
 import {enqueueEventMessages,retainEventsForContext,takeNextEvent} from "../services/generator-event-queue.js";
 import {youtubeCelebrationUrl,requestYoutubeAudio,sendYoutubeCommand} from "../services/youtube-celebration.js";
+import {BEFORE_FINAL_PDF_EVENT} from "../services/final-pdf-flow.js";
 import "../generator-messages.css";
 import "../generator-graduation.css";
 
@@ -140,6 +141,8 @@ export default function GeneratorMessageHost(){
     if(!item)return;
     markMessageSeen(item.event,item.ctx);
     activeRef.current=null;setActive(null);
+    // Al cerrar el video móvil se autoriza generar el PDF, una sola vez.
+    item.onClose?.();
     window.setTimeout(openNext,260);
   },[openNext]);
   useEffect(()=>{
@@ -163,9 +166,24 @@ export default function GeneratorMessageHost(){
     const poll=window.setInterval(openNext,900);
     const calendarPoll=window.setInterval(checkGraduation,60000);
     const final=e=>enqueue("final-bitacora",{profile:{...readProfileData(),...e.detail}});
+    const beforeFinalPdf=e=>{
+      const detail=e.detail;
+      if(typeof detail?.continueToPdf!=="function")return;
+      const ctx={...currentContext(),profile:{...readProfileData(),
+        school:detail.school||readProfileData().school,
+        specialty:detail.specialty||readProfileData().specialty}};
+      const event=finalBitacoraMessages(config,ctx)[0];
+      if(!event)return; // Sin evento elegible: el generador prosigue solo.
+      detail.handled=true;
+      const item={event,ctx,kind:"final-bitacora",onClose:detail.continueToPdf};
+      // Una despedida manual tiene prioridad sobre los avisos pendientes.
+      queue.current=[item,...queue.current];
+      openNext();
+    };
     const showList=()=>{if(activeRef.current)return;historyRef.current=true;setHistoryOpen(true);};
     const focus=()=>{if(!document.hidden){enqueue("date");checkGraduation();openNext();}};
     window.addEventListener("bitacora-final-bitacora",final);
+    window.addEventListener(BEFORE_FINAL_PDF_EVENT,beforeFinalPdf);
     window.addEventListener("bitacora-profile",begin);
     window.addEventListener("bitacora-open-messages",showList);
     window.addEventListener("focus",focus);
@@ -173,6 +191,7 @@ export default function GeneratorMessageHost(){
       window.clearTimeout(initial);window.clearInterval(poll);window.clearInterval(calendarPoll);
       document.body.classList.remove("generator-graduation-active");
       window.removeEventListener("bitacora-final-bitacora",final);
+      window.removeEventListener(BEFORE_FINAL_PDF_EVENT,beforeFinalPdf);
       window.removeEventListener("bitacora-profile",begin);
       window.removeEventListener("bitacora-open-messages",showList);
       window.removeEventListener("focus",focus);

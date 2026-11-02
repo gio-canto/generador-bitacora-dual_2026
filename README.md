@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.9-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.10-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.10 · Despedida y PDF final
+
+Al seleccionar **Esta es mi última bitácora de Educación Dual**, el móvil muestra primero la despedida disponible. El cierre del mensaje da paso a la generación del PDF: no se crea el documento mientras el video está abierto. Después se intenta descargarlo y se mantiene un enlace real para volver a guardarlo o compartirlo cuando el navegador bloquee la descarga automática. Si no hay evento elegible, se procede al PDF sin bloquear al alumno.
+
+En computadora se conserva la descarga inmediata y después aparece la despedida, sin superponer el diálogo de recomendaciones. Los PDF normales mantienen su proceso anterior. El proceso completo evita dobles pulsaciones, conserva el registro validado y permite reintentar si falla la generación.
 
 ## v0.60.9 · Depuración de eventos
 
