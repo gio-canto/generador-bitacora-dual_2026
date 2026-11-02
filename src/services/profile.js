@@ -6,7 +6,6 @@ const EMPTY_PROFILE = Object.freeze({
   name: "",
   school: "",
   specialty: "",
-  generation: "",
   semester: "",
   group: "",
   company: "",
@@ -143,7 +142,6 @@ export function readProfileData(storage = localStorage) {
       name: name && !isSecretName(name) ? name : "",
       school: cleanText(raw.school),
       specialty: cleanText(raw.specialty, 120),
-      generation: cleanText(raw.generation, 80),
       semester: cleanText(raw.semester, 12),
       group: cleanText(raw.group, 20).toUpperCase(),
       company: cleanText(raw.company),
@@ -214,9 +212,6 @@ export function rememberProfile(value, storage = localStorage) {
     specialty: has(patch, "specialty")
       ? cleanText(patch.specialty, 120)
       : current.specialty,
-    generation: has(patch, "generation")
-      ? cleanText(patch.generation, 80)
-      : current.generation,
     semester: has(patch, "semester")
       ? cleanText(patch.semester, 12)
       : current.semester,

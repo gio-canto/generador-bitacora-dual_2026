@@ -5,7 +5,7 @@ export function graduationPreviewForDate(config,eventId,date,profile=null){
   const selected=config?.events?.find(event=>event.id===eventId && event.trigger?.type==="graduation");
   if(!selected)return null;
   const isolated={version:1,events:[{...selected,enabled:true,
-    audience:profile===null?{schools:"all",specialties:"all",generations:"all"}:selected.audience}]};
+    audience:profile===null?{schools:"all",specialties:"all"}:selected.audience}]};
   return activeGraduation(isolated,{date,profile:profile||{}});
 }
 

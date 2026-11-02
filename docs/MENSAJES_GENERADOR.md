@@ -129,11 +129,11 @@ Los eventos de efemérides, los anuncios PNG, los avisos administrativos y los P
 - En escritorio se conserva el flujo anterior de generación/descarga, y luego se emite `bitacora-final-bitacora`. El diálogo de recomendaciones se reserva a las bitácoras normales.
 - La descarga cancelada no se marca como finalizada. Un error al generar permite reintentar sin perder el registro; el video que se cerró no se vuelve a mostrar por esa descarga.
 
-## Generaciones Dual (0.60.11)
+## Graduación institucional por plantel (0.60.11.1)
 
-- `profile.generation` es una clave opcional guardada en el perfil del alumno (`bitacora_profiles_v2`) y nunca se calcula a partir del semestre o la fecha. Un perfil anterior sin este campo funciona igual que antes.
-- `event.audience.generations` puede omitirse o ser `"all"` para mantener las reglas históricas, o incluir una lista de claves de generación (minúsculas, números y guiones).
-- Una graduación exclusiva requiere coincidencia simultánea de plantel, especialidad y generación; si no hay generación en el perfil, la graduación exclusiva no se muestra. La despedida general no se bloquea.
-- La graduación publicada de la cuarta generación de Educación Dual del CBTis 134 (2027) usa la clave `cbtis134-dual-4-2027`, disponible en Perfil → Editar predeterminados → Generación de Educación Dual.
-- Para futuras generaciones, crea un evento de graduación en Debug, asigna un identificador estable en «Generación destinataria» y publica el archivo JSON completo. Las opciones de generación del perfil se obtienen automáticamente de los eventos activos publicados.
-- El simulador de Debug permite seleccionar una generación diferente o ninguna y ver la coincidencia sin alterar perfiles reales.
+- La generación la determina cada escuela y queda documentada en el evento de graduación `graduation.label` de `src/data/generator-messages.json`. No se solicita el número de generación a los alumnos.
+- `audience.schools` selecciona el plantel o planteles destinatarios, `audience.specialties` delimita especialidades y `trigger.startDate/endDate/videoDates` define la ventana institucional.
+- En julio de 2027, el CBTis 134 conserva la despedida de su cuarta generación, sin obligar a sus alumnos a agregar atributos a su perfil.
+- Las propiedades antiguas `profile.generation` y `event.audience.generations` quedan descontinuadas. Se ignoran en el motor y se omiten del perfil al guardarlo; no se borran las bitácoras ni perfiles históricos.
+- Para futuras generaciones se registra un nuevo evento dirigido al plantel y fechas específicas, con el nombre institucional que la escuela determine.
+- Debug permite simular fecha, plantel y especialidad, así como la última bitácora, sin guardar cambios de alumnos.

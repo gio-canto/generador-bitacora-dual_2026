@@ -82,7 +82,6 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
     name: "Alumno de Prueba",
     school: "Plantel de Prueba",
     specialty: "Programación",
-    generation: "",
     semester: "5",
     group: "C",
     company: "Empresa de Prueba",

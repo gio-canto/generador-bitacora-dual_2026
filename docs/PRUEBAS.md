@@ -366,13 +366,12 @@ Pruebas automáticas en `tests/v06010-final-pdf-flow.test.jsx`. Revisión manual
 - Dos pulsaciones rápidas no deben generar dos PDFs ni dos despedidas.
 - Error de Data Matrix o imagen JPEG: comprobar notificación y que la bitácora permanezca disponible para reintento.
 
-## Pruebas v0.60.11 · Generación y graduación
+## Pruebas v0.60.11.1 · Generación institucional por plantel
 
-- Un perfil antiguo sin `generation` debe conservar nombre, semestre, empresa y todos sus demás campos.
-- Editar la generación debe persistir al cambiar de perfil, reiniciar la página y volver a editar otra preferencia.
-- Si se cambia el plantel en el editor de perfil, el selector de generación debe limpiarse hasta una nueva elección.
-- En fechas de graduación: alumnos de la generación 2027 con la clave exacta reciben el tema y el video; otros grupos o perfiles sin generación no.
-- En el último PDF de un alumno de otra generación debe mostrarse, cuando corresponda, sólo la despedida general, nunca la felicitación exclusiva.
-- Los mensajes históricos sin filtro de generación siguen aplicando conforme a sus filtros originales.
-- En Debug probar misma fecha y plantel con generación correcta, distinta y sin generación. Confirmar que la vista de graduación únicamente se activa para la correcta.
-- Confirmar que en celular el video sigue antecediendo al PDF final y que el formato PDF, Data Matrix y Registro Dual no cambian.
+- El perfil de alumno no contiene campo ni selector de generación, en lectura, edición o al cambiar de perfil.
+- Un perfil creado en 0.60.11 con un atributo heredado `generation` debe poder leerse y editarse sin perder nombre, escuela, semestre o empresa; al volver a guardar, se omite el atributo obsoleto.
+- Para el CBTis 134 en las fechas de julio de 2027, la despedida especial debe seleccionarse por plantel y fechas, no por un dato del alumno.
+- En otras escuelas, otras fechas o especialidades fuera del público destinatario, no debe activarse la graduación de ese plantel.
+- Debug permite simular el periodo y la entrega final sin selector de generación; el nombre institucional se edita exclusivamente en el evento.
+- Los eventos históricos con `audience.generations` pueden importarse sin imponer una coincidencia con el perfil; el filtro antiguo queda obsoleto.
+- Confirmar que descarga final móvil/PC, firmas, Data Matrix, Registro Dual y mensajes generales no sufren regresiones.

@@ -4,7 +4,7 @@ import published from "../src/data/generator-messages.json";
 import {activeGraduation,eligibleMessages,finalBitacoraMessages,validateMessageConfig,
   markMessageSeen} from "../src/services/generator-message-rules.js";
 
-const profile={school:"cbtis-134",specialty:"Programación",generation:"cbtis134-dual-4-2027"};
+const profile={school:"cbtis-134",specialty:"Programación"};
 const config=structuredClone(published);
 const grad=config.events.find(e=>e.trigger.type==="graduation");
 const local=()=>{const data=new Map();return{
