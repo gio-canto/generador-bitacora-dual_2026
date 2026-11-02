@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.60.13 · Avisos emergentes y despedidas estables · 2026-11-02
+
+- La despedida de última bitácora tiene prioridad sobre anuncios ordinarios, incluso si uno ya estaba abierto. Los mensajes desplazados se conservan pendientes y no se marcan vistos hasta cerrarse.
+- Se unifican las continuaciones de solicitudes finales simultáneas para evitar dos despedidas o PDFs bloqueados por callbacks perdidos.
+- Los diálogos emergentes y el historial se pueden cerrar con Escape; mantienen el foco dentro de la ventana, restauran el foco previo y bloquean el desplazamiento del fondo.
+- El cierre de la despedida móvil se identifica con «Continuar al PDF»; el generador sólo construye el PDF después de que el alumno cierre la felicitación.
+- Ajustes responsivos para tableros, ventanas medianas y pantalla completa en móviles, considerando las zonas seguras y la configuración de movimiento reducido.
+- El editor de Debug ahora muestra el orden de mensajes y sus prioridades conforme a las reglas reales de destinatarios, fecha, lectura y disparador.
+- Se mantienen los avisos PNG, videos, efemérides, easter eggs, registros y bitácoras existentes. Las pruebas reales en iPhone/Android siguen siendo externas al CI.
+
+
 ## 0.60.12 · Avisos PNG y Debug · 2026-11-02
 
 - Los avisos guardados pueden seleccionarse y exportarse en ZIP de hasta 25 PNG por lote. El ZIP respeta el formato y estilo original de cada diseño; los avisos automáticos pueden seguir exportándose en el formato elegido.
