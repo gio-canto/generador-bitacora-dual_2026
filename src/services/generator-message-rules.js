@@ -56,6 +56,12 @@ export function validateMessageConfig(config) {
     if (!MESSAGE_FREQUENCIES.includes(event?.frequency)) errors.push(at+"Frecuencia no válida.");
     if (event?.dismissible !== true) errors.push(at+"Los mensajes deben permitir cerrarse.");
     if (!listValid(event?.audience?.schools) || !listValid(event?.audience?.specialties)) errors.push(at+"Público no válido.");
+    // Ausencia del filtro mantiene compatibilidad con mensajes históricos.
+    if(event?.audience?.generations!=null &&
+       (!listValid(event.audience.generations) ||
+        (Array.isArray(event.audience.generations) &&
+         event.audience.generations.some(id=>!/^[a-z0-9][a-z0-9_-]{1,79}$/.test(id)))))
+      errors.push(at+"Generación destinataria no válida.");
     if (!String(event?.content?.title || "").trim() || !String(event?.content?.body || "").trim()) errors.push(at+"Faltan título o texto.");
     if (!validYoutubeId(event?.content?.youtubeId)) errors.push(at+"ID de YouTube incorrecto.");
     if (event?.content?.action?.url && !validSurveyUrl(event.content.action.url)) errors.push(at+"Enlace no seguro.");
@@ -88,10 +94,12 @@ function schoolNames(value){
   return [value,found?.id,found?.name,found?.shortName].filter(Boolean).map(normalized);
 }
 function matchesAudience(event,profile={}){
-  const {schools:targetSchools="all",specialties="all"}=event.audience || {};
+  const {schools:targetSchools="all",specialties="all",generations="all"}=event.audience || {};
   const identities=schoolNames(profile.school);
   return (targetSchools==="all" || targetSchools.some(s=>schoolNames(s).some(candidate=>identities.includes(candidate)))) &&
-    (specialties==="all" || specialties.some(s=>normalized(s)===normalized(profile.specialty)));
+    (specialties==="all" || specialties.some(s=>normalized(s)===normalized(profile.specialty))) &&
+    (generations==="all" || generations.some(id=>
+      Boolean(profile.generation)&&normalized(id)===normalized(profile.generation)));
 }
 function matchesTrigger(event,trigger,date){
   const spec=event.trigger || {};
@@ -178,7 +186,8 @@ export function historyMessages(config,ctx={}){
 const overlaps=(a,b)=>a==="all"||b==="all"||
   a.some(value=>b.some(other=>normalized(value)===normalized(other)));
 const sharedPublic=(a,b)=>overlaps(a.audience.schools,b.audience.schools)&&
-  overlaps(a.audience.specialties,b.audience.specialties);
+  overlaps(a.audience.specialties,b.audience.specialties)&&
+  overlaps(a.audience.generations??"all",b.audience.generations??"all");
 
 /** Advertencias no destructivas para el editor y los eventos antiguos. */
 export function messageEventWarnings(config){

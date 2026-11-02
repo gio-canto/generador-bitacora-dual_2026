@@ -6,6 +6,8 @@ import EventEditorDebug from "./components/EventEditorDebug.jsx";
 import DebugInboxLab from "./components/DebugInboxLab.jsx";
 import {GeneratorMessageCard} from "./components/GeneratorMessageHost.jsx";
 import eventConfig from "./data/generator-messages.json";
+import schools from "./data/schools.json";
+import {graduationCohorts} from "./services/graduation-cohorts.js";
 import {graduationPreviewForDate,graduationPreviewDates} from "./services/debug-graduation.js";
 import "./generator-graduation.css";
 
@@ -399,6 +401,9 @@ function DebugPage() {
   const [graduationPreview,setGraduationPreview]=useState(null);
   const graduationEvents=eventConfig.events.filter(event=>event.trigger?.type==="graduation");
   const [graduationEventId,setGraduationEventId]=useState(()=>graduationEvents[0]?.id||"");
+  const [testSchool,setTestSchool]=useState(schools[0]?.id||"");
+  const [testSpecialty,setTestSpecialty]=useState(schools[0]?.specialties?.[0]||"");
+  const [testGeneration,setTestGeneration]=useState(graduationEvents[0]?.audience?.generations?.[0]||"");
   const [actionOutput, setActionOutput] = useState("");
   const calendarStop = useRef(null);
   const env = useMemo(environmentSnapshot, []);
@@ -429,7 +434,9 @@ function DebugPage() {
       now: date,
       storage: {getItem:()=>null,setItem:()=>{}},
     });
-    const matched=graduationPreviewForDate(eventConfig,eventId,value);
+    const matched=graduationPreviewForDate(eventConfig,eventId,value,{
+      school:testSchool,specialty:testSpecialty,generation:testGeneration
+    });
     setGraduationPreview(matched);
     setAdaptivePreview(matched?.trigger?.videoDates?.includes(value)&&
       matched.trigger.showOn!=="final-bitacora"?matched:null);
@@ -633,10 +640,40 @@ function DebugPage() {
             <div className="debug-field">
               <label htmlFor="debug-graduation-event">Graduación para probar</label>
               <select id="debug-graduation-event" value={graduationEventId}
-                onChange={e=>{setGraduationEventId(e.target.value);resetCalendar();}}>
+                onChange={e=>{
+                  setGraduationEventId(e.target.value);
+                  const selected=graduationEvents.find(item=>item.id===e.target.value);
+                  setTestGeneration(selected?.audience?.generations?.[0]||"");
+                  resetCalendar();
+                }}>
                 {graduationEvents.map(event=><option key={event.id} value={event.id}>
                   {event.graduation?.label||event.content.title}
                 </option>)}
+              </select>
+            </div>
+          </div>}
+          {graduationEvents.length>0&&<div className="debug-row" aria-label="Perfil de prueba para graduación">
+            <div className="debug-field"><label htmlFor="debug-test-school">Plantel de prueba</label>
+              <select id="debug-test-school" value={testSchool} onChange={e=>{
+                setTestSchool(e.target.value);setTestGeneration("");resetCalendar();
+              }}>
+                {schools.map(s=><option key={s.id} value={s.id}>{s.shortName||s.name}</option>)}
+              </select>
+            </div>
+            <div className="debug-field"><label htmlFor="debug-test-specialty">Especialidad de prueba</label>
+              <select id="debug-test-specialty" value={testSpecialty}
+                onChange={e=>{setTestSpecialty(e.target.value);resetCalendar();}}>
+                {[...new Set(schools.flatMap(s=>s.specialties||[]))].map(s=>
+                  <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div className="debug-field"><label htmlFor="debug-test-generation">Generación de prueba</label>
+              <select id="debug-test-generation" value={testGeneration}
+                onChange={e=>{setTestGeneration(e.target.value);resetCalendar();}}>
+                <option value="">Sin generación</option>
+                {graduationCohorts(eventConfig,testSchool).map(item=>
+                  <option key={item.id} value={item.id}>{item.label}</option>)}
+                <option value="otra-generacion">Otra generación (prueba)</option>
               </select>
             </div>
           </div>}
@@ -648,6 +685,8 @@ function DebugPage() {
                   {day===event.trigger.startDate?"Inicio · ":"Video · "}{day}
                 </button>))}
           </div>}
+          {graduationEvents.length>0&&!graduationPreview&&
+            <p className="debug-note">Sin graduación aplicable para la fecha, plantel, especialidad y generación simulados.</p>}
           {graduationPreview&&<div className="debug-row">
             <p className="debug-note" role="status">
               Vista de graduación activa: {graduationPreview.graduation?.label||graduationPreview.content.title}.

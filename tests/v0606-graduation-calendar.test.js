@@ -36,7 +36,7 @@ describe("0.60.6 · graduación como efeméride de página completa",()=>{
     const css=readFileSync("src/debug.css","utf8");
     expect(src).toContain('document.body.classList.toggle("debug-graduation-preview"');
     expect(src).toContain('document.body.classList.remove("debug-graduation-preview")');
-    expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value)");
+    expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value,{");
     expect(src).toContain("setGraduationPreview(null)");
     expect(src).toContain("Simular entrega de última bitácora");
     expect(src).not.toContain("showGraduationTest");

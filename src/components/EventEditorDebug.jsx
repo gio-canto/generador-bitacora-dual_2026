@@ -9,6 +9,7 @@ import {getDefaultMessageConfig,validateMessageConfig,eligibleMessages,
 import {StudioField,StudioSwitch,StudioChoices,StudioSelect,StudioPills,
   StudioCalendar,StudioConfirmation} from "./EventStudioControls.jsx";
 import schools from "../data/schools.json";
+import {graduationCohorts} from "../services/graduation-cohorts.js";
 import "./event-studio.css";
 
 const copy=value=>JSON.parse(JSON.stringify(value));
@@ -38,7 +39,7 @@ const newEvent=(graduation=false)=>graduation?({
   id:"graduacion-"+Date.now().toString(36),revision:1,enabled:false,
   presentation:"fullscreen",trigger:{type:"graduation",startDate:"2027-07-19",endDate:"2027-07-23",
     videoDates:["2027-07-22","2027-07-23"],showOn:"final-bitacora"},
-  audience:{schools:["cbtis-134"],specialties:"all"},
+  audience:{schools:["cbtis-134"],specialties:"all",generations:["generacion-nueva"]},
   content:{title:"¡Felicidades por concluir Educación Dual!",body:"Gracias por formar parte de esta generación.",
     youtubeId:null,action:null},
   graduation:{label:"Generación de Educación Dual",theme:"celebration"},
@@ -82,6 +83,7 @@ export default function EventEditorDebug(){
   const [simDate,setSimDate]=useState(initialDate(getDefaultMessageConfig().events[0]));
   const [simSchool,setSimSchool]=useState(schools[0]?.id||"");
   const [simSpecialty,setSimSpecialty]=useState(specialties[0]||"");
+  const [simGeneration,setSimGeneration]=useState("");
   const [simMemory,setSimMemory]=useState(fakeStorage);
   const [memoryRevision,setMemoryRevision]=useState(0);
   const fileRef=useRef(null);
@@ -89,7 +91,14 @@ export default function EventEditorDebug(){
   const warnings=useMemo(()=>messageEventWarnings(config),[config]);
   const current=config.events[selected];
   const changed=JSON.stringify(config)!==JSON.stringify(published);
-  const profile={school:simSchool,specialty:simSpecialty};
+  const profile={school:simSchool,specialty:simSpecialty,generation:simGeneration};
+  const generationOptions=graduationCohorts({...config,events:config.events.map(event=>
+    ({...event,enabled:true}))},simSchool);
+  const candidateGenerations=[...new Set([
+    ...generationOptions.map(item=>item.id),
+    ...config.events.flatMap(event=>Array.isArray(event.audience?.generations)?
+      event.audience.generations:[])
+  ])];
   const ctx={profile,profileId:"debug-perfil",date:simDate,storage:simMemory,sessionStorage:simMemory};
   const simulatedConfig=useMemo(()=>({...config,events:config.events.map((event,index)=>
     index===selected?{...event,enabled:true}:event)}),[config,selected]);
@@ -105,19 +114,25 @@ export default function EventEditorDebug(){
   const detail=(key,patch)=>update({[key]:{...current[key],...patch}});
   const choose=(index,targetStep=1)=>{
     setSelected(index);setStep(targetStep);setTheme(false);setNotice("");
-    setSimDate(initialDate(config.events[index]));setSimMemory(fakeStorage());
+    setSimDate(initialDate(config.events[index]));
+    setSimGeneration(Array.isArray(config.events[index].audience?.generations)?
+      config.events[index].audience.generations[0]:"");
+    setSimMemory(fakeStorage());
   };
   const add=(graduation=false)=>{
     const event=newEvent(graduation);
     setConfig(prev=>({...prev,events:[...prev.events,event]}));
     setSelected(config.events.length);setSimDate(initialDate(event));
+    setSimGeneration(event.audience.generations?.[0]||"");
     setStep(1);setNotice("Evento nuevo. Completa sus pasos antes de exportar.");
   };
   const duplicate=()=>{
     if(!current)return;
     const cloned=copy(current);cloned.id+="-copia-"+Date.now().toString(36);cloned.enabled=false;
     setConfig(prev=>({...prev,events:[...prev.events,cloned]}));
-    setSelected(config.events.length);setStep(1);setNotice("Copia desactivada para revisar antes de publicarla.");
+    setSelected(config.events.length);setStep(1);
+    setSimGeneration(Array.isArray(cloned.audience?.generations)?cloned.audience.generations[0]:"");
+    setNotice("Copia desactivada para revisar antes de publicarla.");
   };
   const importJSON=text=>{
     try{
@@ -204,10 +219,10 @@ export default function EventEditorDebug(){
     </div>}
     {current&&step===1&&<div className="es-stage-content">
       <StudioChoices label="Alcance del mensaje" value={audience} onChange={mode=>{
-        if(mode==="all")update({audience:{schools:"all",specialties:"all"}});
-        else if(mode==="specialty")update({audience:{schools:"all",specialties:[simSpecialty]}});
-        else if(mode==="school")update({audience:{schools:[simSchool],specialties:"all"}});
-        else update({audience:{schools:[simSchool],specialties:[simSpecialty]}});
+        if(mode==="all")update({audience:{...current.audience,schools:"all",specialties:"all"}});
+        else if(mode==="specialty")update({audience:{...current.audience,schools:"all",specialties:[simSpecialty]}});
+        else if(mode==="school")update({audience:{...current.audience,schools:[simSchool],specialties:"all"}});
+        else update({audience:{...current.audience,schools:[simSchool],specialties:[simSpecialty]}});
       }} items={[
         {id:"all",title:"Todos los alumnos Dual",description:"Sin filtros",icon:Users},
         {id:"specialty",title:"Una especialidad",description:"En todos los planteles",icon:Users},
@@ -220,12 +235,25 @@ export default function EventEditorDebug(){
       {current.audience.specialties!=="all"&&
         <StudioPills label="Especialidad" selection={current.audience.specialties} items={specialtyOptions}
           onChange={value=>detail("audience",{specialties:value})} help="Puedes elegir varias especialidades."/>}
-      <div className="es-hint">Los destinatarios se calculan desde el plantel y la especialidad guardados en cada perfil.</div>
+      {current.trigger.type==="graduation"&&<>
+        <StudioChoices label="Generación destinataria"
+          value={!current.audience.generations||current.audience.generations==="all"?"all":"specific"}
+          onChange={mode=>detail("audience",{generations:mode==="all"?"all":
+            Array.isArray(current.audience.generations)?current.audience.generations:["generacion-nueva"]})}
+          items={[{id:"specific",title:"Una generación específica",description:"Exige coincidencia con el perfil"},
+            {id:"all",title:"Todas las generaciones",description:"Compatibilidad con avisos históricos"}]}/>
+        {Array.isArray(current.audience.generations)&&
+          <StudioField label="Clave de generación" value={current.audience.generations[0]||""}
+            onChange={value=>detail("audience",{generations:[value.trim()]})}
+            help="Usa una clave estable, sin espacios ni acentos; debe coincidir con la generación elegida en el perfil."/>}
+      </>}
+      <div className="es-hint">Los destinatarios se calculan desde el plantel, la especialidad y, cuando aplique, la generación guardada en cada perfil.</div>
     </div>}
     {current&&step===2&&<div className="es-stage-content">
       <StudioChoices label="Momento de activación" value={current.trigger.type} onChange={type=>{
         if(type===current.trigger.type)return;
         if(type==="graduation")update({
+          audience:{...current.audience,generations:["generacion-nueva"]},
           trigger:{type,startDate:"2027-07-19",endDate:"2027-07-23",videoDates:["2027-07-22","2027-07-23"],showOn:"final-bitacora"},
           presentation:"fullscreen",frequency:"once-per-day",
           graduation:current.graduation||{label:"Generación Dual",theme:"celebration"}
@@ -320,6 +348,11 @@ export default function EventEditorDebug(){
         <div className="es-sim-profile">
           <StudioSelect label="Plantel de prueba" value={simSchool} items={schoolOptions} onChange={setSimSchool}/>
           <StudioSelect label="Especialidad de prueba" value={simSpecialty} items={specialtyOptions} onChange={setSimSpecialty}/>
+          <StudioSelect label="Generación de prueba" value={simGeneration}
+            items={[{id:"",title:"Sin generación"},
+              ...candidateGenerations.map(id=>({id,title:generationOptions.find(item=>item.id===id)?.label||id})),
+              {id:"generacion-diferente",title:"Otra generación (prueba)"}]}
+            onChange={setSimGeneration}/>
           <div className="es-status">
             {current.trigger.type==="graduation"&&current.trigger.showOn==="final-bitacora"&&
               <small>Prueba del aviso después del PDF de la última bitácora.</small>}
@@ -340,7 +373,7 @@ export default function EventEditorDebug(){
         }}>Reiniciar prueba</button>
       </div>
       {theme&&current.trigger.type==="graduation"&&<>
-        <p className="es-hint">{themeActive?"El tema corresponde a la fecha y al perfil simulados.":"Vista forzada del tema. La fecha o el plantel simulados no coinciden todavía."}</p>
+        <p className="es-hint">{themeActive?"El tema corresponde a la fecha y al perfil simulados.":"Vista forzada del tema. Revisa fecha, plantel, especialidad y generación."}</p>
         <GraduationStage event={current}/>
       </>}
       <div className="es-library">

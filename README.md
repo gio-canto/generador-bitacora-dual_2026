@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.10-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.11-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.11 · Graduación por generación
+
+Cada perfil puede guardar una **generación de Educación Dual** opcional, independiente del semestre, grupo y formato PDF. Los eventos de graduación ahora admiten destinatarios por generación además del plantel y la especialidad. La despedida especial de la cuarta generación del CBTis 134 de 2027 está restringida a la clave `cbtis134-dual-4-2027`.
+
+Los perfiles antiguos permanecen intactos. Si un alumno todavía no ha elegido generación, no verá una graduación exclusiva, pero seguirá recibiendo la despedida general cuando corresponda. Los eventos históricos que no traen filtro de generación siguen siendo compatibles. El editor y el simulador de Debug permiten probar generaciones, fechas, planteles y especialidades sin modificar datos reales.
 
 ## v0.60.10 · Despedida y PDF final
 

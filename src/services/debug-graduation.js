@@ -1,12 +1,12 @@
 import {activeGraduation} from "./generator-message-rules.js";
 
 /** Probar graduaciones futuras (incluso borradores) sin tocar perfiles reales. */
-export function graduationPreviewForDate(config,eventId,date){
+export function graduationPreviewForDate(config,eventId,date,profile=null){
   const selected=config?.events?.find(event=>event.id===eventId && event.trigger?.type==="graduation");
   if(!selected)return null;
   const isolated={version:1,events:[{...selected,enabled:true,
-    audience:{schools:"all",specialties:"all"}}]};
-  return activeGraduation(isolated,{date,profile:{}});
+    audience:profile===null?{schools:"all",specialties:"all",generations:"all"}:selected.audience}]};
+  return activeGraduation(isolated,{date,profile:profile||{}});
 }
 
 export function graduationPreviewDates(event){

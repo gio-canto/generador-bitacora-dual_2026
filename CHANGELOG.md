@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.60.11 · Graduación dirigida por generación · 2026-11-02
+
+- Se incorpora una generación Dual opcional a cada perfil, conservada en el almacenamiento existente sin migraciones destructivas.
+- Las felicitaciones pueden filtrarse por plantel, especialidad y generación. La cuarta generación del CBTis 134 de 2027 sólo se dirige a `cbtis134-dual-4-2027`.
+- Un perfil sin generación asignada recibe la despedida general, no una graduación exclusiva de otra cohorte.
+- El perfil permite seleccionar una generación publicada; el editor de Debug permite cambiar su clave de destinatarios y simular perfiles, fechas y generaciones distintas.
+- Los eventos históricos sin `audience.generations` continúan con su comportamiento anterior.
+- Se agregan pruebas de compatibilidad, perfiles, coincidencias y simulación. No cambian los formatos PDF, el registro de entregas ni los hitos de horas.
+
+
 ## 0.60.10 · Despedida y descarga inteligente · 2026-11-02
 
 - En celulares, la última bitácora muestra primero la felicitación disponible; el PDF sólo se genera cuando se cierra ese mensaje. Si el video no carga, el alumno puede cerrar la ventana y continuar sin perder el archivo.
