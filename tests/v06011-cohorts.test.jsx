@@ -108,7 +108,7 @@ describe("0.60.11 · perfil y retrocompatibilidad",()=>{
       specialty:"Programación",defaultStart:"10:00",defaultEnd:"14:00"});
     render(<Profile/>);
     fireEvent.click(screen.getByRole("button",{name:"Editar"}));
-    const selector=screen.getByLabelText("Generación de Educación Dual (opcional)");
+    const selector=screen.getByRole("combobox",{name:"Generación de Educación Dual (opcional)"});
     expect(selector.value).toBe("");
     expect([...selector.options].some(x=>x.value===cohort)).toBe(true);
     fireEvent.change(selector,{target:{value:cohort}});

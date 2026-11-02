@@ -722,7 +722,8 @@ export function Profile() {
               </label>
               <label>
                 Generación de Educación Dual (opcional)
-                <select id="profileGeneration" value={form.generation||""}
+                <select id="profileGeneration" aria-label="Generación de Educación Dual (opcional)"
+                  aria-describedby="profileGenerationHint" value={form.generation||""}
                   onChange={update("generation")}>
                   <option value="">Sin asignar</option>
                   {availableGenerations.map(item=><option key={item.id} value={item.id}>
@@ -731,7 +732,7 @@ export function Profile() {
                   {form.generation&&!availableGenerations.some(item=>item.id===form.generation)&&
                     <option value={form.generation}>Generación guardada ({form.generation})</option>}
                 </select>
-                <small className="profile-field-hint">
+                <small className="profile-field-hint" id="profileGenerationHint">
                   Se utiliza únicamente para mostrar mensajes dirigidos a tu generación. No modifica las bitácoras.
                 </small>
               </label>
