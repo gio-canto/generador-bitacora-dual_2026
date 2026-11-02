@@ -365,3 +365,14 @@ Pruebas automáticas en `tests/v06010-final-pdf-flow.test.jsx`. Revisión manual
 - PDF normal sin marcar última bitácora: debe conservar la descarga y las recomendaciones anteriores.
 - Dos pulsaciones rápidas no deben generar dos PDFs ni dos despedidas.
 - Error de Data Matrix o imagen JPEG: comprobar notificación y que la bitácora permanezca disponible para reintento.
+
+## Pruebas v0.60.11 · Generación y graduación
+
+- Un perfil antiguo sin `generation` debe conservar nombre, semestre, empresa y todos sus demás campos.
+- Editar la generación debe persistir al cambiar de perfil, reiniciar la página y volver a editar otra preferencia.
+- Si se cambia el plantel en el editor de perfil, el selector de generación debe limpiarse hasta una nueva elección.
+- En fechas de graduación: alumnos de la generación 2027 con la clave exacta reciben el tema y el video; otros grupos o perfiles sin generación no.
+- En el último PDF de un alumno de otra generación debe mostrarse, cuando corresponda, sólo la despedida general, nunca la felicitación exclusiva.
+- Los mensajes históricos sin filtro de generación siguen aplicando conforme a sus filtros originales.
+- En Debug probar misma fecha y plantel con generación correcta, distinta y sin generación. Confirmar que la vista de graduación únicamente se activa para la correcta.
+- Confirmar que en celular el video sigue antecediendo al PDF final y que el formato PDF, Data Matrix y Registro Dual no cambian.

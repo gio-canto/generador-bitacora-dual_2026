@@ -23,7 +23,7 @@ describe("0.60.5 · despedida compartida",()=>{
     expect(generic.content.body).toContain("última bitácora");
     expect(graduation.content.body).toContain("la última vez que nos veremos");
     const byGraduation=eligibleMessages(config,{trigger:"final-bitacora",
-      date:"2027-07-22",profile:{school:"cbtis-134",specialty:"Programación"},ignoreSeen:true})
+      date:"2027-07-22",profile:{school:"cbtis-134",specialty:"Programación",generation:"cbtis134-dual-4-2027"},ignoreSeen:true})
       .filter(x=>x.trigger.type==="graduation");
     const byFinal=eligibleMessages(config,{trigger:"final-bitacora",
       date:"2027-05-20",profile:{school:"otro",specialty:"Programación"},ignoreSeen:true});
@@ -79,7 +79,7 @@ describe("0.60.5 · Debug como efemérides",()=>{
   it("aplica el tema de graduación a toda la página desde Efemérides, sin panel especial",()=>{
     const src=readFileSync("src/debug-main.jsx","utf8");
     expect(src).toContain('classList.toggle("debug-graduation-preview"');
-    expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value)");
+    expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value,{");
     expect(src).toContain("graduationPreviewDates(event)");
     expect(src).toContain('matched.trigger.showOn!=="final-bitacora"?matched:null');
     expect(src).toContain('document.body.classList.remove("debug-graduation-preview")');

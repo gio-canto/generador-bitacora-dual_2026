@@ -128,3 +128,12 @@ Los eventos de efemérides, los anuncios PNG, los avisos administrativos y los P
 - Tras la generación, se intenta descargar el PDF y se presenta un enlace directo para recuperarlo en iOS/Android. La opción de compartir requiere interacción del usuario para cumplir las restricciones del navegador.
 - En escritorio se conserva el flujo anterior de generación/descarga, y luego se emite `bitacora-final-bitacora`. El diálogo de recomendaciones se reserva a las bitácoras normales.
 - La descarga cancelada no se marca como finalizada. Un error al generar permite reintentar sin perder el registro; el video que se cerró no se vuelve a mostrar por esa descarga.
+
+## Generaciones Dual (0.60.11)
+
+- `profile.generation` es una clave opcional guardada en el perfil del alumno (`bitacora_profiles_v2`) y nunca se calcula a partir del semestre o la fecha. Un perfil anterior sin este campo funciona igual que antes.
+- `event.audience.generations` puede omitirse o ser `"all"` para mantener las reglas históricas, o incluir una lista de claves de generación (minúsculas, números y guiones).
+- Una graduación exclusiva requiere coincidencia simultánea de plantel, especialidad y generación; si no hay generación en el perfil, la graduación exclusiva no se muestra. La despedida general no se bloquea.
+- La graduación publicada de la cuarta generación de Educación Dual del CBTis 134 (2027) usa la clave `cbtis134-dual-4-2027`, disponible en Perfil → Editar predeterminados → Generación de Educación Dual.
+- Para futuras generaciones, crea un evento de graduación en Debug, asigna un identificador estable en «Generación destinataria» y publica el archivo JSON completo. Las opciones de generación del perfil se obtienen automáticamente de los eventos activos publicados.
+- El simulador de Debug permite seleccionar una generación diferente o ninguna y ver la coincidencia sin alterar perfiles reales.
