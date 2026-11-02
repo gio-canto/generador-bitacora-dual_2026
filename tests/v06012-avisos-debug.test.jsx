@@ -74,7 +74,9 @@ describe("0.60.12 · avisos PNG guardados",()=>{
      onSave={vi.fn()} onBack={vi.fn()}/>);
    fireEvent.click(screen.getByLabelText("Seleccionar aviso Aviso A"));
    fireEvent.click(screen.getByLabelText("Seleccionar aviso Aviso C"));
-   fireEvent.click(screen.getByRole("button",{name:"Descargar seleccionados · ZIP (2)"}));
+   const downloadButton=screen.getByRole("button",{name:"Descargar seleccionados · ZIP (2)"});
+   await waitFor(()=>expect(downloadButton.disabled).toBe(false));
+   fireEvent.click(downloadButton);
    await waitFor(()=>expect(zip).toHaveBeenCalled());
    const [items,opts]=zip.mock.calls.at(-1);
    expect(items.map(item=>item.title)).toEqual(["Aviso A","Aviso C"]);
