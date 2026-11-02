@@ -9,7 +9,6 @@ import {getDefaultMessageConfig,validateMessageConfig,eligibleMessages,
 import {StudioField,StudioSwitch,StudioChoices,StudioSelect,StudioPills,
   StudioCalendar,StudioConfirmation} from "./EventStudioControls.jsx";
 import schools from "../data/schools.json";
-import {graduationCohorts} from "../services/graduation-cohorts.js";
 import "./event-studio.css";
 
 const copy=value=>JSON.parse(JSON.stringify(value));
@@ -39,7 +38,7 @@ const newEvent=(graduation=false)=>graduation?({
   id:"graduacion-"+Date.now().toString(36),revision:1,enabled:false,
   presentation:"fullscreen",trigger:{type:"graduation",startDate:"2027-07-19",endDate:"2027-07-23",
     videoDates:["2027-07-22","2027-07-23"],showOn:"final-bitacora"},
-  audience:{schools:["cbtis-134"],specialties:"all",generations:["generacion-nueva"]},
+  audience:{schools:["cbtis-134"],specialties:"all"},
   content:{title:"¡Felicidades por concluir Educación Dual!",body:"Gracias por formar parte de esta generación.",
     youtubeId:null,action:null},
   graduation:{label:"Generación de Educación Dual",theme:"celebration"},
@@ -83,7 +82,6 @@ export default function EventEditorDebug(){
   const [simDate,setSimDate]=useState(initialDate(getDefaultMessageConfig().events[0]));
   const [simSchool,setSimSchool]=useState(schools[0]?.id||"");
   const [simSpecialty,setSimSpecialty]=useState(specialties[0]||"");
-  const [simGeneration,setSimGeneration]=useState("");
   const [simMemory,setSimMemory]=useState(fakeStorage);
   const [memoryRevision,setMemoryRevision]=useState(0);
   const fileRef=useRef(null);
@@ -91,14 +89,7 @@ export default function EventEditorDebug(){
   const warnings=useMemo(()=>messageEventWarnings(config),[config]);
   const current=config.events[selected];
   const changed=JSON.stringify(config)!==JSON.stringify(published);
-  const profile={school:simSchool,specialty:simSpecialty,generation:simGeneration};
-  const generationOptions=graduationCohorts({...config,events:config.events.map(event=>
-    ({...event,enabled:true}))},simSchool);
-  const candidateGenerations=[...new Set([
-    ...generationOptions.map(item=>item.id),
-    ...config.events.flatMap(event=>Array.isArray(event.audience?.generations)?
-      event.audience.generations:[])
-  ])];
+  const profile={school:simSchool,specialty:simSpecialty};
   const ctx={profile,profileId:"debug-perfil",date:simDate,storage:simMemory,sessionStorage:simMemory};
   const simulatedConfig=useMemo(()=>({...config,events:config.events.map((event,index)=>
     index===selected?{...event,enabled:true}:event)}),[config,selected]);
@@ -115,15 +106,12 @@ export default function EventEditorDebug(){
   const choose=(index,targetStep=1)=>{
     setSelected(index);setStep(targetStep);setTheme(false);setNotice("");
     setSimDate(initialDate(config.events[index]));
-    setSimGeneration(Array.isArray(config.events[index].audience?.generations)?
-      config.events[index].audience.generations[0]:"");
     setSimMemory(fakeStorage());
   };
   const add=(graduation=false)=>{
     const event=newEvent(graduation);
     setConfig(prev=>({...prev,events:[...prev.events,event]}));
     setSelected(config.events.length);setSimDate(initialDate(event));
-    setSimGeneration(event.audience.generations?.[0]||"");
     setStep(1);setNotice("Evento nuevo. Completa sus pasos antes de exportar.");
   };
   const duplicate=()=>{
@@ -131,7 +119,6 @@ export default function EventEditorDebug(){
     const cloned=copy(current);cloned.id+="-copia-"+Date.now().toString(36);cloned.enabled=false;
     setConfig(prev=>({...prev,events:[...prev.events,cloned]}));
     setSelected(config.events.length);setStep(1);
-    setSimGeneration(Array.isArray(cloned.audience?.generations)?cloned.audience.generations[0]:"");
     setNotice("Copia desactivada para revisar antes de publicarla.");
   };
   const importJSON=text=>{
@@ -235,25 +222,12 @@ export default function EventEditorDebug(){
       {current.audience.specialties!=="all"&&
         <StudioPills label="Especialidad" selection={current.audience.specialties} items={specialtyOptions}
           onChange={value=>detail("audience",{specialties:value})} help="Puedes elegir varias especialidades."/>}
-      {current.trigger.type==="graduation"&&<>
-        <StudioChoices label="Generación destinataria"
-          value={!current.audience.generations||current.audience.generations==="all"?"all":"specific"}
-          onChange={mode=>detail("audience",{generations:mode==="all"?"all":
-            Array.isArray(current.audience.generations)?current.audience.generations:["generacion-nueva"]})}
-          items={[{id:"specific",title:"Una generación específica",description:"Exige coincidencia con el perfil"},
-            {id:"all",title:"Todas las generaciones",description:"Compatibilidad con avisos históricos"}]}/>
-        {Array.isArray(current.audience.generations)&&
-          <StudioField label="Clave de generación" value={current.audience.generations[0]||""}
-            onChange={value=>detail("audience",{generations:[value.trim()]})}
-            help="Usa una clave estable, sin espacios ni acentos; debe coincidir con la generación elegida en el perfil."/>}
-      </>}
-      <div className="es-hint">Los destinatarios se calculan desde el plantel, la especialidad y, cuando aplique, la generación guardada en cada perfil.</div>
+      <div className="es-hint">El plantel determina la generación que aparece en la felicitación. Los alumnos no seleccionan generación: el evento se dirige por plantel, especialidad y fechas de graduación.</div>
     </div>}
     {current&&step===2&&<div className="es-stage-content">
       <StudioChoices label="Momento de activación" value={current.trigger.type} onChange={type=>{
         if(type===current.trigger.type)return;
         if(type==="graduation")update({
-          audience:{...current.audience,generations:["generacion-nueva"]},
           trigger:{type,startDate:"2027-07-19",endDate:"2027-07-23",videoDates:["2027-07-22","2027-07-23"],showOn:"final-bitacora"},
           presentation:"fullscreen",frequency:"once-per-day",
           graduation:current.graduation||{label:"Generación Dual",theme:"celebration"}
@@ -314,9 +288,10 @@ export default function EventEditorDebug(){
         <p className="es-hint">Este mensaje sólo se activa después de descargar el PDF cuando el estudiante confirma que es su última bitácora.</p>}
     </div>}
     {current&&step===4&&<div className="es-stage-content">
-      {current.trigger.type==="graduation"&&<StudioField label="Nombre de la generación"
+      {current.trigger.type==="graduation"&&<StudioField label="Generación asignada por el plantel"
         value={current.graduation?.label||""}
-        onChange={label=>update({graduation:{...current.graduation,label,theme:"celebration"}})}/>}
+        onChange={label=>update({graduation:{...current.graduation,label,theme:"celebration"}})}
+        help="Es el nombre institucional que se mostrará a los alumnos del plantel durante estas fechas."/>}
       <StudioField label="Título" value={current.content.title}
         onChange={title=>detail("content",{title})}/>
       <StudioField label="Texto del mensaje" value={current.content.body}
@@ -348,11 +323,6 @@ export default function EventEditorDebug(){
         <div className="es-sim-profile">
           <StudioSelect label="Plantel de prueba" value={simSchool} items={schoolOptions} onChange={setSimSchool}/>
           <StudioSelect label="Especialidad de prueba" value={simSpecialty} items={specialtyOptions} onChange={setSimSpecialty}/>
-          <StudioSelect label="Generación de prueba" value={simGeneration}
-            items={[{id:"",title:"Sin generación"},
-              ...candidateGenerations.map(id=>({id,title:generationOptions.find(item=>item.id===id)?.label||id})),
-              {id:"generacion-diferente",title:"Otra generación (prueba)"}]}
-            onChange={setSimGeneration}/>
           <div className="es-status">
             {current.trigger.type==="graduation"&&current.trigger.showOn==="final-bitacora"&&
               <small>Prueba del aviso después del PDF de la última bitácora.</small>}
@@ -373,7 +343,7 @@ export default function EventEditorDebug(){
         }}>Reiniciar prueba</button>
       </div>
       {theme&&current.trigger.type==="graduation"&&<>
-        <p className="es-hint">{themeActive?"El tema corresponde a la fecha y al perfil simulados.":"Vista forzada del tema. Revisa fecha, plantel, especialidad y generación."}</p>
+        <p className="es-hint">{themeActive?"El tema corresponde al plantel, fecha y especialidad simulados.":"Vista forzada del tema. Revisa plantel, fecha y especialidad."}</p>
         <GraduationStage event={current}/>
       </>}
       <div className="es-library">
