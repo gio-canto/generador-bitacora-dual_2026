@@ -79,7 +79,7 @@ const asMonth=value=>{
   return new Date(Date.UTC(parsed.getUTCFullYear(),parsed.getUTCMonth(),1,12));
 };
 const iso=date=>date.toISOString().slice(0,10);
-const weekdays=["L","M","M","J","V","S","D"];
+const weekdays=["Lu","Ma","Mi","Ju","Vi","Sá","Do"];
 export function StudioCalendar({label,value,onChange,multiple=false,min="",max="",help=""}){
   const selected=multiple?(Array.isArray(value)?value:[]):[value].filter(Boolean);
   const [month,setMonth]=useState(()=>asMonth(selected[0]||min||"2027-07-01"));
@@ -95,7 +95,7 @@ export function StudioCalendar({label,value,onChange,multiple=false,min="",max="
     else onChange(date);
   };
   const previous=iso(new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth()-1,1,12)));
-  const next=iso(new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth()+1,0,12)));
+  const next=iso(new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth()+1,1,12)));
   return <div className="es-field">
     <span className="es-label">{label}</span>
     <div className="es-calendar" aria-label={label}>
@@ -103,7 +103,7 @@ export function StudioCalendar({label,value,onChange,multiple=false,min="",max="
         <button type="button" onClick={()=>shift(-1)} disabled={Boolean(min&&previous<min.slice(0,7)+"-01")}
           aria-label="Mes anterior"><CaretLeft size={19}/></button>
         <strong><CalendarBlank size={17}/>{monthName}</strong>
-        <button type="button" onClick={()=>shift(1)} disabled={Boolean(max&&next>max)}
+        <button type="button" onClick={()=>shift(1)} disabled={Boolean(max&&next>max.slice(0,7)+"-01")}
           aria-label="Mes siguiente"><CaretRight size={19}/></button>
       </div>
       <div className="es-calendar-grid">

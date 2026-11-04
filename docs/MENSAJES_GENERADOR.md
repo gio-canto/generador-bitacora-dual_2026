@@ -1,4 +1,12 @@
-# Mensajes del generador (0.60.0)
+# Mensajes del generador (0.60.15)
+
+## Comportamiento vigente (0.60.15)
+
+La institución configura la despedida para días determinados de graduación. El sistema **no comprueba que el alumno haya generado su última bitácora real**: muestra la felicitación al generar un PDF en los días publicados cuando el perfil coincide con plantel y especialidad. En móvil la despedida antecede al PDF; en escritorio se presenta después. El modo visual de graduación sigue todo el intervalo configurado, aunque la despedida con video tenga menos fechas.
+
+Un evento inválido no interrumpe los demás eventos válidos en producción. El editor sigue exigiendo corregir todos los errores antes de exportar. Las herramientas de simulación de Efemérides comparten el JSON temporal del editor para probar cambios no publicados; no alteran las reglas ni el almacenamiento de los alumnos.
+
+En caso de que la ventana de despedida deje de responder, el proceso móvil cuenta con recuperación para evitar que el PDF quede esperando de forma indefinida. El calendario permite marcar video en meses diferentes dentro del periodo permitido.
 
 ## Configuración
 

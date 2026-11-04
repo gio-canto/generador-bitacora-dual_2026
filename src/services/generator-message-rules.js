@@ -82,16 +82,35 @@ export function validateMessageConfig(config) {
   });
   return errors;
 }
+/** Descarta únicamente entradas inválidas o IDs repetidos, sin apagar eventos sanos. */
+function validEvents(config){
+  if(config?.version!==1||!Array.isArray(config.events))return [];
+  const ids=new Set();
+  return config.events.filter(event=>{
+    if(validateMessageConfig({version:1,events:[event]}).length||ids.has(event.id))return false;
+    ids.add(event.id);
+    return true;
+  });
+}
 export const getDefaultMessageConfig = () => structuredClone(defaultMessages);
 function schoolNames(value){
   const found=schools.find(x=>x.id===value || normalized(x.name)===normalized(value) || normalized(x.shortName)===normalized(value));
   return [value,found?.id,found?.name,found?.shortName].filter(Boolean).map(normalized);
 }
+export function matchesSchoolTargets(targetSchools,school){
+  if(targetSchools==="all")return true;
+  if(!Array.isArray(targetSchools))return false;
+  const identities=schoolNames(school);
+  return targetSchools.some(s=>schoolNames(s).some(candidate=>identities.includes(candidate)));
+}
+export function matchesSpecialtyTargets(specialties,specialty){
+  return specialties==="all" || Array.isArray(specialties) &&
+    specialties.some(s=>normalized(s)===normalized(specialty));
+}
 function matchesAudience(event,profile={}){
   const {schools:targetSchools="all",specialties="all"}=event.audience || {};
-  const identities=schoolNames(profile.school);
-  return (targetSchools==="all" || targetSchools.some(s=>schoolNames(s).some(candidate=>identities.includes(candidate)))) &&
-    (specialties==="all" || specialties.some(s=>normalized(s)===normalized(profile.specialty)));
+  return matchesSchoolTargets(targetSchools,profile.school) &&
+    matchesSpecialtyTargets(specialties,profile.specialty);
 }
 function matchesTrigger(event,trigger,date){
   const spec=event.trigger || {};
@@ -127,8 +146,7 @@ export function markMessageSeen(event,{storage,sessionStorage,profileId="",date=
   catch{/* usable without storage */}
 }
 export function eligibleMessages(config,{trigger="on-open",profile={},profileId="",date=mexicoDate(),storage,sessionStorage,ignoreSeen=false}={}){
-  if(validateMessageConfig(config).length)return [];
-  return uniqueContents(config.events.filter(event=>event.enabled && matchesAudience(event,profile) &&
+  return uniqueContents(validEvents(config).filter(event=>event.enabled && matchesAudience(event,profile) &&
     matchesTrigger(event,trigger,date) &&
     (ignoreSeen || !hasSeenMessage(event,{storage,sessionStorage,profileId,date})))
     .sort(priorityOrder));
@@ -137,8 +155,7 @@ export function eligibleMessages(config,{trigger="on-open",profile={},profileId=
 /** Configuración visual independiente de la lectura: activa el tema durante todo
  * el intervalo, aunque la felicitación con video aparezca sólo en las fechas elegidas. */
 export function activeGraduation(config,{profile={},date=mexicoDate()}={}){
-  if(validateMessageConfig(config).length)return null;
-  return config.events.filter(e=>e.enabled&&e.trigger?.type==="graduation"&&
+  return validEvents(config).filter(e=>e.enabled&&e.trigger?.type==="graduation"&&
     date>=e.trigger.startDate&&date<=e.trigger.endDate&&matchesAudience(e,profile))
     .sort(priorityOrder)[0]||null;
 }
@@ -165,9 +182,8 @@ export function finalBitacoraMessages(config,options={}){
 
 /** No publicar en el historial despedidas finales todavía no presentadas. */
 export function historyMessages(config,ctx={}){
-  if(validateMessageConfig(config).length)return [];
   const date=ctx.date||mexicoDate();
-  return uniqueContents(config.events.filter(event=>{
+  return uniqueContents(validEvents(config).filter(event=>{
     if(!event.enabled || !matchesAudience(event,ctx.profile))return false;
     const finalEvent=event.trigger?.type==="final-bitacora" ||
       (event.trigger?.type==="graduation"&&event.trigger.showOn==="final-bitacora");
@@ -182,13 +198,13 @@ const sharedPublic=(a,b)=>overlaps(a.audience.schools,b.audience.schools)&&
 
 /** Advertencias no destructivas para el editor y los eventos antiguos. */
 export function messageEventWarnings(config){
-  if(!Array.isArray(config?.events))return [];
+  const events=validEvents(config);
   const warnings=[];
-  for(let i=0;i<config.events.length;i++){
-    const a=config.events[i];
+  for(let i=0;i<events.length;i++){
+    const a=events[i];
     if(!a?.enabled||!a.audience)continue;
-    for(let j=i+1;j<config.events.length;j++){
-      const b=config.events[j];
+    for(let j=i+1;j<events.length;j++){
+      const b=events[j];
       if(!b?.enabled||!b.audience||!sharedPublic(a,b))continue;
       const matchingTrigger=a.trigger?.type===b.trigger?.type &&
         (a.trigger?.type==="date"

@@ -80,7 +80,7 @@ describe("0.60.5 · Debug como efemérides",()=>{
   it("aplica el tema de graduación a toda la página desde Efemérides, sin panel especial",()=>{
     const src=readFileSync("src/debug-main.jsx","utf8");
     expect(src).toContain('classList.toggle("debug-graduation-preview"');
-    expect(src).toContain("graduationPreviewForDate(eventConfig,eventId,value,{");
+    expect(src).toContain("graduationPreviewForDate(workEventConfig,eventId,value,{");
     expect(src).toContain("graduationPreviewDates(event)");
     expect(src).toContain('matched.trigger.showOn!=="final-bitacora"?matched:null');
     expect(src).toContain('document.body.classList.remove("debug-graduation-preview")');
