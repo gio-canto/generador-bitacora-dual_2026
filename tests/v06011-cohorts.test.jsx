@@ -33,9 +33,9 @@ describe("0.60.11.1 · generación institucional por plantel",()=>{
     const wrongSchool={...profile,school:"otro-plantel"};
     expect(activeGraduation(published,{date,profile:wrongSchool})).toBeNull();
     expect(finalBitacoraMessages(published,{date,profile:wrongSchool})
-      .map(e=>e.id)).toEqual(["fin-dual"]);
+      .map(e=>e.id)).toEqual([]);
     expect(finalBitacoraMessages(published,{date:"2027-06-22",profile})
-      .map(e=>e.id)).toEqual(["fin-dual"]);
+      .map(e=>e.id)).toEqual([]);
     expect(activeGraduation(published,{date:"2027-07-25",profile})).toBeNull();
   });
   it("eventos históricos con audience.generations no obligan a los alumnos",()=>{
