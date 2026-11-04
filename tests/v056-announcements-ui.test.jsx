@@ -2,6 +2,7 @@ import {describe,it,expect,vi,afterEach,beforeEach} from "vitest";
 import {render,fireEvent,screen,cleanup,waitFor} from "@testing-library/react";
 import DeliveryAnnouncements from "../src/components/DeliveryAnnouncements.jsx";
 import {createStudent} from "../src/services/delivery-registry.js";
+import {VERSION} from "../src/domain/records.js";
 import {downloadNoticePng,downloadNoticeBatch,drawNoticeCanvas} from "../src/services/notice-png.js";
 
 vi.mock("../src/services/student-dossier-report.js",()=>({
@@ -44,7 +45,7 @@ describe("v0.56.1 · generador de avisos PNG",()=>{
   fireEvent.click(screen.getByRole("tab",{name:"Crear aviso"}));
   fireEvent.change(screen.getByLabelText("Plantilla"),{target:{value:"release"}});
   fireEvent.click(screen.getByRole("button",{name:"Usar datos de la versión actual"}));
-  expect(screen.getByLabelText("Título").value).toContain("0.60.13");
+  expect(screen.getByLabelText("Título").value).toContain(VERSION);
   expect(screen.getByLabelText("Mensaje").value).toContain("Novedades:");
   await waitFor(()=>expect(screen.getAllByRole("button",{name:"Descargar PNG"})[0].disabled).toBe(false));
   fireEvent.click(screen.getAllByRole("button",{name:"Descargar PNG"})[0]);

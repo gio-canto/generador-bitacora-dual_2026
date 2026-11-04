@@ -55,7 +55,7 @@ describe("v0.60.4 · Vista adaptable de Debug",()=>{
   });
   it("usa el aviso real y el video de graduación configurados en el JSON",()=>{
     expect(source).toContain("GeneratorMessageCard");
-    expect(source).toContain('eventConfig.events.filter(event=>event.trigger?.type==="graduation")');
+    expect(source).toContain('workEventConfig.events.filter(event=>event.trigger?.type==="graduation")');
     expect(source).toContain("setAdaptivePreview(event)");
     expect(event.content.youtubeId).toBe("YUC4FH3tSOk");
   });
