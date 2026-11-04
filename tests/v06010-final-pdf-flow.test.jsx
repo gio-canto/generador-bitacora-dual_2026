@@ -8,7 +8,7 @@ import {BEFORE_FINAL_PDF_EVENT,requiresFarewellBeforePdf,
   waitForFinalFarewell} from "../src/services/final-pdf-flow.js";
 
 beforeEach(()=>{window.localStorage.clear();window.sessionStorage.clear();});
-afterEach(()=>{cleanup();vi.restoreAllMocks();});
+afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();});
 
 describe("v0.60.10 · orden de despedida y PDF",()=>{
   it("sólo espera el video si la bitácora es final, móvil y guardada",()=>{
@@ -39,13 +39,15 @@ describe("v0.60.10 · orden de despedida y PDF",()=>{
     expect(completed).toHaveBeenCalledOnce();
   });
   it("el cierre de la despedida React libera la generación y no el montaje",async()=>{
+    vi.useFakeTimers({toFake:["Date"]});
+    vi.setSystemTime(new Date("2027-07-22T18:00:00Z"));
     render(<GeneratorMessageHost/>);
     const resume=vi.fn();
     const detail={school:"CBTis No. 134",specialty:"Programación",continueToPdf:resume,handled:false};
     act(()=>window.dispatchEvent(new CustomEvent(BEFORE_FINAL_PDF_EVENT,{detail})));
     expect(detail.handled).toBe(true);
     expect(resume).not.toHaveBeenCalled();
-    const modal=screen.getByRole("dialog",{name:/Felicidades por concluir tu formación dual/i});
+    const modal=screen.getByRole("dialog",{name:/Felicidades a la cuarta generación/i});
     expect(modal).toBeTruthy();
     fireEvent.click(screen.getByRole("button",{name:"Cerrar mensaje"}));
     expect(resume).toHaveBeenCalledOnce();
