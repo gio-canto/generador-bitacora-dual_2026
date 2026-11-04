@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.15-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.16-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,10 @@
 </div>
 
 ---
+
+## v0.60.16 · Estabilidad de pruebas automatizadas
+
+Las pruebas Vitest ahora se ejecutan con un solo proceso de pruebas a la vez para aislar el motor Canvas y sus registros globales de tipografías, además de reducir interferencias con las pruebas de la interfaz heredada. No cambia el funcionamiento del generador, los eventos programados ni la elaboración de PDF en producción.
 
 ## v0.60.15 · Depuración de eventos especiales
 
