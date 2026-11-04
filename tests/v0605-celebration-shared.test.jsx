@@ -28,7 +28,8 @@ describe("0.60.5 · despedida compartida",()=>{
     const byFinal=eligibleMessages(config,{trigger:"final-bitacora",
       date:"2027-05-20",profile:{school:"otro",specialty:"Programación"},ignoreSeen:true});
     expect(byGraduation.map(x=>x.id)).toEqual([graduation.id]);
-    expect(byFinal.map(x=>x.id)).toEqual([generic.id]);
+    expect(byFinal.map(x=>x.id)).toEqual([]);
+    expect(generic.enabled).toBe(false);
   });
   it("ambos mensajes tienen diseño unificado y bucle hasta el cierre",()=>{
     for(const event of [generic,graduation]){
