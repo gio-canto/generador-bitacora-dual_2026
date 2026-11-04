@@ -15,6 +15,8 @@ import {
   listArchivedProfiles,
 } from "../services/profile.js";
 import companies from "../data/companies.json";
+import messageConfig from "../data/generator-messages.json";
+import {finalBitacoraMessages,mexicoDate} from "../services/generator-message-rules.js";
 import {actingSigner} from "../domain/signing.js";
 import schools from "../data/schools.json";
 import absenceReasons from "../data/absence-reasons.json";
@@ -2621,9 +2623,16 @@ export function startEditor() {
         return;
       }
       const saved = persistRecord(collectRecord(), true);
-      const isFinal=Boolean($("#generatorFinalDual")?.checked);
+      // La despedida se activa por fecha de emisión y plantel, no manualmente.
+      const scheduledFarewell=finalBitacoraMessages(messageConfig,{
+        date:mexicoDate(),
+        profile:{school:$("#school")?.value||"",specialty:$("#specialty")?.value||""},
+        profileId:readActiveProfileId(),
+        storage:window.localStorage,
+        sessionStorage:window.sessionStorage
+      }).some(event=>event.trigger?.type==="graduation");
       const mobileFinal=requiresFarewellBeforePdf({
-        mobile:isMobileLike(),final:isFinal,saved
+        mobile:isMobileLike(),final:scheduledFarewell,saved
       });
       const b = $("#pdfBtn"),
         mb = $("#mobilePdf"),
@@ -2655,15 +2664,14 @@ export function startEditor() {
           ? startMobileFinalDelivery(blob,safeFileName())
           : await deliverPdf(blob,safeFileName());
         if(delivered!=="cancelled"&&saved){
-          if(isFinal){
+          if(scheduledFarewell){
             if(!mobileFinal){
-              // En escritorio: primero la descarga y después la despedida.
-              // No abrir el diálogo de recomendaciones sobre el video.
+              // En escritorio: primero se descarga el PDF y después se muestra
+              // el evento correspondiente a la fecha programada.
               window.dispatchEvent(new CustomEvent("bitacora-final-bitacora",{detail:{
                 school:$("#school")?.value||"",specialty:$("#specialty")?.value||""
               }}));
             }
-            $("#generatorFinalDual").checked=false;
           }else{
             showDeliveryTips();
           }
