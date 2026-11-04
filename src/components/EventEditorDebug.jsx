@@ -1,5 +1,5 @@
 
-import {useMemo,useRef,useState} from "react";
+import {useEffect,useMemo,useRef,useState} from "react";
 import {CalendarBlank,ClipboardText,FileArrowDown,FileArrowUp,FloppyDisk,
   GraduationCap,Plus,PlayCircle,Trash,ArrowClockwise,Copy,CheckCircle,
   ArrowRight,ArrowLeft,Warning,Buildings,Users,Eye,Code,Confetti} from "@phosphor-icons/react";
@@ -67,10 +67,11 @@ function GraduationStage({event}){
     </div>
   </div>;
 }
-export default function EventEditorDebug(){
+export default function EventEditorDebug({onConfigChange}){
   // El punto de partida es SIEMPRE el JSON incluido en la versión publicada.
   const [published]=useState(getDefaultMessageConfig);
   const [config,setConfig]=useState(getDefaultMessageConfig);
+  useEffect(()=>{onConfigChange?.(config);},[config,onConfigChange]);
   const [selected,setSelected]=useState(0);
   const [step,setStep]=useState(0);
   const [notice,setNotice]=useState("");
@@ -264,18 +265,18 @@ export default function EventEditorDebug(){
         {current.trigger.annualDate?
           <StudioField label="Mes y día (MM-DD)" value={current.trigger.annualDate}
             onChange={annualDate=>detail("trigger",{annualDate})} placeholder="11-02" help="Ejemplo: 11-02 para el 2 de noviembre."/>:
-          <StudioCalendar label="Fecha del comunicado" value={current.trigger.date||""}
+          <StudioCalendar key={current.id+"-date"} label="Fecha del comunicado" value={current.trigger.date||""}
             onChange={date=>detail("trigger",{date})}/>}
       </>}
       {current.trigger.type==="graduation"&&<>
         <div className="es-hint"><strong>Dos momentos distintos:</strong> durante el periodo cambia el diseño del generador. El video sólo aparece en los días elegidos{current.trigger.showOn==="final-bitacora"?", después de generar la última bitácora.":"."}</div>
         <div className="es-calendar-pair">
-          <StudioCalendar label="Inicio de graduación" value={current.trigger.startDate||""}
+          <StudioCalendar key={current.id+"-start"} label="Inicio de graduación" value={current.trigger.startDate||""}
             onChange={startDate=>detail("trigger",{startDate})}/>
-          <StudioCalendar label="Fin de graduación" value={current.trigger.endDate||""}
+          <StudioCalendar key={current.id+"-end"} label="Fin de graduación" value={current.trigger.endDate||""}
             onChange={endDate=>detail("trigger",{endDate})}/>
         </div>
-        <StudioCalendar label="Días para mostrar el video" multiple
+        <StudioCalendar key={current.id+"-video"} label="Días para mostrar el video" multiple
           min={current.trigger.startDate||""} max={current.trigger.endDate||""}
           value={current.trigger.videoDates||[]}
           onChange={videoDates=>detail("trigger",{videoDates})}
@@ -323,7 +324,7 @@ export default function EventEditorDebug(){
     {current&&step===5&&<div className="es-stage-content">
       <div className="es-hint"><strong>Simulador aislado.</strong> Prueba cualquier evento del JSON, incluso si está desactivado. No cambia fechas del sistema, bitácoras ni anuncios leídos.</div>
       <div className="es-sim-fields">
-        <StudioCalendar label="Fecha de prueba" value={simDate} onChange={setSimDate}/>
+        <StudioCalendar key={current.id+"-simulation"} label="Fecha de prueba" value={simDate} onChange={setSimDate}/>
         <div className="es-sim-profile">
           <StudioSelect label="Plantel de prueba" value={simSchool} items={schoolOptions} onChange={setSimSchool}/>
           <StudioSelect label="Especialidad de prueba" value={simSpecialty} items={specialtyOptions} onChange={setSimSpecialty}/>

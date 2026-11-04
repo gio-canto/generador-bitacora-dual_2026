@@ -399,7 +399,8 @@ function DebugPage() {
   const nestedPreview=new URLSearchParams(window.location.search).has("debug-preview");
   const [adaptivePreview,setAdaptivePreview]=useState(null);
   const [graduationPreview,setGraduationPreview]=useState(null);
-  const graduationEvents=eventConfig.events.filter(event=>event.trigger?.type==="graduation");
+  const [workEventConfig,setWorkEventConfig]=useState(()=>structuredClone(eventConfig));
+  const graduationEvents=workEventConfig.events.filter(event=>event.trigger?.type==="graduation");
   const [graduationEventId,setGraduationEventId]=useState(()=>graduationEvents[0]?.id||"");
   const [testSchool,setTestSchool]=useState(schools[0]?.id||"");
   const [testSpecialty,setTestSpecialty]=useState(schools[0]?.specialties?.[0]||"");
@@ -420,6 +421,11 @@ function DebugPage() {
     document.body.classList.toggle("debug-graduation-preview",Boolean(graduationPreview));
     return ()=>document.body.classList.remove("debug-graduation-preview");
   },[graduationPreview]);
+  useEffect(()=>{
+    if(graduationEvents.some(event=>event.id===graduationEventId))return;
+    setGraduationEventId(graduationEvents[0]?.id||"");
+    setGraduationPreview(null);
+  },[workEventConfig,graduationEventId]);
 
   // La misma fecha de prueba aplica las efemérides y, si corresponde, el
   // tema de graduación sobre TODO Debug, no sobre una maqueta independiente.
@@ -433,7 +439,7 @@ function DebugPage() {
       now: date,
       storage: {getItem:()=>null,setItem:()=>{}},
     });
-    const matched=graduationPreviewForDate(eventConfig,eventId,value,{
+    const matched=graduationPreviewForDate(workEventConfig,eventId,value,{
       school:testSchool,specialty:testSpecialty
     });
     setGraduationPreview(matched);
@@ -690,7 +696,7 @@ function DebugPage() {
           <pre className="debug-output">{JSON.stringify(calendarState, null, 2)}</pre>
         </Card>
         <Card id="debug-editor" title="Editor de eventos" description="Importa, modifica, prueba y exporta el JSON de mensajes." wide>
-          <EventEditorDebug />
+          <EventEditorDebug onConfigChange={setWorkEventConfig}/>
         </Card>
 
         <Card id="debug-avisos" title="Avisos PNG" description="Prueba los formatos, estilos y avisos con datos ficticios; muestra si el texto cabe antes de exportar." wide>
