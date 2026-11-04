@@ -31,7 +31,7 @@ Los eventos de calendario existentes permanecen independientes: no deben migrars
 
 Los avisos por apertura se revisan al iniciar el generador y después de cambios de perfil. Los de fecha se revisan al abrir la aplicación y cuando se recupera el foco. Se usa el calendario local de `America/Mexico_City`; los rangos incluyen los días de inicio y finalización.
 
-`final-bitacora` sólo se emite después de generar y entregar correctamente el archivo PDF, cuando el alumno marca **Esta es mi última bitácora de Educación Dual** en el paso 5. No calcula automáticamente el fin de Dual por semestre, empresa o número de horas. La casilla se desmarca después de su activación.
+El disparador interno `final-bitacora` se ejecuta sin casilla manual cuando se emite un PDF en una fecha de despedida programada. La fecha de activación es la fecha local de México de emisión del PDF, no la semana que se está registrando; también se valida el plantel y la especialidad. El evento genérico `fin-dual` queda deshabilitado por defecto.
 
 La lectura se guarda en `bitacora-generator-messages-seen-v1` de `localStorage`, y en `sessionStorage` para frecuencia por sesión. Se construye una clave con ID, revisión, perfil o dispositivo y, si aplica, año. No hay sincronización entre equipos. La aplicación evita abrir mensajes cuando hay otras ventanas emergentes activas y los presenta después.
 
@@ -65,7 +65,7 @@ El activador utiliza `trigger.type: "graduation"`, `startDate`, `endDate` y `vid
 
 **Ejemplo publicado:** `graduacion-cbtis134-dual-generacion4-2027`. CBTis No. 134, 19–23 de julio de 2027, video `YUC4FH3tSOk` el 22 (jueves) y el 23 (viernes). El criterio de destinatarios es el plantel. El perfil actual no almacena un identificador de generación, por lo que **no se valida de forma individual la pertenencia a la cuarta generación**. El texto es institucional y su publicación debe corresponder a los alumnos previstos.
 
-En los dos días del video no aparece una segunda despedida genérica después de marcar la última bitácora. Los eventos de graduación pueden clonarse o agregarse como entradas independientes. Puedes consultar y probar las reglas con cualquier fecha en Debug antes de exportar el JSON. El video usa la reproducción configurada en la 0.60.1, sujeta a restricciones del navegador.
+En los dos días del video no aparece una segunda despedida genérica al generar el PDF. Los eventos de graduación pueden clonarse o agregarse como entradas independientes. Puedes consultar y probar las reglas con cualquier fecha en Debug antes de exportar el JSON. El video usa la reproducción configurada en la 0.60.1, sujeta a restricciones del navegador.
 
 
 ## Editor visual guiado (0.60.3)
@@ -88,7 +88,7 @@ En **Debug → Vista adaptable** se puede elegir **Debug completo**, seleccionar
 
 ## Felicitaciones compartidas (0.60.5)
 
-Los eventos `fin-dual` y `graduacion-cbtis134-dual-generacion4-2027` conservan sus IDs y activadores, pero emplean los mismos atributos `celebration: {"kind":"dual","loopVideo":true,"autoplayAudio":true}`. Los dos reproducen `YUC4FH3tSOk` con la estética de celebración. **La última bitácora** sólo se confirma al generar el PDF con la opción final marcada; la felicitación de cuarta generación conserva las fechas del 22 y 23 de julio de 2027. En esos dos días la lógica de mensajes evita que el evento general se superponga al de graduación.
+Los eventos `fin-dual` y `graduacion-cbtis134-dual-generacion4-2027` conservan sus IDs y activadores, pero emplean los mismos atributos `celebration: {"kind":"dual","loopVideo":true,"autoplayAudio":true}`. Los dos reproducen `YUC4FH3tSOk` con la estética de celebración. La felicitación de cuarta generación se activa al generar un PDF en las fechas del 22 y 23 de julio de 2027; no requiere confirmación manual. En esos dos días la lógica de mensajes evita que el evento general se superponga al de graduación.
 
 El bucle de YouTube utiliza `loop=1` y `playlist` con el mismo video; termina cuando se cierra la ventana y se desmonta el reproductor. Para el audio, el video empieza cargando silenciado y el programa solicita `setVolume(90)` y `unMute` automáticamente cuando se carga el reproductor. Si el navegador bloquea esta operación, se intenta mantener el video reproduciéndose sin sonido. **No es posible garantizar sonido automático en todos los navegadores**: la política del dispositivo y YouTube prevalecen. Se conserva el botón «Activar audio», sin texto de instrucciones adicional.
 
@@ -104,7 +104,7 @@ No hay una sección ni pestaña independiente de graduación. En Vista adaptable
 
 ## Activación después de la última bitácora (0.60.7)
 
-**Comportamiento vigente para el evento de graduación publicado:** durante el intervalo `startDate`–`endDate`, el tema visual se aplica al generador de quienes cumplan la audiencia. **El video no aparece al abrir la página.** Solamente se muestra cuando se cumplen simultáneamente estos requisitos: (1) la fecha pertenece a `videoDates`; (2) el alumno está en el plantel/especialidad correspondiente; (3) seleccionó **«Esta es mi última bitácora de Educación Dual»**; (4) el PDF se generó y entregó exitosamente. Una nueva descarga después de haber visto el aviso no duplica la despedida general. En días distintos de los programados, el PDF final conserva la despedida general.
+**Comportamiento vigente para el evento de graduación publicado:** durante el intervalo `startDate`–`endDate`, el tema visual se aplica al generador de quienes cumplan la audiencia. **El video no aparece al abrir la página.** Solamente se muestra cuando se cumplen simultáneamente estos requisitos: (1) la fecha pertenece a `videoDates`; (2) el alumno está en el plantel/especialidad correspondiente; (3) se genera el PDF de una bitácora durante el periodo programado. Una nueva descarga después de haber visto el aviso no duplica la despedida general. En días distintos de los programados, no se presenta ninguna despedida y el PDF mantiene su proceso ordinario.
 
 El esquema de graduación añade `trigger.showOn: "final-bitacora"`. Éste es el valor **predeterminado para graduaciones nuevas** en Debug → Editor de eventos. Se puede elegir `"date"` para mostrar la felicitación al abrir en las fechas elegidas. Los JSON de graduaciones publicados anteriormente que no contienen `showOn` mantienen el comportamiento anterior y siguen siendo válidos. El rango y los días se pueden configurar para otras escuelas, generaciones o ciclos sin modificar código.
 
@@ -126,7 +126,7 @@ Los eventos de efemérides, los anuncios PNG, los avisos administrativos y los P
 - En móvil, luego de validar y guardar el registro, `waitForFinalFarewell` emite `bitacora-final-bitacora-before-pdf`. El anfitrión React responde sólo si existe una despedida aplicable; la marca de lectura se guarda cuando el usuario cierra la ventana.
 - El motor PDF no empieza antes del cierre de la despedida. Si no hay mensaje elegible, o si el anfitrión React no está disponible, continúa inmediatamente.
 - Tras la generación, se intenta descargar el PDF y se presenta un enlace directo para recuperarlo en iOS/Android. La opción de compartir requiere interacción del usuario para cumplir las restricciones del navegador.
-- En escritorio se conserva el flujo anterior de generación/descarga, y luego se emite `bitacora-final-bitacora`. El diálogo de recomendaciones se reserva a las bitácoras normales.
+- En escritorio se conserva el flujo anterior de generación/descarga, y luego se emite `bitacora-final-bitacora`. El diálogo de recomendaciones se muestra cuando no hay una despedida programada.
 - La descarga cancelada no se marca como finalizada. Un error al generar permite reintentar sin perder el registro; el video que se cerró no se vuelve a mostrar por esa descarga.
 
 ## Graduación institucional por plantel (0.60.11.1)
