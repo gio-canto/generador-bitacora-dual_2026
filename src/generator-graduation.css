@@ -4,12 +4,11 @@ body.generator-graduation-active{background:
  radial-gradient(ellipse at 100% 3%,rgba(75,135,185,.16),transparent 50%),#f7f8fc}
 .generator-graduation-active .shell{--graduation-ink:#283955}
 .generator-graduation-active .shell :is(.topbar,.gm-header,.gm-bottom-nav){
- border-color:rgba(191,163,100,.48)!important;
+ border-color:rgba(175,148,88,.34)!important;
  box-shadow:0 10px 30px rgba(73,91,116,.14),inset 0 1px 0 rgba(255,255,255,.9)!important;
- background:linear-gradient(110deg,rgba(255,255,255,.90),rgba(249,239,213,.71),rgba(237,247,255,.85))!important;
+ background:linear-gradient(115deg,rgba(255,255,255,.85),rgba(246,236,208,.72) 50%,rgba(233,244,255,.84))!important;
  -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
 }
-.generator-graduation-active .shell :is(.gm-panel,.section,.gm-primary){border-color:rgba(187,157,91,.25)}
 .generator-graduation-active .gm-home::before{
  content:"GRADUACIÓN · EDUCACIÓN DUAL";display:block;width:max-content;max-width:100%;
  border-radius:999px;border:1px solid rgba(176,137,61,.35);
@@ -29,12 +28,6 @@ body.generator-graduation-active{background:
 .generator-graduation-banner span{display:block;font:600 10px/1.3 system-ui;color:#887044;letter-spacing:.04em;margin-bottom:4px}
 .generator-graduation-banner strong{display:block;font:650 13px/1.35 system-ui}
 .generator-mobile-active .generator-graduation-banner{bottom:calc(92px + env(safe-area-inset-bottom));right:13px;max-width:min(280px,calc(100vw - 26px))}
-.generator-message-graduation .generator-message-card{
- background:radial-gradient(ellipse at 15% 0%,rgba(246,226,165,.42),transparent 55%),
- linear-gradient(145deg,#fffdf7,#f5f9ff 75%,#fff);
- border:1px solid rgba(187,151,67,.55);
- box-shadow:0 28px 95px rgba(44,65,94,.32),inset 0 2px 0 rgba(255,255,255,.94);
-}
 .generator-message-graduation .generator-message-header{color:#88672b;letter-spacing:.08em}
 .generator-message-graduation .generator-message-card h2{color:#2d4769}
 @keyframes graduationBannerIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -60,14 +53,11 @@ body.generator-graduation-active{
  background-image:linear-gradient(128deg,#3c6890,#235078);
  color:#fff;border-color:rgba(31,77,117,.4);
 }
-.generator-graduation-active .shell :is(.gm-bottom-nav,.gm-header,.topbar){
- border-color:rgba(175,148,88,.34)!important;
- background:linear-gradient(115deg,rgba(255,255,255,.85),rgba(246,236,208,.72) 50%,rgba(233,244,255,.84))!important;
-}
 .generator-message-graduation .generator-message-card{
- border-color:rgba(177,140,64,.55);
+ border:1px solid rgba(177,140,64,.55);
  background:radial-gradient(circle at 0% 0%,rgba(244,222,162,.28),transparent 52%),
  linear-gradient(145deg,#fffef9,#f4f8ff 75%,#fff);
+ box-shadow:0 28px 95px rgba(44,65,94,.32),inset 0 2px 0 rgba(255,255,255,.94);
 }
 .generator-message-graduation .generator-message-media-controls button{
  border-color:rgba(188,154,93,.45);background:#fcf7e8;color:#725624;
