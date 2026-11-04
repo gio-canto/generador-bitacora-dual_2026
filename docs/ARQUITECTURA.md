@@ -115,7 +115,7 @@ La coincidencia aproximada es una ayuda de recuperación, no una decisión autom
 
 ## Mensajes y centro de avisos (0.60)
 
-`src/services/generator-message-rules.js` determina destinatarios, fechas, activadores y frecuencia de comunicados configurados en `src/data/generator-messages.json`. El componente React `GeneratorMessageHost.jsx` monta un portal fuera del editor heredado, evitando duplicar formularios o alterar la interfaz clásica. El editor envía un evento de última bitácora **únicamente después de la generación correcta del PDF** y con la casilla explícita marcada.
+`src/services/generator-message-rules.js` determina destinatarios, fechas, activadores y frecuencia de comunicados configurados en `src/data/generator-messages.json`. El componente React `GeneratorMessageHost.jsx` monta un portal fuera del editor heredado, evitando duplicar formularios o alterar la interfaz clásica. El editor consulta la fecha local de México y los eventos habilitados, y sólo activa la despedida programada durante la emisión del PDF. No hay casilla manual. En móvil muestra la felicitación antes de crear el PDF y en escritorio después de descargarlo.
 
 `src/services/registry-notifications.js` calcula avisos administrativos desde el estado local de Registro Dual, con sonido generado por Web Audio cuando el navegador lo permite. `ReasonInbox.jsx` muestra la bandeja, filtros, clasificación de motivos y navegación; las marcas de lectura no cambian el JSON escolar.
 
