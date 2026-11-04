@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.13-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.15-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.60.15 · Depuración de eventos especiales
+
+El motor de mensajes ignora **solamente las entradas inválidas o los identificadores duplicados**, sin desactivar la graduación ni otros eventos correctos. El calendario del editor permite programaciones que cruzan de mes, y el simulador de efemérides lee los cambios del editor mientras se trabaja con ellos, sin alterar el JSON publicado.
+
+La **despedida institucional es automática por las fechas programadas**, no depende de verificar individualmente si la bitácora generada es la última del alumno. El CBTis 134 conserva el periodo de graduación del 19 al 23 de julio de 2027 y el video de despedida los días 22 y 23. La protección de recuperación de PDF impide una espera ilimitada cuando la ventana de despedida deja de responder. Se consolidaron reglas y estilos duplicados, sin modificar registros escolares ni el formato PDF.
 
 ## v0.60.13 · Avisos especiales y despedida final
 

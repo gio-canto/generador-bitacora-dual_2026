@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.60.15 · Depuración de eventos especiales · 2026-11-04
+
+- Un evento con datos inválidos ya no deshabilita las graduaciones y los avisos válidos: se descarta individualmente la entrada incorrecta, manteniendo la validación estricta en el editor antes de publicar el JSON.
+- El diagnóstico reutiliza las reglas reales de coincidencia de plantel y especialidad; las simulaciones detectan conflictos por identificador.
+- El calendario permite seleccionar días de video que cruzan de mes y renueva su vista al cambiar de evento sin alterar las fechas de graduación existentes.
+- El editor de mensajes y las efemérides de Debug comparten temporalmente los cambios de graduación para previsualizarlos antes de exportar. Las pruebas no modifican el perfil ni los datos del alumno.
+- El flujo móvil de despedida incorpora una recuperación defensiva ante un anfitrión que deja de responder; conserva la reproducción previa al PDF y el flujo de descarga en escritorio.
+- Se consolidan reglas visuales repetidas del tema de graduación, manteniendo su apariencia. Se incluyen pruebas de aislamiento de fallos, calendario, edición y recuperación del PDF.
+- La despedida sigue activándose **por fecha institucional, plantel y especialidad**, sin comprobar si el alumno genera realmente su última bitácora. Se mantienen el evento de la cuarta generación, sus fechas, video, textos y frecuencias.
+
 ## 0.60.13 · Avisos emergentes y despedidas estables · 2026-11-02
 
 - La despedida de última bitácora tiene prioridad sobre anuncios ordinarios, incluso si uno ya estaba abierto. Los mensajes desplazados se conservan pendientes y no se marcan vistos hasta cerrarse.
