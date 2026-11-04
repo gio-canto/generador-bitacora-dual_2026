@@ -45,6 +45,7 @@ describe("v0.60 · eventos del generador",()=>{
   });
   it("recuerda mensajes por perfil y revisión sin repetirlos",()=>{
     const c=getDefaultMessageConfig(),e=c.events[0],storage=fakeStorage(),sessionStorage=fakeStorage();
+    e.enabled=true; // Prueba el historial de un evento habilitado explícitamente.
     const ctx={trigger:"final-bitacora",date:"2026-10-31",profile,profileId:"student-x",storage,sessionStorage};
     expect(eligibleMessages(c,ctx)).toHaveLength(1);
     markMessageSeen(e,ctx);

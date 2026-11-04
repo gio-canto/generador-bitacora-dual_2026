@@ -28,10 +28,10 @@ describe("0.60.7 · despedida tras la última bitácora",()=>{
     const result=finalBitacoraMessages(config,{date:"2027-07-22",profile});
     expect(result.map(x=>x.id)).toEqual([grad.id]);
     expect(finalBitacoraMessages(config,{date:"2027-07-20",profile}).map(x=>x.id))
-      .toEqual(["fin-dual"]);
+      .toEqual([]);
     expect(finalBitacoraMessages(config,{
       date:"2027-07-22",profile:{school:"otro-plantel",specialty:"Programación"}
-    }).map(x=>x.id)).toEqual(["fin-dual"]);
+    }).map(x=>x.id)).toEqual([]);
   });
   it("no repite el mensaje genérico si ya se vio el de graduación",()=>{
     const storage=local(),ctx={date:"2027-07-22",profile,profileId:"usuario-prueba",storage};

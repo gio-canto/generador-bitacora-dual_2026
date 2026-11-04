@@ -19,7 +19,7 @@ const ctx=()=>({profileId:"alumna",date:"2027-07-22",
 const final=published.events.find(event=>event.trigger.type==="graduation");
 const tab=published.events.find(event=>event.presentation==="tab");
 beforeEach(()=>{window.localStorage.clear();window.sessionStorage.clear();document.body.style.overflow="";});
-afterEach(()=>{cleanup();vi.restoreAllMocks();document.body.style.overflow="";});
+afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();document.body.style.overflow="";});
 
 describe("0.60.13 · prioridad y lecturas",()=>{
  it("interrumpe una pestaña sin marcarla vista y la reanuda después de la despedida",()=>{
@@ -90,6 +90,8 @@ describe("0.60.13 · accesibilidad y presentación de avisos",()=>{
    expect(document.body.style.overflow).toBe("");
  });
  it("continúa exactamente una vez después de cerrar una despedida",()=>{
+   vi.useFakeTimers({toFake:["Date"]});
+   vi.setSystemTime(new Date("2027-07-22T18:00:00Z"));
    render(<GeneratorMessageHost/>);
    const resume=vi.fn(),detail={school:"CBTis No. 134",specialty:"Programación",
      handled:false,continueToPdf:resume};
