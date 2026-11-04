@@ -15,6 +15,10 @@ Ese comando debe completar:
 
 Un build exitoso no sustituye las pruebas manuales del PDF, cámara o impresión.
 
+## Aislamiento de pruebas (0.60.16)
+
+Vitest utiliza `pool: "forks"`, `maxWorkers: 1` y `fileParallelism: false`. Los archivos se ejecutan por separado para evitar interferencia entre inicializaciones del Canvas nativo, registro global de fuentes y pruebas del editor heredado. Es una medida de estabilidad del entorno de prueba; no cambia la lógica del PDF en producción.
+
 ## Qué cubre la suite automatizada
 
 La suite incluye pruebas sobre:

@@ -1,5 +1,11 @@
 # Notas de versión
 
+## 0.60.16 · Aislamiento de pruebas en CI · 2026-11-04
+
+- La suite Vitest utiliza un proceso de pruebas a la vez, con archivos aislados, para reducir interferencias al inicializar Canvas, fuentes globales y la interfaz heredada.
+- No cambia el renderizador PDF, el formato de bitácora ni las reglas de graduación de la versión 0.60.15.
+- Se documenta la configuración de ejecución de las pruebas para reproducir GitHub Actions localmente.
+
 ## 0.60.15 · Depuración de eventos especiales · 2026-11-04
 
 - Un evento con datos inválidos ya no deshabilita las graduaciones y los avisos válidos: se descarta individualmente la entrada incorrecta, manteniendo la validación estricta en el editor antes de publicar el JSON.
