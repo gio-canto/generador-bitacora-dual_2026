@@ -40,6 +40,13 @@ La suite incluye pruebas sobre:
 
 Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regla.
 
+## Ampliación de espacio de escritura (0.60.17)
+
+- La tabla semanal llega hasta 159 mm en lugar de 154 mm, con separación de 5 mm antes del inicio de la sección de firmas, ahora en `y = 164 mm`. La línea física para firmar sigue en `184.6 mm`.
+- La actualización idéntica debe mantenerse en `src/legacy/editor.js` y `src/services/pdf.js`. El límite sigue calculándose con el modelo del contenido de las cuatro jornadas.
+- Revisar manualmente la vista previa, el contador y un PDF tamaño carta: un renglón adicional puede caber según la distribución de texto, sin cortar actividades ni invadir firmas.
+- No se alteran las reglas de faltas, días inhábiles ni sin labores.
+
 ## Matriz de revisión manual
 
 ### Generador

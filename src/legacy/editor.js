@@ -280,7 +280,7 @@ export function startEditor() {
       },
       signatures: {
         x: 10.5,
-        y: 159,
+        y: 164,
         w: 276,
         colRatio: [0.18, 0.34, 0.28, 0.2],
         lineY: 184.6,

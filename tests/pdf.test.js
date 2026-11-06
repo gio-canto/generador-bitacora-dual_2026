@@ -36,6 +36,7 @@ it("genera PDF carta horizontal con margen seguro y vista previa proporcional", 
   expect(text.startsWith("%PDF-1.4")).toBe(true);
   expect(text).toContain("/Count 1");
   expect(text).toContain("792.0000 612.0000");
+   expect(buildPageModel(r).maxBottom).toBe(159); // Cinco milímetros más de espacio útil.
    expect(canvas.width).toBe(Math.round(279.4*6));
    expect(canvas.height).toBe(Math.round(215.9*6));
    const fit=printPlacement();
