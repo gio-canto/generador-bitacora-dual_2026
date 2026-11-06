@@ -2,6 +2,8 @@
 
 ## 0.60.17 · Ampliación moderada de escritura · 2026-11-06
 
+- **Publicación con excepción de CI:** a petición del responsable se permite desplegar esta entrega pese a tres pruebas automatizadas pendientes (PDF, firmas y selección de justificante). Las pruebas se ejecutan y su resultado se advierte en Actions. Esta excepción solo aplica al commit de liberación; las siguientes publicaciones conservan su bloqueo por pruebas fallidas. No se declara validación completa.
+
 - Se añaden 5 mm de altura útil para actividades, compartidos entre las cuatro jornadas, sin cambiar fuente, columnas ni el formato de una hoja.
 - El límite de la tabla se actualiza en el editor interactivo y el motor PDF, dejando la misma separación de 5 mm antes de la sección de firmas; la línea de firma no se desplaza.
 - No se modifican el cálculo de interlineado, los contadores existentes, los estados de jornada, los respaldos, la impresión carta ni Registro Dual.
