@@ -474,7 +474,9 @@ export function startEditor() {
         reasonId: "",
         start: $("#defaultStart").value || preset.start,
         end: $("#defaultEnd").value || preset.end,
-        area: readProfileData().area || preset.area,
+        area: readProfileData().areaByCompany?.[$("#company").value] ||
+          (readProfileData().company === $("#company").value ? readProfileData().area : "") ||
+          preset.area,
         activity: "",
       };
     }
@@ -838,6 +840,14 @@ export function startEditor() {
               : e.status === "inhabil"
                 ? INHABIL_JUSTIFICATION
                 : "Puedes usar **negritas**, *cursivas* y listas con -";
+        const companyAreas = companies.find((company) => company.name === $("#company").value)?.areas || [];
+        const areaListId = "day-area-options-" + i;
+        const areaListAttribute = companyAreas.length ? ' list="' + areaListId + '"' : "";
+        const areaOptions = companyAreas.length
+          ? '<datalist id="' + areaListId + '">' +
+            companyAreas.map((area) => '<option value="' + escapeHtml(area) + '"></option>').join("") +
+            '<option value="Otra área…"></option></datalist>'
+          : "";
         const detectedReason = refreshReasonClassification(e);
         const absenceReasonId = e.reasonId || detectedReason?.id || reasonIdForText(e.status, e.activity);
         const absenceReasonOptions = reasonsForStatus(e.status).map(
@@ -848,7 +858,7 @@ export function startEditor() {
           ["falta", "sin_labores"].includes(e.status)
             ? `<div class="absence-reason"><div class="absence-reason-head"><label for="absenceReason-${i}">Motivo frecuente</label><span>Opcional</span></div><select id="absenceReason-${i}" data-absence-reason="${i}"><option value="">Selecciona un motivo para usarlo como base…</option>${absenceReasonOptions}</select><small>El texto se colocará en la justificación y podrás modificarlo libremente.</small><small data-reason-detection="${i}" aria-live="polite"></small></div>`
             : "";
-        card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Área</label><input data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" ${e.status !== "laboral" ? "disabled" : ""}></div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
+        card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><div class="day-area-heading"><label for="day-area-${i}">Área</label><button type="button" class="day-area-all" data-area-all="${i}" aria-label="Aplicar esta área a los cuatro días" title="Aplicar a los cuatro días" ${e.status !== "laboral" ? "disabled" : ""}>4 días</button></div><input id="day-area-${i}" data-index="${i}" data-key="area"${areaListAttribute} value="${escapeHtml(e.area)}" ${e.status !== "laboral" ? "disabled" : ""}>${areaOptions}</div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
         host.appendChild(card);
         updateReasonIndicator(host, i);
       });
@@ -883,6 +893,7 @@ export function startEditor() {
             refreshLineLimits();
             return;
           }
+          if (k === "area" && input.value === "Otra área…") input.value = "";
           const previous = entries[i][k],
             before = buildPageModel();
           entries[i][k] = input.value;
@@ -933,6 +944,37 @@ export function startEditor() {
           input.addEventListener("change", handler);
         else input.addEventListener("input", handler);
       });
+      host.querySelectorAll("[data-area-all]").forEach((button) =>
+        button.addEventListener("click", async () => {
+          const area = String(entries[+button.dataset.areaAll]?.area || "").trim();
+          if (!area) {
+            showGuardAlert("Falta el área", "Escribe o selecciona un área para aplicarla a la semana.");
+            return;
+          }
+          const workingDays = entries.filter((entry) => entry.status === "laboral");
+          if (workingDays.some((entry) => entry.area && entry.area.trim() !== area)) {
+            const approved = await openGuardDialog(
+              "¿Aplicar área a la semana?",
+              "Las áreas distintas de los demás días con labores se reemplazarán.",
+              { confirm: true, confirmText: "Aplicar a la semana", cancelText: "Cancelar" },
+            );
+            if (!approved) return;
+          }
+          const snapshot = deepCopy(entries);
+          const before = buildPageModel();
+          for (const entry of workingDays) entry.area = area;
+          const after = buildPageModel();
+          if (!after.fits && after.bottom >= before.bottom - 0.01) {
+            entries = snapshot;
+            showGuardAlert("Límite de espacio alcanzado", "El área no cabe en el formato actual. Usa un nombre más corto.");
+            return;
+          }
+          rememberProfile({ area });
+          renderDays();
+          markDirty();
+          updatePreview();
+        }),
+      );
       host.querySelectorAll("[data-absence-reason]").forEach((select) =>
         select.addEventListener("change", async () => {
           const i = +select.dataset.absenceReason,
@@ -2964,6 +3006,7 @@ export function startEditor() {
           $("#autorizoRole").value = company.representatives[0].role;
         }
         rememberProfile(collectProfileDefaults());
+        renderDays();
         markDirty();
         updatePreview();
       });

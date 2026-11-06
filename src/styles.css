@@ -539,3 +539,9 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
  .pa-option{padding:4px 0}
  .pa-profile-fields{grid-template-columns:1fr;min-width:0}
 }
+
+/* 0.61: la selección de área usa el campo existente y no amplía las tarjetas. */
+.day-area-heading{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.day-card .day-area-all{min-width:0;min-height:0;width:auto;height:auto;margin:0;padding:0;border:0;border-radius:3px;background:transparent;color:var(--muted);font-size:10px;font-weight:650;line-height:1.3;white-space:nowrap}
+.day-card .day-area-all:hover,.day-card .day-area-all:focus-visible{color:var(--blue)}
+.day-card .day-area-all:disabled{opacity:.4;cursor:default}
