@@ -42,7 +42,16 @@
       }
     ],
     "shortName": "COCYTIEG",
-    "instructorEnabledByDefault": true
+    "instructorEnabledByDefault": true,
+    "areas": [
+      "Área de Informática",
+      "Departamento de Archivo",
+      "Departamento de Apropiación Social de la Ciencia",
+      "Departamento de Vinculación Interinstitucional",
+      "Departamento de Fortalecimiento a la Investigación e Innovación Tecnológica",
+      "Departamento de Propiedad Intelectual y Emprendimiento",
+      "Subdirección de Administración, Finanzas y Archivo"
+    ]
   },
   {
     "id": "company-2",
