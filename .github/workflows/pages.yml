@@ -59,7 +59,7 @@ jobs:
         id: regression
         # Excepción EXCLUSIVA del commit de publicación 0.60.17, autorizada con fallas CI conocidas.
         # Cualquier push posterior mantiene el bloqueo habitual si las pruebas fallan.
-        continue-on-error: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.head_commit.message == 'release: publicar 0.60.17 con advertencia de pruebas' }}
+        continue-on-error: "${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.head_commit.message == 'release: publicar 0.60.17 con advertencia de pruebas' }}"
         run: npm test
         if: steps.fresh.outputs.stale == 'false'
 
