@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.17-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.61.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,10 @@
 </div>
 
 ---
+
+## v0.61.0 · Áreas por empresa
+
+El campo «Área» conserva su tamaño en las cuatro jornadas. El COCYTIEG ofrece departamentos sugeridos, incluido «Departamento de Archivo», y permite «Otra área…» o escribir libremente. La acción compacta «4 días» permite usar una misma área durante la semana, previa confirmación si se reemplazan áreas distintas. Cada perfil recuerda el área por empresa; los instructores formadores son independientes. La interfaz y el PDF conservan sus dimensiones y los registros anteriores permanecen intactos.
 
 ## v0.60.17 · Más espacio para actividades
 

@@ -1,5 +1,14 @@
 # Notas de versión
 
+## 0.61.0 · Áreas por empresa · 2026-11-06
+
+- Catálogo de departamentos del COCYTIEG, incluido «Departamento de Archivo», totalmente independiente de los instructores formadores.
+- Selector con sugerencias nativas en el campo «Área» y opción «Otra área…» para escribir libremente. Otras empresas siguen aceptando captura manual.
+- Acción discreta «4 días» para copiar el área de una jornada a las otras jornadas con labores, con confirmación si hay valores diferentes.
+- Preferencia de área separada por empresa y perfil, con migración de los valores anteriores, sin modificar el texto de las bitácoras históricas.
+- Dimensiones de campos, cuadrícula, tarjetas, hoja PDF, firmas y respaldos sin cambios.
+
+
 ## 0.60.17 · Ampliación moderada de escritura · 2026-11-06
 
 - **Publicación con excepción de CI:** a petición del responsable se permite desplegar esta entrega pese a tres pruebas automatizadas pendientes (PDF, firmas y selección de justificante). Las pruebas se ejecutan y su resultado se advierte en Actions. Esta excepción solo aplica al commit de liberación; las siguientes publicaciones conservan su bloqueo por pruebas fallidas. No se declara validación completa.

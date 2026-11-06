@@ -40,6 +40,15 @@ La suite incluye pruebas sobre:
 
 Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regla.
 
+## Áreas por empresa (0.61.0)
+
+- Confirmar que el campo «Área» mantiene su tamaño en escritorio y móvil y que las tarjetas no ganan filas ni controles adicionales.
+- En COCYTIEG, seleccionar «Departamento de Archivo» desde las sugerencias y probar «Otra área…» con captura libre.
+- Cambiar de empresa y verificar que el área anterior no se transfiera, que las preferencias se recuperen al volver y que los instructores no afecten áreas.
+- Probar «4 días» con áreas distintas (confirmar y cancelar), jornadas sin labores y una denominación larga que no quepa en el PDF.
+- Abrir bitácoras y respaldos antiguos y confirmar que sus áreas no se reescriban.
+- Ejecutar tests/v061-company-areas.test.js y la suite global antes de publicar.
+
 ## Ampliación de espacio de escritura (0.60.17)
 
 - La tabla semanal llega hasta 159 mm en lugar de 154 mm, con separación de 5 mm antes del inicio de la sección de firmas, ahora en `y = 164 mm`. La línea física para firmar sigue en `184.6 mm`.
