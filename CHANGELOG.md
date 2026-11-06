@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.60.17 · Ampliación moderada de escritura · 2026-11-06
+
+- Se añaden 5 mm de altura útil para actividades, compartidos entre las cuatro jornadas, sin cambiar fuente, columnas ni el formato de una hoja.
+- El límite de la tabla se actualiza en el editor interactivo y el motor PDF, dejando la misma separación de 5 mm antes de la sección de firmas; la línea de firma no se desplaza.
+- No se modifican el cálculo de interlineado, los contadores existentes, los estados de jornada, los respaldos, la impresión carta ni Registro Dual.
+- Se verifica el nuevo límite inferior de la tabla mediante prueba automatizada.
+
+
 ## 0.60.16 · Aislamiento de pruebas en CI · 2026-11-04
 
 - La suite Vitest utiliza un proceso de pruebas a la vez, con archivos aislados, para reducir interferencias al inicializar Canvas, fuentes globales y la interfaz heredada.

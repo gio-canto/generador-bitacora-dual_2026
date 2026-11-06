@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.60.16-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.60.17-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,10 @@
 </div>
 
 ---
+
+## v0.60.17 · Más espacio para actividades
+
+La tabla semanal dispone de **5 mm adicionales de altura compartida** entre las cuatro jornadas: se conserva el tamaño de letra, el margen de impresión, el formato de una hoja y la ubicación de las líneas de firma. El contador original mantiene la distribución dinámica por jornada. Los PDF y el editor usan el nuevo límite sin cambios en respaldos, Data Matrix ni Registro Dual.
 
 ## v0.60.16 · Estabilidad de pruebas automatizadas
 
