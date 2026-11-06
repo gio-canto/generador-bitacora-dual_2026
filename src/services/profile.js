@@ -335,6 +335,18 @@ export function rememberProfile(value, storage = localStorage) {
   }
 }
 
+// Guarda el área de una empresa sin cambiar la empresa activa del perfil.
+export function rememberCompanyArea(company, area, storage = localStorage) {
+  const name = cleanText(company);
+  const value = cleanText(area, 150);
+  if (!name || !value) return false;
+  const current = readProfileData(storage);
+  return rememberProfile({
+    areaByCompany: { ...current.areaByCompany, [name]: value },
+    ...(current.company === name ? { area: value } : {}),
+  }, storage);
+}
+
 export function rememberName(value, storage = localStorage) {
   const name = cleanText(value, 160);
   if (!name || isSecretName(name)) return false;

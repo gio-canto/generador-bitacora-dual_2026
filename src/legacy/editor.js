@@ -9,6 +9,7 @@ import {
   readProfileData,
   rememberName,
   rememberProfile,
+  rememberCompanyArea,
   initializeProfile,
   readActiveProfileId,
   listProfiles,
@@ -467,15 +468,17 @@ export function startEditor() {
       updatePreview();
     }
     function blankEntry(date = "") {
-      const preset = companyDefaults($("#company").value);
+      const company = $("#company").value;
+      const preset = companyDefaults(company);
+      const profile = readProfileData();
       return {
         date,
         status: "laboral",
         reasonId: "",
         start: $("#defaultStart").value || preset.start,
         end: $("#defaultEnd").value || preset.end,
-        area: readProfileData().areaByCompany?.[$("#company").value] ||
-          (readProfileData().company === $("#company").value ? readProfileData().area : "") ||
+        area: profile.areaByCompany?.[company] ||
+          (profile.company === company ? profile.area : "") ||
           preset.area,
         activity: "",
       };
@@ -934,7 +937,7 @@ export function startEditor() {
               ),
             ];
             if (commonAreas.length === 1)
-              rememberProfile({ area: commonAreas[0] });
+              rememberCompanyArea($("#company").value, commonAreas[0]);
           }
           markDirty();
           updatePreview();
@@ -969,7 +972,7 @@ export function startEditor() {
             showGuardAlert("Límite de espacio alcanzado", "El área no cabe en el formato actual. Usa un nombre más corto.");
             return;
           }
-          rememberProfile({ area });
+          rememberCompanyArea($("#company").value, area);
           renderDays();
           markDirty();
           updatePreview();

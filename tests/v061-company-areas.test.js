@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import companies from "../src/data/companies.json";
-import { readProfileData, rememberProfile } from "../src/services/profile.js";
+import { readProfileData, rememberProfile, rememberCompanyArea } from "../src/services/profile.js";
 
 const council = companies.find((item) => item.shortName === "COCYTIEG");
 const institute = companies.find((item) => item.shortName === "ITCH");
@@ -31,6 +31,15 @@ describe("0.61.0 · áreas por empresa", () => {
     expect(rememberProfile({ company: council.name }, storage)).toBe(true);
     expect(readProfileData(storage).area).toBe("Departamento de Archivo");
     expect(readProfileData(storage).areaByCompany[institute.name]).toBe("Laboratorio propio");
+  });
+
+  it("guarda un área de otra empresa sin cambiar el perfil activo", () => {
+    const storage = memory();
+    rememberProfile({ name: "Alumno", company: council.name, area: "Área de Informática" }, storage);
+    expect(rememberCompanyArea(institute.name, "Área de soporte", storage)).toBe(true);
+    expect(readProfileData(storage).company).toBe(council.name);
+    expect(readProfileData(storage).area).toBe("Área de Informática");
+    expect(readProfileData(storage).areaByCompany[institute.name]).toBe("Área de soporte");
   });
 
   it("migra áreas anteriores sin cambiar el texto guardado", () => {
