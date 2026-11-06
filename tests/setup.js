@@ -3,9 +3,9 @@ import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
 import {existsSync} from "node:fs";
 
 // Las métricas tipográficas del PDF deben ser estables en Linux CI.
-// El sistema CI ya instala fuentes Liberation: evitar registrar un segundo alias de Times New Roman.
-// La firma genérica conserva su alias de prueba, sin cambiar las fuentes de producción.
+// Alias de pruebas, sin cambiar las fuentes de la aplicación en producción.
 for(const [file,family] of [
+  ["/usr/share/fonts/truetype/liberation2/LiberationSerif-Regular.ttf","Times New Roman"],
   ["/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf","Segoe Script"],
 ]){
   if(existsSync(file))GlobalFonts.registerFromPath(file,family);
