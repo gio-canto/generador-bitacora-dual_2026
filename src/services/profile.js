@@ -226,7 +226,10 @@ export function rememberProfile(value, storage = localStorage) {
   const company = has(patch, "company")
     ? cleanText(patch.company)
     : current.company;
-  const areaByCompany = { ...current.areaByCompany };
+  const areaByCompany = {
+    ...current.areaByCompany,
+    ...(has(patch, "areaByCompany") ? cleanAreaByCompany(patch.areaByCompany) : {}),
+  };
   const area = has(patch, "area")
     ? cleanText(patch.area, 150)
     : company === current.company
