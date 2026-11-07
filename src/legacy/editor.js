@@ -917,7 +917,10 @@ export function startEditor() {
             before = buildPageModel();
           entries[i][k] = input.value;
           const after = buildPageModel();
-          if (!after.fits && after.bottom >= before.bottom - 0.01) {
+          const exceedsSpace = k === "area"
+            ? !after.fits && (before.fits || after.bottom > before.bottom + 0.01)
+            : !after.fits && after.bottom >= before.bottom - 0.01;
+          if (exceedsSpace) {
             entries[i][k] = previous;
             input.value = previous ?? "";
             if (k === "activity") {
@@ -982,7 +985,7 @@ export function startEditor() {
         const before = buildPageModel();
         workingDays.forEach((entry) => { entry.area = area; });
         const after = buildPageModel();
-        if (!after.fits && after.bottom >= before.bottom - 0.01) {
+        if (!after.fits && (before.fits || after.bottom > before.bottom + 0.01)) {
           workingDays.forEach((entry, index) => { entry.area = snapshot[index]; });
           notifySpaceLimit();
           return;
@@ -1017,7 +1020,7 @@ export function startEditor() {
           const before = buildPageModel();
           entries[i].area = next;
           const after = buildPageModel();
-          if (!after.fits && after.bottom >= before.bottom - 0.01) {
+          if (!after.fits && (before.fits || after.bottom > before.bottom + 0.01)) {
             entries[i].area = previous;
             notifySpaceLimit();
           } else {

@@ -1,7 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { cleanup, render, fireEvent, waitFor } from "@testing-library/react";
 import App from "../src/App.jsx";
-import { Profile } from "../src/components/Profile.jsx";
 import companies from "../src/data/companies.json";
 import { readProfileData, rememberProfile } from "../src/services/profile.js";
 
@@ -11,8 +10,9 @@ vi.stubGlobal("IntersectionObserver", class {
 });
 vi.stubGlobal("devicePixelRatio", 1);
 
-afterEach(() => {
+afterEach(async () => {
   cleanup();
+  await new Promise((resolve) => setTimeout(resolve, 0));
   localStorage.clear();
 });
 
@@ -73,7 +73,9 @@ it("0.61.1 · en perfil conserva un área personalizada al volver a las opciones
     instructor: { enabled: false },
   });
 
-  render(<Profile />);
+  render(<App />);
+  await waitFor(() => expect($("autorizoPaEnabled")).toBeTruthy());
+  await waitFor(() => expect(document.querySelector(".profile-text-button")).toBeTruthy());
   fireEvent.click(document.querySelector(".profile-text-button"));
   await waitFor(() => expect($("profileArea")).toBeTruthy());
   expect($("profileArea").tagName).toBe("SELECT");
