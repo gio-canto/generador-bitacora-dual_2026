@@ -113,6 +113,7 @@ export function Profile() {
   const [profile, setProfile] = useState(readProfileData);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(readProfileData);
+  const [customAreaMode, setCustomAreaMode] = useState(false);
   const [profiles, setProfiles] = useState(listProfiles);
   const [archivedProfiles, setArchivedProfiles] = useState(listArchivedProfiles);
   const [activeId, setActiveId] = useState(readActiveProfileId);
@@ -180,8 +181,13 @@ export function Profile() {
     setForm((current) => ({ ...current, [key]: event.target.value }));
 
   const changeArea = (event) => {
-    const area = event.target.value === "Otra área…" ? "" : event.target.value;
-    setForm((current) => ({ ...current, area }));
+    if (event.target.value === "__custom_area__") {
+      setCustomAreaMode(true);
+      setForm((current) => ({ ...current, area: "" }));
+    } else {
+      setCustomAreaMode(false);
+      setForm((current) => ({ ...current, area: event.target.value }));
+    }
   };
 
   const updateAuthority = (key) => (event) =>
@@ -203,6 +209,7 @@ export function Profile() {
     }));
 
   const edit = () => {
+    setCustomAreaMode(false);
     setForm(editableDefaults(profile));
     setEditing(true);
   };
@@ -232,6 +239,7 @@ export function Profile() {
   };
 
   const changeCompany = (event) => {
+    setCustomAreaMode(false);
     const companyName = event.target.value;
     const company = companies.find((item) => item.name === companyName);
     const representative =
@@ -871,25 +879,50 @@ export function Profile() {
                 </label>
               </div>
 
-              <label>
-                Área común
-                <input
-                  id="profileArea"
-                  value={form.area}
-                  onChange={changeArea}
-                  list={selectedCompany?.areas?.length ? "profileAreaOptions" : undefined}
-                  maxLength={150}
-                  placeholder="Área de Informática"
-                />
+              <div className="profile-area-field">
+                <label htmlFor="profileArea">Área común</label>
                 {selectedCompany?.areas?.length ? (
-                  <datalist id="profileAreaOptions">
-                    {selectedCompany.areas.map((area) => (
-                      <option key={area} value={area} />
-                    ))}
-                    <option value="Otra área…" />
-                  </datalist>
-                ) : null}
-              </label>
+                  customAreaMode ||
+                  (form.area && !selectedCompany.areas.includes(form.area)) ? (
+                    <div className="area-picker-control">
+                      <input
+                        id="profileAreaCustom"
+                        aria-label="Área personalizada"
+                        className="area-custom-value"
+                        value={form.area}
+                        onChange={update("area")}
+                        maxLength={150}
+                        placeholder="Escribe el área"
+                      />
+                      <button
+                        type="button"
+                        className="area-picker-back"
+                        aria-label="Ver áreas disponibles"
+                        title="Ver áreas disponibles"
+                        onClick={() => {
+                          setCustomAreaMode(false);
+                          setForm((current) => ({ ...current, area: "" }));
+                        }}
+                      >⌄</button>
+                    </div>
+                  ) : (
+                    <select id="profileArea" className="area-picker-select"
+                      value={form.area || ""} onChange={changeArea}
+                      title={form.area || "Selecciona un área"}
+                    >
+                      <option value="">Selecciona un área…</option>
+                      {selectedCompany.areas.map((area) => (
+                        <option key={area} value={area}>{area}</option>
+                      ))}
+                      <option value="__custom_area__">Otra área…</option>
+                    </select>
+                  )
+                ) : (
+                  <input id="profileArea" value={form.area}
+                    onChange={update("area")} maxLength={150}
+                    placeholder="Escribe el área" />
+                )}
+              </div>
 
               <label className="profile-check">
                 <input
