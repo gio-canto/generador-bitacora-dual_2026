@@ -104,7 +104,8 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
   fireEvent.change($("profileDefaultEnd"), {
     target: { value: "13:30" },
   });
-  fireEvent.input($("profileArea"), {
+  fireEvent.change($("profileArea"), { target: { value: "__custom_area__" } });
+  fireEvent.input($("profileAreaCustom"), {
     target: { value: "Laboratorio de programación" },
   });
   fireEvent.click($("profileSave"));
@@ -332,7 +333,7 @@ it("recupera la interfaz original, genera cuatro días y conserva sus herramient
     localStorage.getItem("bitacora_dual_clean_v3"),
   ).length;
   fireEvent.click(document.querySelector(".profile-text-button"));
-  fireEvent.input($("profileArea"), {
+  fireEvent.input($("profileAreaCustom"), {
     target: { value: "Área actualizada solo para nuevas bitácoras" },
   });
   fireEvent.click($("profileSave"));
