@@ -1,5 +1,5 @@
-import { afterEach, expect, fireEvent, it, vi, waitFor } from "vitest";
-import { cleanup, render } from "@testing-library/react";
+import { afterEach, expect, it, vi } from "vitest";
+import { cleanup, render, fireEvent, waitFor } from "@testing-library/react";
 import App from "../src/App.jsx";
 import { Profile } from "../src/components/Profile.jsx";
 import companies from "../src/data/companies.json";
