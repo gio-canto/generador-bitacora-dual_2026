@@ -9,7 +9,7 @@ describe("0.60.8 · publicación de GitHub Pages",()=>{
     expect(workflow).toContain("cancel-in-progress: false");
   });
   it("verifica que el commit esté vigente después del build y antes del artefacto",()=>{
-    const tests=workflow.indexOf("      - run: npm test");
+    const tests=workflow.indexOf("        run: npm test");
     const build=workflow.indexOf("      - run: npm run build");
     const verify=workflow.indexOf("      - name: Confirmar versión antes de publicar");
     const upload=workflow.indexOf("      - uses: actions/upload-pages-artifact@v3");

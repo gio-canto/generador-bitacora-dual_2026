@@ -54,7 +54,7 @@ function editableDefaults(profile) {
     defaultEnd:
       profile.defaultEnd ||
       valueFromEditor("defaultEnd", company.end || "14:00"),
-    area: profile.area || company.area || "",
+    area: profile.areaByCompany?.[companyName] || (companyName === profile.company ? profile.area : "") || company.area || "",
     markdown: profile.markdown ?? checkedFromEditor("markdown", true),
     studentGenericSignature:
       profile.studentGenericSignature ??
@@ -179,6 +179,11 @@ export function Profile() {
   const update = (key) => (event) =>
     setForm((current) => ({ ...current, [key]: event.target.value }));
 
+  const changeArea = (event) => {
+    const area = event.target.value === "Otra área…" ? "" : event.target.value;
+    setForm((current) => ({ ...current, area }));
+  };
+
   const updateAuthority = (key) => (event) =>
     setForm((current) => ({
       ...current,
@@ -234,27 +239,35 @@ export function Profile() {
         ? company.representatives[0]
         : null;
 
-    setForm((current) => ({
-      ...current,
-      company: companyName,
-      defaultStart: company?.start || current.defaultStart || "10:00",
-      defaultEnd: company?.end || current.defaultEnd || "14:00",
-      area: company?.area || current.area,
-      authorities: {
-        ...current.authorities,
-        autorizoName: representative?.name || "",
-        autorizoRole: representative?.role || "",
-        autorizoPaEnabled:false,autorizoPaName:"",autorizoPaRole:"",
-      },
-      instructor: {
-        enabled: company?.instructorEnabledByDefault === true,
-        preset: "__custom__",
-        name: "",
-        roleMain: "",
-        note: "Instructor Formador",
-        paEnabled:false,paName:"",paRole:"",
-      },
-    }));
+    setForm((current) => {
+      const areaByCompany = { ...current.areaByCompany };
+      if (current.company) {
+        if (current.area) areaByCompany[current.company] = current.area;
+        else delete areaByCompany[current.company];
+      }
+      return {
+        ...current,
+        company: companyName,
+        defaultStart: company?.start || current.defaultStart || "10:00",
+        defaultEnd: company?.end || current.defaultEnd || "14:00",
+        area: areaByCompany[companyName] || company?.area || "",
+        areaByCompany,
+        authorities: {
+          ...current.authorities,
+          autorizoName: representative?.name || "",
+          autorizoRole: representative?.role || "",
+          autorizoPaEnabled: false, autorizoPaName: "", autorizoPaRole: "",
+        },
+        instructor: {
+          enabled: company?.instructorEnabledByDefault === true,
+          preset: "__custom__",
+          name: "",
+          roleMain: "",
+          note: "Instructor Formador",
+          paEnabled: false, paName: "", paRole: "",
+        },
+      };
+    });
   };
 
   const changeRepresentative = (event) => {
@@ -863,10 +876,19 @@ export function Profile() {
                 <input
                   id="profileArea"
                   value={form.area}
-                  onChange={update("area")}
+                  onChange={changeArea}
+                  list={selectedCompany?.areas?.length ? "profileAreaOptions" : undefined}
                   maxLength={150}
                   placeholder="Área de Informática"
                 />
+                {selectedCompany?.areas?.length ? (
+                  <datalist id="profileAreaOptions">
+                    {selectedCompany.areas.map((area) => (
+                      <option key={area} value={area} />
+                    ))}
+                    <option value="Otra área…" />
+                  </datalist>
+                ) : null}
               </label>
 
               <label className="profile-check">

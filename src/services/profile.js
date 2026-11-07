@@ -12,6 +12,7 @@ const EMPTY_PROFILE = Object.freeze({
   defaultStart: "",
   defaultEnd: "",
   area: "",
+  areaByCompany: Object.freeze({}),
   markdown: true,
   studentGenericSignature: false,
   studentSignatureIntroduced: false,
@@ -49,6 +50,18 @@ const cleanMultiline = (value, max = 300) =>
     .replace(/[ \t]+/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .slice(0, max);
+
+const cleanAreaByCompany = (value) => {
+  const areas = {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) return areas;
+  for (const [key, entry] of Object.entries(value)) {
+    const company = cleanText(key);
+    const area = cleanText(entry, 150);
+    if (company && area && !["__proto__", "constructor", "prototype"].includes(company))
+      areas[company] = area;
+  }
+  return areas;
+};
 
 const cleanTime = (value) => {
   const time = cleanText(value, 5);
@@ -131,6 +144,11 @@ export function readProfileData(storage = localStorage) {
       !Array.isArray(raw.authorities)
         ? raw.authorities
         : {};
+    const areaByCompany = cleanAreaByCompany(raw.areaByCompany);
+    const legacyCompany = cleanText(raw.company);
+    const legacyArea = cleanText(raw.area, 150);
+    if (legacyCompany && legacyArea && !areaByCompany[legacyCompany])
+      areaByCompany[legacyCompany] = legacyArea;
     const instructor =
       raw.instructor &&
       typeof raw.instructor === "object" &&
@@ -147,7 +165,8 @@ export function readProfileData(storage = localStorage) {
       company: cleanText(raw.company),
       defaultStart: cleanTime(raw.defaultStart),
       defaultEnd: cleanTime(raw.defaultEnd),
-      area: cleanText(raw.area, 150),
+      area: areaByCompany[legacyCompany] || legacyArea,
+      areaByCompany,
       markdown: raw.markdown !== false,
       studentGenericSignature: raw.studentGenericSignature === true,
       studentSignatureIntroduced: raw.studentSignatureIntroduced === true,
@@ -204,6 +223,23 @@ export function rememberProfile(value, storage = localStorage) {
       ? patch.instructor
       : {};
 
+  const company = has(patch, "company")
+    ? cleanText(patch.company)
+    : current.company;
+  const areaByCompany = {
+    ...current.areaByCompany,
+    ...(has(patch, "areaByCompany") ? cleanAreaByCompany(patch.areaByCompany) : {}),
+  };
+  const area = has(patch, "area")
+    ? cleanText(patch.area, 150)
+    : company === current.company
+      ? current.area
+      : areaByCompany[company] || "";
+  if (has(patch, "area") && company) {
+    if (area) areaByCompany[company] = area;
+    else delete areaByCompany[company];
+  }
+
   const next = {
     name,
     school: has(patch, "school")
@@ -218,18 +254,15 @@ export function rememberProfile(value, storage = localStorage) {
     group: has(patch, "group")
       ? cleanText(patch.group, 20).toUpperCase()
       : current.group,
-    company: has(patch, "company")
-      ? cleanText(patch.company)
-      : current.company,
+    company,
     defaultStart: has(patch, "defaultStart")
       ? cleanTime(patch.defaultStart)
       : current.defaultStart,
     defaultEnd: has(patch, "defaultEnd")
       ? cleanTime(patch.defaultEnd)
       : current.defaultEnd,
-    area: has(patch, "area")
-      ? cleanText(patch.area, 150)
-      : current.area,
+    area,
+    areaByCompany,
     markdown: has(patch, "markdown")
       ? patch.markdown !== false
       : current.markdown,
@@ -300,6 +333,18 @@ export function rememberProfile(value, storage = localStorage) {
   } catch {
     return false;
   }
+}
+
+// Guarda el área de una empresa sin cambiar la empresa activa del perfil.
+export function rememberCompanyArea(company, area, storage = localStorage) {
+  const name = cleanText(company);
+  const value = cleanText(area, 150);
+  if (!name || !value) return false;
+  const current = readProfileData(storage);
+  return rememberProfile({
+    areaByCompany: { ...current.areaByCompany, [name]: value },
+    ...(current.company === name ? { area: value } : {}),
+  }, storage);
 }
 
 export function rememberName(value, storage = localStorage) {

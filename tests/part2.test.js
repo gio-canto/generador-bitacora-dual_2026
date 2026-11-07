@@ -88,6 +88,7 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
     defaultStart: "08:00",
     defaultEnd: "14:30",
     area: "Laboratorio de desarrollo",
+    areaByCompany: { "Empresa de Prueba": "Laboratorio de desarrollo" },
     markdown: false,
     studentGenericSignature: true,
     studentSignatureIntroduced: false,
