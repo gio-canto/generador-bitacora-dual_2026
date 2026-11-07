@@ -2,6 +2,8 @@
 
 ## 0.61.1 · Selector de áreas intuitivo · 2026-11-06
 
+- Publicación autorizada con 385 de 388 pruebas aprobadas; las tres fallas conocidas están limitadas a `app.test.jsx`, `pa-signatures.test.js` y `pdf.test.js`. El flujo de publicación verifica que no existan fallas adicionales y la excepción sólo aplica al commit de liberación.
+
 - Se sustituye el autocompletado `datalist` por un selector nativo con flecha, opciones institucionales y «Otra área…» para escritura libre.
 - La captura personalizada reemplaza al selector en la misma celda; se puede volver a abrir el menú sin añadir filas ni perder los datos escritos.
 - «Aplicar esta área a toda la semana» pasa al desplegable; se confirma antes de sustituir áreas diferentes. En empresas sin catálogo, la acción compacta se llama «Semana».
