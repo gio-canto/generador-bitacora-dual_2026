@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.61.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.61.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,10 @@
 </div>
 
 ---
+
+## v0.61.1 · Selector de áreas mejorado
+
+El menú **Área** ahora utiliza un selector convencional con flecha visible en lugar de sugerencias variables del navegador. «Otra área…» cambia al campo de captura personalizada **en el mismo espacio**, con una flecha para regresar al catálogo sin perder el dato escrito. «Aplicar esta área a toda la semana» aparece en el propio menú; si las demás jornadas tienen áreas distintas se pide confirmación. Se conserva la captura directa en empresas sin catálogo y la opción compacta «Semana» para copiar su área. No cambian la cuadrícula, la altura o anchura de los campos, las áreas guardadas, las dimensiones del PDF ni la independencia de instructores.
 
 ## v0.61.0 · Áreas por empresa
 

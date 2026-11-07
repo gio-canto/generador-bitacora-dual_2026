@@ -125,6 +125,11 @@ export function startEditor() {
     const COMPANY_PRESETS = Object.fromEntries(
       companies.map((c) => [c.name, c]),
     );
+    // La preferencia visual no forma parte de las bitácoras ni de los respaldos.
+    const areaPickerModes = new WeakMap();
+    const AREA_OTHER = "__custom_area__";
+    const AREA_SAVED_OTHER = "__saved_custom_area__";
+    const AREA_APPLY_WEEK = "__apply_area_to_week__";
     function companyDefaults(company) {
       company = LEGACY_COMPANY_ALIASES[company] || company;
       return (
@@ -844,13 +849,24 @@ export function startEditor() {
                 ? INHABIL_JUSTIFICATION
                 : "Puedes usar **negritas**, *cursivas* y listas con -";
         const companyAreas = companies.find((company) => company.name === $("#company").value)?.areas || [];
-        const areaListId = "day-area-options-" + i;
-        const areaListAttribute = companyAreas.length ? ' list="' + areaListId + '"' : "";
-        const areaOptions = companyAreas.length
-          ? '<datalist id="' + areaListId + '">' +
-            companyAreas.map((area) => '<option value="' + escapeHtml(area) + '"></option>').join("") +
-            '<option value="Otra área…"></option></datalist>'
-          : "";
+        const savedCustomArea = !!e.area && !companyAreas.includes(e.area);
+        const areaMode = areaPickerModes.get(e);
+        const editingCustom = !!companyAreas.length &&
+          (areaMode === "custom" || (areaMode !== "select" && savedCustomArea));
+        const areaSelectValue = savedCustomArea ? AREA_SAVED_OTHER : (e.area || "");
+        const areaControl = !companyAreas.length
+          ? `<input id="day-area-${i}" data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" maxlength="150" ${e.status !== "laboral" ? "disabled" : ""}>`
+          : editingCustom
+            ? `<div class="area-picker-control"><input class="area-custom-value" id="day-area-${i}" data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" maxlength="150" placeholder="Escribe el área" ${e.status !== "laboral" ? "disabled" : ""}><button type="button" class="area-picker-back" data-area-options="${i}" title="Ver áreas disponibles" aria-label="Ver áreas disponibles" ${e.status !== "laboral" ? "disabled" : ""}>⌄</button></div>`
+            : `<select class="area-picker-select" id="day-area-${i}" data-area-preset="${i}" title="${escapeHtml(e.area || "Selecciona un área")}" ${e.status !== "laboral" ? "disabled" : ""}>
+              <option value="" ${!areaSelectValue ? "selected" : ""}>Selecciona un área…</option>
+              ${companyAreas.map((area) => `<option value="${escapeHtml(area)}" ${areaSelectValue === area ? "selected" : ""}>${escapeHtml(area)}</option>`).join("")}
+              ${savedCustomArea ? `<option value="${AREA_SAVED_OTHER}" selected disabled>Área personalizada</option>` : ""}
+              <optgroup label="Opciones">
+                <option value="${AREA_OTHER}">Otra área…</option>
+                <option value="${AREA_APPLY_WEEK}" ${e.area ? "" : "disabled"}>Aplicar esta área a toda la semana</option>
+              </optgroup>
+            </select>`;
         const detectedReason = refreshReasonClassification(e);
         const absenceReasonId = e.reasonId || detectedReason?.id || reasonIdForText(e.status, e.activity);
         const absenceReasonOptions = reasonsForStatus(e.status).map(
@@ -861,7 +877,7 @@ export function startEditor() {
           ["falta", "sin_labores"].includes(e.status)
             ? `<div class="absence-reason"><div class="absence-reason-head"><label for="absenceReason-${i}">Motivo frecuente</label><span>Opcional</span></div><select id="absenceReason-${i}" data-absence-reason="${i}"><option value="">Selecciona un motivo para usarlo como base…</option>${absenceReasonOptions}</select><small>El texto se colocará en la justificación y podrás modificarlo libremente.</small><small data-reason-detection="${i}" aria-live="polite"></small></div>`
             : "";
-        card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><div class="day-area-heading"><label for="day-area-${i}">Área</label><button type="button" class="day-area-all" data-area-all="${i}" aria-label="Aplicar esta área a los cuatro días" title="Aplicar a los cuatro días" ${e.status !== "laboral" ? "disabled" : ""}>4 días</button></div><input id="day-area-${i}" data-index="${i}" data-key="area"${areaListAttribute} value="${escapeHtml(e.area)}" ${e.status !== "laboral" ? "disabled" : ""}>${areaOptions}</div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
+        card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><div class="day-area-label"><label for="day-area-${i}">Área</label>${!companyAreas.length ? `<button type="button" class="day-area-week" data-area-week="${i}" title="Aplicar esta área a toda la semana" aria-label="Aplicar esta área a toda la semana" ${e.status !== "laboral" ? "disabled" : ""}>Semana</button>` : ""}</div>${areaControl}</div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
         host.appendChild(card);
         updateReasonIndicator(host, i);
       });
@@ -901,7 +917,10 @@ export function startEditor() {
             before = buildPageModel();
           entries[i][k] = input.value;
           const after = buildPageModel();
-          if (!after.fits && after.bottom >= before.bottom - 0.01) {
+          const exceedsSpace = k === "area"
+            ? !after.fits && (before.fits || after.bottom > before.bottom + 0.01)
+            : !after.fits && after.bottom >= before.bottom - 0.01;
+          if (exceedsSpace) {
             entries[i][k] = previous;
             input.value = previous ?? "";
             if (k === "activity") {
@@ -947,36 +966,84 @@ export function startEditor() {
           input.addEventListener("change", handler);
         else input.addEventListener("input", handler);
       });
-      host.querySelectorAll("[data-area-all]").forEach((button) =>
-        button.addEventListener("click", async () => {
-          const area = String(entries[+button.dataset.areaAll]?.area || "").trim();
-          if (!area) {
-            showGuardAlert("Falta el área", "Escribe o selecciona un área para aplicarla a la semana.");
+      async function applyAreaToWeek(i) {
+        const area = String(entries[i]?.area || "").trim();
+        if (!area) {
+          showGuardAlert("Falta el área", "Selecciona o escribe el área antes de aplicarla.");
+          return;
+        }
+        const workingDays = entries.filter((entry) => entry.status === "laboral");
+        if (workingDays.some((entry) => entry.area && entry.area.trim() !== area)) {
+          const confirmed = await openGuardDialog(
+            "¿Aplicar área a toda la semana?",
+            "Se reemplazarán las áreas distintas de los demás días con labores.",
+            { confirm: true, confirmText: "Aplicar a toda la semana", cancelText: "Cancelar" },
+          );
+          if (!confirmed) return;
+        }
+        const snapshot = workingDays.map((entry) => entry.area);
+        const before = buildPageModel();
+        workingDays.forEach((entry) => { entry.area = area; });
+        const after = buildPageModel();
+        if (!after.fits && (before.fits || after.bottom > before.bottom + 0.01)) {
+          workingDays.forEach((entry, index) => { entry.area = snapshot[index]; });
+          notifySpaceLimit();
+          return;
+        }
+        rememberCompanyArea($("#company").value, area);
+        renderDays();
+        markDirty();
+        updatePreview();
+      }
+
+      host.querySelectorAll("[data-area-preset]").forEach((select) =>
+        select.addEventListener("change", async () => {
+          const i = +select.dataset.areaPreset;
+          const next = select.value;
+          if (next === AREA_APPLY_WEEK) {
+            select.value = entries[i].area && !companies.find((company) =>
+              company.name === $("#company").value)?.areas?.includes(entries[i].area)
+                ? AREA_SAVED_OTHER : entries[i].area || "";
+            await applyAreaToWeek(i);
             return;
           }
-          const workingDays = entries.filter((entry) => entry.status === "laboral");
-          if (workingDays.some((entry) => entry.area && entry.area.trim() !== area)) {
-            const approved = await openGuardDialog(
-              "¿Aplicar área a la semana?",
-              "Las áreas distintas de los demás días con labores se reemplazarán.",
-              { confirm: true, confirmText: "Aplicar a la semana", cancelText: "Cancelar" },
-            );
-            if (!approved) return;
+          if (next === AREA_OTHER) {
+            areaPickerModes.set(entries[i], "custom");
+            entries[i].area = "";
+            renderDays();
+            host.querySelector(`input[data-index="${i}"][data-key="area"]`)?.focus();
+            markDirty();
+            updatePreview();
+            return;
           }
-          const snapshot = deepCopy(entries);
+          const previous = entries[i].area;
           const before = buildPageModel();
-          for (const entry of workingDays) entry.area = area;
+          entries[i].area = next;
           const after = buildPageModel();
-          if (!after.fits && after.bottom >= before.bottom - 0.01) {
-            entries = snapshot;
-            showGuardAlert("Límite de espacio alcanzado", "El área no cabe en el formato actual. Usa un nombre más corto.");
-            return;
+          if (!after.fits && (before.fits || after.bottom > before.bottom + 0.01)) {
+            entries[i].area = previous;
+            notifySpaceLimit();
+          } else {
+            areaPickerModes.delete(entries[i]);
+            if (next) rememberCompanyArea($("#company").value, next);
+            markDirty();
+            updatePreview();
           }
-          rememberCompanyArea($("#company").value, area);
           renderDays();
-          markDirty();
-          updatePreview();
         }),
+      );
+
+      host.querySelectorAll("[data-area-options]").forEach((button) =>
+        button.addEventListener("click", () => {
+          const i = +button.dataset.areaOptions;
+          areaPickerModes.set(entries[i], "select");
+          renderDays();
+          host.querySelector(`[data-area-preset="${i}"]`)?.focus();
+        }),
+      );
+
+      host.querySelectorAll("[data-area-week]").forEach((button) =>
+        button.addEventListener("click", () => applyAreaToWeek(+button.dataset.areaWeek)),
       );
       host.querySelectorAll("[data-absence-reason]").forEach((select) =>
         select.addEventListener("change", async () => {

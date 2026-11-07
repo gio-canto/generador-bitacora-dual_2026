@@ -40,6 +40,15 @@ La suite incluye pruebas sobre:
 
 Cuando agregues una regla, agrega una prueba en el nivel más cercano a esa regla.
 
+## Selector de áreas (0.61.1)
+
+- En COCYTIEG, confirmar que cada jornada presenta un `select` visible, con flecha y catálogo; no debe existir `datalist`.
+- Seleccionar «Otra área…»: aparece `input` en la misma celda sin agregar filas; escribir un valor, volver al menú y comprobar que sigue guardado.
+- Seleccionar «Aplicar esta área a toda la semana»; comprobar confirmación con áreas distintas, cancelación y conservación de estados especiales.
+- Validar con las columnas de escritorio intactas, con las tarjetas móviles y con nombres largos sin desbordes. No cambiar medidas ni tipografías del PDF.
+- En el perfil, alternar entre departamento registrado y área libre, preservar el valor y guardar el perfil.
+- Ejecutar `tests/v0611-area-picker-ui.test.jsx` y las demás pruebas antes de publicar.
+
 ## Áreas por empresa (0.61.0)
 
 - Confirmar que el campo «Área» mantiene su tamaño en escritorio y móvil y que las tarjetas no ganan filas ni controles adicionales.

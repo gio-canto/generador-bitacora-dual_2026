@@ -1,5 +1,13 @@
 # Notas de versión
 
+## 0.61.1 · Selector de áreas intuitivo · 2026-11-06
+
+- Se sustituye el autocompletado `datalist` por un selector nativo con flecha, opciones institucionales y «Otra área…» para escritura libre.
+- La captura personalizada reemplaza al selector en la misma celda; se puede volver a abrir el menú sin añadir filas ni perder los datos escritos.
+- «Aplicar esta área a toda la semana» pasa al desplegable; se confirma antes de sustituir áreas diferentes. En empresas sin catálogo, la acción compacta se llama «Semana».
+- El campo mantiene dimensiones actuales y el PDF no cambia. Las áreas históricas y los instructores formadores permanecen independientes.
+
+
 ## 0.61.0 · Áreas por empresa · 2026-11-06
 
 - Publicación autorizada con excepción temporal y restringida al commit de entrega, tras verificar 383 de 386 pruebas aprobadas; las tres fallas restantes corresponden a pruebas previamente conocidas de PDF, firmas y justificación. La excepción no se mantiene para futuros cambios.
