@@ -2,6 +2,8 @@
 
 ## 0.61.0 · Áreas por empresa · 2026-11-06
 
+- Publicación autorizada con excepción temporal y restringida al commit de entrega, tras verificar 383 de 386 pruebas aprobadas; las tres fallas restantes corresponden a pruebas previamente conocidas de PDF, firmas y justificación. La excepción no se mantiene para futuros cambios.
+
 - Catálogo de departamentos del COCYTIEG, incluido «Departamento de Archivo», totalmente independiente de los instructores formadores.
 - Selector con sugerencias nativas en el campo «Área» y opción «Otra área…» para escribir libremente. Otras empresas siguen aceptando captura manual.
 - Acción discreta «4 días» para copiar el área de una jornada a las otras jornadas con labores, con confirmación si hay valores diferentes.
