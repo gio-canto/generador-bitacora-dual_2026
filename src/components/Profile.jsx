@@ -113,7 +113,7 @@ export function Profile() {
   const [profile, setProfile] = useState(readProfileData);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(readProfileData);
-  const [customAreaMode, setCustomAreaMode] = useState(false);
+  const [customAreaMode, setCustomAreaMode] = useState(null);
   const [profiles, setProfiles] = useState(listProfiles);
   const [archivedProfiles, setArchivedProfiles] = useState(listArchivedProfiles);
   const [activeId, setActiveId] = useState(readActiveProfileId);
@@ -183,7 +183,10 @@ export function Profile() {
   const changeArea = (event) => {
     if (event.target.value === "__custom_area__") {
       setCustomAreaMode(true);
-      setForm((current) => ({ ...current, area: "" }));
+      setForm((current) => ({
+        ...current,
+        area: selectedCompany?.areas?.includes(current.area) ? "" : current.area,
+      }));
     } else {
       setCustomAreaMode(false);
       setForm((current) => ({ ...current, area: event.target.value }));
@@ -209,7 +212,7 @@ export function Profile() {
     }));
 
   const edit = () => {
-    setCustomAreaMode(false);
+    setCustomAreaMode(null);
     setForm(editableDefaults(profile));
     setEditing(true);
   };
@@ -239,7 +242,7 @@ export function Profile() {
   };
 
   const changeCompany = (event) => {
-    setCustomAreaMode(false);
+    setCustomAreaMode(null);
     const companyName = event.target.value;
     const company = companies.find((item) => item.name === companyName);
     const representative =
@@ -880,10 +883,15 @@ export function Profile() {
               </div>
 
               <div className="profile-area-field">
-                <label htmlFor="profileArea">Área común</label>
+                <label htmlFor={selectedCompany?.areas?.length &&
+                    (customAreaMode === true ||
+                    (customAreaMode === null && form.area &&
+                    !selectedCompany.areas.includes(form.area)))
+                      ? "profileAreaCustom" : "profileArea"}>Área común</label>
                 {selectedCompany?.areas?.length ? (
-                  customAreaMode ||
-                  (form.area && !selectedCompany.areas.includes(form.area)) ? (
+                  customAreaMode === true ||
+                  (customAreaMode === null && form.area &&
+                    !selectedCompany.areas.includes(form.area)) ? (
                     <div className="area-picker-control">
                       <input
                         id="profileAreaCustom"
@@ -901,19 +909,22 @@ export function Profile() {
                         title="Ver áreas disponibles"
                         onClick={() => {
                           setCustomAreaMode(false);
-                          setForm((current) => ({ ...current, area: "" }));
                         }}
                       >⌄</button>
                     </div>
                   ) : (
                     <select id="profileArea" className="area-picker-select"
-                      value={form.area || ""} onChange={changeArea}
+                      value={selectedCompany.areas.includes(form.area)
+                        ? form.area : form.area ? "__saved_custom_area__" : ""} onChange={changeArea}
                       title={form.area || "Selecciona un área"}
                     >
                       <option value="">Selecciona un área…</option>
                       {selectedCompany.areas.map((area) => (
                         <option key={area} value={area}>{area}</option>
                       ))}
+                      {form.area && !selectedCompany.areas.includes(form.area) ? (
+                        <option value="__saved_custom_area__" disabled>Área personalizada</option>
+                      ) : null}
                       <option value="__custom_area__">Otra área…</option>
                     </select>
                   )
