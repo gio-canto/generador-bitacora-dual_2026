@@ -477,6 +477,8 @@ export function startEditor() {
     }
     function toggleWaitingLayout() {
       const waiting = isWaitingForCompany();
+      if (waiting && !entries.length)
+        $("#weekHint").textContent = "Selecciona únicamente el martes de inicio de la semana.";
       for (const item of [
         $("#defaultStart")?.closest(".field"),
         $("#defaultEnd")?.closest(".field"),
