@@ -9,6 +9,7 @@ const EMPTY_PROFILE = Object.freeze({
   semester: "",
   group: "",
   company: "",
+  companyTransfer: null,
   defaultStart: "",
   defaultEnd: "",
   area: "",
@@ -61,6 +62,14 @@ const cleanAreaByCompany = (value) => {
       areas[company] = area;
   }
   return areas;
+};
+
+const cleanCompanyTransfer = (value) => {
+  if (!value || typeof value !== "object") return null;
+  const fromCompany = cleanText(value.fromCompany, 220);
+  const effectiveDate = cleanText(value.effectiveDate, 10);
+  if (!fromCompany || !/^\d{4}-\d{2}-\d{2}$/.test(effectiveDate)) return null;
+  return { fromCompany, effectiveDate, reason: "company_decision" };
 };
 
 const cleanTime = (value) => {
@@ -163,6 +172,7 @@ export function readProfileData(storage = localStorage) {
       semester: cleanText(raw.semester, 12),
       group: cleanText(raw.group, 20).toUpperCase(),
       company: cleanText(raw.company),
+      companyTransfer: cleanCompanyTransfer(raw.companyTransfer),
       defaultStart: cleanTime(raw.defaultStart),
       defaultEnd: cleanTime(raw.defaultEnd),
       area: areaByCompany[legacyCompany] || legacyArea,
@@ -255,6 +265,9 @@ export function rememberProfile(value, storage = localStorage) {
       ? cleanText(patch.group, 20).toUpperCase()
       : current.group,
     company,
+    companyTransfer: has(patch, "companyTransfer")
+      ? cleanCompanyTransfer(patch.companyTransfer)
+      : current.companyTransfer,
     defaultStart: has(patch, "defaultStart")
       ? cleanTime(patch.defaultStart)
       : current.defaultStart,
