@@ -672,7 +672,7 @@ export function startEditor() {
       for (let i = 0; i < entries.length; i++) {
         const e = entries[i];
         if (
-          e.status === "laboral" &&
+          (e.status === "laboral" || (isSpecialMode() && e.specialType === "asistencia")) &&
           (!validTime(e.start) || !validTime(e.end) || e.end <= e.start)
         )
           return {
@@ -681,6 +681,15 @@ export function startEditor() {
             message:
               "Completa entrada y salida. La salida debe ser después de la entrada.",
           };
+        if (isSpecialMode() && (
+          !["asistencia", "limbo"].includes(e.specialType) ||
+          e.status !== "sin_labores" ||
+          (e.specialType === "asistencia" && !String(e.area || "").trim())
+        )) return {
+          ok: false,
+          title: `Revisa el día ${i + 1}`,
+          message: "Elige Asistencia o En espera de reubicación. Para Asistencia, especifica el lugar al que acudiste.",
+        };
         if (e.status === "inhabil") continue;
         const check = validateActivityText(e.activity);
         if (!check.ok)
