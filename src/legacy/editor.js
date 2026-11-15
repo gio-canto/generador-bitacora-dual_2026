@@ -1141,8 +1141,8 @@ export function startEditor() {
     async function generateWeek() {
       const setup = weekSetup(
         $("#weekDate").value,
-        $("#defaultStart").value,
-        $("#defaultEnd").value,
+        isWaitingForCompany() ? "10:00" : $("#defaultStart").value,
+        isWaitingForCompany() ? "14:00" : $("#defaultEnd").value,
       );
       const error = $("#weekError");
       error.hidden = !setup.error;
@@ -3109,11 +3109,13 @@ export function startEditor() {
       $("#company").addEventListener("change", () => {
         const wasWaiting = $("#company").dataset.waitingSelection === "true";
         syncCompanyContext(true);
-        if (wasWaiting && !isWaitingForCompany()) {
-          // Las jornadas de espera no se convierten en actividades laborales.
+        if (wasWaiting !== isWaitingForCompany()) {
+          // No reutilizar actividades laborales como jornadas de espera, ni a la inversa.
           entries = [];
           $("#weekDate").value = "";
-          $("#weekHint").textContent = "Usaremos este horario de martes a viernes. Puedes ajustar cada día después.";
+          $("#weekHint").textContent = isWaitingForCompany()
+            ? "Selecciona únicamente el martes con el que comienza la semana."
+            : "Usaremos este horario de martes a viernes. Puedes ajustar cada día después.";
         }
         toggleWaitingLayout();
         const company = companies.find((c) => c.name === $("#company").value);
