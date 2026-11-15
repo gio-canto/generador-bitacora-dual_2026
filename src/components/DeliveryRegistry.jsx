@@ -802,6 +802,7 @@ export default function DeliveryRegistry({ onClose }) {
         status,
         matrixVersion: payload.version,
         statistics: payload.statistics || null,
+        specialDays: payload.specialDays || null,
       },
     ]);
     if (rawKey) fuzzyStudentAliases.current.set(rawKey, student.id);
@@ -812,6 +813,7 @@ export default function DeliveryRegistry({ onClose }) {
         (isNameOrderInverted(payload.name, student.name)
           ? " · Apellidos primero"
           : "") +
+        (payload.reportMode === "special" ? " · Bitácora especial de reubicación" : "") +
         (status === "entregado_tarde" ? " · A destiempo" : ""),
     );
 
@@ -1944,7 +1946,8 @@ export default function DeliveryRegistry({ onClose }) {
             item.studentId,
             item.at,
             "camera",
-            { matrixVersion: item.matrixVersion, statistics: item.statistics },
+            { matrixVersion: item.matrixVersion, statistics: item.statistics,
+              specialDays: item.specialDays },
           );
         return updatedWeek;
       });
