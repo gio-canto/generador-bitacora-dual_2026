@@ -1,6 +1,6 @@
 import { validDate } from "../domain/records.js";
 import {actingSigner} from "../domain/signing.js";
-import { createMatrixPayload } from "./delivery-registry.js";
+import { createMatrixPayload, LIMBO_COMPANY } from "./delivery-registry.js";
 import {prepareLetterPage,LETTER_PDF_POINTS} from "./print-sheet.js";
 const COUNCIL =
   "Consejo de Ciencia, Tecnología e Innovación del Estado de Guerrero (COCYTIEG)";
@@ -205,7 +205,8 @@ export function buildPageModel(record) {
       const st = e.status || "laboral",
         special = st !== "laboral",
         label =
-          st === "sin_labores"
+          record.company === LIMBO_COMPANY ? "EN ESPERA DE REUBICACIÓN"
+          : st === "sin_labores"
             ? "SIN LABORES"
             : st === "inhabil"
               ? "DÍA INHÁBIL"
@@ -540,7 +541,9 @@ export function drawPdfPage(canvas, p, record, logoImage) {
     y += r.h;
   });
   const s = layout.signatures,
-    sw = s.colRatio.map((r) => r * s.w),
+    sw = id.company === LIMBO_COMPANY
+      ? [s.w / 2, s.w / 2]
+      : s.colRatio.map((r) => r * s.w),
     sx2 = [s.x];
   sw.forEach((w) => sx2.push(sx2.at(-1) + w));
   const companyName = companySignatureName(id.company);
@@ -584,7 +587,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
       },
     ];
   cells.forEach((cell, i) => {
-    if (!cell.on) return;
+    if (!cell.on || (id.company === LIMBO_COMPANY && i >= 2)) return;
     const cx = sx2[i] + sw[i] / 2;
     drawText(
       c,
@@ -750,9 +753,9 @@ export function canvasToJpegBytes(canvas, quality = 0.96) {
 }
 
 function signatureFits(r) {
-  const widths = layout.signatures.colRatio.map(
-    (v) => v * layout.signatures.w - 3,
-  );
+  const waiting = r.company === LIMBO_COMPANY;
+  const widths = waiting ? [layout.signatures.w / 2 - 3, layout.signatures.w / 2 - 3]
+    : layout.signatures.colRatio.map((v) => v * layout.signatures.w - 3);
   const auth=actingSigner({name:r.authorities.autorizoName,role:r.authorities.autorizoRole,enabled:r.authorities.autorizoPaEnabled,paName:r.authorities.autorizoPaName,paRole:r.authorities.autorizoPaRole});
   const instructor=actingSigner({name:r.instructor.name,role:r.instructor.roleMain,enabled:r.instructor.paEnabled,paName:r.instructor.paName,paRole:r.instructor.paRole});
   const groups = [
@@ -771,7 +774,7 @@ function signatureFits(r) {
         : authoritySignatureRoles(r.authorities.autorizoRole,r.company),
     },
   ];
-  if (r.instructor.enabled)
+  if (!waiting && r.instructor.enabled)
     groups.push({
       name: instructor.name,
       roles: instructor.byAbsence
@@ -779,7 +782,7 @@ function signatureFits(r) {
         : [r.instructor.roleMain,r.instructor.note,companySignatureName(r.company)].filter(Boolean),
     });
   return (
-    groups.every(
+    (waiting ? groups.slice(0, 2) : groups).every(
       (g, i) =>
         g.roles.length <= 4 &&
         measureMm(g.name, 6, "bold") <= widths[i] &&

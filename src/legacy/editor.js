@@ -1,4 +1,4 @@
-import { validDate, validTime, weekDates } from "../domain/records.js";
+import { validDate, validTime, weekDates, waitingWeekEntries } from "../domain/records.js";
 import {
   weekSetup,
   signatureName,
@@ -25,7 +25,7 @@ import nonWorkingReasons from "../data/non-working-reasons.json";
 import { classifyReason } from "../services/reason-classifier.js";
 import { parseBackup } from "../services/storage.js";
 import { notify, notifyImported } from "../services/rare-notification.jsx";
-import { createMatrixPayload } from "../services/delivery-registry.js";
+import { createMatrixPayload, LIMBO_COMPANY } from "../services/delivery-registry.js";
 import {prepareLetterPage,LETTER_PDF_POINTS} from "../services/print-sheet.js";
 import {requiresFarewellBeforePdf,waitForFinalFarewell} from "../services/final-pdf-flow.js";
 export function startEditor() {
@@ -471,6 +471,32 @@ export function startEditor() {
       rememberProfile({ instructor: getIdentity().instructor });
       markDirty();
       updatePreview();
+    }
+    function isWaitingForCompany() {
+      return $("#company")?.value === LIMBO_COMPANY;
+    }
+    function toggleWaitingLayout() {
+      const waiting = isWaitingForCompany();
+      if (waiting && !entries.length)
+        $("#weekHint").textContent = "Selecciona únicamente el martes de inicio de la semana.";
+      for (const item of [
+        $("#defaultStart")?.closest(".field"),
+        $("#defaultEnd")?.closest(".field"),
+        $("#weekBtn"),
+        $("#days")?.closest(".section"),
+        $("#autorizoName")?.closest(".auth-box"),
+        $("#instructorBox"),
+        $("#restoreBtn"),
+      ]) {
+        if (item) item.style.display = waiting ? "none" : "";
+      }
+      const title = document.querySelector('[data-step="3"] .step-head h2');
+      const description = document.querySelector('[data-step="3"] .step-head p');
+      if (title) title.textContent = waiting ? "Firmas de seguimiento" : "Responsables";
+      if (description) description.textContent = waiting
+        ? "Solo firman la alumna o el alumno y la persona responsable de Vinculación del plantel."
+        : "El alumno se completa automáticamente. El visto bueno escolar permanece precargado.";
+      $("#company").dataset.waitingSelection = waiting ? "true" : "false";
     }
     function blankEntry(date = "") {
       const company = $("#company").value;
@@ -1117,8 +1143,8 @@ export function startEditor() {
     async function generateWeek() {
       const setup = weekSetup(
         $("#weekDate").value,
-        $("#defaultStart").value,
-        $("#defaultEnd").value,
+        isWaitingForCompany() ? "10:00" : $("#defaultStart").value,
+        isWaitingForCompany() ? "14:00" : $("#defaultEnd").value,
       );
       const error = $("#weekError");
       error.hidden = !setup.error;
@@ -1129,9 +1155,10 @@ export function startEditor() {
       if (setup.error) {
         $("#" + setup.field).setAttribute("aria-invalid", "true");
         $("#" + setup.field).focus();
-        return;
+        return false;
       }
       if (
+        !isWaitingForCompany() &&
         entries.some((e) => e.activity?.trim()) &&
         !(await openGuardDialog(
           "¿Reemplazar las jornadas?",
@@ -1139,14 +1166,20 @@ export function startEditor() {
           { confirm: true, confirmText: "Reemplazar" },
         ))
       )
-        return;
-      entries = setup.dates.map((date) => blankEntry(date));
-      $("#weekHint").textContent =
-        `Del ${setup.dates[0].split("-").reverse().join("/")} al ${setup.dates[3].split("-").reverse().join("/")}. Ajusta abajo solo lo que cambie.`;
+        return false;
+      entries = isWaitingForCompany()
+        ? waitingWeekEntries(setup.dates[0])
+        : setup.dates.map((date) => blankEntry(date));
+      $("#weekHint").textContent = isWaitingForCompany()
+        ? "Semana registrada. Continúa a las firmas."
+        : `Del ${setup.dates[0].split("-").reverse().join("/")} al ${setup.dates[3].split("-").reverse().join("/")}. Ajusta abajo solo lo que cambie.`;
       renderDays();
       markDirty();
       updatePreview();
+      return true;
     }
+    window.bitacoraPrepareWaitingWeek = async () =>
+      !isWaitingForCompany() || await generateWeek();
     function updateStudentSignaturePreview() {
       const sample = $("#studentSignatureSample"),
         preview = $("#studentSignaturePreview"),
@@ -1303,6 +1336,7 @@ export function startEditor() {
       $("#instructorPaRole").value = ins.paRole || "";
       syncCompanyContext();
       syncPaUI();
+      toggleWaitingLayout();
     }
     function autoTitle() {
       const dates = entries
@@ -1423,13 +1457,15 @@ export function startEditor() {
         ["elaboroRole", "el cargo de quien elabora"],
         ["voboName", "el nombre de quien da el visto bueno"],
         ["voboRole", "el cargo de quien da el visto bueno"],
-        ["autorizoName", "el nombre de quien autoriza"],
-        ["autorizoRole", "el cargo de quien autoriza"],
+        ...(!isWaitingForCompany() ? [
+          ["autorizoName", "el nombre de quien autoriza"],
+          ["autorizoRole", "el cargo de quien autoriza"],
+        ] : []),
       ];
-      if ($("#autorizoPaEnabled").checked) {
+      if (!isWaitingForCompany() && $("#autorizoPaEnabled").checked) {
         required.push(["autorizoPaName","el nombre del suplente que autoriza"],["autorizoPaRole","el cargo del suplente que autoriza"]);
       }
-      if ($("#instructorEnabled").checked && $("#instructorPaEnabled").checked) {
+      if (!isWaitingForCompany() && $("#instructorEnabled").checked && $("#instructorPaEnabled").checked) {
         required.push(["instructorPaName","el nombre del instructor suplente"],["instructorPaRole","el cargo del instructor suplente"]);
       }
       const missing = required.find(
@@ -1437,10 +1473,10 @@ export function startEditor() {
       );
       if (!missing) {
         const duplicate =
-          $("#autorizoPaEnabled").checked &&
+          !isWaitingForCompany() && $("#autorizoPaEnabled").checked &&
           $("#autorizoPaName").value.trim().toLowerCase()===$("#autorizoName").value.trim().toLowerCase()
           ? "La persona suplente que autoriza debe ser distinta de la titular."
-          : $("#instructorEnabled").checked && $("#instructorPaEnabled").checked &&
+          : !isWaitingForCompany() && $("#instructorEnabled").checked && $("#instructorPaEnabled").checked &&
             $("#instructorPaName").value.trim().toLowerCase()===$("#instructorName").value.trim().toLowerCase()
             ? "El instructor suplente debe ser distinto del titular." : "";
         return duplicate ? {ok:false,title:"Revisa al suplente",message:duplicate} : {ok:true};
@@ -1465,14 +1501,13 @@ export function startEditor() {
         "group",
         "voboName",
         "voboRole",
-        "autorizoName",
-        "autorizoRole",
+        ...(!isWaitingForCompany() ? ["autorizoName", "autorizoRole"] : []),
       ];
-      if ($("#instructorEnabled").checked)
+      if (!isWaitingForCompany() && $("#instructorEnabled").checked)
         required.push("instructorName", "instructorRoleMain");
-      if ($("#autorizoPaEnabled").checked)
+      if (!isWaitingForCompany() && $("#autorizoPaEnabled").checked)
         required.push("autorizoPaName","autorizoPaRole");
-      if ($("#instructorEnabled").checked && $("#instructorPaEnabled").checked)
+      if (!isWaitingForCompany() && $("#instructorEnabled").checked && $("#instructorPaEnabled").checked)
         required.push("instructorPaName","instructorPaRole");
       const missing = required.find((id) => !$("#" + id).value.trim());
       if (!missing) return true;
@@ -1489,7 +1524,7 @@ export function startEditor() {
         showGuardAlert(check.title, check.message);
         return;
       }
-      if (!(await confirmShortNames("all"))) return;
+      if (!(await confirmShortNames(isWaitingForCompany() ? "student" : "all"))) return;
       persistRecord(collectRecord());
     }
     function persistRecord(r, quiet = false) {
@@ -1966,7 +2001,8 @@ export function startEditor() {
           const st = e.status || "laboral",
             special = st !== "laboral",
             label =
-              st === "sin_labores"
+              isWaitingForCompany() ? "EN ESPERA DE REUBICACIÓN"
+                : st === "sin_labores"
                 ? "SIN LABORES"
                 : st === "inhabil"
                   ? "DÍA INHÁBIL"
@@ -2361,7 +2397,7 @@ export function startEditor() {
         y += r.h;
       });
       const s = layout.signatures,
-        sw = s.colRatio.map((r) => r * s.w),
+        sw = isWaitingForCompany() ? [s.w / 2, s.w / 2] : s.colRatio.map((r) => r * s.w),
         sx2 = [s.x];
       sw.forEach((w) => sx2.push(sx2.at(-1) + w));
       const companyName = companySignatureName(id.company);
@@ -2412,7 +2448,7 @@ export function startEditor() {
           },
         ];
       cells.forEach((cell, i) => {
-        if (!cell.on) return;
+        if (!cell.on || (isWaitingForCompany() && i >= 2)) return;
         const cx = sx2[i] + sw[i] / 2;
         drawText(
           c,
@@ -2725,7 +2761,7 @@ export function startEditor() {
         showGuardAlert(check.title, check.message);
         return;
       }
-      if (!(await confirmShortNames("all"))) return;
+      if (!(await confirmShortNames(isWaitingForCompany() ? "student" : "all"))) return;
       const m = buildPageModel();
       if (!m.fits) {
         showGuardAlert(
@@ -2858,6 +2894,11 @@ export function startEditor() {
       $("#mobileSave").onclick = saveRecord;
       $("#generatorMessagesBtn")?.addEventListener("click",()=>window.dispatchEvent(new Event("bitacora-open-messages")));
       $("#weekBtn").onclick = generateWeek;
+      $("#weekDate").addEventListener("change", async () => {
+        if (!isWaitingForCompany() || !$("#weekDate").value) return;
+        if (await generateWeek())
+          window.dispatchEvent(new Event("bitacora-waiting-week-ready"));
+      });
       $("#addDayBtn").onclick = () => {
         if (entries.length >= MAX_DAYS) {
           showGuardAlert(
@@ -3065,11 +3106,23 @@ export function startEditor() {
         }
 
         updateStudentSignaturePreview();
+        toggleWaitingLayout();
         markDirty();
         updatePreview();
       });
       $("#company").addEventListener("change", () => {
+        const wasWaiting = $("#company").dataset.waitingSelection === "true";
         syncCompanyContext(true);
+        if (wasWaiting !== isWaitingForCompany()) {
+          // Conservar la bitácora anterior: la siguiente se guarda como registro nuevo.
+          currentId = null;
+          entries = [];
+          $("#weekDate").value = "";
+          $("#weekHint").textContent = isWaitingForCompany()
+            ? "Selecciona únicamente el martes con el que comienza la semana."
+            : "Usaremos este horario de martes a viernes. Puedes ajustar cada día después.";
+        }
+        toggleWaitingLayout();
         const company = companies.find((c) => c.name === $("#company").value);
         if (company?.representatives?.length === 1) {
           $("#autorizoName").value = company.representatives[0].name;
