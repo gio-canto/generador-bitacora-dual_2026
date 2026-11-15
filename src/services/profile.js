@@ -267,7 +267,7 @@ export function rememberProfile(value, storage = localStorage) {
     company,
     companyTransfer: has(patch, "companyTransfer")
       ? cleanCompanyTransfer(patch.companyTransfer)
-      : current.companyTransfer,
+      : company === current.company ? current.companyTransfer : null,
     defaultStart: has(patch, "defaultStart")
       ? cleanTime(patch.defaultStart)
       : current.defaultStart,
