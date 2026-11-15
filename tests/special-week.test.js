@@ -52,8 +52,8 @@ describe("Bitácora especial de reubicación", () => {
     const pdf = buildPageModel({ entries, markdown:true, reportMode:"special" });
     expect(pdf.rows[0].label).toContain("ASISTENCIA");
     expect(pdf.rows[1].label).toBe("EN ESPERA DE REUBICACIÓN");
-    expect(pdf.rows[0].timeLines.flat().join(" ")).not.toBe("-");
-    expect(pdf.rows[1].timeLines.flat().join(" ")).toBe("-");
+    expect(pdf.rows[0].timeLines.flat().map((part)=>part.text).join(" ")).not.toBe("-");
+    expect(pdf.rows[1].timeLines.flat().map((part)=>part.text).join(" ")).toBe("-");
   });
   it("el registro conserva una entrega y no suma horas de empresa ni registra una baja", () => {
     const w=createWeek({id:"special-week",label:"Semana especial",startDate:days[0],endDate:days[3]});
