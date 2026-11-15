@@ -670,7 +670,10 @@ export function mergeStudents(current, incoming) {
         name,
         specialty:
           clean(item?.specialty, 120) || result[index].specialty || "",
-        company: clean(item?.company, 220) || result[index].company || "",
+        // Las importaciones periódicas no deben revertir una reubicación formal.
+        company: result[index].companyTransfers?.length
+          ? result[index].company
+          : clean(item?.company, 220) || result[index].company || "",
         group: normalizeGroup(item?.group || item?.semesterGroup) || normalizeGroup(result[index].group || result[index].semesterGroup),
         gender: item?.gender || result[index].gender || "",
         usageMode: item?.usageMode || result[index].usageMode || "unknown",
