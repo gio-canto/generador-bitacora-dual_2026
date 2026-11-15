@@ -782,9 +782,8 @@ function signatureFits(r) {
         : [r.instructor.roleMain,r.instructor.note,companySignatureName(r.company)].filter(Boolean),
     });
   return (
-    groups.every(
+    (waiting ? groups.slice(0, 2) : groups).every(
       (g, i) =>
-        (waiting ? i < 2 : true) &&
         g.roles.length <= 4 &&
         measureMm(g.name, 6, "bold") <= widths[i] &&
         g.roles.every((t) => t.startsWith("P. A. · Por ausencia del ") ||
