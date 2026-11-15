@@ -39,6 +39,7 @@ function WeekDetail({week}) {
         <div><dt>Fecha límite</dt><dd>{week.dueAt||"No especificada"}</dd></div>
         <div><dt>Registro</dt><dd>{week.registeredAt||"Sin entrega registrada"}</dd></div>
         <div><dt>Método</dt><dd>{week.method}</dd></div>
+        {week.reportMode==="special"&&<div><dt>Tipo</dt><dd>Bitácora especial · Seguimiento de reubicación</dd></div>}
       </dl>
       {week.statsKnown ? <div className="ds-table-scroll">
         <table className="ds-table ds-dossier-days">
@@ -46,7 +47,7 @@ function WeekDetail({week}) {
             <th scope="col">Horas</th><th scope="col">Motivo registrado</th></tr></thead>
           <tbody>{week.days.map(day=><tr key={day.index}>
             <th scope="row">{weekdays[day.index]||"Día "+(day.index+1)}</th>
-            <td>{dayStatus[day.status]||"Sin especificar"}</td>
+            <td>{day.specialType==="asistencia"?"Asistencia (sin horas de empresa)":day.specialType==="limbo"?"En espera de reubicación":dayStatus[day.status]||"Sin especificar"}</td>
             <td>{day.status==="laboral"?hours(day.minutes/60):"—"}</td>
             <td>{day.reason||"—"}</td>
           </tr>)}</tbody>
