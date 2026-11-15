@@ -781,8 +781,13 @@ function signatureFits(r) {
         ? [instructor.role.split("\n")[0],instructor.absenceLine,r.instructor.note,companySignatureName(r.company)].filter(Boolean)
         : [r.instructor.roleMain,r.instructor.note,companySignatureName(r.company)].filter(Boolean),
     });
+  if (waiting) {
+    // El PDF ajusta los textos de estas dos firmas al ancho de su columna.
+    // No bloquearlo por diferencias de métricas entre fuentes del sistema.
+    return groups.slice(0, 2).every((group) => group.roles.length <= 4);
+  }
   return (
-    (waiting ? groups.slice(0, 2) : groups).every(
+    groups.every(
       (g, i) =>
         g.roles.length <= 4 &&
         measureMm(g.name, 6, "bold") <= widths[i] &&
