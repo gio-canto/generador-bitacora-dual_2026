@@ -36,12 +36,14 @@ export function buildStudentDossier(state,studentId,{asOf=new Date()}={}){
       .filter(d=>d&&validStatuses.has(d.status))
       .map((d,i)=>({
         index:i,status:d.status,minutes:d.minutes||0,
+        specialType:actual?.specialDays?.[i]||"",
         reasonCode:d.reasonCode||0,
         reason:d.status==="falta"||d.status==="sin_labores"
           ?causeLabel(d.status,d.reasonCode):"",
       })) : [];
     return {
       id:week.id,label:week.label,
+      reportMode:actual?.reportMode==="special"?"special":"normal",
       startDate:week.startDate,endDate:week.endDate,
       dueAt:week.dueAt,closedAt:week.closedAt,
       status,expired:due,
