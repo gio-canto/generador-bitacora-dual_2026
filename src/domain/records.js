@@ -69,6 +69,7 @@ export function normalizeRecord(raw) {
       autorizoPaEnabled: raw.authorities?.autorizoPaEnabled === true,
     },
     instructor: { ...base.instructor, ...raw.instructor, paEnabled: raw.instructor?.paEnabled === true },
+    reportMode: raw.reportMode === "special" ? "special" : "normal",
     entries: (raw.entries || []).map((e) => ({
       ...e,
       status: e.status || "laboral",
@@ -104,6 +105,15 @@ export function validateRecord(r, step) {
       seen.add(e.date);
       if (!["laboral", "falta", "sin_labores", "inhabil"].includes(e.status))
         errors[k + "status"] = "Selecciona un estado válido.";
+      if (r.reportMode === "special" && (
+        !["asistencia","limbo"].includes(e.specialType) || e.status !== "sin_labores"
+      )) errors[k + "status"] = "Selecciona Asistencia o En espera de reubicación.";
+      if (r.reportMode === "special" && e.specialType === "asistencia") {
+        if (!validTime(e.start)) errors[k + "start"] = "Indica la hora de asistencia.";
+        if (!validTime(e.end) || e.end <= e.start)
+          errors[k + "end"] = "La salida debe ser posterior a la entrada.";
+        required(k + "area", e.area, "el lugar de asistencia", 150);
+      }
       if (e.status === "laboral") {
         if (!validTime(e.start)) errors[k + "start"] = "Indica la entrada.";
         if (!validTime(e.end) || e.end <= e.start)
