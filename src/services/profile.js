@@ -1,4 +1,5 @@
 import { isSecretName } from "../domain/presentation.js";
+import { LIMBO_COMPANY } from "./delivery-registry.js";
 
 const KEY = "bitacora_profile_v1";
 const PROFILES_KEY = "bitacora_profiles_v2";
@@ -145,7 +146,10 @@ export function readProfileData(storage = localStorage) {
         ? raw.authorities
         : {};
     const areaByCompany = cleanAreaByCompany(raw.areaByCompany);
-    const legacyCompany = cleanText(raw.company);
+    // La espera es una condición de una bitácora, nunca una empresa permanente.
+    // También sanea perfiles guardados con versiones anteriores.
+    const legacyCompany = cleanText(raw.company) === LIMBO_COMPANY
+      ? "" : cleanText(raw.company);
     const legacyArea = cleanText(raw.area, 150);
     if (legacyCompany && legacyArea && !areaByCompany[legacyCompany])
       areaByCompany[legacyCompany] = legacyArea;
@@ -162,7 +166,7 @@ export function readProfileData(storage = localStorage) {
       specialty: cleanText(raw.specialty, 120),
       semester: cleanText(raw.semester, 12),
       group: cleanText(raw.group, 20).toUpperCase(),
-      company: cleanText(raw.company),
+      company: legacyCompany,
       defaultStart: cleanTime(raw.defaultStart),
       defaultEnd: cleanTime(raw.defaultEnd),
       area: areaByCompany[legacyCompany] || legacyArea,
@@ -223,9 +227,8 @@ export function rememberProfile(value, storage = localStorage) {
       ? patch.instructor
       : {};
 
-  const company = has(patch, "company")
-    ? cleanText(patch.company)
-    : current.company;
+  const requestedCompany = has(patch, "company") ? cleanText(patch.company) : current.company;
+  const company = requestedCompany === LIMBO_COMPANY ? current.company : requestedCompany;
   const areaByCompany = {
     ...current.areaByCompany,
     ...(has(patch, "areaByCompany") ? cleanAreaByCompany(patch.areaByCompany) : {}),
@@ -339,7 +342,7 @@ export function rememberProfile(value, storage = localStorage) {
 export function rememberCompanyArea(company, area, storage = localStorage) {
   const name = cleanText(company);
   const value = cleanText(area, 150);
-  if (!name || !value) return false;
+  if (!name || name === LIMBO_COMPANY || !value) return false;
   const current = readProfileData(storage);
   return rememberProfile({
     areaByCompany: { ...current.areaByCompany, [name]: value },
