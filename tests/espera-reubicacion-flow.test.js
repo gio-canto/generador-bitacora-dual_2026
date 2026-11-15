@@ -26,7 +26,7 @@ describe("Flujo de bitácora en espera de reubicación", () => {
     ]);
     expect(entries.every((entry) => entry.status === "sin_labores")).toBe(true);
     expect(entries.every((entry) => !entry.start && !entry.end && !entry.area)).toBe(true);
-    expect(entries.every((entry) => entry.activity.includes("En espera de reubicación"))).toBe(true);
+    expect(entries.every((entry) => entry.activity.includes("reubicación"))).toBe(true);
   });
   it("permite solo firmas del estudiante y Vinculación; no exige firmas de empresa", () => {
     const r = waiting();

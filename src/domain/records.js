@@ -32,7 +32,7 @@ export function weekDates(value) {
     return day.toISOString().slice(0, 10);
   });
 }
-export const LIMBO_DAY_DESCRIPTION = "En espera de reubicación a otra empresa receptora; sin actividades laborales asignadas.";
+export const LIMBO_DAY_DESCRIPTION = "Sin empresa asignada; en proceso de reubicación.";
 export function waitingWeekEntries(firstDate) {
   return weekDates(firstDate).map((date) => ({
     date, status: "sin_labores", reasonId: "",
