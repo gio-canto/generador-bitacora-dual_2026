@@ -1,4 +1,4 @@
-import {studentAppliesToWeek,deliveryStatus} from "./delivery-registry.js";
+import {studentAppliesToWeek,studentCompanyAtDate,deliveryStatus} from "./delivery-registry.js";
 import {summarizeWeekStatistics,causeLabel} from "./matrix-statistics.js";
 import {isWeekDue} from "./student-insights.js";
 
@@ -42,6 +42,7 @@ export function buildStudentDossier(state,studentId,{asOf=new Date()}={}){
       })) : [];
     return {
       id:week.id,label:week.label,
+      company:studentCompanyAtDate(student,week.startDate),
       startDate:week.startDate,endDate:week.endDate,
       dueAt:week.dueAt,closedAt:week.closedAt,
       status,expired:due,
@@ -97,6 +98,7 @@ export function buildStudentDossier(state,studentId,{asOf=new Date()}={}){
   return {
     id:student.id,name:student.name,
     group:student.group||"Sin especificar",company:student.company||"Sin especificar",
+    companyTransfers:student.companyTransfers||[],
     specialty:student.specialty||"Sin especificar",
     active:student.dualStatus!=="desisted",
     dateFrom:detail.at(-1)?.startDate||"",
