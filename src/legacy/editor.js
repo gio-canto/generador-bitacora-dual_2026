@@ -3112,7 +3112,8 @@ export function startEditor() {
         const wasWaiting = $("#company").dataset.waitingSelection === "true";
         syncCompanyContext(true);
         if (wasWaiting !== isWaitingForCompany()) {
-          // No reutilizar actividades laborales como jornadas de espera, ni a la inversa.
+          // Conservar la bitácora anterior: la siguiente se guarda como registro nuevo.
+          currentId = null;
           entries = [];
           $("#weekDate").value = "";
           $("#weekHint").textContent = isWaitingForCompany()
