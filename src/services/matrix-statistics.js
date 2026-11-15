@@ -22,6 +22,9 @@ function minutesBetween(start, end) {
 }
 
 export function reasonFromEntry(entry) {
+  // Los días especiales se identifican con M1 y no son motivos de inasistencia.
+  if (["asistencia", "limbo"].includes(entry?.specialType) &&
+      entry?.status === "sin_labores") return 0;
   const catalog = catalogFor(entry?.status);
   if (!catalog.length) return 0;
   const selected = catalog.find((item) => item.id === entry?.reasonId);
