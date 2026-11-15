@@ -155,6 +155,7 @@ export function buildDeliveryReportModel(
           company: clean(student.company, 220),
           dualStatus: studentIsActive(student) ? "active" : "desisted",
           status,
+          reportMode:delivery?.reportMode==="special"?"special":"normal",
           statusLabel: STATUS_META[status].label,
           registeredAt: delivery?.registeredAt || "",
           source: sourceLabel(delivery?.source),
