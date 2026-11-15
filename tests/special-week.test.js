@@ -49,7 +49,11 @@ describe("Bitácora especial de reubicación", () => {
     });
     expect(code).not.toContain("|M1:");
     expect(parseMatrixPayload(code).reportMode).toBeUndefined();
-    const pdf = buildPageModel({ entries, markdown:true, reportMode:"special" });
+    const pdf = buildPageModel(normalizeRecord({
+      student:student.name,company:student.company,school:"Plantel",
+      specialty:student.specialty,semester:"5",group:"B",
+      entries, markdown:true, reportMode:"special",
+    }));
     expect(pdf.rows[0].label).toContain("ASISTENCIA");
     expect(pdf.rows[1].label).toBe("EN ESPERA DE REUBICACIÓN");
     expect(pdf.rows[0].timeLines.flat().map((part)=>part.text).join(" ")).not.toBe("-");
