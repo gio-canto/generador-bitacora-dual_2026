@@ -461,6 +461,10 @@ export function drawPdfPage(canvas, p, record, logoImage) {
     p,
     layout.table.w,
   );
+  if (id.companyTransfer?.effectiveDate && id.entries?.some((day) => day.date >= id.companyTransfer.effectiveDate)) {
+    drawText(c, "REUBICACIÓN DE EMPRESA · CONTINÚA EN DUAL · DESDE " + id.companyTransfer.effectiveDate,
+      layout.table.x, 82.2, 7.5, "normal", "left", "#454545", p, layout.table.w);
+  }
   const t = layout.table,
     { xs, widths, rows } = model;
   rect(c, t.x, t.y, t.w, t.headH, null, "#333", 0.22, p);
