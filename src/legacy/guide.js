@@ -1,6 +1,7 @@
 import { notify } from "../services/rare-notification.jsx";
 import { CREDIT_NAMES } from "../domain/presentation.js";
 import { readActiveProfileId } from "../services/profile.js";
+import { LIMBO_COMPANY } from "../services/delivery-registry.js";
 export function startGuide() {
   (() => {
     "use strict";
@@ -8,6 +9,7 @@ export function startGuide() {
       highestStep = 0,
       tourIndex = 0;
     const STEP_KEY = "bitacora_dual_wizard_step_v1";
+    const isWaiting = () => document.getElementById("company")?.value === LIMBO_COMPANY;
     const panels = [...document.querySelectorAll("[data-step]")],
       links = [...document.querySelectorAll("[data-step-link]")],
       req = [
@@ -61,6 +63,9 @@ export function startGuide() {
       return true;
     }
     async function advance() {
+      // La fecha basta para crear automáticamente las cuatro jornadas de espera.
+      if (step === 2 && isWaiting() &&
+        !(await window.bitacoraPrepareWaitingWeek?.())) return;
       if (!valid(step)) return;
       if (
         step === 1 &&
@@ -69,11 +74,16 @@ export function startGuide() {
       )
         return;
       if (
-        step === 3 &&
+        step === 3 && !isWaiting() &&
         window.bitacoraConfirmNames &&
         !(await window.bitacoraConfirmNames("representatives"))
       )
         return;
+      if (step === 0 && isWaiting() &&
+        document.getElementById("student")?.value.trim()) {
+        showStep(2, true);
+        return;
+      }
       showStep(step + 1, true);
     }
     function showStep(i, force = false) {
@@ -96,6 +106,16 @@ export function startGuide() {
     document
       .querySelectorAll(".wizard-next")
       .forEach((b) => (b.onclick = advance));
+    document.getElementById("company")?.addEventListener("change", async () => {
+      if (!isWaiting() || step !== 1) return;
+      if (!document.getElementById("student")?.value.trim()) {
+        announce("Escribe primero el nombre de la alumna o del alumno.");
+        return;
+      }
+      if (window.bitacoraConfirmNames &&
+          !(await window.bitacoraConfirmNames("student"))) return;
+      showStep(2, true);
+    });
     document
       .querySelectorAll(".wizard-prev")
       .forEach((b) => (b.onclick = () => showStep(step - 1, true)));
