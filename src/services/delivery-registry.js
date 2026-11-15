@@ -888,7 +888,7 @@ export function exportWeekCsv(state, weekId) {
         return [
           student.name,
           student.specialty,
-          student.company,
+          studentCompanyAtDate(student, week.startDate),
           studentIsActive(student) ? "Activo" : "Desistido de Dual",
           status === "entregado_tarde"
             ? "Entregado a destiempo"
