@@ -54,7 +54,9 @@ import {
   setDeliveryStatus,
   statusFromTimestamp,
   studentAppliesToWeek,
+  studentCompanyAtDate,
   studentIsActive,
+  transferStudentCompany,
   updateWeekDueAt,
   weekSummary,
   writeDeliveryState,
@@ -527,6 +529,8 @@ export default function DeliveryRegistry({ onClose }) {
   const [dueAtValue, setDueAtValue] = useState("");
   const [editingStudentId, setEditingStudentId] = useState("");
   const [studentActionId, setStudentActionId] = useState("");
+  const [transferStudentId, setTransferStudentId] = useState("");
+  const [transferForm, setTransferForm] = useState({ company: "", effectiveDate: "" });
   const [notice, setNotice] = useState(null);
   const [quickOpen,setQuickOpen] = useState(false);
   const [backupReminderOpen,setBackupReminderOpen] = useState(false);
@@ -802,6 +806,8 @@ export default function DeliveryRegistry({ onClose }) {
         status,
         matrixVersion: payload.version,
         statistics: payload.statistics || null,
+        companyAtDelivery: payload.company || "",
+        companyTransfer: payload.companyTransfer || null,
       },
     ]);
     if (rawKey) fuzzyStudentAliases.current.set(rawKey, student.id);
@@ -812,6 +818,7 @@ export default function DeliveryRegistry({ onClose }) {
         (isNameOrderInverted(payload.name, student.name)
           ? " · Apellidos primero"
           : "") +
+        (payload.companyTransfer ? " · Reubicación de empresa (sigue en Dual)" : "") +
         (status === "entregado_tarde" ? " · A destiempo" : ""),
     );
 
@@ -1645,6 +1652,23 @@ export default function DeliveryRegistry({ onClose }) {
     clearNotice();
   };
 
+  const saveCompanyReassignment = (studentId) => {
+    try {
+      const students = state.students.map((student) =>
+        student.id === studentId
+          ? transferStudentCompany(student, transferForm.company, transferForm.effectiveDate)
+          : student,
+      );
+      commit({ ...state, students });
+      setTransferStudentId("");
+      setTransferForm({ company: "", effectiveDate: "" });
+      setStudentActionId("");
+      notify("success", "Reubicación registrada", "La alumna continúa activa en Educación Dual, sin perder entregas ni horas.");
+    } catch (error) {
+      showNotice("warning", "No se pudo registrar la reubicación", error.message);
+    }
+  };
+
   const markStudentAsDesisted = (studentId) => {
     const student = state.students.find((item) => item.id === studentId);
     if (!student) return;
@@ -1944,7 +1968,8 @@ export default function DeliveryRegistry({ onClose }) {
             item.studentId,
             item.at,
             "camera",
-            { matrixVersion: item.matrixVersion, statistics: item.statistics },
+            { matrixVersion: item.matrixVersion, statistics: item.statistics,
+              companyAtDelivery: item.companyAtDelivery, companyTransfer: item.companyTransfer },
           );
         return updatedWeek;
       });
@@ -2189,7 +2214,7 @@ export default function DeliveryRegistry({ onClose }) {
         <div className="delivery-student-main">
           <strong>{student.name}</strong>
           <span>
-            {[student.specialty, shortCompany(student.company)]
+            {[student.specialty, shortCompany(activeWeek ? studentCompanyAtDate(student, activeWeek.startDate) : student.company)]
               .filter(Boolean)
               .join(" · ") || "Sin datos"}
           </span>
@@ -2705,6 +2730,16 @@ export default function DeliveryRegistry({ onClose }) {
                             Desistido de Dual
                           </span>
                         )}
+                        {student.companyTransfers?.length > 0 && (
+                          <span className="delivery-dual-status">
+                            Reubicada · continúa en Dual · {student.companyTransfers.length} movimiento(s)
+                          </span>
+                        )}
+                        {student.companyTransfers?.map((transfer, index) => (
+                          <small key={index}>
+                            {transfer.effectiveDate}: {shortCompany(transfer.fromCompany)} → {shortCompany(transfer.toCompany)} · Decisión de empresa anterior
+                          </small>
+                        ))}
                       </div>
                       <div className="delivery-base-actions">
                         <button
@@ -2739,13 +2774,21 @@ export default function DeliveryRegistry({ onClose }) {
                           </div>
                           <div className="delivery-student-action-buttons">
                             {studentIsActive(student) ? (
-                              <button
-                                className="btn"
-                                type="button"
-                                onClick={() => markStudentAsDesisted(student.id)}
-                              >
-                                Desistido de Dual
-                              </button>
+                              <>
+                                <button className="btn" type="button" onClick={() => {
+                                  setTransferStudentId(student.id);
+                                  setTransferForm({ company: "", effectiveDate: "" });
+                                }}>
+                                  Reubicar de empresa (continúa en Dual)
+                                </button>
+                                <button
+                                  className="btn"
+                                  type="button"
+                                  onClick={() => markStudentAsDesisted(student.id)}
+                                >
+                                  Desistido de Dual
+                                </button>
+                              </>
                             ) : (
                               <button
                                 className="btn"
@@ -2754,6 +2797,31 @@ export default function DeliveryRegistry({ onClose }) {
                               >
                                 Reactivar
                               </button>
+                            )}
+                            {transferStudentId === student.id && (
+                              <div className="delivery-transfer-editor">
+                                <label className="delivery-field">
+                                  <span>Nueva empresa</span>
+                                  <select value={transferForm.company} onChange={(event) => setTransferForm((current) => ({ ...current, company: event.target.value }))}>
+                                    <option value="">Selecciona la empresa</option>
+                                    {companies.map((company) => (
+                                      <option key={company.id} value={company.name} disabled={company.name === student.company}>
+                                        {company.shortName || company.name}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </label>
+                                <label className="delivery-field">
+                                  <span>Fecha efectiva de reubicación</span>
+                                  <input type="date" value={transferForm.effectiveDate}
+                                    onChange={(event) => setTransferForm((current) => ({ ...current, effectiveDate: event.target.value }))}/>
+                                </label>
+                                <span>Motivo: decisión de la empresa anterior. Continúa en Educación Dual.</span>
+                                <button className="btn primary" type="button"
+                                  onClick={() => saveCompanyReassignment(student.id)}>
+                                  Guardar reubicación
+                                </button>
+                              </div>
                             )}
                             <button
                               className="btn delivery-danger"
