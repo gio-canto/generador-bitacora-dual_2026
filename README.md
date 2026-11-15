@@ -249,6 +249,7 @@ El proyecto funciona sin cuentas y sin una base de datos central propia. El gene
 - Clasificación automática de la semana mediante el periodo del código.
 - Estados **Entregado a tiempo**, **Entregado a destiempo**, **No entregado** y **No aplica**; este último excluye al alumno del cálculo de cumplimiento de esa semana.
 - La fecha y hora límite de una semana puede editarse después de crearla; las entregas registradas por cámara se reclasifican con el nuevo límite, mientras las correcciones manuales y **No aplica** se conservan.
+- Las **reubicaciones de empresa sin baja de Dual** conservan un solo expediente activo, el historial de empresas y la fecha efectiva; el generador identifica el cambio en perfil, PDF y marcador Data Matrix `R1`, mientras el registro reconoce bitácoras de ambas empresas y mantiene el acumulado de horas.
 - Cada alumno puede quedar como **Activo** o **Desistido de Dual**. Un desistido conserva sus entregas históricas, deja de aparecer y de contarse en semanas donde nunca tuvo entrega, puede reactivarse y sólo pierde su historial si se usa **Eliminar definitivamente**.
 - Coincidencias aproximadas de nombre con confirmación humana mediante una alerta visual integrada al sistema cuando un Data Matrix no coincide exactamente; muestra el nombre leído, la persona sugerida, especialidad/empresa y porcentaje aproximado antes de registrar.
 - Filtros, agrupaciones, edición de alumnos, CSV y reportes PDF.
