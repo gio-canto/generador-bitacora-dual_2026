@@ -150,7 +150,8 @@ export function readProfileData(storage = localStorage) {
     // También sanea perfiles guardados con versiones anteriores.
     const legacyCompany = cleanText(raw.company) === LIMBO_COMPANY
       ? "" : cleanText(raw.company);
-    const legacyArea = cleanText(raw.area, 150);
+    const legacyArea = cleanText(raw.company) === LIMBO_COMPANY
+      ? "" : cleanText(raw.area, 150);
     if (legacyCompany && legacyArea && !areaByCompany[legacyCompany])
       areaByCompany[legacyCompany] = legacyArea;
     const instructor =
