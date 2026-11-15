@@ -1245,7 +1245,8 @@ export function startEditor() {
     window.bitacoraPrepareWaitingWeek = async () => {
       if (!isWaitingForCompany()) return true;
       const dates = weekDates($("#weekDate").value);
-      if (waitingAnswer && entries.length === MAX_DAYS &&
+      if (waitingAnswer && dates.length === MAX_DAYS &&
+          $("#weekDate").value === dates[0] && entries.length === MAX_DAYS &&
           dates.every((date, index) => entries[index]?.date === date)) return true;
       await generateWeek(); // Esta primera acción presenta la pregunta, no salta la respuesta «Sí».
       return false;
