@@ -2758,14 +2758,14 @@ export default function DeliveryRegistry({ onClose }) {
                         <button
                           className="btn"
                           type="button"
-                          aria-label={"Opciones de baja de " + student.name}
+                          aria-label={"Opciones de situación de " + student.name}
                           onClick={() =>
                             setStudentActionId((current) =>
                               current === student.id ? "" : student.id,
                             )
                           }
                         >
-                          <Trash size={18} />
+                          <DotsThree size={18} />
                         </button>
                       </div>
                       {studentActionId === student.id && (
