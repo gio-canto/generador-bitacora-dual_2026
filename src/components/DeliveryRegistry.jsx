@@ -1605,6 +1605,11 @@ export default function DeliveryRegistry({ onClose }) {
         );
         return;
       }
+      const previous = state.students.find((student) => student.id === editingStudentId);
+      if (previous?.company !== nextStudent.company) {
+        showNotice("warning", "Cambio de empresa", "Para conservar la empresa anterior, la fecha de reubicación y sus horas, utiliza «Reubicar de empresa» en Situación en Educación Dual.");
+        return;
+      }
       commit({
         ...state,
         students: state.students.map((student) =>
