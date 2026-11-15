@@ -134,6 +134,9 @@ export function startGuide() {
       highestStep = 0;
       showStep(0, true);
     });
+    window.addEventListener("bitacora-waiting-week-ready", () => {
+      if (isWaiting() && step === 2 && valid(2)) showStep(3, true);
+    });
     window.addEventListener("bitacora-edit-name", () => {
       showStep(1, true);
       document.getElementById("student").focus();
