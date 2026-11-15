@@ -173,6 +173,18 @@ Los archivos descargados quedan bajo control de quien los conserva. No subas res
 
 Consulta [../SECURITY.md](../SECURITY.md).
 
+## Reubicación dentro de Educación Dual
+
+Una alumna retirada de la empresa por decisión de ésta y asignada a otra **no es una baja de Dual**. Se registra el cambio desde **Registro de entrega → Alumnos → Situación en Educación Dual → Reubicar de empresa**. El registro conserva el mismo ID, mantiene `dualStatus: "active"` y añade en `companyTransfers` la empresa anterior, nueva empresa, fecha efectiva y motivo `company_decision`. Las entregas anteriores conservan sus fechas y estadísticas, y las semanas previas se atribuyen a la empresa anterior en CSV, reportes y métricas.
+
+En el **Generador**, abrir **Mi perfil → Editar predeterminados → Formación dual**; seleccionar la nueva empresa, activar **Reubicación de empresa sin baja de Educación Dual**, elegir la anterior e indicar la fecha efectiva. El perfil conserva `companyTransfer` y las bitácoras posteriores incorporan al Data Matrix BD26|4 el segmento opcional `R1:AAAAMMDD:empresa-anterior`. El segmento no sustituye los datos normales, no altera S5 y no se añade a periodos anteriores a la fecha efectiva. El PDF identifica la continuidad en Dual.
+
+Al escanear, Registro de entrega puede leer el marcador R1 y guardar la empresa consignada y la reubicación junto con la entrega. **No se modifica automáticamente el padrón a partir de un código proporcionado por un alumno**: el administrador debe registrar previamente la reubicación para reconocer documentos de ambas empresas. El generador y Registro de entrega siguen almacenando datos localmente; no comparten el perfil por red.
+
+La reubicación no genera `no_aplica`, borra pendientes o modifica fechas límite por sí sola: las semanas siguen siendo exigibles según la determinación académica. Si hubo días en la transición sin empresa asignada, se documentan de forma independiente; no se convierten en horas trabajadas. Si la fecha del traslado cae dentro de una semana con actividades en ambas empresas, revisar la documentación de esa semana, pues el encabezado del PDF refleja una sola empresa.
+
+La ampliación usa campos opcionales y conserva `schemaVersion: 9` y los respaldos previos.
+
 ## Acumulado histórico de Educación Dual
 
 El panel y el PDF calculan las horas históricas a partir de las entregas con estadísticas válidas de jornada. El consolidado incluye todas las semanas almacenadas del alumno, incluso si ha desistido. Si existen varias semanas con la misma fecha inicial y entrega para un mismo alumno, se conserva únicamente el registro válido más reciente. Los códigos anteriores que no contienen estadísticas de jornada no se convierten en cero horas.
