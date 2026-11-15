@@ -3,6 +3,7 @@ import { VERSION } from "../domain/records.js";
 import {
   deliveryStatus,
   studentAppliesToWeek,
+  studentCompanyAtDate,
   studentIsActive,
   weekSummary,
 } from "./delivery-registry.js";
@@ -152,7 +153,7 @@ export function buildDeliveryReportModel(
           id: student.id,
           name: clean(student.name, 180),
           specialty: clean(student.specialty, 120),
-          company: clean(student.company, 220),
+          company: clean(studentCompanyAtDate(student, week.startDate), 220),
           dualStatus: studentIsActive(student) ? "active" : "desisted",
           status,
           statusLabel: STATUS_META[status].label,
