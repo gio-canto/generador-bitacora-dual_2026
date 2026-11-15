@@ -16,6 +16,7 @@ import {
   deleteArchivedProfilePermanently,
 } from "../services/profile.js";
 import { isSecretName } from "../domain/presentation.js";
+import { LIMBO_COMPANY } from "../services/delivery-registry.js";
 import { notify } from "../services/rare-notification.jsx";
 
 const valueFromEditor = (id, fallback = "") =>
@@ -33,7 +34,8 @@ function editableDefaults(profile) {
   const schoolName =
     profile.school || valueFromEditor("school", firstSchool.name || "");
   const school = schools.find((item) => item.name === schoolName) || firstSchool;
-  const companyName = profile.company || valueFromEditor("company", "");
+  const candidateCompany = profile.company || valueFromEditor("company", "");
+  const companyName = candidateCompany === LIMBO_COMPANY ? "" : candidateCompany;
   const company = companies.find((item) => item.name === companyName) || {};
 
   return {
@@ -777,7 +779,7 @@ export function Profile() {
                   onChange={changeCompany}
                 >
                   <option value="">Selecciona una empresa</option>
-                  {companies.map((company) => (
+                  {companies.filter((company) => company.name !== LIMBO_COMPANY).map((company) => (
                     <option key={company.id} value={company.name}>
                       {company.shortName || company.name}
                     </option>
