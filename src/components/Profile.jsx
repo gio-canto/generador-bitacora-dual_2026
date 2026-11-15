@@ -259,6 +259,7 @@ export function Profile() {
       return {
         ...current,
         company: companyName,
+        companyTransfer: current.company === companyName ? current.companyTransfer : null,
         defaultStart: company?.start || current.defaultStart || "10:00",
         defaultEnd: company?.end || current.defaultEnd || "14:00",
         area: areaByCompany[companyName] || company?.area || "",
@@ -321,6 +322,15 @@ export function Profile() {
         "Ese texto no se guarda como nombre",
         "Es un disparador especial del generador.",
       );
+      return;
+    }
+    if (form.companyTransfer && (
+      !form.companyTransfer.fromCompany?.trim() ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(form.companyTransfer.effectiveDate || "") ||
+      !form.company ||
+      form.companyTransfer.fromCompany === form.company
+    )) {
+      notify("error", "Revisa la reubicación", "Selecciona una empresa anterior distinta de la actual y la fecha efectiva del cambio.");
       return;
     }
     if (
@@ -596,6 +606,12 @@ export function Profile() {
                   <dt>Empresa</dt>
                   <dd>{shown(shortCompany(profile.company))}</dd>
                 </div>
+                {profile.companyTransfer && (
+                  <div>
+                    <dt>Situación</dt>
+                    <dd>Activa en Dual · Reubicada desde {shortCompany(profile.companyTransfer.fromCompany)} ({profile.companyTransfer.effectiveDate})</dd>
+                  </div>
+                )}
                 <div>
                   <dt>Horario</dt>
                   <dd>{schedule}</dd>
@@ -784,6 +800,41 @@ export function Profile() {
                   ))}
                 </select>
               </label>
+              <label className="profile-transfer-toggle">
+                <input
+                  type="checkbox"
+                  checked={Boolean(form.companyTransfer)}
+                  onChange={(event) => setForm((current) => ({
+                    ...current,
+                    companyTransfer: event.target.checked
+                      ? { fromCompany: profile.company && profile.company !== current.company ? profile.company : "", effectiveDate: "", reason: "company_decision" }
+                      : null,
+                  }))}
+                />
+                Reubicación de empresa sin baja de Educación Dual
+              </label>
+              {form.companyTransfer && (
+                <div className="profile-form-grid">
+                  <label>
+                    Empresa anterior
+                    <select value={form.companyTransfer.fromCompany || ""}
+                      onChange={(event) => setForm((current) => ({
+                        ...current, companyTransfer: { ...current.companyTransfer, fromCompany: event.target.value },
+                      }))}>
+                      <option value="">Selecciona la empresa anterior</option>
+                      {companies.map((item) => <option key={item.id} value={item.name}>{item.shortName || item.name}</option>)}
+                    </select>
+                  </label>
+                  <label>
+                    Fecha efectiva de reubicación
+                    <input type="date" value={form.companyTransfer.effectiveDate || ""}
+                      onChange={(event) => setForm((current) => ({
+                        ...current, companyTransfer: { ...current.companyTransfer, effectiveDate: event.target.value },
+                      }))}/>
+                  </label>
+                  <p>El cambio fue por decisión de la empresa anterior. La alumna continúa en Dual y debe seguir entregando sus bitácoras.</p>
+                </div>
+              )}
 
               {representatives.length > 0 ? (
                 <label>
