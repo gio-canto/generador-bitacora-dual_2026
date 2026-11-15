@@ -1,5 +1,6 @@
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
+import { LIMBO_COMPANY } from "../services/delivery-registry.js";
 export const VERSION = "0.61.1";
 export const RELEASE = "Selector de áreas mejorado";
 export const MAX_DAYS = 4;
@@ -31,6 +32,14 @@ export function weekDates(value) {
     return day.toISOString().slice(0, 10);
   });
 }
+export const LIMBO_DAY_DESCRIPTION = "En espera de reubicación a otra empresa receptora; sin actividades laborales asignadas.";
+export function waitingWeekEntries(firstDate) {
+  return weekDates(firstDate).map((date) => ({
+    date, status: "sin_labores", reasonId: "",
+    start: "", end: "", area: "", activity: LIMBO_DAY_DESCRIPTION,
+  }));
+}
+
 export function generateEntries(record, area) {
   return weekDates(record.weekDate).map((date) => ({
     date,
@@ -137,11 +146,14 @@ export function validateRecord(r, step) {
         "Las cuatro jornadas deben corresponder a martes, miércoles, jueves y viernes de la misma semana.";
   }
   if (step === undefined || step === 3) {
+    const waiting = r.company === LIMBO_COMPANY;
     for (const [key, label] of [
       ["voboName", "el nombre de quien da el visto bueno"],
       ["voboRole", "el cargo de quien da el visto bueno"],
-      ["autorizoName", "el nombre de quien autoriza"],
-      ["autorizoRole", "el cargo de quien autoriza"],
+      ...(!waiting ? [
+        ["autorizoName", "el nombre de quien autoriza"],
+        ["autorizoRole", "el cargo de quien autoriza"],
+      ] : []),
     ])
       required(
         "authorities." + key,
@@ -149,13 +161,13 @@ export function validateRecord(r, step) {
         label,
         key.endsWith("Name") ? 100 : 180,
       );
-    if (r.authorities.autorizoPaEnabled) {
+    if (!waiting && r.authorities.autorizoPaEnabled) {
       required("authorities.autorizoPaName",r.authorities.autorizoPaName,"el nombre de quien firma P. A.",100);
       required("authorities.autorizoPaRole",r.authorities.autorizoPaRole,"el cargo de quien firma P. A.",140);
       if(!isDifferentSigner(r.authorities.autorizoName,r.authorities.autorizoPaName))
         errors["authorities.autorizoPaName"]="El suplente debe ser distinto del titular.";
     }
-    if (r.instructor.enabled) { 
+    if (!waiting && r.instructor.enabled) { 
       if (r.instructor.paEnabled) {
         required("instructor.paName",r.instructor.paName,"el nombre del instructor suplente",100);
         required("instructor.paRole",r.instructor.paRole,"el cargo del instructor suplente",140);
