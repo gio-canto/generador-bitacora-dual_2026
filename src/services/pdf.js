@@ -205,7 +205,11 @@ export function buildPageModel(record) {
       const st = e.status || "laboral",
         special = st !== "laboral",
         label =
-          st === "sin_labores"
+          e.specialType === "asistencia"
+            ? "ASISTENCIA · SIN HORAS DE EMPRESA"
+            : e.specialType === "limbo"
+              ? "EN ESPERA DE REUBICACIÓN"
+              : st === "sin_labores"
             ? "SIN LABORES"
             : st === "inhabil"
               ? "DÍA INHÁBIL"
@@ -224,14 +228,14 @@ export function buildPageModel(record) {
               ...wrapStyled(e.activity, widths[1] - 3.2, sizes.activity, on),
             ]
           : wrapStyled(e.activity, widths[1] - 3.2, sizes.activity, on),
-        timeLines = special
+        timeLines = special && e.specialType !== "asistencia"
           ? wrapPlain("-", widths[2] - 2.6, sizes.other)
           : wrapPlain(
               formatTime(e.start) + " - " + formatTime(e.end),
               widths[2] - 2.6,
               sizes.other,
             ),
-        areaLines = special
+        areaLines = special && e.specialType !== "asistencia"
           ? wrapPlain("-", widths[3] - 3.2, sizes.other)
           : wrapPlain(e.area, widths[3] - 3.2, sizes.other),
         h = Math.max(
@@ -416,7 +420,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
   );
   drawText(
     c,
-    "BITÁCORA SEMANAL",
+    id.reportMode === "special" ? "BITÁCORA ESPECIAL" : "BITÁCORA SEMANAL",
     PAGE.w / 2,
     layout.bitacoraY,
     sizes.title,
@@ -439,7 +443,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
   );
   drawText(
     c,
-    "Nombre de la empresa: " + id.company,
+    (id.reportMode === "special" ? "Empresa registrada (referencia): " : "Nombre de la empresa: ") + id.company,
     layout.table.x,
     layout.metaY[1],
     sizes.meta,
@@ -461,6 +465,10 @@ export function drawPdfPage(canvas, p, record, logoImage) {
     p,
     layout.table.w,
   );
+    if (id.reportMode === "special") {
+    drawText(c, "SEGUIMIENTO DE REUBICACIÓN · ASISTENCIA / EN ESPERA · NO SON HORAS DE EMPRESA",
+      layout.table.x, 82.2, 7.4, "normal", "left", "#454545", p, layout.table.w);
+  }
   const t = layout.table,
     { xs, widths, rows } = model;
   rect(c, t.x, t.y, t.w, t.headH, null, "#333", 0.22, p);
