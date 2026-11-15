@@ -1,10 +1,10 @@
-import {studentIsActive,studentAppliesToWeek,deliveryStatus} from "./delivery-registry.js";
+import {studentIsActive,studentAppliesToWeek,studentCompanyAtDate,deliveryStatus} from "./delivery-registry.js";
 import {summarizeWeekStatistics,causeLabel} from "./matrix-statistics.js";
 export const percent = (value,total) => total ? Math.round(value/total*100) : 0;
 const makeCounts=()=>({laboral:0,falta:0,sin_labores:0,inhabil:0});
 const compareText=(a,b)=>a.localeCompare(b,"es",{sensitivity:"base"});
 const groupLabel=student=>String(student.group||"").trim().toLocaleUpperCase("es-MX")||"Sin grupo";
-const companyLabel=student=>String(student.company||"").trim()||"Sin especificar";
+const companyLabel=(student,date="")=>String(studentCompanyAtDate(student,date)||"").trim()||"Sin especificar";
 const blankComparison=label=>({
   label,activeStudents:0,studentIds:new Set(),reports:0,minutes:0,
   worked:0,absences:0,nonWorking:0,holidays:0,
@@ -57,7 +57,7 @@ function groupTotals(people, field) {
   return [...groups.entries()].map(([label,count])=>({label,count})).sort((a,b)=>b.count-a.count);
 }
 export function calculateDeliveryStatistics(state,{period="weekly",weekId="",month="",specialty="",company=""}={}){
-  const roster=(state.students||[]).filter(student=>(!specialty||student.specialty===specialty)&&(!company||student.company===company));
+  const roster=(state.students||[]).filter(student=>(!specialty||student.specialty===specialty)&&(!company||[student.company,...(student.companyTransfers||[]).flatMap(t=>[t.fromCompany,t.toCompany])].includes(company)));
   const students=roster.filter(studentIsActive);
   const byId=new Map(roster.map(item=>[item.id,item]));
   const weeks=(state.weeks||[]).filter(w=>period==="all" || (period==="monthly" ? w.startDate?.startsWith(month) : w.id===weekId)).sort((a,b)=>(a.startDate||"").localeCompare(b.startDate||""));
@@ -69,6 +69,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
   for(const student of roster){
     const row=register(companyMap,companyLabel(student));
     if(studentIsActive(student))row.activeStudents++;
+    for(const transfer of student.companyTransfers||[])register(companyMap,transfer.fromCompany);
   }
   for(const student of students)register(groupMap,groupLabel(student)).activeStudents++;
   const methods=new Map(), trend=[];
@@ -82,6 +83,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
     const weekCompany=new Map();
     for(const student of roster){
       if(!studentAppliesToWeek(student,week))continue;
+      if(company&&studentCompanyAtDate(student,week.startDate)!==company)continue;
       const delivery=week.deliveries?.[student.id];
       const status=deliveryStatus(week,student.id);
       if(status==="no_aplica"){notApplicable++;continue;}
@@ -101,7 +103,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
       if(!summary)continue;
       weeksWithStatistics++;reportCount++;weekReports++;
       totalMinutes+=summary.minutes;weekMinutes+=summary.minutes;
-      const name=companyLabel(student);
+      const name=companyLabel(student,week.startDate);
       if(!weekCompany.has(name))weekCompany.set(name,{minutes:0,studentIds:new Set()});
       const weekRow=weekCompany.get(name);
       weekRow.minutes+=summary.minutes;
@@ -128,7 +130,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
           map.set(key,(map.get(key)||0)+1);
         }
       }
-      receivedCompanies.push({company:student.company,minutes:summary.minutes});
+      receivedCompanies.push({company:studentCompanyAtDate(student,week.startDate),minutes:summary.minutes});
       receivedSpecialties.push({specialty:student.specialty,minutes:summary.minutes});
     }
     // Sumar promedios por semana; solo cuentan alumnos con datos esa semana.
@@ -185,7 +187,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
 export function calculateDualLifetimeStatistics(state, {specialty = "", company = ""} = {}) {
   const roster = (state.students || []).filter(student =>
     (!specialty || student.specialty === specialty) &&
-    (!company || student.company === company)
+    (!company || [student.company,...(student.companyTransfers||[]).flatMap(t=>[t.fromCompany,t.toCompany])].includes(company))
   );
   const active = roster.filter(studentIsActive);
   const byId = new Map(roster.map(student => [student.id, student]));
@@ -199,7 +201,7 @@ export function calculateDualLifetimeStatistics(state, {specialty = "", company 
   const uniquePeriods = new Map();
   for (const week of state.weeks || []) {
     for (const [studentId, delivery] of Object.entries(week.deliveries || {})) {
-      if (!byId.has(studentId) || !delivery || delivery.status === "no_aplica" ||
+      if (!byId.has(studentId) || (company && studentCompanyAtDate(byId.get(studentId),week.startDate)!==company) || !delivery || delivery.status === "no_aplica" ||
           !["entregado", "entregado_tarde", "no_entregado"].includes(delivery.status)) continue;
       const stats = summarizeWeekStatistics(delivery.statistics);
       if (!stats) continue;
