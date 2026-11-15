@@ -39,6 +39,7 @@ function WeekDetail({week}) {
         <div><dt>Fecha límite</dt><dd>{week.dueAt||"No especificada"}</dd></div>
         <div><dt>Registro</dt><dd>{week.registeredAt||"Sin entrega registrada"}</dd></div>
         <div><dt>Método</dt><dd>{week.method}</dd></div>
+        <div><dt>Empresa del periodo</dt><dd>{week.company||"Sin especificar"}</dd></div>
       </dl>
       {week.statsKnown ? <div className="ds-table-scroll">
         <table className="ds-table ds-dossier-days">
@@ -75,6 +76,8 @@ export default function StudentDossier({state,studentId}) {
         <h3>{dossier.name}</h3>
         <p>{dossier.specialty} · {dossier.company} · Grupo {dossier.group}</p>
         <small>{dossier.active?"Alumno activo":"Historial de alumno desistido"} · {dossier.dateFrom||"Sin periodos"}{dossier.dateTo?" — "+dossier.dateTo:""}</small>
+        {dossier.companyTransfers?.length > 0 && <p>Reubicación dentro de Dual (sin baja). {dossier.companyTransfers.map((transfer) =>
+          `${transfer.effectiveDate}: ${transfer.fromCompany} → ${transfer.toCompany}`).join(" · ")}</p>}
       </div>
       <div className="ds-dossier-summary">
         <strong>{rate(dossier.deliveryRate)}</strong>
