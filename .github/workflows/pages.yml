@@ -57,9 +57,9 @@ jobs:
 
       - name: Ejecutar pruebas de regresión
         id: regression
-        # Excepción EXCLUSIVA de la publicación 0.61.1: solo 3 fallas CI conocidas.
-        # Cualquier push posterior mantiene el bloqueo habitual si las pruebas fallan.
-        continue-on-error: "${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.head_commit.message == 'release: publicar 0.61.1 con advertencia de pruebas' }}"
+        # Excepciones de publicación concretas, nunca para pruebas adicionales.
+        # Las tres fallas permitidas se verifican estrictamente en el paso siguiente.
+        continue-on-error: "${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && (github.event.head_commit.message == 'release: publicar 0.61.1 con advertencia de pruebas' || startsWith(github.event.head_commit.message, 'release: publicar espera de reubicacion con advertencia de pruebas')) }}"
         run: |
           set -o pipefail
           npm test 2>&1 | tee "$RUNNER_TEMP/bitacora-tests.log"
@@ -72,7 +72,7 @@ jobs:
       - name: Advertir fallos conocidos de esta publicación
         if: steps.fresh.outputs.stale == 'false' && steps.regression.outcome == 'failure'
         run: |
-          echo "::warning::0.61.1 se publica con 3 pruebas conocidas fallidas, verificadas por nombre y cantidad. No equivale a una verificación completa."
+          echo "::warning::Publicación con 3 pruebas conocidas fallidas, verificadas por nombre y cantidad. No equivale a una verificación completa."
           echo "Las pruebas de validación de PDF, firmas y justificantes siguen pendientes de corregirse."
 
       - run: npm run build

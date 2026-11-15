@@ -14,6 +14,7 @@ export const LEGACY_DELIVERY_KEYS = [
   "bitacora_dual_delivery_registry_v1",
 ];
 export const DELIVERY_SCHEMA = 9;
+export const LIMBO_COMPANY = "En espera de reubicación";
 
 const uid = () =>
   globalThis.crypto?.randomUUID?.() ||
@@ -130,6 +131,16 @@ export function matrixPeriodFromData(data = {}) {
     startDate: validIsoDate(startDate) ? startDate : "",
     endDate: validIsoDate(endDate) ? endDate : "",
   };
+}
+
+// El registro del alumno conserva su empresa; esta opción solo identifica
+// un periodo sin empresa asignada, con entrega exenta de tardanza.
+export function isLimboMatrixPayload(payload) {
+  return payload?.version === 4 &&
+    validIsoDate(payload.startDate) &&
+    validIsoDate(payload.endDate) &&
+    payload.startDate <= payload.endDate &&
+    normalizeMatrixText(payload.company, 80) === companyMatrixValue(LIMBO_COMPANY);
 }
 
 export function createMatrixPayload(data = {}) {
@@ -337,12 +348,15 @@ function normalizeDelivery(value) {
     : "entregado";
   const registeredAt = clean(value.registeredAt, 40);
   if (!registeredAt && status !== "no_aplica" && status !== "no_entregado") return null;
+  const limboExempt = value.limboExempt === true &&
+    ["entregado", "entregado_tarde"].includes(status);
   return {
-    status,
+    status: limboExempt ? "entregado" : status,
     registeredAt,
     source: ["camera", "manual", "import"].includes(value.source)
       ? value.source
       : "manual",
+    ...(limboExempt ? { limboExempt: true } : {}),
     ...( ["generator", "other", "unknown"].includes(value.usageSource)
       ? { usageSource: value.usageSource } : {}),
     ...(Number.isInteger(value.matrixVersion) && value.matrixVersion > 0
@@ -485,9 +499,8 @@ export function deliveryStatus(week, studentId) {
   if (!delivery) return "no_entregado";
   if (delivery.status === "no_aplica") return "no_aplica";
   if (delivery.status === "no_entregado") return "no_entregado";
-  return delivery.status === "entregado_tarde"
-    ? "entregado_tarde"
-    : "entregado";
+  return delivery.limboExempt === true ? "entregado" :
+    delivery.status === "entregado_tarde" ? "entregado_tarde" : "entregado";
 }
 
 export function statusFromTimestamp(week, timestamp) {
@@ -501,14 +514,18 @@ export function statusFromTimestamp(week, timestamp) {
 
 export function registerDelivery(week, studentId, timestamp, source = "manual", metadata = {}) {
   const registeredAt = timestamp || new Date().toISOString();
+  // Solo el lector de un Data Matrix de "En espera de reubicación" activa
+  // automáticamente la excepción. La captura manual mantiene sus reglas.
+  const limboExempt = source === "camera" && metadata.limboExempt === true;
   return {
     ...week,
     deliveries: {
       ...week.deliveries,
       [studentId]: {
-        status: statusFromTimestamp(week, registeredAt),
+        status: limboExempt ? "entregado" : statusFromTimestamp(week, registeredAt),
         registeredAt,
         source,
+        ...(limboExempt ? { limboExempt: true } : {}),
         ...(Number.isInteger(metadata.matrixVersion) ? { matrixVersion: metadata.matrixVersion } : {}),
         ...(metadata.statistics ? { statistics: metadata.statistics } : {}),
         ...( ["generator","other","unknown"].includes(metadata.usageSource) ? { usageSource: metadata.usageSource } : {}),
@@ -530,6 +547,7 @@ export function updateWeekDueAt(week, dueAt) {
     if (
       !delivery ||
       delivery.status === "no_aplica" ||
+      delivery.limboExempt === true ||
       delivery.source !== "camera" ||
       !delivery.registeredAt
     )
@@ -557,15 +575,17 @@ export function setDeliveryStatus(
   const previous = week?.deliveries?.[studentId];
   const registeredAt =
     timestamp || previous?.registeredAt || new Date().toISOString();
+  const limboExempt = previous?.limboExempt === true && status !== "no_aplica";
 
   return {
     ...week,
     deliveries: {
       ...week.deliveries,
       [studentId]: {
-        status,
+        status: limboExempt ? "entregado" : status,
         registeredAt,
         source,
+        ...(limboExempt ? { limboExempt: true } : {}),
         ...(status !== "no_aplica" && previous?.statistics ? { statistics: previous.statistics } : {}),
         ...(status !== "no_aplica" && previous?.matrixVersion ? { matrixVersion: previous.matrixVersion } : {}),
         ...(status !== "no_aplica" && previous?.usageSource ? { usageSource: previous.usageSource } : {}),
@@ -620,11 +640,13 @@ export function mergeStudents(current, incoming) {
 
 function matrixMetadataMatchesStudent(student, payload) {
   if (payload.version >= 4) {
-    return (
-      normalizeName(student.specialty) === normalizeName(payload.specialty) &&
-      companyMatrixValue(student.company) ===
-        normalizeMatrixText(payload.company, 80)
-    );
+    if (normalizeName(student.specialty) !== normalizeName(payload.specialty))
+      return false;
+    // Durante la espera la alumna conserva su empresa registrada en el
+    // padrón: el código de "En espera" se reconoce sin modificarla.
+    if (isLimboMatrixPayload(payload)) return true;
+    return companyMatrixValue(student.company) ===
+      normalizeMatrixText(payload.company, 80);
   }
 
   if (payload.version === 3) {
@@ -720,10 +742,14 @@ export function findStudentByMatrixValue(students, rawValue) {
   // Siempre se prefiere el nombre tal como aparece en la base.
   if (byName.length) {
     if (payload.version >= 3) {
-      return (
-        byName.find((student) => matrixMetadataMatchesStudent(student, payload)) ||
-        null
+      const matches = byName.filter((student) =>
+        matrixMetadataMatchesStudent(student, payload),
       );
+      // El código de espera no contiene una empresa real para desambiguar;
+      // la coincidencia exacta debe ser única dentro de la especialidad.
+      return isLimboMatrixPayload(payload)
+        ? matches.length === 1 ? matches[0] : null
+        : matches[0] || null;
     }
     return byName.length === 1 ? byName[0] : null;
   }

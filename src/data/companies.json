@@ -218,5 +218,16 @@
     "instructors": [],
     "shortName": "La Avispa",
     "instructorEnabledByDefault": false
+  },
+  {
+    "id": "company-9",
+    "name": "En espera de reubicación",
+    "shortName": "En espera de reubicación",
+    "start": "10:00",
+    "end": "14:00",
+    "area": "Seguimiento de reubicación",
+    "representatives": [],
+    "instructors": [],
+    "instructorEnabledByDefault": false
   }
 ]
