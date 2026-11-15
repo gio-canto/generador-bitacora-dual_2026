@@ -41,6 +41,7 @@ import {
   findStudentSuggestionsByMatrixValue,
   findWeekByMatrixValue,
   isNameOrderInverted,
+  isLimboMatrixPayload,
   markStudentDesisted,
   matrixPeriodLabel,
   mergeStudents,
@@ -788,7 +789,8 @@ export default function DeliveryRegistry({ onClose }) {
 
     pendingIds.current.add(pendingKey);
     const at = new Date().toISOString();
-    const status = statusFromTimestamp(targetWeek, at);
+    const limboExempt = isLimboMatrixPayload(payload);
+    const status = limboExempt ? "entregado" : statusFromTimestamp(targetWeek, at);
     setScanQueue((current) => [
       ...current,
       {
@@ -800,6 +802,7 @@ export default function DeliveryRegistry({ onClose }) {
         startDate: targetWeek.startDate,
         endDate: targetWeek.endDate,
         status,
+        limboExempt,
         matrixVersion: payload.version,
         statistics: payload.statistics || null,
       },
@@ -812,6 +815,7 @@ export default function DeliveryRegistry({ onClose }) {
         (isNameOrderInverted(payload.name, student.name)
           ? " · Apellidos primero"
           : "") +
+        (limboExempt ? " · En espera de reubicación · A tiempo (sin tardanza)" : "") +
         (status === "entregado_tarde" ? " · A destiempo" : ""),
     );
 
@@ -1944,7 +1948,8 @@ export default function DeliveryRegistry({ onClose }) {
             item.studentId,
             item.at,
             "camera",
-            { matrixVersion: item.matrixVersion, statistics: item.statistics },
+            { matrixVersion: item.matrixVersion, statistics: item.statistics,
+              limboExempt: item.limboExempt },
           );
         return updatedWeek;
       });
