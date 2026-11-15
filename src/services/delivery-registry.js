@@ -137,6 +137,11 @@ export function createMatrixPayload(data = {}) {
   if (!name) return "";
   const { startDate, endDate } = matrixPeriodFromData(data);
   const compactStatistics = encodeWeekStatistics(data.entries);
+  const transfer = normalizeCompanyTransfer(data.companyTransfer);
+  const relocationTag = transfer && companyMatrixValue(data.company) &&
+    startDate >= transfer.effectiveDate && companyMatrixValue(data.company) !== companyMatrixValue(transfer.fromCompany)
+    ? `R1:${compactDate(transfer.effectiveDate)}:${companyMatrixValue(transfer.fromCompany)}`
+    : "";
   return [
     "BD26",
     "4",
@@ -146,6 +151,7 @@ export function createMatrixPayload(data = {}) {
     compactDate(startDate),
     compactDate(endDate),
     ...(compactStatistics ? [compactStatistics] : []),
+    ...(relocationTag ? [relocationTag] : []),
   ].join("|");
 }
 
@@ -168,6 +174,13 @@ export function parseMatrixPayload(rawValue) {
     parts.length >= 7
   ) {
     const statistics = decodeWeekStatistics(parts[7]);
+    const relocationText = parts.find((part, index) => index >= 7 && /^R1:\d{8}:/i.test(part));
+    const relocationMatch = relocationText?.match(/^R1:(\d{8}):(.+)$/i);
+    const companyTransfer = relocationMatch ? normalizeCompanyTransfer({
+      effectiveDate: expandCompactDate(relocationMatch[1]),
+      fromCompany: relocationMatch[2],
+      reason: "company_decision",
+    }) : null;
     return {
       version: 4,
       name: clean(parts[2], 180),
@@ -176,6 +189,7 @@ export function parseMatrixPayload(rawValue) {
       startDate: expandCompactDate(parts[5]),
       endDate: expandCompactDate(parts[6]),
       ...(statistics ? { statistics } : {}),
+      ...(companyTransfer ? { companyTransfer } : {}),
     };
   }
 
@@ -244,6 +258,48 @@ export function normalizeGroup(value) {
   return clean(withSemester ? withSemester[1] : raw, 30);
 }
 
+export function normalizeCompanyTransfer(value) {
+  if (!value || typeof value !== "object") return null;
+  const fromCompany = clean(value.fromCompany, 220);
+  const effectiveDate = clean(value.effectiveDate, 10);
+  if (!fromCompany || !validIsoDate(effectiveDate)) return null;
+  return { fromCompany, effectiveDate, reason: "company_decision" };
+}
+
+// El cambio de empresa no constituye baja de la modalidad Dual.
+export function transferStudentCompany(student, toCompany, effectiveDate) {
+  if (!student || !studentIsActive(student)) throw new Error("La alumna debe estar activa en Dual.");
+  const nextCompany = clean(toCompany, 220);
+  const date = clean(effectiveDate, 10);
+  if (!nextCompany || !validIsoDate(date) || !Number.isFinite(Date.parse(date + "T12:00:00Z")))
+    throw new Error("Indica una empresa y una fecha de reubicación válidas.");
+  if (companyMatrixValue(nextCompany) === companyMatrixValue(student.company))
+    throw new Error("Selecciona una empresa distinta a la actual.");
+  const transfers = Array.isArray(student.companyTransfers) ? student.companyTransfers : [];
+  if (transfers.length && date <= transfers.at(-1).effectiveDate)
+    throw new Error("La reubicación debe ser posterior a la última registrada.");
+  return {
+    ...student,
+    company: nextCompany,
+    dualStatus: "active",
+    desistedAt: "",
+    companyTransfers: [...transfers, {
+      fromCompany: student.company, toCompany: nextCompany,
+      effectiveDate: date, reason: "company_decision",
+    }],
+  };
+}
+
+export function studentCompanyAtDate(student, date) {
+  const transfers = Array.isArray(student?.companyTransfers) ? student.companyTransfers : [];
+  if (!validIsoDate(date) || !transfers.length) return student?.company || "";
+  const ordered = [...transfers].sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate));
+  for (let index = ordered.length - 1; index >= 0; index--) {
+    if (date >= ordered[index].effectiveDate) return ordered[index].toCompany;
+  }
+  return ordered[0].fromCompany;
+}
+
 export function createStudent(data = {}) {
   const dualStatus = data.dualStatus === "desisted" ? "desisted" : "active";
   return {
@@ -255,6 +311,13 @@ export function createStudent(data = {}) {
     gender: ["male", "female", "nonbinary", "other", "undisclosed"].includes(data.gender)
       ? data.gender : "",
     usageMode: ["other", "unknown"].includes(data.usageMode) ? data.usageMode : "unknown",
+    companyTransfers: (Array.isArray(data.companyTransfers) ? data.companyTransfers : []).map((item) => ({
+      fromCompany: clean(item?.fromCompany, 220),
+      toCompany: clean(item?.toCompany, 220),
+      effectiveDate: clean(item?.effectiveDate, 10),
+      reason: "company_decision",
+    })).filter((item) => item.fromCompany && item.toCompany && validIsoDate(item.effectiveDate))
+      .sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)),
     dualStatus,
     desistedAt:
       dualStatus === "desisted" && typeof data.desistedAt === "string"
@@ -347,6 +410,8 @@ function normalizeDelivery(value) {
       ? { usageSource: value.usageSource } : {}),
     ...(Number.isInteger(value.matrixVersion) && value.matrixVersion > 0
       ? { matrixVersion: value.matrixVersion } : {}),
+    ...(clean(value.companyAtDelivery,220) ? { companyAtDelivery: clean(value.companyAtDelivery,220) } : {}),
+    ...(normalizeCompanyTransfer(value.companyTransfer) ? { companyTransfer: normalizeCompanyTransfer(value.companyTransfer) } : {}),
     ...(value.statistics && value.statistics.version === 5 &&
       Array.isArray(value.statistics.entries) && value.statistics.entries.length === 4 &&
       value.statistics.entries.every((day) =>
@@ -511,6 +576,8 @@ export function registerDelivery(week, studentId, timestamp, source = "manual", 
         source,
         ...(Number.isInteger(metadata.matrixVersion) ? { matrixVersion: metadata.matrixVersion } : {}),
         ...(metadata.statistics ? { statistics: metadata.statistics } : {}),
+        ...(clean(metadata.companyAtDelivery,220) ? { companyAtDelivery: clean(metadata.companyAtDelivery,220) } : {}),
+        ...(normalizeCompanyTransfer(metadata.companyTransfer) ? { companyTransfer: normalizeCompanyTransfer(metadata.companyTransfer) } : {}),
         ...( ["generator","other","unknown"].includes(metadata.usageSource) ? { usageSource: metadata.usageSource } : {}),
       },
     },
@@ -620,17 +687,22 @@ export function mergeStudents(current, incoming) {
 
 function matrixMetadataMatchesStudent(student, payload) {
   if (payload.version >= 4) {
+    const dates = [payload.startDate, payload.endDate].filter(validIsoDate);
+    const candidateCompanies = dates.length ?
+      dates.map((date) => studentCompanyAtDate(student, date)) :
+      [student.company];
     return (
       normalizeName(student.specialty) === normalizeName(payload.specialty) &&
-      companyMatrixValue(student.company) ===
-        normalizeMatrixText(payload.company, 80)
+      candidateCompanies.some((company) =>
+        companyMatrixValue(company) === normalizeMatrixText(payload.company, 80))
     );
   }
 
   if (payload.version === 3) {
     return (
       normalizeName(student.specialty) === normalizeName(payload.specialty) &&
-      normalizeName(student.company) === normalizeName(payload.company)
+      [student.company, ...(student.companyTransfers || []).flatMap((t)=>[t.fromCompany,t.toCompany])]
+        .some((company)=>normalizeName(company) === normalizeName(payload.company))
     );
   }
 
