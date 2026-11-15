@@ -1,4 +1,4 @@
-import { validDate, validTime, weekDates, waitingWeekEntries } from "../domain/records.js";
+import { validDate, validTime, weekDates, waitingWeekEntries, LIMBO_DAY_DESCRIPTION } from "../domain/records.js";
 import {
   weekSetup,
   signatureName,
@@ -305,6 +305,7 @@ export function startEditor() {
       note: 7.3,
     };
     let entries = [],
+      waitingAnswer = "",
       currentId = null,
       dirty = false,
       logoImage = null;
@@ -479,6 +480,11 @@ export function startEditor() {
       const waiting = isWaitingForCompany();
       if (waiting && !entries.length)
         $("#weekHint").textContent = "Selecciona únicamente el martes de inicio de la semana.";
+      const notes = $("#waitingNotes");
+      if (notes) {
+        notes.hidden = !(waiting && waitingAnswer === "yes" && entries.length === MAX_DAYS);
+        notes.style.display = notes.hidden ? "none" : "";
+      }
       for (const item of [
         $("#defaultStart")?.closest(".field"),
         $("#defaultEnd")?.closest(".field"),
@@ -497,6 +503,34 @@ export function startEditor() {
         ? "Solo firman la alumna o el alumno y la persona responsable de Vinculación del plantel."
         : "El alumno se completa automáticamente. El visto bueno escolar permanece precargado.";
       $("#company").dataset.waitingSelection = waiting ? "true" : "false";
+    }
+    function renderWaitingNotesFields() {
+      const host = $("#waitingNotesFields");
+      if (!host) return;
+      host.innerHTML = entries.map((entry, i) => `
+        <div class="field" style="margin:12px 0">
+          <label for="waiting-note-${i}">Día ${i + 1} · ${escapeHtml(entry.date.split("-").reverse().join("/"))}</label>
+          <textarea id="waiting-note-${i}" data-waiting-note="${i}"
+            maxlength="${ACTIVITY_LIMIT}" rows="3" spellcheck="true"
+            placeholder="Describe solo lo que ocurrió realmente.">${escapeHtml(entry.activity)}</textarea>
+        </div>`).join("");
+      host.querySelectorAll("[data-waiting-note]").forEach((input) => {
+        input.addEventListener("input", () => {
+          const i = Number(input.dataset.waitingNote);
+          const previous = entries[i].activity;
+          const before = buildPageModel();
+          entries[i].activity = input.value;
+          const after = buildPageModel();
+          if (!after.fits && (before.fits || after.bottom > before.bottom + 0.01)) {
+            entries[i].activity = previous;
+            input.value = previous;
+            notifySpaceLimit();
+            return;
+          }
+          markDirty();
+          updatePreview();
+        });
+      });
     }
     function blankEntry(date = "") {
       const company = $("#company").value;
@@ -778,6 +812,11 @@ export function startEditor() {
     }
     function saveDraftNow(profileId = readActiveProfileId()) {
       clearTimeout(draftTimer);
+      if (isWaitingForCompany()) {
+        // El modo de espera es de un solo uso: no reabrirlo al volver al sitio.
+        clearDraft(profileId);
+        return;
+      }
       try {
         localStorage.setItem(
           draftStorageKey(profileId),
@@ -812,6 +851,11 @@ export function startEditor() {
         if (!raw) return false;
         const d = JSON.parse(raw);
         if (!d || !d.identity || !Array.isArray(d.entries)) return false;
+        if (d.identity.company === LIMBO_COMPANY) {
+          // Limpieza de borradores temporales creados en versiones anteriores.
+          localStorage.removeItem(fromLegacyKey ? DRAFT_KEY : scopedKey);
+          return false;
+        }
         const activeName = readProfileData().name.trim().toLowerCase();
         const draftName = String(d.identity.student || "").trim().toLowerCase();
         if (d.profileId && d.profileId !== activeId) return false;
@@ -1167,19 +1211,46 @@ export function startEditor() {
         ))
       )
         return false;
+      if (isWaitingForCompany() && waitingAnswer &&
+          entries.length === MAX_DAYS &&
+          setup.dates.every((date, index) => entries[index]?.date === date)) return true;
       entries = isWaitingForCompany()
         ? waitingWeekEntries(setup.dates[0])
         : setup.dates.map((date) => blankEntry(date));
+      waitingAnswer = "";
       $("#weekHint").textContent = isWaitingForCompany()
-        ? "Semana registrada. Continúa a las firmas."
+        ? "Semana registrada. Si no tienes información adicional, puedes continuar a las firmas."
         : `Del ${setup.dates[0].split("-").reverse().join("/")} al ${setup.dates[3].split("-").reverse().join("/")}. Ajusta abajo solo lo que cambie.`;
       renderDays();
       markDirty();
       updatePreview();
+      if (isWaitingForCompany()) {
+        const wantsToRegister = await openGuardDialog(
+          "¿Quieres registrar algo durante la espera?",
+          "Puedes agregar actividades o gestiones de seguimiento realizadas en esos días. Si no tienes nada que registrar, continuarás directamente a las firmas.",
+          { confirm: true, confirmText: "Sí, registrar", cancelText: "No, ir a firmas" },
+        );
+        waitingAnswer = wantsToRegister ? "yes" : "no";
+        if (wantsToRegister) {
+          renderWaitingNotesFields();
+          toggleWaitingLayout();
+          $("#waitingNotesFields textarea")?.focus();
+        } else {
+          toggleWaitingLayout();
+          window.dispatchEvent(new Event("bitacora-waiting-week-ready"));
+        }
+      }
       return true;
     }
-    window.bitacoraPrepareWaitingWeek = async () =>
-      !isWaitingForCompany() || await generateWeek();
+    window.bitacoraPrepareWaitingWeek = async () => {
+      if (!isWaitingForCompany()) return true;
+      const dates = weekDates($("#weekDate").value);
+      if (waitingAnswer && dates.length === MAX_DAYS &&
+          $("#weekDate").value === dates[0] && entries.length === MAX_DAYS &&
+          dates.every((date, index) => entries[index]?.date === date)) return true;
+      await generateWeek(); // Esta primera acción presenta la pregunta, no salta la respuesta «Sí».
+      return false;
+    };
     function updateStudentSignaturePreview() {
       const sample = $("#studentSignatureSample"),
         preview = $("#studentSignaturePreview"),
@@ -1361,6 +1432,16 @@ export function startEditor() {
     }
     function collectProfileDefaults() {
       const identity = getIdentity();
+      if (isWaitingForCompany()) {
+        // Esta selección solo identifica la bitácora actual: conservar la empresa,
+        // los responsables y horarios del perfil para la próxima semana.
+        return {
+          name: identity.student, school: identity.school, specialty: identity.specialty,
+          semester: identity.semester, group: identity.group,
+          markdown: $("#markdown").checked,
+          studentGenericSignature: identity.studentGenericSignature,
+        };
+      }
       return {
         name: identity.student,
         school: identity.school,
@@ -1399,6 +1480,7 @@ export function startEditor() {
       if (clear) clearDraft();
       currentId = null;
       entries = [];
+      waitingAnswer = "";
       $("#weekDate").value = "";
       const profile = readProfileData();
       const savedAuthorities = Object.fromEntries(
@@ -1435,9 +1517,14 @@ export function startEditor() {
     function loadRecord(r) {
       currentId = r.id;
       entries = deepCopy(r.entries || []).slice(0, MAX_DAYS);
+      waitingAnswer = r.company === LIMBO_COMPANY
+        ? (entries.some((entry) => entry.activity !== LIMBO_DAY_DESCRIPTION) ? "yes" : "no")
+        : "";
       $("#weekDate").value = weekDates(entries[0]?.date)[0] || "";
       $("#markdown").checked = r.markdown !== false;
       fillIdentity(r);
+      if (waitingAnswer === "yes") renderWaitingNotesFields();
+      toggleWaitingLayout();
       renderDays();
       dirty = false;
       setSaveState("Guardado");
@@ -2896,8 +2983,7 @@ export function startEditor() {
       $("#weekBtn").onclick = generateWeek;
       $("#weekDate").addEventListener("change", async () => {
         if (!isWaitingForCompany() || !$("#weekDate").value) return;
-        if (await generateWeek())
-          window.dispatchEvent(new Event("bitacora-waiting-week-ready"));
+        await generateWeek();
       });
       $("#addDayBtn").onclick = () => {
         if (entries.length >= MAX_DAYS) {
@@ -3117,6 +3203,7 @@ export function startEditor() {
           // Conservar la bitácora anterior: la siguiente se guarda como registro nuevo.
           currentId = null;
           entries = [];
+          waitingAnswer = "";
           $("#weekDate").value = "";
           $("#weekHint").textContent = isWaitingForCompany()
             ? "Selecciona únicamente el martes con el que comienza la semana."
