@@ -132,11 +132,21 @@ export function matrixPeriodFromData(data = {}) {
   };
 }
 
+export function normalizeSpecialDays(value) {
+  if (!Array.isArray(value) || value.length !== 4 ||
+      !value.every((item) => ["asistencia", "limbo"].includes(item))) return null;
+  return [...value];
+}
+
 export function createMatrixPayload(data = {}) {
   const name = normalizeMatrixText(data.name ?? data.student, 180);
   if (!name) return "";
   const { startDate, endDate } = matrixPeriodFromData(data);
   const compactStatistics = encodeWeekStatistics(data.entries);
+  const specialDays = data.reportMode === "special" ?
+    normalizeSpecialDays(data.entries?.map((entry) => entry.specialType)) : null;
+  const specialMarker = specialDays ?
+    "M1:" + specialDays.map((item) => item === "asistencia" ? "A" : "L").join("") : "";
   return [
     "BD26",
     "4",
@@ -146,6 +156,7 @@ export function createMatrixPayload(data = {}) {
     compactDate(startDate),
     compactDate(endDate),
     ...(compactStatistics ? [compactStatistics] : []),
+    ...(specialMarker ? [specialMarker] : []),
   ].join("|");
 }
 
@@ -168,6 +179,9 @@ export function parseMatrixPayload(rawValue) {
     parts.length >= 7
   ) {
     const statistics = decodeWeekStatistics(parts[7]);
+    const specialMarker = parts.slice(7).find((item) => /^M1:[AL]{4}$/.test(item));
+    const specialDays = specialMarker ?
+      specialMarker.slice(3).split("").map((item) => item === "A" ? "asistencia" : "limbo") : null;
     return {
       version: 4,
       name: clean(parts[2], 180),
@@ -176,6 +190,7 @@ export function parseMatrixPayload(rawValue) {
       startDate: expandCompactDate(parts[5]),
       endDate: expandCompactDate(parts[6]),
       ...(statistics ? { statistics } : {}),
+      ...(specialDays ? { reportMode: "special", specialDays } : {}),
     };
   }
 
@@ -347,6 +362,9 @@ function normalizeDelivery(value) {
       ? { usageSource: value.usageSource } : {}),
     ...(Number.isInteger(value.matrixVersion) && value.matrixVersion > 0
       ? { matrixVersion: value.matrixVersion } : {}),
+    ...(normalizeSpecialDays(value.specialDays) ? {
+      reportMode: "special", specialDays: normalizeSpecialDays(value.specialDays),
+    } : {}),
     ...(value.statistics && value.statistics.version === 5 &&
       Array.isArray(value.statistics.entries) && value.statistics.entries.length === 4 &&
       value.statistics.entries.every((day) =>
@@ -511,6 +529,9 @@ export function registerDelivery(week, studentId, timestamp, source = "manual", 
         source,
         ...(Number.isInteger(metadata.matrixVersion) ? { matrixVersion: metadata.matrixVersion } : {}),
         ...(metadata.statistics ? { statistics: metadata.statistics } : {}),
+        ...(normalizeSpecialDays(metadata.specialDays) ? {
+          reportMode: "special", specialDays: normalizeSpecialDays(metadata.specialDays),
+        } : {}),
         ...( ["generator","other","unknown"].includes(metadata.usageSource) ? { usageSource: metadata.usageSource } : {}),
       },
     },
