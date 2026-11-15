@@ -2892,8 +2892,10 @@ export function startEditor() {
       $("#mobileSave").onclick = saveRecord;
       $("#generatorMessagesBtn")?.addEventListener("click",()=>window.dispatchEvent(new Event("bitacora-open-messages")));
       $("#weekBtn").onclick = generateWeek;
-      $("#weekDate").addEventListener("change", () => {
-        if (isWaitingForCompany() && $("#weekDate").value) generateWeek();
+      $("#weekDate").addEventListener("change", async () => {
+        if (!isWaitingForCompany() || !$("#weekDate").value) return;
+        if (await generateWeek())
+          window.dispatchEvent(new Event("bitacora-waiting-week-ready"));
       });
       $("#addDayBtn").onclick = () => {
         if (entries.length >= MAX_DAYS) {
