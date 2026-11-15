@@ -85,6 +85,7 @@ it("recuerda todos los predeterminados sin guardar contenido de jornadas", () =>
     semester: "5",
     group: "C",
     company: "Empresa de Prueba",
+    companyTransfer: null,
     defaultStart: "08:00",
     defaultEnd: "14:30",
     area: "Laboratorio de desarrollo",
