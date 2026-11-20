@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.61.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.62.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,10 @@
 </div>
 
 ---
+
+## v0.62.0 · Eventos especiales
+
+Nuevo estado de jornada en Generador (escritorio y móvil): Evento → Fase → Disciplina → Modalidad con/sin labores. PDF «EVENTO» en blanco, sin sombreado. Catálogo JSON compartido o por plantel, opción «Otros», lectura S6/BD26|5 sin perder S5/BD26|4, captura manual y estadísticas independientes de faltas. Guía: [Eventos especiales](docs/EVENTOS_ESPECIALES.md).
 
 ## v0.61.1 · Selector de áreas mejorado
 
