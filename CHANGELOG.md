@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.62.1 · Ajustes de eventos especiales · 2026-11-20
+
+- Se simplifica la advertencia al elegir «Evento especial» y se precisa su aplicación a concursos, encuentros, olimpiadas y actividades académicas, culturales, cívicas, deportivas o de representación institucional. Se retira la frase final «El evento…».
+- El selector muestra «Festival Académico de la DGETI», utilizando la abreviatura institucional.
+- Se agrega a **todos** los eventos el campo opcional «Lugar o resultado obtenido», con placeholder de ejemplos (1.er lugar, finalista o participación). Si se captura, el Generador lo agrega al texto sugerido, conservando la posibilidad de editar la descripción y su impresión en el PDF.
+- Registro Dual permite capturar el resultado, recuperarlo al editar y conservarlo en respaldos JSON. El texto libre no se incluye en Data Matrix S6; no cambia la compatibilidad de los códigos existentes.
+- Pruebas adicionales del campo, aviso, evento del catálogo, formato S6 y recuperación de respaldo.
+- La publicación mantiene una excepción limitada a las tres fallas históricas identificadas en `app.test.jsx`, `pa-signatures.test.js` y `pdf.test.js`; cualquier falla distinta bloquea el despliegue.
+
+
 ## 0.62.0 · Eventos especiales por plantel · 2026-11-20
 
 - Publicación restringida a las tres fallas preexistentes identificadas en `app.test.jsx`, `pa-signatures.test.js` y `pdf.test.js`. La verificación automatizada comprueba exactamente los archivos y la cantidad de fallas; cualquier regresión nueva bloquea la publicación. Esta excepción no equivale a pruebas completas aprobadas.

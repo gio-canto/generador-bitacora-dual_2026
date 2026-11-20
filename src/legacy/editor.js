@@ -60,7 +60,7 @@ export function startEditor() {
       sin_labores:
         "Selecciona «Sin labores» cuando por algún motivo no se realizaron actividades en tu empresa. No se usa cuando únicamente tú faltaste. Avisa a la directora de Vinculación y escribe la justificación correspondiente.",
       evento:
-        "Utiliza «Evento especial» para registrar tu participación en una actividad académica, cívica, cultural, deportiva o de representación institucional. Selecciona el evento, la fase y la disciplina; después indica si también realizaste labores de formación Dual. Informa a Vinculación y al responsable correspondiente. El evento no se contabilizará como falta y podrá ser revisado en Registro Dual.",
+        "Esta opción sirve para registrar la participación en concursos, encuentros, olimpiadas y otras actividades académicas, culturales, cívicas, deportivas o de representación del plantel. Indica el tipo de actividad, la fase, la disciplina y, si corresponde, el resultado obtenido. Señala también si realizaste labores de Educación Dual durante la jornada. La información se incluirá en tu bitácora y podrá consultarse en Registro Dual. Comunica tu participación a Vinculación y al responsable de tu formación.",
       inhabil:
         "Selecciona «Día inhábil» única y exclusivamente cuando la suspensión de actividades esté contemplada en el calendario escolar oficial aplicable a Educación Dual (DGETI, CBTis, SEP o su calendario interno). Si la empresa no trabajó por otro motivo, utiliza «Sin labores».",
     };
@@ -918,6 +918,7 @@ export function startEditor() {
         field("Modalidad",'<select data-event-field="eventMode" data-event-index="'+i+'">'+
           option("sin","Sin labores",e.eventMode!=="con")+
           option("con","Con labores",e.eventMode==="con")+'</select>')+
+        field("Lugar o resultado obtenido (opcional)",'<input data-event-field="eventResult" data-event-index="'+i+'" maxlength="120" placeholder="Ej. 1.er lugar, finalista o participación" value="'+escapeHtml(e.eventResult||"")+'">')+
         '</div>';
       card.querySelector(".day-grid").after(section);
     }
@@ -999,7 +1000,7 @@ export function startEditor() {
             entries[i].status = next;
             if (previous !== next) { entries[i].reasonId = ""; entries[i].reasonMode = "auto"; }
             if (next === "evento" && previous !== next) {
-              Object.assign(entries[i],{eventId:"",eventName:"",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin"});
+              Object.assign(entries[i],{eventId:"",eventName:"",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin",eventResult:""});
               entries[i].activity = "";
             }
             if (next === "inhabil") entries[i].activity = INHABIL_JUSTIFICATION;
@@ -1114,16 +1115,17 @@ export function startEditor() {
           if(!e||e.status!=="evento")return;
           const before={...e};
           const oldEvent=specialEventById(e.eventId,school);
-          const oldSuggested=specialEventText(oldEvent,e.eventPhase,e.eventDiscipline,e.eventName);
+          const oldSuggested=specialEventText(oldEvent,e.eventPhase,e.eventDiscipline,e.eventName,e.eventResult);
           e[key]=input.value;
           if(key==="eventId"){
             const event=specialEventById(e.eventId,school);
             e.eventName="";
+            e.eventResult="";
             e.eventPhase=event?.phases?.[0]||"no_aplica";
             e.eventDiscipline=event?.disciplines?.[0]||"No aplica";
           }
           const event=specialEventById(e.eventId,school);
-          const suggested=specialEventText(event,e.eventPhase,e.eventDiscipline,e.eventName);
+          const suggested=specialEventText(event,e.eventPhase,e.eventDiscipline,e.eventName,e.eventResult);
           if(key!=="eventMode" && (!String(e.activity||"").trim()||e.activity===oldSuggested))
             e.activity=suggested;
           const model=buildPageModel();

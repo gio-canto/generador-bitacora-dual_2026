@@ -374,6 +374,8 @@ function normalizeDelivery(value) {
             eventPhase: clean(day.eventPhase, 24),
             eventDiscipline: clean(day.eventDiscipline, 100),
             eventMode: day.eventMode === "con" ? "con" : "sin",
+            ...(typeof day.eventResult === "string" && day.eventResult.trim()
+              ? { eventResult: clean(day.eventResult, 120) } : {}),
           } : {}),
           ...(["kept", "classified"].includes(day.reasonReview) ? {
             reasonReview: day.reasonReview,

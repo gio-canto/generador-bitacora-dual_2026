@@ -3,12 +3,13 @@ import nonWorkingReasons from "../data/non-working-reasons.json";
 import {EVENT_PHASE_CODES,specialEventByCode} from "./special-events.js";
 const VALID=["laboral","falta","sin_labores","inhabil","evento"];
 export const MANUAL_DAYS=["Martes","Miércoles","Jueves","Viernes"];
-export const blankManualDays=()=>MANUAL_DAYS.map(()=>({status:"",hours:"",reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin"}));
+export const blankManualDays=()=>MANUAL_DAYS.map(()=>({status:"",hours:"",reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin",eventResult:""}));
 export const manualDaysFromStatistics=statistics=>statistics?.entries?.length===4
  ?statistics.entries.map(day=>({status:day.status,
     hours:["laboral","evento"].includes(day.status)&&day.minutes?String(day.minutes/60):"",
     reasonCode:String(day.reasonCode||0),eventPhase:day.eventPhase||"no_aplica",
-    eventDiscipline:day.eventDiscipline||"No aplica",eventMode:day.eventMode||"sin"})):blankManualDays();
+    eventDiscipline:day.eventDiscipline||"No aplica",eventMode:day.eventMode||"sin",
+    eventResult:day.eventResult||""})):blankManualDays();
 export const reasonsForStatus=status=>status==="falta"?absenceReasons:status==="sin_labores"?nonWorkingReasons:[];
 export function buildManualStatistics(days){
  if(!Array.isArray(days)||days.length!==4)throw Error("Se requieren cuatro jornadas.");
@@ -38,7 +39,10 @@ export function buildManualStatistics(days){
      if(day.eventDiscipline&&!ev.disciplines.includes(day.eventDiscipline)&&ev.id!=="otros")
        throw Error("Revisa la disciplina del evento.");
      if(!["con","sin"].includes(day.eventMode))throw Error("Selecciona la modalidad del evento.");
-     extra={eventPhase:phase,eventDiscipline:day.eventDiscipline||"",eventMode:day.eventMode};
+     const result=String(day.eventResult||"").trim();
+     if(result.length>120)throw Error("El resultado no debe superar 120 caracteres.");
+     extra={eventPhase:phase,eventDiscipline:day.eventDiscipline||"",eventMode:day.eventMode,
+       ...(result?{eventResult:result}:{})};
    }
    const catalog=status==="falta"?absenceReasons:reasonsForStatus(status);
    return {status,minutes,reasonCode,reasonId:status==="evento"?(specialEventByCode(reasonCode)?.id||""):(catalog.find(x=>x.code===reasonCode)?.id||""),...extra};

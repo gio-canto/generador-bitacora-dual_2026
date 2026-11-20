@@ -23,13 +23,15 @@ export const eventDisciplineFromCode=(eventId,code)=>{
   const e=catalog.find(x=>x.id===eventId);
   return code>0?(e?.disciplines?.[code]||""):"";
 };
-export function specialEventText(event,phase="no_aplica",discipline="",customName="") {
+export function specialEventText(event,phase="no_aplica",discipline="",customName="",eventResult="") {
   if(!event)return "";
   const title=event.id==="otros"?(String(customName||"").trim()||"un evento especial"):event.label;
-  return String(event.phaseTexts?.[phase] || event.text || "")
+  const base=String(event.phaseTexts?.[phase] || event.text || "")
     .replaceAll("{evento}",title)
     .replaceAll("{fase}",phase&&phase!=="no_aplica"?", fase "+(EVENT_PHASE_LABELS[phase]||phase).toLowerCase():"")
     .replaceAll("{disciplina}",discipline&&discipline!=="No aplica"?", disciplina "+discipline:"");
+  const result=String(eventResult||"").trim().replace(/[.\s]+$/,"");
+  return result ? base.trimEnd()+" Resultado obtenido: "+result+"." : base;
 }
 export function validSpecialEvent(entry,school) {
   const e=specialEventById(entry?.eventId,school);
@@ -37,5 +39,6 @@ export function validSpecialEvent(entry,school) {
     (e.id!=="otros"||String(entry.eventName||"").trim())&&
     (!entry.eventDiscipline||e.disciplines.includes(entry.eventDiscipline)||
        (e.id==="otros"&&String(entry.eventDiscipline).length<=100))&&
-    ["con","sin"].includes(entry.eventMode));
+    ["con","sin"].includes(entry.eventMode)&&
+    (entry.eventResult===undefined || (typeof entry.eventResult==="string"&&entry.eventResult.length<=120)));
 }

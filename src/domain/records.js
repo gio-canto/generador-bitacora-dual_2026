@@ -2,8 +2,8 @@ import { validSpecialEvent } from "../services/special-events.js";
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
 import { LIMBO_COMPANY } from "../services/delivery-registry.js";
-export const VERSION = "0.62.0";
-export const RELEASE = "Eventos especiales";
+export const VERSION = "0.62.1";
+export const RELEASE = "Resultados de eventos especiales";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
@@ -230,7 +230,8 @@ export function recordShape(r) {
         ) &&
         (e.date === "" || validDate(e.date)) &&
         (e.status !== "evento" || (["con","sin"].includes(e.eventMode) &&
-          ["eventId","eventName","eventPhase","eventDiscipline"].every(key=>e[key]===undefined||string(e[key],180)))) &&
+          ["eventId","eventName","eventPhase","eventDiscipline"].every(key=>e[key]===undefined||string(e[key],180)) &&
+          (e.eventResult===undefined || string(e.eventResult,120)))) &&
         ["laboral", "falta", "sin_labores", "inhabil", "evento", undefined].includes(
           e.status,
         ),

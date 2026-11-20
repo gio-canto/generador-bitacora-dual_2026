@@ -1,12 +1,14 @@
-# Eventos especiales · versión 0.62.0
+# Eventos especiales · versión 0.62.1
 
 ## Uso
 
-El quinto estado **Evento especial** permite capturar Evento → Fase → Disciplina → Modalidad y editar la descripción. No reemplaza ni cambia el comportamiento de «Falta», «Sin labores» o «Día inhábil».
+El estado **Evento especial** permite capturar Evento → Fase → Disciplina → Modalidad → Lugar o resultado obtenido (opcional) y editar la descripción. La advertencia indica para qué participaciones se utiliza esta opción: concursos, encuentros, olimpiadas y actividades académicas, culturales, cívicas, deportivas o de representación institucional. No reemplaza ni cambia el comportamiento de «Falta», «Sin labores» o «Día inhábil».
 
 **Con labores:** el alumno también realizó trabajo Dual; se requieren horas de entrada y salida y el área, y únicamente esos minutos se contabilizan como trabajo.
 
 **Sin labores:** el alumno participó en el evento y no realizó trabajo Dual; en el PDF se muestran guiones en horario y área. La modalidad habla del **alumno**, no de la apertura o cierre de su empresa.
+
+El campo «Lugar o resultado obtenido» aparece en todos los eventos y muestra el ejemplo «1.er lugar, finalista o participación». Puede dejarse vacío. Cuando se captura, se añade al texto sugerido como «Resultado obtenido: ...» y aparece en la actividad del PDF; el alumno conserva la posibilidad de editar manualmente la descripción.
 
 El PDF imprime únicamente **EVENTO** como encabezado de la celda de actividades y no aplica fondo gris. Los eventos no se suman a las faltas. El aviso del Generador pide informar a Vinculación y al responsable correspondiente, sin dar por acreditada una autorización institucional.
 
@@ -20,7 +22,7 @@ Ejemplo de una entrada compartida:
 {
   "id": "festival",
   "code": 1,
-  "label": "Festival Académico de la Dirección General de Educación Tecnológica Industrial y de Servicios",
+  "label": "Festival Académico de la DGETI",
   "schools": "all",
   "phases": ["local", "regional", "estatal", "nacional"],
   "disciplines": ["No aplica", "Pensamiento matemático", "Inglés"],
@@ -68,7 +70,7 @@ La opción `otros` tiene código 63. Solicita el nombre personalizado y permite 
 
 Las semanas sin eventos siguen generando `BD26|4` con `S5:`. Las semanas con algún evento generan `BD26|5` con `S6:`.
 
-S6 transporta el estado de cada jornada, minutos efectivamente trabajados, motivo del evento, fase, índice de disciplina del catálogo y modalidad. No incluye textos libres. Registro Dual lee ambas versiones, permite captura manual de eventos, conserva datos en JSON y contabiliza estas jornadas aparte de las faltas.
+S6 transporta el estado de cada jornada, minutos efectivamente trabajados, motivo del evento, fase, índice de disciplina del catálogo y modalidad. **No incluye textos libres ni el lugar o resultado obtenido.** Ese dato permanece en la descripción del PDF y en los registros locales de capturas manuales; al leer un Data Matrix, el resultado se consulta en el documento. Registro Dual lee ambas versiones, permite captura manual de eventos, conserva datos en JSON y contabiliza estas jornadas aparte de las faltas.
 
 Los concursos registrados anteriormente como faltas **no se reclasifican automáticamente**. Los PDF históricos siguen siendo válidos.
 

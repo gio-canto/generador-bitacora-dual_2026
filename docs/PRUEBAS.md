@@ -430,3 +430,7 @@ Pruebas automáticas en `tests/v06010-final-pdf-flow.test.jsx`. Revisión manual
 ## Eventos especiales (0.62.0)
 
 Verificar catálogo por plantel, selector Evento → Fase → Disciplina → Modalidad, Otros, texto editable, PDF EVENTO sin fondo gris, horario y área según labores, lectura S5/S6, captura manual, respaldo y restauración, estadísticas sin contabilizar eventos como faltas. Ejecutar `npm run check`.
+
+## Campo opcional de resultado (0.62.1)
+
+Comprobar que todos los eventos muestran el placeholder del lugar o resultado obtenido; se agrega a la descripción y al PDF sólo cuando se captura; se conserva en el registro manual y el respaldo JSON; S5/S6 no cambian y la ausencia de resultado conserva la compatibilidad. El aviso conserva indicaciones generales sin la frase anterior de contabilización de faltas.
