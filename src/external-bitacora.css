@@ -41,7 +41,7 @@
 .external-fields input,.external-fields select,.external-day-fields input,.external-day-fields select,
 .external-day-fields textarea,.external-transcript textarea{
  box-sizing:border-box;min-height:42px;min-width:0;max-width:100%;width:100%;border:1px solid #d8e0ea;border-radius:9px;
- background:#fff;color:#1b293e;font:400 .89rem/1.4 inherit;padding:10px 12px;outline-offset:2px}
+ background:#fff;color:#1b293e;font-size:.89rem;line-height:1.4;font-family:inherit;font-weight:400;padding:10px 12px;outline-offset:2px}
 .external-fields input:focus,.external-fields select:focus,.external-day-fields input:focus,
 .external-day-fields select:focus,.external-day-fields textarea:focus{border-color:#275b93;outline:2px solid #d4e6fc}
 .external-warnings{margin:0 0 14px;padding:10px 12px 10px 27px;background:#fff8e9;
@@ -90,3 +90,6 @@
  .external-save button{flex:1 1 120px}
 }
 @media(prefers-reduced-motion:reduce){.external-overlay,.external-panel{scroll-behavior:auto}}
+.external-delivery-detail{max-width:245px;margin:5px 0;font-size:.73rem;color:#62748a}
+.external-delivery-detail summary{cursor:pointer;color:#294d80;font-weight:600}
+.external-delivery-detail span{display:block;overflow-wrap:anywhere;margin-top:4px}

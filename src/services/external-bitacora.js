@@ -143,7 +143,7 @@ export function externalReviewMetadata(item,days){
  const keep=value=>externalClean(value).slice(0,900);
  return {
    filename:keep(item.filename).slice(0,180),
-   method:["pdf-text","ocr","mixed","manual"].includes(item.method)?item.method:"ocr",
+   method:["pdf-text","docx-text","ocr","mixed","manual"].includes(item.method)?item.method:"ocr",
    pages:Math.min(16,Math.max(1,Number(item.pages)||1)),
    reviewedAt:new Date().toISOString(),
    name:keep(item.name).slice(0,120),

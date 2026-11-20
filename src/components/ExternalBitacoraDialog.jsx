@@ -76,7 +76,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          const extracted=extractExternalFields(result.text);
          const studentId=suggestExternalStudent(extracted,students);
          const weekId=suggestExternalWeek(extracted,weeks);
-         const current={key:crypto.randomUUID(),filename:file.name,kind,url,
+         const current={key:(globalThis.crypto?.randomUUID?.()||"external-"+Date.now()+"-"+added),filename:file.name,kind,url,
            pages:result.pages,method:result.method,truncated:result.truncated,
            text:result.text,form:{name:extracted.name,company:extracted.company,
              studentId,weekId,days:extracted.days},warnings:extracted.warnings,
@@ -84,7 +84,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          if(mounted.current){setItems(prev=>[...prev,current]);setSelected(items.length+added);added++;}
        }catch(e){
          if(mounted.current){
-           setItems(prev=>[...prev,{key:crypto.randomUUID(),filename:file.name,kind,url,
+           setItems(prev=>[...prev,{key:(globalThis.crypto?.randomUUID?.()||"external-error-"+Date.now()+"-"+added),filename:file.name,kind,url,
              state:"error",message:e?.message||"No se pudo leer el archivo."}]);
            setSelected(items.length+added);added++;
          }
@@ -120,6 +120,16 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    const week=weeks.find(x=>x.id===weekId);
    if(!week){setError("Selecciona la semana correspondiente.");return;}
    if(week.closedAt){setError("La semana está cerrada. Reábrela para registrar la entrega.");return;}
+   const invalidDates=days.some((day,index)=>{
+     if(!day.date)return false;
+     const d=new Date(week.startDate+"T12:00:00Z");
+     d.setUTCDate(d.getUTCDate()+index);
+     return day.date!==d.toISOString().slice(0,10);
+   });
+   if(invalidDates){
+     setError("Una fecha de la bitácora no coincide con el día correspondiente de la semana seleccionada.");
+     return;
+   }
    const duplicate=Boolean(week.deliveries?.[studentId]);
    if(duplicate&&!window.confirm("Ya existe un registro de este alumno en esa semana. ¿Deseas reemplazarlo con la lectura externa?"))return;
    try{
