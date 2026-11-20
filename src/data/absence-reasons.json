@@ -315,7 +315,8 @@
       "concurso de prototipos local",
       "emprendimiento fase local"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   },
   {
     "id": "prototypes_entrepreneurship_state",
@@ -328,7 +329,8 @@
       "concurso de prototipos estatal",
       "emprendimiento fase estatal"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   },
   {
     "id": "prototypes_entrepreneurship_national",
@@ -341,7 +343,8 @@
       "concurso de prototipos nacional",
       "emprendimiento fase nacional"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   },
   {
     "id": "academic_festival_local",
@@ -353,7 +356,8 @@
       "festival academico fase local",
       "festival academico etapa local"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   },
   {
     "id": "academic_festival_state",
@@ -365,7 +369,8 @@
       "festival academico fase estatal",
       "festival academico etapa estatal"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   },
   {
     "id": "academic_festival_national",
@@ -377,7 +382,8 @@
       "festival academico fase nacional",
       "festival academico etapa nacional"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   },
   {
     "id": "enac_local",
@@ -389,7 +395,8 @@
       "enac fase local",
       "encuentro nacional de arte y cultura fase local"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   },
   {
     "id": "enac_state",
@@ -401,7 +408,8 @@
       "enac fase estatal",
       "encuentro nacional de arte y cultura fase estatal"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   },
   {
     "id": "enac_national",
@@ -413,6 +421,7 @@
       "enac fase nacional",
       "encuentro nacional de arte y cultura fase nacional"
     ],
-    "priority": 50
+    "priority": 50,
+    "deprecatedForNewEntries": true
   }
 ]
