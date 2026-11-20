@@ -203,7 +203,7 @@
   {
     "id": "semana_ciencia_cbtis134",
     "code": 12,
-    "label": "Semana de Ciencia y Tecnología del CBTis No. 134",
+    "label": "Actividad institucional del CBTis No. 134 (ejemplo)",
     "schools": [
       "cbtis-134"
     ],
@@ -213,7 +213,7 @@
     "disciplines": [
       "No aplica"
     ],
-    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+    "text": "Durante esta jornada participé en {evento}, realizando las actividades institucionales correspondientes."
   },
   {
     "id": "otros",

@@ -126,6 +126,10 @@ npm run check
 
 También conviene abrir una jornada, marcar **Falta**, elegir el motivo modificado y comprobar que el texto se inserte y siga siendo editable.
 
+## Motivos históricos trasladados a Eventos especiales
+
+Desde 0.62.0, los nueve motivos de Prototipos, Festival Académico y ENAC se conservan en este archivo únicamente para lectura de bitácoras antiguas. Cada entrada usa `"deprecatedForNewEntries": true`; por ello no aparece en el selector nuevo de faltas. Para agregar certámenes o cambiar sus fases utiliza [EVENTOS_ESPECIALES.md](EVENTOS_ESPECIALES.md), no este catálogo.
+
 ## Qué no debes modificar
 
 Para cambios normales del catálogo no es necesario tocar:
