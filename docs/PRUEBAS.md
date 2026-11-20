@@ -434,3 +434,7 @@ Verificar catálogo por plantel, selector Evento → Fase → Disciplina → Mod
 ## Campo opcional de resultado (0.62.1)
 
 Comprobar que todos los eventos muestran el placeholder del lugar o resultado obtenido; se agrega a la descripción y al PDF sólo cuando se captura; se conserva en el registro manual y el respaldo JSON; S5/S6 no cambian y la ausencia de resultado conserva la compatibilidad. El aviso conserva indicaciones generales sin la frase anterior de contabilización de faltas.
+
+## Modalidad única de eventos especiales (0.62.2)
+
+Verificar en Generador y Registro Dual que la modalidad no es seleccionable para nuevos eventos; éstos usan «Con labores» y solicitan horas y área; el PDF sólo presenta EVENTO. Las jornadas históricas S6 «Sin labores» deben seguir decodificándose con sus datos originales. Ejecutar `npm run check`.
