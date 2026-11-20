@@ -93,8 +93,11 @@ describe("0.63.0 · lectura de bitácoras externas",()=>{
      timestamp:"2026-11-20T12:00:00Z"});
    expect(saved.deliveries[student.id]).toMatchObject({
      source:"import",usageSource:"other",
-     externalReview:{filename:"bitacora.docx",method:"docx-text",days:[{activity:expect.stringContaining("Clasificación")}]}
+     externalReview:{filename:"bitacora.docx",method:"docx-text"}
    });
+   expect(saved.deliveries[student.id].externalReview.days).toHaveLength(4);
+   expect(saved.deliveries[student.id].externalReview.days[0].activity)
+     .toContain("Clasificación");
    const restored=sanitizeDeliveryState({schemaVersion:9,students:[student],weeks:[saved]});
    expect(restored.weeks[0].deliveries[student.id].externalReview.filename).toBe("bitacora.docx");
    expect(restored.weeks[0].deliveries[student.id]).not.toHaveProperty("originalFile");
