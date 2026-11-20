@@ -26,7 +26,7 @@ export const eventDisciplineFromCode=(eventId,code)=>{
 export function specialEventText(event,phase="no_aplica",discipline="",customName="") {
   if(!event)return "";
   const title=event.id==="otros"?(String(customName||"").trim()||"un evento especial"):event.label;
-  return String(event.text||"")
+  return String(event.phaseTexts?.[phase] || event.text || "")
     .replaceAll("{evento}",title)
     .replaceAll("{fase}",phase&&phase!=="no_aplica"?", fase "+(EVENT_PHASE_LABELS[phase]||phase).toLowerCase():"")
     .replaceAll("{disciplina}",discipline&&discipline!=="No aplica"?", disciplina "+discipline:"");

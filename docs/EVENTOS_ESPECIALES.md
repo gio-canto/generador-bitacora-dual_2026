@@ -42,6 +42,7 @@ Para mostrar un evento sólo en el CBTis No. 134, sustituye `"schools": "all"` p
 | `enabled` | `false` para ocultar un evento sin eliminar su historia. |
 | `phases` | Fases disponibles del evento. |
 | `disciplines` | Lista de modalidades; primera opción «No aplica», con hasta 31 adicionales. |
+| `phaseTexts` | Objeto opcional con textos específicos por fase; cada clave debe coincidir con una fase de `phases`. |
 | `text` | Texto sugerido editable, con `{evento}`, `{fase}` y `{disciplina}`. |
 
 Fases válidas: `no_aplica`, `local`, `regional`, `estatal`, `nacional` e `internacional`. Declara sólo las etapas previstas en cada convocatoria.
@@ -54,6 +55,8 @@ Fases válidas: `no_aplica`, `local`, `regional`, `estatal`, `nacional` e `inter
 4. Para renombrar un evento, modifica sólo `label` y, si procede, `text`. Conserva su `id` y `code`.
 5. Para retirarlo de nuevas capturas, usa `"enabled": false`; para excluir un plantel, usa `excludeSchools`.
 6. Comprueba el JSON, ejecuta `npm run check` y registra el cambio en CHANGELOG y la nueva versión.
+
+Cuando las etapas requieran redacciones distintas, agrega `phaseTexts` con claves como `"local"`, `"estatal"` y `"nacional"`; el Generador utilizará ese texto y, para las etapas sin redacción propia, conservará `text` como alternativa.
 
 **No reutilices códigos ni reordenes o elimines disciplinas ya publicadas.** El Data Matrix almacena índices de disciplinas, por lo que el orden del catálogo afecta la lectura histórica.
 

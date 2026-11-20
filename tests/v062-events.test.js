@@ -39,7 +39,9 @@ describe("v0.62.0 · catálogo de eventos",()=>{
   it("propone texto editable con fase, disciplina y otros",()=>{
     const school="CBTis No. 134";
     const event=specialEventById("festival",school);
-    expect(specialEventText(event,"estatal","Inglés")).toMatch(/fase estatal, disciplina Inglés/);
+    expect(specialEventText(event,"estatal","Inglés")).toMatch(/etapa estatal/);
+    expect(specialEventText(event,"estatal","Inglés")).toMatch(/Inglés/);
+    expect(specialEventText(event,"local","Inglés")).not.toEqual(specialEventText(event,"estatal","Inglés"));
     expect(specialEventText(specialEventById("otros",school),"no_aplica","","Jornada institucional")).toContain("Jornada institucional");
     expect(validSpecialEvent({eventId:"otros",eventName:"Actividad interna",eventPhase:"local",eventDiscipline:"",eventMode:"sin"},school)).toBe(true);
     expect(validSpecialEvent({eventId:"otros",eventName:"",eventPhase:"local",eventMode:"sin"},school)).toBe(false);

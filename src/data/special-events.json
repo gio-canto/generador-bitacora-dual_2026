@@ -20,7 +20,13 @@
       "Ciencias sociales",
       "Ciencias naturales"
     ],
-    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en la etapa local de {evento}{disciplina}, realizando las evaluaciones académicas correspondientes en el plantel.",
+      "regional": "Durante esta jornada participé en la etapa regional de {evento}{disciplina}, realizando las evaluaciones académicas correspondientes a esta fase del certamen.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel y realizando las evaluaciones correspondientes.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, integrando la representación estatal y realizando las evaluaciones correspondientes."
+    }
   },
   {
     "id": "prototipos",
@@ -41,7 +47,12 @@
       "Emprendimiento verde",
       "Emprendimiento en tecnologías"
     ],
-    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en la etapa local de {evento}{disciplina}, mediante la presentación y evaluación del proyecto inscrito.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel, presentando el proyecto ante el jurado correspondiente.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, realizando la exposición y evaluación del proyecto inscrito."
+    }
   },
   {
     "id": "enac",
@@ -67,7 +78,12 @@
       "Creación literaria",
       "Música"
     ],
-    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en la etapa local de {evento}{disciplina}, realizando las actividades artísticas o culturales correspondientes.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, integrando la delegación estatal y desarrollando las actividades correspondientes."
+    }
   },
   {
     "id": "civico",
@@ -85,7 +101,12 @@
       "Banda Reglamentaria",
       "Coro del Himno Nacional"
     ],
-    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en las actividades de selección interna para {evento}{disciplina}, realizando las prácticas y evaluaciones correspondientes.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, integrando la representación estatal."
+    }
   },
   {
     "id": "deportivo",
@@ -109,7 +130,13 @@
       "Sóftbol",
       "Fútbol bandera"
     ],
-    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en la etapa local de {evento}{disciplina}, realizando las pruebas y competencias deportivas correspondientes.",
+      "regional": "Durante esta jornada participé en la etapa regional de {evento}{disciplina}, en representación de mi plantel.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, integrando la delegación estatal y realizando las competencias correspondientes."
+    }
   },
   {
     "id": "olimpiada_matematicas",
