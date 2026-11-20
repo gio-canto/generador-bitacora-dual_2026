@@ -1,8 +1,9 @@
+import { validSpecialEvent } from "../services/special-events.js";
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
 import { LIMBO_COMPANY } from "../services/delivery-registry.js";
-export const VERSION = "0.61.1";
-export const RELEASE = "Selector de áreas mejorado";
+export const VERSION = "0.62.0";
+export const RELEASE = "Eventos especiales";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
@@ -111,9 +112,11 @@ export function validateRecord(r, step) {
       else if (seen.has(e.date))
         errors[k + "date"] = "Esta fecha ya está en otra jornada.";
       seen.add(e.date);
-      if (!["laboral", "falta", "sin_labores", "inhabil"].includes(e.status))
+      if (!["laboral", "falta", "sin_labores", "inhabil", "evento"].includes(e.status))
         errors[k + "status"] = "Selecciona un estado válido.";
-      if (e.status === "laboral") {
+      if (e.status === "evento" && !validSpecialEvent(e,r.school))
+        errors[k+"eventId"] = "Selecciona el evento, la fase, la disciplina y la modalidad.";
+      if (e.status === "laboral" || (e.status === "evento" && e.eventMode === "con")) {
         if (!validTime(e.start)) errors[k + "start"] = "Indica la entrada.";
         if (!validTime(e.end) || e.end <= e.start)
           errors[k + "end"] = "La salida debe ser posterior a la entrada.";
@@ -123,7 +126,7 @@ export function validateRecord(r, step) {
         required(
           k + "activity",
           e.activity,
-          e.status === "laboral" ? "las actividades" : "la justificación",
+          ["laboral","evento"].includes(e.status) ? "las actividades" : "la justificación",
           900,
         );
         const words = (e.activity || "").match(/\p{L}{2,}/gu) || [];
@@ -226,7 +229,9 @@ export function recordShape(r) {
           string(e[k], k === "activity" ? 900 : 180),
         ) &&
         (e.date === "" || validDate(e.date)) &&
-        ["laboral", "falta", "sin_labores", "inhabil", undefined].includes(
+        (e.status !== "evento" || (["con","sin"].includes(e.eventMode) &&
+          ["eventId","eventName","eventPhase","eventDiscipline"].every(key=>e[key]===undefined||string(e[key],180)))) &&
+        ["laboral", "falta", "sin_labores", "inhabil", "evento", undefined].includes(
           e.status,
         ),
     )

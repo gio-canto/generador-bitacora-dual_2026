@@ -1,0 +1,263 @@
+[
+  {
+    "id": "festival",
+    "code": 1,
+    "label": "Festival Académico de la Dirección General de Educación Tecnológica Industrial y de Servicios",
+    "schools": "all",
+    "phases": [
+      "local",
+      "regional",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Pensamiento matemático",
+      "Lengua y comunicación",
+      "Inglés",
+      "Cultura digital",
+      "Conciencia histórica",
+      "Ciencias sociales",
+      "Ciencias naturales"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en la etapa local de {evento}{disciplina}, realizando las evaluaciones académicas correspondientes en el plantel.",
+      "regional": "Durante esta jornada participé en la etapa regional de {evento}{disciplina}, realizando las evaluaciones académicas correspondientes a esta fase del certamen.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel y realizando las evaluaciones correspondientes.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, integrando la representación estatal y realizando las evaluaciones correspondientes."
+    }
+  },
+  {
+    "id": "prototipos",
+    "code": 2,
+    "label": "Concurso Nacional de Prototipos y Proyectos de Emprendimiento de la DGETI",
+    "schools": "all",
+    "phases": [
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Prototipo tecnológico",
+      "Prototipo didáctico",
+      "Desarrollo de software",
+      "Emprendimiento social",
+      "Emprendimiento verde",
+      "Emprendimiento en tecnologías"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en la etapa local de {evento}{disciplina}, mediante la presentación y evaluación del proyecto inscrito.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel, presentando el proyecto ante el jurado correspondiente.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, realizando la exposición y evaluación del proyecto inscrito."
+    }
+  },
+  {
+    "id": "enac",
+    "code": 3,
+    "label": "Encuentro Nacional de Arte y Cultura de la DGETI",
+    "schools": "all",
+    "phases": [
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Video documental",
+      "Fotografía",
+      "Teatro",
+      "Oratoria",
+      "Declamación",
+      "Pintura",
+      "Dibujo artístico",
+      "Danza",
+      "Canto",
+      "Creación literaria",
+      "Música"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en la etapa local de {evento}{disciplina}, realizando las actividades artísticas o culturales correspondientes.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, integrando la delegación estatal y desarrollando las actividades correspondientes."
+    }
+  },
+  {
+    "id": "civico",
+    "code": 4,
+    "label": "Encuentro Nacional Cívico de la DGETI",
+    "schools": "all",
+    "phases": [
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Escolta de Bandera",
+      "Banda Reglamentaria",
+      "Coro del Himno Nacional"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en las actividades de selección interna para {evento}{disciplina}, realizando las prácticas y evaluaciones correspondientes.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, integrando la representación estatal."
+    }
+  },
+  {
+    "id": "deportivo",
+    "code": 5,
+    "label": "Encuentro Nacional Deportivo de la DGETI",
+    "schools": "all",
+    "phases": [
+      "local",
+      "regional",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Atletismo",
+      "Ajedrez",
+      "Baloncesto",
+      "Béisbol",
+      "Fútbol",
+      "Voleibol",
+      "Sóftbol",
+      "Fútbol bandera"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad.",
+    "phaseTexts": {
+      "local": "Durante esta jornada participé en la etapa local de {evento}{disciplina}, realizando las pruebas y competencias deportivas correspondientes.",
+      "regional": "Durante esta jornada participé en la etapa regional de {evento}{disciplina}, en representación de mi plantel.",
+      "estatal": "Durante esta jornada participé en la etapa estatal de {evento}{disciplina}, en representación de mi plantel.",
+      "nacional": "Durante esta jornada participé en la etapa nacional de {evento}{disciplina}, integrando la delegación estatal y realizando las competencias correspondientes."
+    }
+  },
+  {
+    "id": "olimpiada_matematicas",
+    "code": 6,
+    "label": "Olimpiada Mexicana de Matemáticas",
+    "schools": "all",
+    "phases": [
+      "local",
+      "regional",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "olimpiada_informatica",
+    "code": 7,
+    "label": "Olimpiada Mexicana de Informática",
+    "schools": "all",
+    "phases": [
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "feria_ciencia",
+    "code": 8,
+    "label": "Feria científica y tecnológica",
+    "schools": "all",
+    "phases": [
+      "no_aplica",
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "acto_civico",
+    "code": 9,
+    "label": "Ceremonia o acto cívico institucional",
+    "schools": "all",
+    "phases": [
+      "no_aplica"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "representacion",
+    "code": 10,
+    "label": "Comisión o representación institucional",
+    "schools": "all",
+    "phases": [
+      "no_aplica",
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "externo",
+    "code": 11,
+    "label": "Actividad académica externa",
+    "schools": "all",
+    "phases": [
+      "no_aplica"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "semana_ciencia_cbtis134",
+    "code": 12,
+    "label": "Actividad institucional del CBTis No. 134 (ejemplo)",
+    "schools": [
+      "cbtis-134"
+    ],
+    "phases": [
+      "no_aplica"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}, realizando las actividades institucionales correspondientes."
+  },
+  {
+    "id": "otros",
+    "code": 63,
+    "label": "Otros",
+    "schools": "all",
+    "phases": [
+      "no_aplica",
+      "local",
+      "regional",
+      "estatal",
+      "nacional",
+      "internacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  }
+]

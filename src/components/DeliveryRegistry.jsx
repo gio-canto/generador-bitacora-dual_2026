@@ -3807,6 +3807,7 @@ export default function DeliveryRegistry({ onClose }) {
           key={activeWeek.id+":"+manualTarget.studentId}
           week={activeWeek}
           student={state.students.find(student=>student.id===manualTarget.studentId)}
+          school={state.context?.school||state.context?.schoolName||""}
           previous={activeWeek.deliveries?.[manualTarget.studentId]}
           initialStatus={manualTarget.status}
           batchProgress={weekCaptureQueue.length ? {

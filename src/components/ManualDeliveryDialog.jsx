@@ -1,3 +1,4 @@
+import {eventsForSchool,specialEventByCode,EVENT_PHASE_LABELS} from "../services/special-events.js";
 import { useEffect, useRef, useState } from "react";
 import {
   MANUAL_DAYS, blankManualDays, manualDaysFromStatistics,
@@ -5,7 +6,7 @@ import {
 } from "../services/manual-statistics.js";
 
 export default function ManualDeliveryDialog({
-  student, week, previous, initialStatus, onCancel, onSave, onSkip, batchProgress,
+  student, school, week, previous, initialStatus, onCancel, onSave, onSkip, batchProgress,
 }) {
   const [status, setStatus] = useState(initialStatus ||
     (["entregado", "entregado_tarde", "no_entregado"].includes(previous?.status) ?
@@ -112,16 +113,17 @@ export default function ManualDeliveryDialog({
                     <select value={days[index].status}
                       aria-label={day + " · jornada"}
                       onChange={event => changeDay(index, {
-                        status:event.target.value, hours:"", reasonCode:"0",
+                        status:event.target.value, hours:"", reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin",
                       })}>
                       <option value="">Sin capturar</option>
                       <option value="laboral">Con labores</option>
                       <option value="falta">Falta</option>
                       <option value="sin_labores">Sin labores</option>
                       <option value="inhabil">Día inhábil</option>
+                      <option value="evento">Evento especial</option>
                     </select>
                   </label>
-                  {days[index].status === "laboral" && (
+                  {(days[index].status === "laboral" || (days[index].status === "evento" && days[index].eventMode === "con")) && (
                     <label className="delivery-field">
                       <span>Horas realizadas</span>
                       <input type="number" min="0.0166667" max="24" step="any"
@@ -130,6 +132,46 @@ export default function ManualDeliveryDialog({
                         onChange={event=>changeDay(index, {hours:event.target.value})}
                         placeholder="4"/>
                     </label>
+                  )}
+                  {days[index].status === "evento" && (
+                    <>
+                      <label className="delivery-field"><span>Evento</span>
+                        <select value={days[index].reasonCode==="0"?"":days[index].reasonCode} aria-label={day+" · evento"}
+                          onChange={e=>{const selected=specialEventByCode(Number(e.target.value));
+                            changeDay(index,{reasonCode:e.target.value||"0",eventPhase:selected?.phases?.[0]||"no_aplica",
+                              eventDiscipline:selected?.disciplines?.[0]||"No aplica",eventMode:"sin",hours:""});}}>
+                          <option value="">Selecciona evento…</option>
+                          {eventsForSchool(school).map(item=><option key={item.id} value={String(item.code)}>{item.label}</option>)}
+                        </select>
+                      </label>
+                      {specialEventByCode(days[index].reasonCode) && (
+                        <>
+                          <label className="delivery-field"><span>Fase</span>
+                            <select value={days[index].eventPhase} aria-label={day+" · fase"} onChange={e=>changeDay(index,{eventPhase:e.target.value})}>
+                              {specialEventByCode(days[index].reasonCode).phases.map(x=>
+                                <option key={x} value={x}>{EVENT_PHASE_LABELS[x]||x}</option>)}
+                            </select>
+                          </label>
+                          <label className="delivery-field"><span>Disciplina</span>
+                            {Number(days[index].reasonCode)===63 ?
+                              <input value={days[index].eventDiscipline} aria-label={day+" · disciplina"}
+                                onChange={e=>changeDay(index,{eventDiscipline:e.target.value})}/> :
+                              <select value={days[index].eventDiscipline} aria-label={day+" · disciplina"}
+                                onChange={e=>changeDay(index,{eventDiscipline:e.target.value})}>
+                                {specialEventByCode(days[index].reasonCode).disciplines.map(x=>
+                                  <option key={x} value={x}>{x}</option>)}
+                              </select>}
+                          </label>
+                        </>
+                      )}
+                      <label className="delivery-field"><span>Modalidad</span>
+                        <select value={days[index].eventMode} aria-label={day+" · modalidad"}
+                          onChange={e=>changeDay(index,{eventMode:e.target.value,hours:""})}>
+                          <option value="sin">Sin labores</option>
+                          <option value="con">Con labores</option>
+                        </select>
+                      </label>
+                    </>
                   )}
                   {["falta","sin_labores"].includes(days[index].status) && (
                     <label className="delivery-field">
@@ -140,6 +182,10 @@ export default function ManualDeliveryDialog({
                         <option value="0">Sin clasificar</option>
                         {reasonsForStatus(days[index].status).map(reason=>
                           <option key={reason.id} value={String(reason.code)}>{reason.label}</option>)}
+                        {days[index].status==="falta" && days[index].reasonCode !== "0" &&
+                          !reasonsForStatus("falta").some(reason=>String(reason.code)===days[index].reasonCode) &&
+                          days[index].reasonCode!=="63" &&
+                          <option value={days[index].reasonCode}>Motivo histórico · código {days[index].reasonCode}</option>}
                         <option value="63">Otro motivo</option>
                       </select>
                     </label>

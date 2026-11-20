@@ -554,3 +554,10 @@ dialog::backdrop{background:rgba(20,25,40,.3);backdrop-filter:blur(5px)}
 .profile-area-field select,.profile-area-field input{min-width:0;width:100%}
 @media(pointer:coarse){.area-picker-back{width:34px;height:36px;min-height:36px;right:5px}.area-picker-control input.area-custom-value{padding-right:44px}}
 
+
+/* v0.62.0: editor discreto de eventos especiales; conserva la cuadrícula de jornada. */
+.special-event-fields{margin:10px 0 2px;padding:10px 0;border-top:1px solid rgba(120,120,120,.18)}
+.special-event-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.special-event-grid .field{min-width:0}
+.special-event-grid input,.special-event-grid select{width:100%;min-width:0;box-sizing:border-box}
+@media(max-width:620px){.special-event-grid{grid-template-columns:1fr}}

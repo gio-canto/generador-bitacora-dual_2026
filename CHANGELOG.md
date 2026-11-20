@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.62.0 · Eventos especiales por plantel · 2026-11-20
+
+- Publicación restringida a las tres fallas preexistentes identificadas en `app.test.jsx`, `pa-signatures.test.js` y `pdf.test.js`. La verificación automatizada comprueba exactamente los archivos y la cantidad de fallas; cualquier regresión nueva bloquea la publicación. Esta excepción no equivale a pruebas completas aprobadas.
+
+- Nuevo estado «Evento especial» en escritorio y móvil, con selector de evento, fase, disciplina y modalidad con/sin labores del alumno; texto editable y «Otros».
+- Catálogo independiente en `src/data/special-events.json`, con eventos compartidos, exclusivos por plantel y excepciones.
+- El PDF muestra **EVENTO** sin gris, y horario/área solamente si el alumno realizó labores efectivas.
+- Data Matrix `BD26|5`/`S6:` para semanas con evento; compatibilidad con `BD26|4`/`S5:` y respaldos previos.
+- Captura manual de eventos, estadísticas separadas de faltas y guía de mantenimiento `docs/EVENTOS_ESPECIALES.md`.
+
+
 ## 0.61.1 · Selector de áreas intuitivo · 2026-11-06
 
 - Publicación autorizada con 385 de 388 pruebas aprobadas; las tres fallas conocidas están limitadas a `app.test.jsx`, `pa-signatures.test.js` y `pdf.test.js`. El flujo de publicación verifica que no existan fallas adicionales y la excepción sólo aplica al commit de liberación.

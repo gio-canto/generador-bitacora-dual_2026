@@ -150,7 +150,7 @@ export function createMatrixPayload(data = {}) {
   const compactStatistics = encodeWeekStatistics(data.entries);
   return [
     "BD26",
-    "4",
+    compactStatistics.startsWith("S6:") ? "5" : "4",
     name,
     normalizeMatrixText(data.specialty, 120),
     companyMatrixValue(data.company),
@@ -175,12 +175,12 @@ export function parseMatrixPayload(rawValue) {
   const parts = raw.split("|");
   if (
     parts[0]?.toUpperCase() === "BD26" &&
-    parts[1] === "4" &&
+    (parts[1] === "4" || parts[1] === "5") &&
     parts.length >= 7
   ) {
     const statistics = decodeWeekStatistics(parts[7]);
     return {
-      version: 4,
+      version: Number(parts[1]),
       name: clean(parts[2], 180),
       specialty: clean(parts[3], 120),
       company: clean(parts[4], 80),
@@ -361,15 +361,20 @@ function normalizeDelivery(value) {
       ? { usageSource: value.usageSource } : {}),
     ...(Number.isInteger(value.matrixVersion) && value.matrixVersion > 0
       ? { matrixVersion: value.matrixVersion } : {}),
-    ...(value.statistics && value.statistics.version === 5 &&
+    ...(value.statistics && [5,6].includes(value.statistics.version) &&
       Array.isArray(value.statistics.entries) && value.statistics.entries.length === 4 &&
       value.statistics.entries.every((day) =>
-        ["laboral", "falta", "sin_labores", "inhabil"].includes(day?.status) &&
+        ["laboral", "falta", "sin_labores", "inhabil", "evento"].includes(day?.status) &&
         Number.isInteger(day.minutes) && day.minutes >= 0 && day.minutes <= 2046 &&
         Number.isInteger(day.reasonCode) && day.reasonCode >= 0 && day.reasonCode <= 63)
-      ? { statistics: { version: 5, entries: value.statistics.entries.map((day) => ({
+      ? { statistics: { version: value.statistics.version, entries: value.statistics.entries.map((day) => ({
           status: day.status, minutes: day.minutes, reasonCode: day.reasonCode,
           reasonId: clean(day.reasonId, 80),
+          ...(day.status === "evento" && value.statistics.version === 6 ? {
+            eventPhase: clean(day.eventPhase, 24),
+            eventDiscipline: clean(day.eventDiscipline, 100),
+            eventMode: day.eventMode === "con" ? "con" : "sin",
+          } : {}),
           ...(["kept", "classified"].includes(day.reasonReview) ? {
             reasonReview: day.reasonReview,
             reasonReviewedAt: clean(day.reasonReviewedAt, 40),

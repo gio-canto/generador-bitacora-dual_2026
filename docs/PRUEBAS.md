@@ -426,3 +426,7 @@ Pruebas automáticas en `tests/v06010-final-pdf-flow.test.jsx`. Revisión manual
 - Debug debe listar mensajes según su prioridad en la fecha, escuela, especialidad y disparador simulados, y no modificar datos de alumnos.
 - Revisar PWA en modo standalone: regreso de segundo plano, cierre del video, uso de botón «Guardar o abrir PDF», bloqueo de descargas automáticas y repetición de solicitudes.
 - Mantener bitácoras, firmas, Data Matrix, estadísticas, anuncios PNG y eventos de graduación sin regresiones. Estas pruebas físicas deben realizarse en dispositivos reales, no se consideran verificadas por CI.
+
+## Eventos especiales (0.62.0)
+
+Verificar catálogo por plantel, selector Evento → Fase → Disciplina → Modalidad, Otros, texto editable, PDF EVENTO sin fondo gris, horario y área según labores, lectura S5/S6, captura manual, respaldo y restauración, estadísticas sin contabilizar eventos como faltas. Ejecutar `npm run check`.

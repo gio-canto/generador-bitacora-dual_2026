@@ -1,3 +1,4 @@
+import {eventsForSchool,specialEventById,specialEventText,EVENT_PHASE_LABELS,validSpecialEvent} from "../services/special-events.js";
 import { validDate, validTime, weekDates, waitingWeekEntries, LIMBO_DAY_DESCRIPTION } from "../domain/records.js";
 import {
   weekSetup,
@@ -58,6 +59,8 @@ export function startEditor() {
         "Selecciona «Falta» solo cuando tú no asististe, aunque en la empresa sí hubo labores. Avisa a la directora de Vinculación y a tu jefe inmediato, y escribe el motivo de tu inasistencia.",
       sin_labores:
         "Selecciona «Sin labores» cuando por algún motivo no se realizaron actividades en tu empresa. No se usa cuando únicamente tú faltaste. Avisa a la directora de Vinculación y escribe la justificación correspondiente.",
+      evento:
+        "Utiliza «Evento especial» para registrar tu participación en una actividad académica, cívica, cultural, deportiva o de representación institucional. Selecciona el evento, la fase y la disciplina; después indica si también realizaste labores de formación Dual. Informa a Vinculación y al responsable correspondiente. El evento no se contabilizará como falta y podrá ser revisado en Registro Dual.",
       inhabil:
         "Selecciona «Día inhábil» única y exclusivamente cuando la suspensión de actividades esté contemplada en el calendario escolar oficial aplicable a Educación Dual (DGETI, CBTis, SEP o su calendario interno). Si la empresa no trabajó por otro motivo, utiliza «Sin labores».",
     };
@@ -108,7 +111,9 @@ export function startEditor() {
           ? { title: "Antes de registrar la falta", mark: "!" }
           : status === "sin_labores"
             ? { title: "Antes de marcar Sin labores", mark: "i" }
-            : { title: "Antes de marcar Día inhábil", mark: "★" };
+            : status === "evento"
+              ? { title: "Antes de registrar un evento especial", mark: "i" }
+              : { title: "Antes de marcar Día inhábil", mark: "★" };
       if (!dialog) {
         alert(meta.title + "\n\n" + message);
         return;
@@ -728,7 +733,7 @@ export function startEditor() {
       for (let i = 0; i < entries.length; i++) {
         const e = entries[i];
         if (
-          e.status === "laboral" &&
+          (e.status === "laboral" || (e.status === "evento" && e.eventMode === "con")) &&
           (!validTime(e.start) || !validTime(e.end) || e.end <= e.start)
         )
           return {
@@ -737,6 +742,8 @@ export function startEditor() {
             message:
               "Completa entrada y salida. La salida debe ser después de la entrada.",
           };
+        if (e.status === "evento" && !validSpecialEvent(e,$("#school").value))
+          return {ok:false,title:"Revisa el evento del día "+(i+1),message:"Selecciona el evento, su fase, la disciplina y la modalidad. En Otros, indica el nombre del evento."};
         if (e.status === "inhabil") continue;
         const check = validateActivityText(e.activity);
         if (!check.ok)
@@ -889,6 +896,32 @@ export function startEditor() {
     window.bitacoraValidateWeek = validateWeekEntries;
     window.bitacoraValidateAuthorities = validateAuthoritiesForReview;
     window.bitacoraConfirmNames = confirmShortNames;
+
+    function addSpecialEventFields(card,e,i) {
+      if(e.status!=="evento")return;
+      const school=$("#school").value, events=eventsForSchool(school);
+      const selected=specialEventById(e.eventId,school);
+      const option=(value,label,chosen)=>'<option value="'+escapeHtml(value)+'"'+(chosen?' selected':'')+'>'+escapeHtml(label)+'</option>';
+      const eventOptions=events.map(item=>option(item.id,item.label,item.id===e.eventId)).join("");
+      const phases=(selected?.phases||["no_aplica"]).map(value=>option(value,EVENT_PHASE_LABELS[value]||value,value===(e.eventPhase||"no_aplica"))).join("");
+      const disciplines=(selected?.disciplines||["No aplica"]).map(value=>option(value,value,value===(e.eventDiscipline||"No aplica"))).join("");
+      const field=(title,control)=>'<div class="field"><label>'+title+'</label>'+control+'</div>';
+      const section=document.createElement("div");
+      section.className="special-event-fields";
+      section.innerHTML='<div class="special-event-grid">'+
+        field("Evento",'<select data-event-field="eventId" data-event-index="'+i+'">'+option("","Selecciona el evento…",!e.eventId)+eventOptions+'</select>')+
+        (e.eventId==="otros"?field("Nombre del evento",'<input data-event-field="eventName" data-event-index="'+i+'" maxlength="180" placeholder="Nombre del evento" value="'+escapeHtml(e.eventName||"")+'">'):"")+
+        field("Fase",'<select data-event-field="eventPhase" data-event-index="'+i+'">'+phases+'</select>')+
+        field("Disciplina",e.eventId==="otros"?
+          '<input data-event-field="eventDiscipline" data-event-index="'+i+'" maxlength="100" placeholder="No aplica o disciplina" value="'+escapeHtml(e.eventDiscipline||"")+'">':
+          '<select data-event-field="eventDiscipline" data-event-index="'+i+'">'+disciplines+'</select>')+
+        field("Modalidad",'<select data-event-field="eventMode" data-event-index="'+i+'">'+
+          option("sin","Sin labores",e.eventMode!=="con")+
+          option("con","Con labores",e.eventMode==="con")+'</select>')+
+        '</div>';
+      card.querySelector(".day-grid").after(section);
+    }
+
     function renderDays() {
       const host = $("#days");
       host.innerHTML = "";
@@ -901,9 +934,10 @@ export function startEditor() {
         if (e.status === "inhabil") e.activity = INHABIL_JUSTIFICATION;
         const card = document.createElement("div");
         card.className =
-          "day-card" + (e.status !== "laboral" ? " nonwork" : "");
+          "day-card" + (e.status !== "laboral" && e.status !== "evento" ? " nonwork" : "");
         const activityLabel =
-          e.status === "falta"
+          e.status === "evento" ? "Descripción del evento"
+          : e.status === "falta"
             ? "Justificación de la falta"
             : e.status === "sin_labores"
               ? "Justificación de sin labores"
@@ -911,7 +945,8 @@ export function startEditor() {
                 ? "Justificación de día inhábil"
                 : "Actividad";
         const activityPlaceholder =
-          e.status === "falta"
+          e.status === "evento" ? "Describe las actividades que realizaste durante el evento."
+          : e.status === "falta"
             ? "Explica el motivo de la inasistencia; puedes usar un motivo frecuente como base."
             : e.status === "sin_labores"
               ? "Explica por qué no hubo labores en la empresa; puedes usar un motivo frecuente como base."
@@ -925,10 +960,10 @@ export function startEditor() {
           (areaMode === "custom" || (areaMode !== "select" && savedCustomArea));
         const areaSelectValue = savedCustomArea ? AREA_SAVED_OTHER : (e.area || "");
         const areaControl = !companyAreas.length
-          ? `<input id="day-area-${i}" data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" maxlength="150" ${e.status !== "laboral" ? "disabled" : ""}>`
+          ? `<input id="day-area-${i}" data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" maxlength="150" ${e.status !== "laboral" && !(e.status === "evento" && e.eventMode === "con") ? "disabled" : ""}>`
           : editingCustom
-            ? `<div class="area-picker-control"><input class="area-custom-value" id="day-area-${i}" data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" maxlength="150" placeholder="Escribe el área" ${e.status !== "laboral" ? "disabled" : ""}><button type="button" class="area-picker-back" data-area-options="${i}" title="Ver áreas disponibles" aria-label="Ver áreas disponibles" ${e.status !== "laboral" ? "disabled" : ""}>⌄</button></div>`
-            : `<select class="area-picker-select" id="day-area-${i}" data-area-preset="${i}" title="${escapeHtml(e.area || "Selecciona un área")}" ${e.status !== "laboral" ? "disabled" : ""}>
+            ? `<div class="area-picker-control"><input class="area-custom-value" id="day-area-${i}" data-index="${i}" data-key="area" value="${escapeHtml(e.area)}" maxlength="150" placeholder="Escribe el área" ${e.status !== "laboral" && !(e.status === "evento" && e.eventMode === "con") ? "disabled" : ""}><button type="button" class="area-picker-back" data-area-options="${i}" title="Ver áreas disponibles" aria-label="Ver áreas disponibles" ${e.status !== "laboral" && !(e.status === "evento" && e.eventMode === "con") ? "disabled" : ""}>⌄</button></div>`
+            : `<select class="area-picker-select" id="day-area-${i}" data-area-preset="${i}" title="${escapeHtml(e.area || "Selecciona un área")}" ${e.status !== "laboral" && !(e.status === "evento" && e.eventMode === "con") ? "disabled" : ""}>
               <option value="" ${!areaSelectValue ? "selected" : ""}>Selecciona un área…</option>
               ${companyAreas.map((area) => `<option value="${escapeHtml(area)}" ${areaSelectValue === area ? "selected" : ""}>${escapeHtml(area)}</option>`).join("")}
               ${savedCustomArea ? `<option value="${AREA_SAVED_OTHER}" selected disabled>Área personalizada</option>` : ""}
@@ -947,8 +982,9 @@ export function startEditor() {
           ["falta", "sin_labores"].includes(e.status)
             ? `<div class="absence-reason"><div class="absence-reason-head"><label for="absenceReason-${i}">Motivo frecuente</label><span>Opcional</span></div><select id="absenceReason-${i}" data-absence-reason="${i}"><option value="">Selecciona un motivo para usarlo como base…</option>${absenceReasonOptions}</select><small>El texto se colocará en la justificación y podrás modificarlo libremente.</small><small data-reason-detection="${i}" aria-live="polite"></small></div>`
             : "";
-        card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" ? "disabled" : ""}></div><div class="field"><div class="day-area-label"><label for="day-area-${i}">Área</label>${!companyAreas.length ? `<button type="button" class="day-area-week" data-area-week="${i}" title="Aplicar esta área a toda la semana" aria-label="Aplicar esta área a toda la semana" ${e.status !== "laboral" ? "disabled" : ""}>Semana</button>` : ""}</div>${areaControl}</div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
+        card.innerHTML = `<div class="day-grid"><div class="field"><label>Fecha</label><input data-index="${i}" data-key="date" type="date" value="${escapeHtml(e.date)}"></div><div class="field"><label>Tipo de día</label><select data-index="${i}" data-key="status"><option value="laboral" ${e.status === "laboral" ? "selected" : ""}>Con labores</option><option value="sin_labores" ${e.status === "sin_labores" ? "selected" : ""}>Sin labores</option><option value="inhabil" ${e.status === "inhabil" ? "selected" : ""}>Día inhábil</option><option value="falta" ${e.status === "falta" ? "selected" : ""}>Falta</option><option value="evento" ${e.status === "evento" ? "selected" : ""}>Evento especial</option></select></div><div class="field"><label>Entrada</label><input data-index="${i}" data-key="start" type="time" value="${escapeHtml(e.start)}" ${e.status !== "laboral" && !(e.status === "evento" && e.eventMode === "con") ? "disabled" : ""}></div><div class="field"><label>Salida</label><input data-index="${i}" data-key="end" type="time" value="${escapeHtml(e.end)}" ${e.status !== "laboral" && !(e.status === "evento" && e.eventMode === "con") ? "disabled" : ""}></div><div class="field"><div class="day-area-label"><label for="day-area-${i}">Área</label>${!companyAreas.length ? `<button type="button" class="day-area-week" data-area-week="${i}" title="Aplicar esta área a toda la semana" aria-label="Aplicar esta área a toda la semana" ${e.status !== "laboral" && !(e.status === "evento" && e.eventMode === "con") ? "disabled" : ""}>Semana</button>` : ""}</div>${areaControl}</div><button class="icon-btn" data-delete="${i}" title="Eliminar día">×</button></div><div class="field" style="margin-top:9px">${absenceReasonControl}<label>${activityLabel}</label><textarea lang="es" spellcheck="true" data-index="${i}" data-key="activity" maxlength="${ACTIVITY_LIMIT}" placeholder="${escapeHtml(activityPlaceholder)}" ${e.status === "inhabil" ? "disabled" : ""}>${escapeHtml(e.activity)}</textarea><button type="button" class="btn spelling-trigger" data-spellcheck ${e.status === "inhabil" ? "disabled" : ""}>Revisar ortografía</button><div class="counter"><span class="line-budget" data-lines="${i}">Calculando…</span></div></div>`;
         host.appendChild(card);
+        addSpecialEventFields(card,e,i);
         updateReasonIndicator(host, i);
       });
       host.querySelectorAll("[data-key]").forEach((input) => {
@@ -962,6 +998,10 @@ export function startEditor() {
               next = input.value;
             entries[i].status = next;
             if (previous !== next) { entries[i].reasonId = ""; entries[i].reasonMode = "auto"; }
+            if (next === "evento" && previous !== next) {
+              Object.assign(entries[i],{eventId:"",eventName:"",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin"});
+              entries[i].activity = "";
+            }
             if (next === "inhabil") entries[i].activity = INHABIL_JUSTIFICATION;
             else if (
               previous === "inhabil" &&
@@ -1065,6 +1105,43 @@ export function startEditor() {
         markDirty();
         updatePreview();
       }
+
+
+      host.querySelectorAll("[data-event-field]").forEach(input=>{
+        const key=input.dataset.eventField;
+        input.addEventListener(input.tagName==="INPUT"?"input":"change",()=>{
+          const i=Number(input.dataset.eventIndex),e=entries[i],school=$("#school").value;
+          if(!e||e.status!=="evento")return;
+          const before={...e};
+          const oldEvent=specialEventById(e.eventId,school);
+          const oldSuggested=specialEventText(oldEvent,e.eventPhase,e.eventDiscipline,e.eventName);
+          e[key]=input.value;
+          if(key==="eventId"){
+            const event=specialEventById(e.eventId,school);
+            e.eventName="";
+            e.eventPhase=event?.phases?.[0]||"no_aplica";
+            e.eventDiscipline=event?.disciplines?.[0]||"No aplica";
+          }
+          const event=specialEventById(e.eventId,school);
+          const suggested=specialEventText(event,e.eventPhase,e.eventDiscipline,e.eventName);
+          if(key!=="eventMode" && (!String(e.activity||"").trim()||e.activity===oldSuggested))
+            e.activity=suggested;
+          const model=buildPageModel();
+          if(!model.fits){
+            entries[i]=before;
+            notifySpaceLimit();
+            renderDays();
+            return;
+          }
+          if(input.tagName==="INPUT"){
+            const area=host.querySelector('textarea[data-index="'+i+'"][data-key="activity"]');
+            if(area)area.value=e.activity||"";
+          }else renderDays();
+          markDirty();
+          updatePreview();
+          refreshLineLimits();
+        });
+      });
 
       host.querySelectorAll("[data-area-preset]").forEach((select) =>
         select.addEventListener("change", async () => {
@@ -3279,6 +3356,7 @@ export function startEditor() {
       $("#company").options[0].textContent = "Selecciona una empresa";
       $("#school").addEventListener("change", () => {
         configureSchool(true);
+        if (entries.some(entry => entry.status === "evento")) renderDays();
         markDirty();
         updatePreview();
       });
