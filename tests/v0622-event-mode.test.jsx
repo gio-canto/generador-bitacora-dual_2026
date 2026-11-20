@@ -57,7 +57,7 @@ describe("v0.62.2 · evento sin selector de modalidad",()=>{
   it("el PDF sólo imprime EVENTO y transmite modo con labores en S6",()=>{
     const record=blankRecord();
     record.school=school;record.entries=[event];
-    expect(validateRecord({...record,entries:[event,event,event,event]},2)).toHaveProperty("entries");
+    expect(validateRecord({...record,entries:[event,event,event,event]},2))["entries.1.date"]).toBeTruthy();
     expect(buildPageModel(record).rows[0]).toMatchObject({label:"EVENTO",st:"evento"});
     const code=encodeWeekStatistics([event,
       {status:"inhabil"},{status:"inhabil"},{status:"inhabil"}]);
