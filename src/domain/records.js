@@ -2,8 +2,8 @@ import { validSpecialEvent } from "../services/special-events.js";
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
 import { LIMBO_COMPANY } from "../services/delivery-registry.js";
-export const VERSION = "0.62.1";
-export const RELEASE = "Resultados de eventos especiales";
+export const VERSION = "0.62.2";
+export const RELEASE = "Eventos especiales con labores";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
@@ -115,7 +115,7 @@ export function validateRecord(r, step) {
       if (!["laboral", "falta", "sin_labores", "inhabil", "evento"].includes(e.status))
         errors[k + "status"] = "Selecciona un estado válido.";
       if (e.status === "evento" && !validSpecialEvent(e,r.school))
-        errors[k+"eventId"] = "Selecciona el evento, la fase, la disciplina y la modalidad.";
+        errors[k+"eventId"] = "Selecciona el evento, la fase y la disciplina.";
       if (e.status === "laboral" || (e.status === "evento" && e.eventMode === "con")) {
         if (!validTime(e.start)) errors[k + "start"] = "Indica la entrada.";
         if (!validTime(e.end) || e.end <= e.start)
