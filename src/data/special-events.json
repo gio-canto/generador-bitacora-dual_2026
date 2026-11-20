@@ -1,0 +1,236 @@
+[
+  {
+    "id": "festival",
+    "code": 1,
+    "label": "Festival Académico de la Dirección General de Educación Tecnológica Industrial y de Servicios",
+    "schools": "all",
+    "phases": [
+      "local",
+      "regional",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Pensamiento matemático",
+      "Lengua y comunicación",
+      "Inglés",
+      "Cultura digital",
+      "Conciencia histórica",
+      "Ciencias sociales",
+      "Ciencias naturales"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "prototipos",
+    "code": 2,
+    "label": "Concurso Nacional de Prototipos y Proyectos de Emprendimiento de la DGETI",
+    "schools": "all",
+    "phases": [
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Prototipo tecnológico",
+      "Prototipo didáctico",
+      "Desarrollo de software",
+      "Emprendimiento social",
+      "Emprendimiento verde",
+      "Emprendimiento en tecnologías"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "enac",
+    "code": 3,
+    "label": "Encuentro Nacional de Arte y Cultura de la DGETI",
+    "schools": "all",
+    "phases": [
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Video documental",
+      "Fotografía",
+      "Teatro",
+      "Oratoria",
+      "Declamación",
+      "Pintura",
+      "Dibujo artístico",
+      "Danza",
+      "Canto",
+      "Creación literaria",
+      "Música"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "civico",
+    "code": 4,
+    "label": "Encuentro Nacional Cívico de la DGETI",
+    "schools": "all",
+    "phases": [
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Escolta de Bandera",
+      "Banda Reglamentaria",
+      "Coro del Himno Nacional"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "deportivo",
+    "code": 5,
+    "label": "Encuentro Nacional Deportivo de la DGETI",
+    "schools": "all",
+    "phases": [
+      "local",
+      "regional",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica",
+      "Atletismo",
+      "Ajedrez",
+      "Baloncesto",
+      "Béisbol",
+      "Fútbol",
+      "Voleibol",
+      "Sóftbol",
+      "Fútbol bandera"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "olimpiada_matematicas",
+    "code": 6,
+    "label": "Olimpiada Mexicana de Matemáticas",
+    "schools": "all",
+    "phases": [
+      "local",
+      "regional",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "olimpiada_informatica",
+    "code": 7,
+    "label": "Olimpiada Mexicana de Informática",
+    "schools": "all",
+    "phases": [
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "feria_ciencia",
+    "code": 8,
+    "label": "Feria científica y tecnológica",
+    "schools": "all",
+    "phases": [
+      "no_aplica",
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "acto_civico",
+    "code": 9,
+    "label": "Ceremonia o acto cívico institucional",
+    "schools": "all",
+    "phases": [
+      "no_aplica"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "representacion",
+    "code": 10,
+    "label": "Comisión o representación institucional",
+    "schools": "all",
+    "phases": [
+      "no_aplica",
+      "local",
+      "estatal",
+      "nacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "externo",
+    "code": 11,
+    "label": "Actividad académica externa",
+    "schools": "all",
+    "phases": [
+      "no_aplica"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "semana_ciencia_cbtis134",
+    "code": 12,
+    "label": "Semana de Ciencia y Tecnología del CBTis No. 134",
+    "schools": [
+      "cbtis-134"
+    ],
+    "phases": [
+      "no_aplica"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  },
+  {
+    "id": "otros",
+    "code": 63,
+    "label": "Otros",
+    "schools": "all",
+    "phases": [
+      "no_aplica",
+      "local",
+      "regional",
+      "estatal",
+      "nacional",
+      "internacional"
+    ],
+    "disciplines": [
+      "No aplica"
+    ],
+    "text": "Durante esta jornada participé en {evento}{fase}{disciplina}, realizando las actividades correspondientes a la actividad."
+  }
+]
