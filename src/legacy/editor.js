@@ -69,7 +69,7 @@ export function startEditor() {
       sin_labores: nonWorkingReasons,
     };
     function reasonsForStatus(status) {
-      return (REASON_PRESETS[status] || []).filter(x=>x.deprecatedForNewEntries !== true);
+      return REASON_PRESETS[status] || [];
     }
     function reasonForId(status, id) {
       return reasonsForStatus(status).find((item) => item.id === id) || null;

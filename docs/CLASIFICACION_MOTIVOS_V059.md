@@ -63,10 +63,6 @@ En el algoritmo actual, entre candidatos coincidentes se calcula `priority * 100
 
 **Edición recomendada:** añadir frases específicas, por ejemplo «empresa cerrada por mantenimiento»; evitar palabras genéricas como «empresa», «día», «evento», «trabajo» y «lluvia». Al agregar una causa nueva, utilizar código único disponible entre `1` y `62` dentro del catálogo correspondiente. El `63` está reservado para «Otro motivo» y el `0` representa ausencia de clasificación.
 
-## Compatibilidad con eventos especiales desde 0.62.0
-
-Los nueve motivos de Festival Académico, Prototipos y ENAC que antes se ofrecían en **Falta** conservan sus IDs y códigos para la lectura histórica de S5, pero están marcados con `deprecatedForNewEntries: true`. No se muestran al elegir motivos de falta en una bitácora nueva ni se detectan automáticamente como tales. Ahora se seleccionan desde **Evento especial**, con su propio catálogo y estadísticas. Consulta [Eventos especiales](EVENTOS_ESPECIALES.md).
-
 ## Qué se reconoce y qué NO se presupone
 
 Los catálogos actuales incluyen, entre otros:

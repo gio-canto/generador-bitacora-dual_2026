@@ -3,7 +3,7 @@ import nonWorkingReasons from "../data/non-working-reasons.json";
 
 // Reglas locales, deterministas y editables. No se envía ningún texto a un servidor.
 export const reasonsForClassification = status => status === "falta"
-  ? absenceReasons.filter(x=>x.deprecatedForNewEntries !== true) : status === "sin_labores" ? nonWorkingReasons : [];
+  ? absenceReasons : status === "sin_labores" ? nonWorkingReasons : [];
 
 export function normalizeReasonText(value) {
   return String(value || "").toLowerCase().normalize("NFD")

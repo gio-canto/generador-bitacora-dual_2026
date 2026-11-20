@@ -16,17 +16,13 @@ describe("v0.59 · reconocimiento local de motivos", () => {
       }
     }
   });
-  it("identifica citas y exámenes sin reclasificar los concursos institucionales como faltas",()=>{
+  it("identifica citas, exámenes y fases de concursos",()=>{
     expect(classifyReason("falta","No asistí porque tuve una consulta médica.")?.id)
       .toBe("medical_appointment");
     expect(classifyReason("falta","Presenté el examen de admisión a la universidad.")?.id)
       .toBe("university_admission_exam");
-    // Desde 0.62.0 esos certámenes se seleccionan como Evento especial;
-    // los códigos históricos permanecen en el catálogo para leer S5.
-    expect(classifyReason("falta","Participé en el concurso de prototipos fase estatal.")).toBeNull();
-    expect(absence.find(x=>x.id==="prototypes_entrepreneurship_state")).toMatchObject({
-      code:21,deprecatedForNewEntries:true
-    });
+    expect(classifyReason("falta","Participé en el concurso de prototipos fase estatal.")?.id)
+      .toBe("prototypes_entrepreneurship_state");
   });
   it("reconoce Día de Muertos, huracanes, mantenimiento y cortes de luz",()=>{
     expect(classifyReason("sin_labores","La empresa suspendió actividades por Día de Muertos.")?.id)

@@ -9,7 +9,7 @@ export const manualDaysFromStatistics=statistics=>statistics?.entries?.length===
     hours:["laboral","evento"].includes(day.status)&&day.minutes?String(day.minutes/60):"",
     reasonCode:String(day.reasonCode||0),eventPhase:day.eventPhase||"no_aplica",
     eventDiscipline:day.eventDiscipline||"No aplica",eventMode:day.eventMode||"sin"})):blankManualDays();
-export const reasonsForStatus=status=>status==="falta"?absenceReasons.filter(x=>x.deprecatedForNewEntries!==true):status==="sin_labores"?nonWorkingReasons:[];
+export const reasonsForStatus=status=>status==="falta"?absenceReasons:status==="sin_labores"?nonWorkingReasons:[];
 export function buildManualStatistics(days){
  if(!Array.isArray(days)||days.length!==4)throw Error("Se requieren cuatro jornadas.");
  if(days.every(day=>!day.status))return null;
