@@ -14,7 +14,7 @@ afterEach(cleanup);
 describe("0.62.1 · resultado de eventos especiales", () => {
   it("abrevia el Festival Académico y muestra el aviso general sin la frase anterior", () => {
     expect(specialEventById("festival",school)?.label).toBe("Festival Académico de la DGETI");
-    const source=readFileSync(new URL("../src/legacy/editor.js",import.meta.url),"utf8");
+    const source=readFileSync("src/legacy/editor.js","utf8");
     expect(source).toContain("Esta opción sirve para registrar la participación en concursos");
     expect(source).toContain("Señala también si realizaste labores de Educación Dual");
     expect(source).not.toContain("El evento no se contabilizará como falta y podrá ser revisado en Registro Dual.");
