@@ -271,7 +271,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
        <Metric name="Jornadas con falta" value={fmt(data.daily.falta)}/>
        <Metric name="Días sin labores" value={fmt(data.daily.sin_labores)}/>
        <Metric name="Días inhábiles" value={fmt(data.daily.inhabil)}/>
-        <Metric name="Eventos especiales" value={fmt(data.daily.evento)}/>
+        
        <Metric name="Uso identificado" value={percent(data.usage.used,data.students.length)+"%"}/>
      </div>}
     <section className="ds-panel ds-interpretations" aria-label="Interpretación del periodo">
