@@ -2,6 +2,8 @@
 
 ## 0.62.2 · Eventos especiales con modalidad única · 2026-11-20
 
+- Corrección de la prueba de regresión de Eventos especiales y endurecimiento de la puerta de publicación: se verifican tanto los archivos de pruebas fallidos como las pruebas individuales. Un error de carga o sintaxis en cualquier suite nueva bloquea el despliegue.
+
 - Se retira el selector «Con labores / Sin labores» del formulario de Eventos especiales en Generador y Registro Dual.
 - Las **nuevas** jornadas «Evento especial» usan internamente «Con labores», con los campos habituales de entrada, salida y área.
 - El aviso y las validaciones dejan de solicitar una modalidad seleccionable.

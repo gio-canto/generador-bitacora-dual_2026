@@ -19,6 +19,16 @@ describe("0.61.1 · excepción de pruebas cerrada", () => {
     expect(checkKnownFailures(full.replace("tests/pdf.test.js", "tests/otra.test.js")).valid).toBe(false);
     expect(checkKnownFailures(full.replace("3 failed | 385", "4 failed | 384")).valid).toBe(false);
   });
+  it("bloquea errores de carga de archivos que no cuentan como pruebas fallidas", () => {
+    const extra = full
+      .replace("Test Files  3 failed | 73 passed (76)", "Test Files  4 failed | 72 passed (76)")
+      .replace("      Tests  3 failed", ` FAIL  tests/nueva.test.jsx [ tests/nueva.test.jsx ]
+      Tests  3 failed`);
+    expect(checkKnownFailures(extra).valid).toBe(false);
+    expect(checkKnownFailures(
+      full.replace("Test Files  3 failed | 73 passed (76)", "Test Files  4 failed | 72 passed (76)")
+    ).valid).toBe(false);
+  });
   it("bloquea un resultado ausente o incompleto", () => {
     expect(checkKnownFailures("Test Files 3 failed").valid).toBe(false);
     expect(checkKnownFailures("").valid).toBe(false);
