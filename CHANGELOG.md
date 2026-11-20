@@ -1,5 +1,19 @@
 # Notas de versión
 
+## 0.63.0 · Lector de bitácoras externas · 2026-11-20
+
+- Lector OCR complementario de Registro Dual sin Data Matrix, accesible desde Escáner y Semana, en escritorio y dispositivos móviles.
+- PDF, imágenes/fotografías y Word DOCX. Hasta doce documentos por lote; PDF de hasta 18 MB y 16 páginas, imagen/DOCX de hasta 12 MB.
+- Texto directo de PDF y DOCX; OCR español-inglés para imágenes y PDF escaneados, cargado bajo demanda. La captura móvil puede usar la cámara trasera.
+- Extracción de alumno, empresa, fechas, jornadas, horarios, horas, áreas y actividades; coincidencias conservadoras con el padrón y la semana, revisión/corrección de transcripción y datos antes de confirmar.
+- Si faltan jornadas, se registra la entrega sin estadísticas y se conservan datos parciales; no se inventan horarios, fechas o actividades.
+- Respaldo JSON con procedencia `externalReview`, método y campos confirmados; no incluye archivos originales. Consulta del detalle desde la entrega registrada y confirmación antes de reemplazar un registro existente.
+- Lector Data Matrix y formatos S5/S6 conservados. Vista responsiva y controles táctiles para teléfono.
+- Los manuscritos pueden pasar por OCR general, sin motor HTR especializado; se requiere revisión manual.
+- Pruebas para extracción, PDF/DOCX, compatibilidad, persistencia, carga múltiple y experiencia móvil. Guía `docs/LECTOR_BITACORAS_EXTERNAS.md`.
+- Publicación con las únicas tres excepciones históricas conocidas, comprobadas por número de tests y archivos de prueba.
+
+
 ## 0.62.2 · Eventos especiales con modalidad única · 2026-11-20
 
 - Corrección de la prueba de regresión de Eventos especiales y endurecimiento de la puerta de publicación: se verifican tanto los archivos de pruebas fallidos como las pruebas individuales. Un error de carga o sintaxis en cualquier suite nueva bloquea el despliegue.
