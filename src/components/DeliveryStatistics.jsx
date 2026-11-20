@@ -109,6 +109,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
     {label:"Faltas",value:data.daily.falta,color:COLORS[1]},
     {label:"Sin labores",value:data.daily.sin_labores,color:COLORS[2]},
     {label:"Días inhábiles",value:data.daily.inhabil,color:COLORS[3]},
+    {label:"Eventos especiales",value:data.daily.evento,color:COLORS[4]||COLORS[0]},
   ];
   const deliveries = [
     {label:"A tiempo",value:data.delivered,color:COLORS[0]},
@@ -270,6 +271,7 @@ export default function DeliveryStatistics({ state, onBack, onReportStudent, onR
        <Metric name="Jornadas con falta" value={fmt(data.daily.falta)}/>
        <Metric name="Días sin labores" value={fmt(data.daily.sin_labores)}/>
        <Metric name="Días inhábiles" value={fmt(data.daily.inhabil)}/>
+        <Metric name="Eventos especiales" value={fmt(data.daily.evento)}/>
        <Metric name="Uso identificado" value={percent(data.usage.used,data.students.length)+"%"}/>
      </div>}
     <section className="ds-panel ds-interpretations" aria-label="Interpretación del periodo">

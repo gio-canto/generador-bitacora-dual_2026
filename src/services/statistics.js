@@ -1,13 +1,13 @@
 import {studentIsActive,studentAppliesToWeek,deliveryStatus} from "./delivery-registry.js";
 import {summarizeWeekStatistics,causeLabel} from "./matrix-statistics.js";
 export const percent = (value,total) => total ? Math.round(value/total*100) : 0;
-const makeCounts=()=>({laboral:0,falta:0,sin_labores:0,inhabil:0});
+const makeCounts=()=>({laboral:0,falta:0,sin_labores:0,inhabil:0,evento:0});
 const compareText=(a,b)=>a.localeCompare(b,"es",{sensitivity:"base"});
 const groupLabel=student=>String(student.group||"").trim().toLocaleUpperCase("es-MX")||"Sin grupo";
 const companyLabel=student=>String(student.company||"").trim()||"Sin especificar";
 const blankComparison=label=>({
   label,activeStudents:0,studentIds:new Set(),reports:0,minutes:0,
-  worked:0,absences:0,nonWorking:0,holidays:0,
+  worked:0,absences:0,nonWorking:0,holidays:0,events:0,
   weeklyAverageMinutesSum:0,weeksWithData:0,
 });
 function calculateComparisons(entries,activeTotal){
@@ -21,8 +21,8 @@ function calculateComparisons(entries,activeTotal){
      averageHours:row.studentIds.size?row.minutes/60/row.studentIds.size:null,
      weeklyAverageAccumulatedHours:row.weeksWithData?row.weeklyAverageMinutesSum/60:null,
      weeksWithData:row.weeksWithData,
-     worked:row.worked,absences:row.absences,nonWorking:row.nonWorking,
-     holidays:row.holidays,knownDays:row.worked+row.absences+row.nonWorking+row.holidays,
+     worked:row.worked,absences:row.absences,nonWorking:row.nonWorking,events:row.events,
+     holidays:row.holidays,knownDays:row.worked+row.absences+row.nonWorking+row.holidays+row.events,
      applicableDays,absenceRate:applicableDays?100*row.absences/applicableDays:null,
    };
  }).sort((a,b)=>compareText(a.label,b.label));
@@ -61,7 +61,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
   const students=roster.filter(studentIsActive);
   const byId=new Map(roster.map(item=>[item.id,item]));
   const weeks=(state.weeks||[]).filter(w=>period==="all" || (period==="monthly" ? w.startDate?.startsWith(month) : w.id===weekId)).sort((a,b)=>(a.startDate||"").localeCompare(b.startDate||""));
-  const daily=makeCounts(),causes={falta:new Map(),sin_labores:new Map()};
+  const daily=makeCounts(),causes={falta:new Map(),sin_labores:new Map(),evento:new Map()};
   const companyMap=new Map(),groupMap=new Map();
   const register=(map,name)=>{if(!map.has(name))map.set(name,blankComparison(name));return map.get(name);};
   // Todas las empresas del padrón, aun cuando hoy no tengan alumnos activos
@@ -114,6 +114,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
         row.absences+=summary.absent;
         row.nonWorking+=summary.nonWorking;
         row.holidays+=summary.holidays;
+        row.events+=summary.events;
       }
       if(status==="no_entregado"){
         pendingWithStatistics++;
@@ -123,7 +124,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
         const day=delivery.statistics.entries[index];
         daily[day.status]++;
         dayTrend[index]+=day.minutes||0;
-        if(day.status==="falta"||day.status==="sin_labores"){
+        if(day.status==="falta"||day.status==="sin_labores"||day.status==="evento"){
           const map=causes[day.status], key=day.reasonCode;
           map.set(key,(map.get(key)||0)+1);
         }
@@ -153,7 +154,7 @@ export function calculateDeliveryStatistics(state,{period="weekly",weekId="",mon
     weeksWithStatistics,reportCount,applicable,delivered,late,notDelivered,notApplicable,
     pendingWithStatistics,pendingMinutes,
     usage:{used,other,unknown:students.length-used-other},
-    genderCounts, causesAbsence:breakdown(causes.falta,"falta"),causesNonWorking:breakdown(causes.sin_labores,"sin_labores"),
+    genderCounts, causesAbsence:breakdown(causes.falta,"falta"),causesNonWorking:breakdown(causes.sin_labores,"sin_labores"),causesEvents:breakdown(causes.evento,"evento"),
     byCompanyPerformance,byGroupPerformance,
     companyLeaders:comparisonLeaders(byCompanyPerformance,"Sin especificar"),
     groupLeaders:comparisonLeaders(byGroupPerformance,"Sin grupo"),

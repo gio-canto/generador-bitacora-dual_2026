@@ -4,7 +4,7 @@ import {isWeekDue} from "./student-insights.js";
 
 const sum=(records,key)=>records.reduce((n,r)=>n+(r[key]||0),0);
 const dateLabel=d=>String(d||"");
-const validStatuses=new Set(["laboral","falta","sin_labores","inhabil"]);
+const validStatuses=new Set(["laboral","falta","sin_labores","inhabil","evento"]);
 const percent=(n,d)=>d ? Math.round(n/d*100) : null;
 const sortDesc=(a,b)=>String(b.startDate).localeCompare(String(a.startDate));
 

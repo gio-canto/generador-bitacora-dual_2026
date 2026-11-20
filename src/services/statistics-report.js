@@ -279,6 +279,7 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     {label:"Faltas",value:r.daily.falta,color:C.red},
     {label:"Sin labores",value:r.daily.sin_labores,color:C.amber},
     {label:"Días inhábiles",value:r.daily.inhabil,color:C.slate},
+    {label:"Eventos especiales",value:r.daily.evento,color:C.teal},
   ];
   const usageItems = [
     {label:"Generador",value:r.usage.used,color:C.blue},
@@ -308,9 +309,9 @@ export async function generateStatisticsReportPdf(state, filters = {}, options =
     legend(ctx,usageItems,938,641,220,60,3);
     panel(ctx,54,993,551,605,"Tipo de jornada","Jornadas con datos");
     donut(ctx,attendanceItems,{cx:269,cy:1210,radius:117,
-      central:fmt(r.daily.laboral+r.daily.falta+r.daily.sin_labores+r.daily.inhabil),
+      central:fmt(r.daily.laboral+r.daily.falta+r.daily.sin_labores+r.daily.inhabil+r.daily.evento),
       description:"jornadas"});
-    legend(ctx,attendanceItems,102,1431,455,34,4);
+    legend(ctx,attendanceItems,102,1431,455,31,5);
     panel(ctx,623,993,563,605,"Evolución de horas",
       filters.period==="weekly"?"Martes a viernes":"Últimas semanas");
     const series=filters.period==="weekly"?

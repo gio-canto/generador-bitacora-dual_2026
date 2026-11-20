@@ -89,7 +89,7 @@ export function calculateStudentInsights(state,{
       periodsWithStats++;
       minutes+=summary.minutes;
       for(const day of actual.statistics.entries){
-        if(!day || !["laboral","falta","sin_labores","inhabil"].includes(day.status))continue;
+        if(!day || !["laboral","falta","sin_labores","inhabil","evento"].includes(day.status))continue;
         knownDays++;
         if(day.status==="falta")absences++;
         if(day.status==="laboral")workDays++;
