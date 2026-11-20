@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.62.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.62.1-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,10 @@
 </div>
 
 ---
+
+## v0.62.1 · Resultado de eventos especiales
+
+La advertencia de «Evento especial» explica a qué actividades se aplica y qué datos se registran, sin la frase final sobre la contabilización de faltas. El selector usa el nombre corto **Festival Académico de la DGETI**. Cada evento incluye el campo opcional **Lugar o resultado obtenido**, con ejemplos en el placeholder; cuando se captura, se integra a la descripción editable y al PDF de la bitácora. En Registro Dual la captura manual conserva el resultado en el respaldo JSON. El Data Matrix mantiene S5/S6 sin transmitir textos libres.
 
 ## v0.62.0 · Eventos especiales
 
