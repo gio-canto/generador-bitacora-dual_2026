@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.62.2-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.63.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.63.0 · Lector de bitácoras externas
+
+**Registro Dual:** opción «Leer bitácora externa» en el escáner y en cada semana, tanto en escritorio como móvil. Acepta PDF, Word DOCX e imágenes/fotografías sin Data Matrix. Extrae texto digital de PDF/DOCX; utiliza OCR español-inglés (Tesseract.js) cuando el documento es una imagen o PDF escaneado, cargado bajo demanda. Permite procesar hasta 12 documentos por lote, revisar/corregir texto y datos, asociar alumno y semana, y guardar la entrega con estadísticas confirmadas. El respaldo JSON conserva la procedencia y campos revisados sin incluir archivos originales.
+
+Los manuscritos se pueden intentar leer con OCR, pero todavía no existe un modelo HTR dedicado y se requiere revisión manual. Guía: [Lector de bitácoras externas](docs/LECTOR_BITACORAS_EXTERNAS.md).
 
 ## v0.62.2 · Eventos especiales sin selector de modalidad
 
