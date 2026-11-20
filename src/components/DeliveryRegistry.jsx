@@ -51,6 +51,7 @@ import {
   reactivateStudent,
   registerDelivery,
   saveManualDelivery,
+  saveExternalDelivery,
   removeDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
@@ -69,6 +70,7 @@ import {generateStudentDossierPdf} from "../services/student-dossier-report.js";
 import {generateStatisticsReportPdf} from "../services/statistics-report.js";
 import {calculateStudentInsights} from "../services/student-insights.js";
 import ManualDeliveryDialog from "./ManualDeliveryDialog.jsx";
+import ExternalBitacoraDialog from "./ExternalBitacoraDialog.jsx";
 import ReasonInbox from "./ReasonInbox.jsx";
 import { decideReasonReview } from "../services/reason-reviews.js";
 import RegistryQuickSidebar from "./RegistryQuickSidebar.jsx";
@@ -506,6 +508,7 @@ export default function DeliveryRegistry({ onClose }) {
   const [setupReturnView,setSetupReturnView] = useState("home");
   const [importPreview,setImportPreview] = useState(null);
   const [manualTarget,setManualTarget] = useState(null);
+  const [externalOpen,setExternalOpen] = useState(false);
   const [weekCaptureQueue,setWeekCaptureQueue] = useState([]);
   const [weekCaptureTotal,setWeekCaptureTotal] = useState(0);
   const [weekCaptureBackupAfter,setWeekCaptureBackupAfter] = useState(false);
@@ -1848,6 +1851,24 @@ export default function DeliveryRegistry({ onClose }) {
     if (weekCaptureQueue.length) advanceWeekCapture(saved);
     else setManualTarget(null);
   };
+  const commitExternalEntry = ({studentId,weekId,statistics,metadata}) => {
+    const week=state.weeks.find(item=>item.id===weekId);
+    if(!week||!state.students.some(item=>item.id===studentId)){
+      showNotice("warning","Revisa el alumno y la semana.");
+      return false;
+    }
+    try{
+      const updated=saveExternalDelivery(week,studentId,{statistics,metadata});
+      const weeks=state.weeks.map(item=>item.id===weekId?updated:item);
+      commit({...state,weeks});
+      setActiveWeekId(weekId);
+      notify("success","Bitácora externa registrada",state.students.find(x=>x.id===studentId)?.name||"");
+      return true;
+    }catch(error){
+      showNotice("error","No se pudo registrar la lectura",error?.message||"Revisa la información.");
+      return false;
+    }
+  };
   const startDueAtEdit = () => {
     if (!activeWeek) return;
     if (activeWeek.closedAt) {
@@ -2216,6 +2237,16 @@ export default function DeliveryRegistry({ onClose }) {
         <div className="delivery-student-time">
           <span>Registro</span>
           <strong>{formatDateTime(delivery?.registeredAt)}</strong>
+          {delivery?.externalReview && (
+            <details className="external-delivery-detail">
+              <summary>Lectura externa · {delivery.externalReview.method==="pdf-text"?"Texto PDF":"OCR"}</summary>
+              <span>{delivery.externalReview.filename}</span>
+              {delivery.externalReview.days?.map((day,index)=>
+                <span key={index}>{["Mar","Mié","Jue","Vie"][index]}: {day.status||"Sin clasificar"}
+                  {day.start&&day.end?" · "+day.start+"–"+day.end:""}
+                  {day.activity?" · "+day.activity:""}</span>)}
+            </details>
+          )}
           {delivery?.source && (
             <small>
               {delivery.source === "camera"
@@ -3217,6 +3248,10 @@ export default function DeliveryRegistry({ onClose }) {
               </div>
               <div className="delivery-week-head-actions">
                 <button className="btn delivery-nav-button" type="button"
+                  disabled={Boolean(activeWeek.closedAt)} onClick={()=>setExternalOpen(true)}>
+                  <FileArrowUp size={18}/><span>Leer externa</span>
+                </button>
+                <button className="btn delivery-nav-button" type="button"
                   disabled={Boolean(activeWeek.closedAt)}
                   onClick={() => beginWeekCapture(activeWeek)}>
                   <ChartBar size={18}/><span>Capturar jornadas</span>
@@ -3674,6 +3709,10 @@ export default function DeliveryRegistry({ onClose }) {
             </div>
 
             <div className="delivery-scanner-actions">
+              <button className="btn external-open-btn" type="button"
+                onClick={()=>{stopCamera();setExternalOpen(true);}}>
+                <FileArrowUp size={18}/> Leer bitácora externa
+              </button>
               <button
                 className="btn"
                 type="button"
@@ -3802,7 +3841,15 @@ export default function DeliveryRegistry({ onClose }) {
         </div>
       )}
 
-      {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
+      {externalOpen && <ExternalBitacoraDialog
+         students={state.students.filter(student=>studentIsActive(student))}
+         weeks={state.weeks}
+         school={state.context?.school||state.context?.schoolName||""}
+         loadPdfJs={ensurePdfJs}
+         onClose={()=>setExternalOpen(false)}
+         onSave={commitExternalEntry}
+       />}
+       {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
         <ManualDeliveryDialog
           key={activeWeek.id+":"+manualTarget.studentId}
           week={activeWeek}

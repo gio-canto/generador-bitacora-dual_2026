@@ -24,6 +24,8 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  const [error,setError]=useState("");
  const [notice,setNotice]=useState("");
  const workerRef=useRef(null),mounted=useRef(true),urls=useRef([]);
+ const onCloseRef=useRef(onClose);onCloseRef.current=onClose;
+ const busyRef=useRef(busy);busyRef.current=busy;
  const fileRef=useRef(null),photoRef=useRef(null),scrollRef=useRef(null);
  const item=items[selected]||null;
  const events=eventsForSchool(school);
@@ -31,7 +33,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    mounted.current=true;
    const former=document.body.style.overflow;
    document.body.style.overflow="hidden";
-   const key=event=>{if(event.key==="Escape"&&!busy)onClose();};
+   const key=event=>{if(event.key==="Escape"&&!busyRef.current)onCloseRef.current();};
    document.addEventListener("keydown",key);
    scrollRef.current?.focus({preventScroll:true});
    return ()=>{
@@ -42,7 +44,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      urls.current=[];
      workerRef.current?.terminate?.().catch(()=>{});
    };
- },[onClose,busy]);
+ },[]);
  const getWorker=async()=>{
    if(workerRef.current)return workerRef.current;
    setProgress("Iniciando reconocimiento de texto en español e inglés…");

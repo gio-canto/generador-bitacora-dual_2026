@@ -14,7 +14,7 @@ function iso(y,m,d){
    ?result.toISOString().slice(0,10):"";
 }
 export function dateFromExternal(value){
- const raw=externalKey(value).replace(/ /g,"");
+ const raw=externalClean(value).replace(/\s/g,"");
  let match=raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
  if(match)return iso(match[1],match[2],match[3]);
  match=raw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
