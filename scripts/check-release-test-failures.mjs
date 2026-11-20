@@ -10,16 +10,19 @@ const ALLOWED = [
 
 export function checkKnownFailures(log) {
   const clean = String(log || "").replace(/\x1b\[[0-9;]*m/g, "");
-  const matches = [...clean.matchAll(/^\s*FAIL\s+(tests\/[^\s>]+)\s+>/gm)];
+  const matches = [...clean.matchAll(/^\s*FAIL\s+(tests\/[^\s>\[]+)\s+(?:>|\[)/gm)];
   const failedFiles = [...new Set(matches.map((match) => match[1]))].sort();
   const summary = clean.match(/\bTests\s+(\d+) failed\s*\|\s*(\d+) passed/);
+  const fileSummary = clean.match(/\bTest Files\s+(\d+) failed\s*\|\s*(\d+) passed/);
   const expected = [...ALLOWED].sort();
   return {
-    valid: Boolean(summary) &&
-      Number(summary[1]) === expected.length &&
+    valid: Boolean(summary && fileSummary) &&
+      Number(fileSummary?.[1]) === expected.length &&
+      Number(summary?.[1]) === expected.length &&
       JSON.stringify(failedFiles) === JSON.stringify(expected),
     failedFiles,
     failedCount: summary ? Number(summary[1]) : null,
+    failedFileCount: fileSummary ? Number(fileSummary[1]) : null,
     passedCount: summary ? Number(summary[2]) : null,
   };
 }
