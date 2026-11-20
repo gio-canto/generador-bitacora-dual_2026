@@ -3356,6 +3356,7 @@ export function startEditor() {
       $("#company").options[0].textContent = "Selecciona una empresa";
       $("#school").addEventListener("change", () => {
         configureSchool(true);
+        if (entries.some(entry => entry.status === "evento")) renderDays();
         markDirty();
         updatePreview();
       });
