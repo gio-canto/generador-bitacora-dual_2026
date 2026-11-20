@@ -8,6 +8,7 @@ Este directorio contiene la documentación mantenible del proyecto. Las notas hi
 | --- | --- |
 | Quiero usar el proyecto en otra escuela | [IMPLEMENTAR_INSTITUCION.md](IMPLEMENTAR_INSTITUCION.md) |
 | Sólo necesito agregar plantel o empresa | [CATALOGOS.md](CATALOGOS.md) |
+| Quiero leer bitácoras externas con OCR, PDF y Word | [LECTOR_BITACORAS_EXTERNAS.md](LECTOR_BITACORAS_EXTERNAS.md) |
 | Quiero agregar, editar o compartir eventos especiales | [EVENTOS_ESPECIALES.md](EVENTOS_ESPECIALES.md) |
 | Quiero agregar o cambiar un motivo frecuente de falta | [MOTIVOS_FRECUENTES_FALTA.md](MOTIVOS_FRECUENTES_FALTA.md) |
 | Quiero agregar o cambiar un motivo de Sin labores | [MOTIVOS_FRECUENTES_SIN_LABORES.md](MOTIVOS_FRECUENTES_SIN_LABORES.md) |

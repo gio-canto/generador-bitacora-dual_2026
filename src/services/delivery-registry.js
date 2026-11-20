@@ -344,7 +344,7 @@ function normalizeExternalReview(value){
  const statuses=["laboral","falta","sin_labores","inhabil","evento",""];
  return {
    filename:clean(value.filename,180),
-   method:["ocr","pdf-text","mixed","manual"].includes(value.method)?value.method:"manual",
+   method:["ocr","pdf-text","docx-text","mixed","manual"].includes(value.method)?value.method:"manual",
    pages:Number.isInteger(value.pages)?Math.min(16,Math.max(1,value.pages)):1,
    reviewedAt:clean(value.reviewedAt,40),
    name:clean(value.name,120),
