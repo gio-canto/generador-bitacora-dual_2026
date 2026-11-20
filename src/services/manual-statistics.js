@@ -27,7 +27,7 @@ export function buildManualStatistics(days){
    if(status==="falta"||status==="sin_labores"){
      reasonCode=Number(day.reasonCode);
      if(!Number.isInteger(reasonCode)||reasonCode<0||reasonCode>63||
-       (reasonCode!==0&&reasonCode!==63&&!reasonsForStatus(status).some(reason=>reason.code===reasonCode)))
+       (reasonCode!==0&&reasonCode!==63&&!(status==="falta"?absenceReasons:nonWorkingReasons).some(reason=>reason.code===reasonCode)))
        throw Error("Revisa la causa de "+MANUAL_DAYS[index].toLowerCase()+".");
    } else if(status==="evento"){
      reasonCode=Number(day.reasonCode);const ev=specialEventByCode(reasonCode);
@@ -40,7 +40,7 @@ export function buildManualStatistics(days){
      if(!["con","sin"].includes(day.eventMode))throw Error("Selecciona la modalidad del evento.");
      extra={eventPhase:phase,eventDiscipline:day.eventDiscipline||"",eventMode:day.eventMode};
    }
-   const catalog=reasonsForStatus(status);
+   const catalog=status==="falta"?absenceReasons:reasonsForStatus(status);
    return {status,minutes,reasonCode,reasonId:status==="evento"?(specialEventByCode(reasonCode)?.id||""):(catalog.find(x=>x.code===reasonCode)?.id||""),...extra};
  });
  return {version:days.some(day=>day.status==="evento")?6:5,entries};

@@ -182,6 +182,10 @@ export default function ManualDeliveryDialog({
                         <option value="0">Sin clasificar</option>
                         {reasonsForStatus(days[index].status).map(reason=>
                           <option key={reason.id} value={String(reason.code)}>{reason.label}</option>)}
+                        {days[index].status==="falta" && days[index].reasonCode !== "0" &&
+                          !reasonsForStatus("falta").some(reason=>String(reason.code)===days[index].reasonCode) &&
+                          days[index].reasonCode!=="63" &&
+                          <option value={days[index].reasonCode}>Motivo histórico · código {days[index].reasonCode}</option>}
                         <option value="63">Otro motivo</option>
                       </select>
                     </label>
