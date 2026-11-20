@@ -3,7 +3,7 @@ import nonWorkingReasons from "../data/non-working-reasons.json";
 import {EVENT_PHASE_CODES,specialEventByCode} from "./special-events.js";
 const VALID=["laboral","falta","sin_labores","inhabil","evento"];
 export const MANUAL_DAYS=["Martes","Miércoles","Jueves","Viernes"];
-export const blankManualDays=()=>MANUAL_DAYS.map(()=>({status:"",hours:"",reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin",eventResult:""}));
+export const blankManualDays=()=>MANUAL_DAYS.map(()=>({status:"",hours:"",reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"con",eventResult:""}));
 export const manualDaysFromStatistics=statistics=>statistics?.entries?.length===4
  ?statistics.entries.map(day=>({status:day.status,
     hours:["laboral","evento"].includes(day.status)&&day.minutes?String(day.minutes/60):"",

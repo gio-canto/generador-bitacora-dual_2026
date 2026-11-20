@@ -113,7 +113,7 @@ export default function ManualDeliveryDialog({
                     <select value={days[index].status}
                       aria-label={day + " · jornada"}
                       onChange={event => changeDay(index, {
-                        status:event.target.value, hours:"", reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin",eventResult:"",
+                        status:event.target.value, hours:"", reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"con",eventResult:"",
                       })}>
                       <option value="">Sin capturar</option>
                       <option value="laboral">Con labores</option>
@@ -139,7 +139,7 @@ export default function ManualDeliveryDialog({
                         <select value={days[index].reasonCode==="0"?"":days[index].reasonCode} aria-label={day+" · evento"}
                           onChange={e=>{const selected=specialEventByCode(Number(e.target.value));
                             changeDay(index,{reasonCode:e.target.value||"0",eventPhase:selected?.phases?.[0]||"no_aplica",
-                              eventDiscipline:selected?.disciplines?.[0]||"No aplica",eventMode:"sin",eventResult:"",hours:""});}}>
+                              eventDiscipline:selected?.disciplines?.[0]||"No aplica",eventMode:"con",eventResult:"",hours:""});}}>
                           <option value="">Selecciona evento…</option>
                           {eventsForSchool(school).map(item=><option key={item.id} value={String(item.code)}>{item.label}</option>)}
                         </select>
@@ -164,13 +164,6 @@ export default function ManualDeliveryDialog({
                           </label>
                         </>
                       )}
-                      <label className="delivery-field"><span>Modalidad</span>
-                        <select value={days[index].eventMode} aria-label={day+" · modalidad"}
-                          onChange={e=>changeDay(index,{eventMode:e.target.value,hours:""})}>
-                          <option value="sin">Sin labores</option>
-                          <option value="con">Con labores</option>
-                        </select>
-                      </label>
                       <label className="delivery-field"><span>Lugar o resultado obtenido (opcional)</span>
                         <input type="text" maxLength={120} value={days[index].eventResult||""}
                           aria-label={day+" · resultado obtenido"}

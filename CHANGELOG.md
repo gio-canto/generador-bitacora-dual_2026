@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.62.2 · Eventos especiales con modalidad única · 2026-11-20
+
+- Se retira el selector «Con labores / Sin labores» del formulario de Eventos especiales en Generador y Registro Dual.
+- Las **nuevas** jornadas «Evento especial» usan internamente «Con labores», con los campos habituales de entrada, salida y área.
+- El aviso y las validaciones dejan de solicitar una modalidad seleccionable.
+- El PDF conserva únicamente la etiqueta **EVENTO**, sin fondo gris. Permanecen el catálogo por plantel, las fases, disciplinas, «Otros» y el campo de lugar o resultado obtenido.
+- Los registros históricos S6 con modalidad «Sin labores» siguen siendo legibles. Ningún registro antiguo se reclasifica automáticamente.
+- Se agregan pruebas de regresión sobre la selección simplificada y la compatibilidad histórica.
+- Se mantiene el control de las tres fallas preexistentes verificadas: `app.test.jsx`, `pa-signatures.test.js` y `pdf.test.js`.
+
+
 ## 0.62.1 · Ajustes de eventos especiales · 2026-11-20
 
 - Se simplifica la advertencia al elegir «Evento especial» y se precisa su aplicación a concursos, encuentros, olimpiadas y actividades académicas, culturales, cívicas, deportivas o de representación institucional. Se retira la frase final «El evento…».

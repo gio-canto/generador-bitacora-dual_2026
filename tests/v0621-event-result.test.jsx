@@ -16,7 +16,7 @@ describe("0.62.1 · resultado de eventos especiales", () => {
     expect(specialEventById("festival",school)?.label).toBe("Festival Académico de la DGETI");
     const source=readFileSync("src/legacy/editor.js","utf8");
     expect(source).toContain("Esta opción sirve para registrar la participación en concursos");
-    expect(source).toContain("Señala también si realizaste labores de Educación Dual");
+    expect(source).toContain("Completa el horario y el área de la jornada.");
     expect(source).not.toContain("El evento no se contabilizará como falta y podrá ser revisado en Registro Dual.");
   });
 
@@ -70,6 +70,7 @@ describe("0.62.1 · resultado de eventos especiales", () => {
     fireEvent.change(screen.getByLabelText("Martes · jornada"),{target:{value:"evento"}});
     fireEvent.change(screen.getByLabelText("Martes · evento"),{target:{value:"1"}});
     fireEvent.change(screen.getByLabelText("Martes · fase"),{target:{value:"estatal"}});
+    fireEvent.change(screen.getByLabelText("Martes · horas"),{target:{value:"3"}});
     const result=screen.getByLabelText("Martes · resultado obtenido");
     expect(result.getAttribute("placeholder")).toMatch(/1.er lugar/);
     fireEvent.change(result,{target:{value:"3.er lugar"}});
@@ -79,7 +80,7 @@ describe("0.62.1 · resultado de eventos especiales", () => {
     expect(onSave).toHaveBeenCalledTimes(1);
     const stats=onSave.mock.calls[0][0].statistics;
     expect(stats.entries[0]).toMatchObject({status:"evento",eventPhase:"estatal",
-      eventResult:"3.er lugar",minutes:0});
+      eventResult:"3.er lugar",eventMode:"con",minutes:180});
     expect(manualDaysFromStatistics(stats)[0].eventResult).toBe("3.er lugar");
     const registered=registerDelivery(week,student.id,"2026-11-21T10:00:00Z","manual",
       {matrixVersion:5,statistics:stats});

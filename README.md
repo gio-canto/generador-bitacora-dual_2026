@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.62.1-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.62.2-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,10 @@
 </div>
 
 ---
+
+## v0.62.2 · Eventos especiales sin selector de modalidad
+
+Se elimina el selector «Con labores / Sin labores» de los nuevos eventos especiales. Su modalidad interna será «Con labores», con horario y área. Se conservan evento, fase, disciplina, resultado opcional y descripción; los eventos antiguos con «Sin labores» siguen siendo legibles sin reclasificación. Las otras jornadas y Data Matrix S5/S6 no cambian.
 
 ## v0.62.1 · Resultado de eventos especiales
 

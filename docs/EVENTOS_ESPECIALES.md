@@ -1,12 +1,12 @@
-# Eventos especiales · versión 0.62.1
+# Eventos especiales · versión 0.62.2
 
 ## Uso
 
-El estado **Evento especial** permite capturar Evento → Fase → Disciplina → Modalidad → Lugar o resultado obtenido (opcional) y editar la descripción. La advertencia indica para qué participaciones se utiliza esta opción: concursos, encuentros, olimpiadas y actividades académicas, culturales, cívicas, deportivas o de representación institucional. No reemplaza ni cambia el comportamiento de «Falta», «Sin labores» o «Día inhábil».
+El estado **Evento especial** permite capturar Evento → Fase → Disciplina → Lugar o resultado obtenido (opcional) y editar la descripción. La advertencia indica para qué participaciones se utiliza esta opción: concursos, encuentros, olimpiadas y actividades académicas, culturales, cívicas, deportivas o de representación institucional. No reemplaza ni cambia el comportamiento de «Falta», «Sin labores» o «Día inhábil».
 
-**Con labores:** el alumno también realizó trabajo Dual; se requieren horas de entrada y salida y el área, y únicamente esos minutos se contabilizan como trabajo.
+**Modalidad única en nuevas capturas:** las jornadas especiales se registran internamente como «Con labores», sin selector adicional. Se solicitan entrada, salida y área, como en una jornada ordinaria. El PDF mantiene la etiqueta **EVENTO**, no «Con labores», y muestra las horas capturadas.
 
-**Sin labores:** el alumno participó en el evento y no realizó trabajo Dual; en el PDF se muestran guiones en horario y área. La modalidad habla del **alumno**, no de la apertura o cierre de su empresa.
+Los registros históricos de eventos con la antigua modalidad «Sin labores» continúan siendo legibles, sin reclasificación automática. Las horas registradas deben corresponder a la jornada realizada; el registro no representa por sí mismo una autorización administrativa de horas.
 
 El campo «Lugar o resultado obtenido» aparece en todos los eventos y muestra el ejemplo «1.er lugar, finalista o participación». Puede dejarse vacío. Cuando se captura, se añade al texto sugerido como «Resultado obtenido: ...» y aparece en la actividad del PDF; el alumno conserva la posibilidad de editar manualmente la descripción.
 
@@ -76,4 +76,4 @@ Los concursos registrados anteriormente como faltas **no se reclasifican automá
 
 ## Pruebas
 
-Ejecuta `npm run check` y revisa la interfaz en escritorio y móvil, disponibilidad por plantel, «Otros», aviso, descripción, horario y área con/sin labores, PDF sin sombreado, lectura de S5/S6, captura manual, estadísticas y recuperación de respaldos.
+Ejecuta `npm run check` y revisa la interfaz en escritorio y móvil, disponibilidad por plantel, «Otros», aviso, descripción, horario y área de eventos nuevos y compatibilidad con eventos históricos, PDF sin sombreado, lectura de S5/S6, captura manual, estadísticas y recuperación de respaldos.

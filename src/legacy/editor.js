@@ -60,7 +60,7 @@ export function startEditor() {
       sin_labores:
         "Selecciona «Sin labores» cuando por algún motivo no se realizaron actividades en tu empresa. No se usa cuando únicamente tú faltaste. Avisa a la directora de Vinculación y escribe la justificación correspondiente.",
       evento:
-        "Esta opción sirve para registrar la participación en concursos, encuentros, olimpiadas y otras actividades académicas, culturales, cívicas, deportivas o de representación del plantel. Indica el tipo de actividad, la fase, la disciplina y, si corresponde, el resultado obtenido. Señala también si realizaste labores de Educación Dual durante la jornada. La información se incluirá en tu bitácora y podrá consultarse en Registro Dual. Comunica tu participación a Vinculación y al responsable de tu formación.",
+        "Esta opción sirve para registrar la participación en concursos, encuentros, olimpiadas y otras actividades académicas, culturales, cívicas, deportivas o de representación del plantel. Indica el tipo de actividad, la fase, la disciplina y, si corresponde, el resultado obtenido. Completa el horario y el área de la jornada. La información se incluirá en tu bitácora y podrá consultarse en Registro Dual. Comunica tu participación a Vinculación y al responsable de tu formación.",
       inhabil:
         "Selecciona «Día inhábil» única y exclusivamente cuando la suspensión de actividades esté contemplada en el calendario escolar oficial aplicable a Educación Dual (DGETI, CBTis, SEP o su calendario interno). Si la empresa no trabajó por otro motivo, utiliza «Sin labores».",
     };
@@ -743,7 +743,7 @@ export function startEditor() {
               "Completa entrada y salida. La salida debe ser después de la entrada.",
           };
         if (e.status === "evento" && !validSpecialEvent(e,$("#school").value))
-          return {ok:false,title:"Revisa el evento del día "+(i+1),message:"Selecciona el evento, su fase, la disciplina y la modalidad. En Otros, indica el nombre del evento."};
+          return {ok:false,title:"Revisa el evento del día "+(i+1),message:"Selecciona el evento, su fase y la disciplina. En «Otros», indica el nombre del evento. Completa también el horario y el área."};
         if (e.status === "inhabil") continue;
         const check = validateActivityText(e.activity);
         if (!check.ok)
@@ -915,9 +915,6 @@ export function startEditor() {
         field("Disciplina",e.eventId==="otros"?
           '<input data-event-field="eventDiscipline" data-event-index="'+i+'" maxlength="100" placeholder="No aplica o disciplina" value="'+escapeHtml(e.eventDiscipline||"")+'">':
           '<select data-event-field="eventDiscipline" data-event-index="'+i+'">'+disciplines+'</select>')+
-        field("Modalidad",'<select data-event-field="eventMode" data-event-index="'+i+'">'+
-          option("sin","Sin labores",e.eventMode!=="con")+
-          option("con","Con labores",e.eventMode==="con")+'</select>')+
         field("Lugar o resultado obtenido (opcional)",'<input data-event-field="eventResult" data-event-index="'+i+'" maxlength="120" placeholder="Ej. 1.er lugar, finalista o participación" value="'+escapeHtml(e.eventResult||"")+'">')+
         '</div>';
       card.querySelector(".day-grid").after(section);
@@ -1000,7 +997,7 @@ export function startEditor() {
             entries[i].status = next;
             if (previous !== next) { entries[i].reasonId = ""; entries[i].reasonMode = "auto"; }
             if (next === "evento" && previous !== next) {
-              Object.assign(entries[i],{eventId:"",eventName:"",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"sin",eventResult:""});
+              Object.assign(entries[i],{eventId:"",eventName:"",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"con",eventResult:""});
               entries[i].activity = "";
             }
             if (next === "inhabil") entries[i].activity = INHABIL_JUSTIFICATION;
@@ -1126,7 +1123,7 @@ export function startEditor() {
           }
           const event=specialEventById(e.eventId,school);
           const suggested=specialEventText(event,e.eventPhase,e.eventDiscipline,e.eventName,e.eventResult);
-          if(key!=="eventMode" && (!String(e.activity||"").trim()||e.activity===oldSuggested))
+          if(!String(e.activity||"").trim()||e.activity===oldSuggested)
             e.activity=suggested;
           const model=buildPageModel();
           if(!model.fits){
