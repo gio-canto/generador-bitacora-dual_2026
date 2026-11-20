@@ -2,6 +2,8 @@
 
 ## 0.62.0 · Eventos especiales por plantel · 2026-11-20
 
+- Publicación restringida a las tres fallas preexistentes identificadas en `app.test.jsx`, `pa-signatures.test.js` y `pdf.test.js`. La verificación automatizada comprueba exactamente los archivos y la cantidad de fallas; cualquier regresión nueva bloquea la publicación. Esta excepción no equivale a pruebas completas aprobadas.
+
 - Nuevo estado «Evento especial» en escritorio y móvil, con selector de evento, fase, disciplina y modalidad con/sin labores del alumno; texto editable y «Otros».
 - Catálogo independiente en `src/data/special-events.json`, con eventos compartidos, exclusivos por plantel y excepciones.
 - El PDF muestra **EVENTO** sin gris, y horario/área solamente si el alumno realizó labores efectivas.
