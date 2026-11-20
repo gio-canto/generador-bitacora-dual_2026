@@ -203,9 +203,11 @@ export function buildPageModel(record) {
     on = record.markdown !== false,
     rows = entries.map((e) => {
       const st = e.status || "laboral",
+         eventWorking = st === "evento" && e.eventMode === "con",
         special = st !== "laboral",
         label =
-          record.company === LIMBO_COMPANY ? "EN ESPERA DE REUBICACIÓN"
+          st === "evento" ? "EVENTO"
+           : record.company === LIMBO_COMPANY ? "EN ESPERA DE REUBICACIÓN"
           : st === "sin_labores"
             ? "SIN LABORES"
             : st === "inhabil"
@@ -225,14 +227,14 @@ export function buildPageModel(record) {
               ...wrapStyled(e.activity, widths[1] - 3.2, sizes.activity, on),
             ]
           : wrapStyled(e.activity, widths[1] - 3.2, sizes.activity, on),
-        timeLines = special
+        timeLines = special && !eventWorking
           ? wrapPlain("-", widths[2] - 2.6, sizes.other)
           : wrapPlain(
               formatTime(e.start) + " - " + formatTime(e.end),
               widths[2] - 2.6,
               sizes.other,
             ),
-        areaLines = special
+        areaLines = special && !eventWorking
           ? wrapPlain("-", widths[3] - 3.2, sizes.other)
           : wrapPlain(e.area, widths[3] - 3.2, sizes.other),
         h = Math.max(
@@ -487,7 +489,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
   );
   let y = t.y + t.headH;
   rows.forEach((r) => {
-    rect(c, t.x, y, t.w, r.h, r.special ? "#e7e7e7" : null, "#333", 0.22, p);
+    rect(c, t.x, y, t.w, r.h, r.special && r.st !== "evento" ? "#e7e7e7" : null, "#333", 0.22, p);
     centered(
       c,
       r.dateLines,
@@ -498,7 +500,7 @@ export function drawPdfPage(canvas, p, record, logoImage) {
       3.65,
       p,
     );
-    r.special
+    r.special && r.st !== "evento"
       ? centered(
           c,
           r.activityLines,
