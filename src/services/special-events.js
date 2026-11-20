@@ -30,7 +30,7 @@ export function specialEventText(event,phase="no_aplica",discipline="",customNam
     .replaceAll("{evento}",title)
     .replaceAll("{fase}",phase&&phase!=="no_aplica"?", fase "+(EVENT_PHASE_LABELS[phase]||phase).toLowerCase():"")
     .replaceAll("{disciplina}",discipline&&discipline!=="No aplica"?", disciplina "+discipline:"");
-  const result=String(eventResult||"").trim().replace(/[.\\s]+$/,"");
+  const result=String(eventResult||"").trim().replace(/[.\s]+$/,"");
   return result ? base.trimEnd()+" Resultado obtenido: "+result+"." : base;
 }
 export function validSpecialEvent(entry,school) {
