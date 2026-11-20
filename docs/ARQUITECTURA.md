@@ -32,7 +32,7 @@ Ejemplos:
 
 `src/data/` contiene configuración compartida de escuelas y empresas.
 
-No almacena datos individuales de alumnos. Además de escuelas y empresas, define los catálogos editables de **Falta** (`absence-reasons.json`) y **Sin labores** (`non-working-reasons.json`), incluidos sus códigos Data Matrix y frases de reconocimiento.
+No almacena datos individuales de alumnos. Además de escuelas y empresas, define los catálogos editables de **Falta** (`absence-reasons.json`) y **Sin labores** (`non-working-reasons.json`), incluidos sus códigos Data Matrix y frases de reconocimiento. Los eventos especiales se configuran en `special-events.json` y se resuelven con `src/services/special-events.js`.
 
 ### Generador heredado
 
@@ -125,7 +125,7 @@ Consulta [Mensajes del generador](MENSAJES_GENERADOR.md) y [Centro de avisos](CE
 
 ## Data Matrix
 
-El payload actual es versionado. El lector conserva compatibilidad con formatos anteriores cuando es razonable.
+El payload actual es versionado. Las jornadas con eventos usan `BD26|5`/`S6:` (motivo, fase, disciplina de catálogo y modalidad); las demás conservan `BD26|4`/`S5:`. Los nombres personalizados y las descripciones libres no viajan en el código. El lector conserva compatibilidad con formatos anteriores cuando es razonable.
 
 Reglas:
 

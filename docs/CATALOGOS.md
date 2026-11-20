@@ -5,9 +5,12 @@ Los catálogos son la configuración institucional compartida del proyecto. Se e
 ```text
 src/data/schools.json
 src/data/companies.json
+src/data/special-events.json
 ```
 
 No existe una pantalla pública para modificar estos catálogos globales desde el navegador.
+
+Para los eventos especiales compartidos o exclusivos de un plantel, consulta [EVENTOS_ESPECIALES.md](EVENTOS_ESPECIALES.md). Los mensajes automáticos de calendario constituyen otra función.
 
 ## Cuándo usar catálogos
 
