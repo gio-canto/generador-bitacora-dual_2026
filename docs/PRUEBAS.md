@@ -438,3 +438,7 @@ Comprobar que todos los eventos muestran el placeholder del lugar o resultado ob
 ## Modalidad única de eventos especiales (0.62.2)
 
 Verificar en Generador y Registro Dual que la modalidad no es seleccionable para nuevos eventos; éstos usan «Con labores» y solicitan horas y área; el PDF sólo presenta EVENTO. Las jornadas históricas S6 «Sin labores» deben seguir decodificándose con sus datos originales. Ejecutar `npm run check`.
+
+## Lector OCR de bitácoras externas (v0.63.0)
+
+Probar PDF con texto, PDF escaneado, JPG/PNG, DOCX, carga de hasta 12 documentos, detección de nombre/semana y horarios, lectura de cuatro jornadas, revisión de fechas, duplicados, registro de entrega sin estadísticas cuando falten jornadas, respaldo JSON, vista original, corrección y funcionamiento de cámara móvil. La suite automatizada simula OCR; validar en iOS y Android con archivos reales antes de usar con estudiantes.

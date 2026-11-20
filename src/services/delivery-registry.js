@@ -339,6 +339,25 @@ function normalizeStudent(value, fallback = {}) {
   });
 }
 
+function normalizeExternalReview(value){
+ if(!value||typeof value!=="object"||!Array.isArray(value.days)||value.days.length!==4)return null;
+ const statuses=["laboral","falta","sin_labores","inhabil","evento",""];
+ return {
+   filename:clean(value.filename,180),
+   method:["ocr","pdf-text","docx-text","mixed","manual"].includes(value.method)?value.method:"manual",
+   pages:Number.isInteger(value.pages)?Math.min(16,Math.max(1,value.pages)):1,
+   reviewedAt:clean(value.reviewedAt,40),
+   name:clean(value.name,120),
+   company:clean(value.company,160),
+   days:value.days.map(day=>({
+     date:validIsoDate(day?.date)?day.date:"",
+     status:statuses.includes(day?.status)?day.status:"",
+     start:clean(day?.start,5),end:clean(day?.end,5),
+     area:clean(day?.area,150),activity:clean(day?.activity,900),
+   })),
+ };
+}
+
 function normalizeDelivery(value) {
   if (!value || typeof value !== "object") return null;
   const status = ["entregado", "entregado_tarde", "no_entregado", "no_aplica"].includes(
@@ -357,6 +376,7 @@ function normalizeDelivery(value) {
       ? value.source
       : "manual",
     ...(limboExempt ? { limboExempt: true } : {}),
+    ...(normalizeExternalReview(value.externalReview) ? {externalReview:normalizeExternalReview(value.externalReview)} : {}),
     ...( ["generator", "other", "unknown"].includes(value.usageSource)
       ? { usageSource: value.usageSource } : {}),
     ...(Number.isInteger(value.matrixVersion) && value.matrixVersion > 0
@@ -596,6 +616,7 @@ export function setDeliveryStatus(
         ...(status !== "no_aplica" && previous?.statistics ? { statistics: previous.statistics } : {}),
         ...(status !== "no_aplica" && previous?.matrixVersion ? { matrixVersion: previous.matrixVersion } : {}),
         ...(status !== "no_aplica" && previous?.usageSource ? { usageSource: previous.usageSource } : {}),
+        ...(status !== "no_aplica" && previous?.externalReview ? {externalReview:previous.externalReview} : {}),
       },
     },
   };
@@ -902,6 +923,7 @@ export function saveManualDelivery(week, studentId, status, { statistics = null,
         registeredAt,
         source: "manual",
         usageSource,
+        ...(week.deliveries?.[studentId]?.externalReview ? {externalReview:week.deliveries[studentId].externalReview}:{}),
         ...(statistics ? {statistics:{
           ...statistics,
           entries:statistics.entries.map((day,index)=>{
@@ -916,4 +938,27 @@ export function saveManualDelivery(week, studentId, status, { statistics = null,
       },
     },
   };
+}
+
+
+/** Confirma una lectura externa revisada: nunca registra el archivo original. */
+export function saveExternalDelivery(week,studentId,{statistics=null,metadata,timestamp=""}={}){
+ if(!week||week.closedAt)throw new Error("Reabre la semana antes de registrar una lectura externa.");
+ if(!studentId||!metadata)throw new Error("Selecciona alumno, semana y archivo.");
+ const externalReview=normalizeExternalReview(metadata);
+ if(!externalReview)throw new Error("Revisa el contenido de las jornadas externas.");
+ const registeredAt=timestamp||new Date().toISOString();
+ return {
+   ...week,
+   deliveries:{...week.deliveries,
+     [studentId]:{
+       status:statusFromTimestamp(week,registeredAt),
+       registeredAt,
+       source:"import",
+       usageSource:"other",
+       externalReview,
+       ...(statistics?{statistics}:{}),
+     }
+   }
+ };
 }
