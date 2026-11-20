@@ -791,12 +791,8 @@ function signatureFits(r) {
   return (
     groups.every(
       (g, i) =>
-        g.roles.length <= 4 &&
-        measureMm(g.name, 6, "bold") <= widths[i] &&
-        g.roles.every((t) => t.startsWith("P. A. · Por ausencia del ") ||
-          measureMm(t, 6, "italic") <= widths[i]),
-    ) &&
-    measureMm(r.school.toUpperCase(), 8, "bold") <= layout.strip.w - 4 &&
-    measureMm("Nombre de la empresa: " + r.company, 9, "bold") <= layout.table.w
+        // drawText ya ajusta a la anchura de la columna; impedir sólo líneas que se perderían.
+        g.roles.length <= 4,
+    )
   );
 }
