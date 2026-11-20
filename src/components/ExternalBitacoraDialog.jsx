@@ -1,10 +1,9 @@
 import {useEffect,useRef,useState} from "react";
 import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,
   externalDaysToStatistics,externalReviewMetadata} from "../services/external-bitacora.js";
-import {readExternalBitacora,createExternalWorker} from "../services/external-ocr.js";
+import {readExternalBitacora,createExternalWorker,externalFileKind} from "../services/external-ocr.js";
 import {buildManualStatistics,reasonsForStatus,MANUAL_DAYS} from "../services/manual-statistics.js";
 import {eventsForSchool,EVENT_PHASE_LABELS,specialEventByCode} from "../services/special-events.js";
-import {scanFileKind} from "../services/scanned-pdf.js";
 import "../external-bitacora.css";
 
 function statusLabel(value){
@@ -63,7 +62,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    try{
      for(const file of picked){
        if(!mounted.current)break;
-       const kind=scanFileKind(file);
+       const kind=externalFileKind(file);
        if(!kind){setError("Archivo no compatible: "+file.name);continue;}
        const url=URL.createObjectURL(file);urls.current.push(url);
        setProgress("Leyendo "+file.name+"…");
@@ -152,12 +151,12 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      </header>
      <div className="external-upload">
        <label className="btn primary external-upload-btn" htmlFor="external-files">
-         Cargar PDF o fotografías
+         Cargar PDF, Word o fotografías
        </label>
-       <input id="external-files" ref={fileRef} type="file" multiple accept=".pdf,application/pdf,image/*,.heic,.heif" onChange={onFiles} disabled={busy}/>
+       <input id="external-files" ref={fileRef} type="file" multiple accept=".pdf,.docx,application/pdf,image/*,.heic,.heif" onChange={onFiles} disabled={busy}/>
        <label className="btn external-upload-btn" htmlFor="external-camera">Tomar fotografía</label>
        <input id="external-camera" ref={photoRef} type="file" accept="image/*" capture="environment" onChange={onFiles} disabled={busy}/>
-       <span className="external-upload-tip">Hasta 12 archivos · PDF máx. 18 MB · imagen máx. 12 MB. La primera lectura OCR requiere internet.</span>
+       <span className="external-upload-tip">Hasta 12 archivos · PDF máx. 18 MB · DOCX/imagen máx. 12 MB. La primera lectura OCR requiere internet.</span>
      </div>
      {busy&&<p className="external-progress" role="status">{progress||"Procesando archivos…"}</p>}
      {error&&<p className="external-error" role="alert">{error}</p>}
@@ -174,8 +173,8 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          <div className="external-original">
            <div className="external-part-title"><strong>Documento original</strong><span>{item.filename}</span></div>
            {item.kind==="image"?<img src={item.url} alt={"Fotografía original: "+item.filename}/>:
-             <div className="external-pdf-preview"><strong>PDF</strong><span>{item.pages||"?"} páginas revisadas</span>
-               <a className="btn" href={item.url} target="_blank" rel="noopener noreferrer">Abrir PDF original</a></div>}
+             <div className="external-pdf-preview"><strong>{item.kind==="docx"?"DOCX":"PDF"}</strong><span>{item.kind==="docx"?"Documento Word":(item.pages||"?")+" páginas revisadas"}</span>
+               <a className="btn" href={item.url} target="_blank" rel="noopener noreferrer">Abrir documento original</a></div>}
            {item.state==="ready"&&<details className="external-transcript"><summary>Ver y corregir transcripción OCR</summary>
              <textarea aria-label="Texto reconocido" value={item.text} rows={8}
                onChange={e=>updateItem({text:e.target.value.slice(0,20000)})}/>

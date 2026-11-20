@@ -7,6 +7,28 @@ export const OCR_SOURCES=[
  "https://unpkg.com/tesseract.js@5/dist/tesseract.min.js",
 ];
 export const EXTERNAL_IMAGE_LIMIT_BYTES=12*1024*1024;
+export const EXTERNAL_DOCX_LIMIT_BYTES=12*1024*1024;
+export const DOCX_SOURCES=[
+ "https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js",
+ "https://unpkg.com/mammoth@1.13.0/mammoth.browser.min.js",
+];
+export function externalFileKind(file){
+ if(!file)return "";
+ if(/\.docx$/i.test(file.name||""))return "docx";
+ return scanFileKind(file);
+}
+let mammothLoader=null;
+async function ensureDocxReader(){
+ if(globalThis.mammoth?.extractRawText)return globalThis.mammoth;
+ if(!mammothLoader)mammothLoader=(async()=>{
+   for(const url of DOCX_SOURCES){
+     try{await scriptOnce(url);if(globalThis.mammoth?.extractRawText)return globalThis.mammoth;}
+     catch{/* Intentar otro servidor. */}
+   }
+   throw new Error("No se pudo cargar el lector de documentos Word.");
+ })().catch(e=>{mammothLoader=null;throw e});
+ return mammothLoader;
+}
 let loader=null;
 function scriptOnce(src){
  return new Promise((resolve,reject)=>{
@@ -75,14 +97,21 @@ function textLinesFromPdf(items){
 }
 export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=()=>{},signal}={}){
  if(!file)throw new Error("Selecciona un archivo.");
- const kind=scanFileKind(file);
+ const kind=externalFileKind(file);
  if(!kind)throw new Error("Este tipo de archivo no es compatible. Usa PDF, JPG, PNG o una fotografía.");
  if(kind==="pdf"&&file.size>PDF_SCAN_LIMIT_BYTES)throw new Error("El PDF supera el máximo de 18 MB.");
+ if(kind==="docx"&&file.size>EXTERNAL_DOCX_LIMIT_BYTES)throw new Error("El Word supera el máximo de 12 MB.");
  if(kind==="image"&&file.size>EXTERNAL_IMAGE_LIMIT_BYTES)throw new Error("La imagen supera el máximo de 12 MB.");
  if(signal?.aborted)throw new Error("Lectura cancelada.");
  let pages=1,pdfText=0,ocrText=0,method="ocr",truncated=false;
  const chunks=[];
- if(kind==="image"){
+ if(kind==="docx"){
+   const mammoth=await ensureDocxReader();
+   onProgress({stage:"docx",page:1,pages:1});
+   const result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});
+   chunks.push(String(result?.value||""));
+   method="docx-text";
+ }else if(kind==="image"){
    const worker=await getWorker();
    onProgress({stage:"ocr",page:1,pages:1});
    const canvas=await imageToCanvas(file);
