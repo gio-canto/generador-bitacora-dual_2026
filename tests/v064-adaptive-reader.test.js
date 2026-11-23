@@ -1,7 +1,7 @@
 import {describe,it,expect} from "vitest";
 import {createStudent,createWeek,createDeliveryState,addStudentAlias,findStudentByMatrixValue,
-  findWeekByMatrixValue,learnExternalExample,sanitizeDeliveryState,normalizeName} from "../src/services/delivery-registry.js";
-import {extractExternalFields,suggestExternalStudent,suggestExternalWeekPeriod} from "../src/services/external-bitacora.js";
+  findWeekByMatrixValue,learnExternalExample,sanitizeDeliveryState,normalizeName,validDualWeekPeriod} from "../src/services/delivery-registry.js";
+import {extractExternalFields,suggestExternalStudent,suggestExternalWeekPeriod,applyExternalLearning} from "../src/services/external-bitacora.js";
 
 const maria=createStudent({id:"maria",name:"María López García",specialty:"Programación",company:"Archivo"});
 const jose=createStudent({id:"jose",name:"José Antonio Pérez",specialty:"Programación",company:"Archivo"});
@@ -42,6 +42,13 @@ describe("v0.64.0 · alias persistentes y aprendizaje",()=>{
     expect(restored.ocrLearning.examples).toHaveLength(1);
     expect(JSON.stringify(restored)).not.toContain("data:image");
   });
+  it("reutiliza correcciones de empresa solamente si no son ambiguas",()=>{
+    const example={studentId:"maria",observedCompany:"Arch1vo",confirmedCompany:"Archivo"};
+    expect(applyExternalLearning({company:"ARCH1VO"},[example],"maria").company).toBe("Archivo");
+    expect(applyExternalLearning({company:"Arch1vo"},[example],"jose").company).toBe("Arch1vo");
+    expect(applyExternalLearning({company:"Arch1vo"},[example,
+      {...example,confirmedCompany:"Archivo General"}],"maria").company).toBe("Arch1vo");
+  });
   it("propone crear semana solo a partir de jornadas de un mismo martes a viernes",()=>{
     const extracted=extractExternalFields("Martes 17/11/2026\nMiércoles 18/11/2026\nViernes 20/11/2026");
     expect(suggestExternalWeekPeriod(extracted)).toEqual({startDate:"2026-11-17",endDate:"2026-11-20"});
@@ -49,5 +56,8 @@ describe("v0.64.0 · alias persistentes y aprendizaje",()=>{
     expect(suggestExternalWeekPeriod({dates:["2026-11-16"]})).toBeNull();
     expect(suggestExternalWeekPeriod({dates:[]})).toBeNull();
     expect(findWeekByMatrixValue([],matrixName)).toBeNull();
+    expect(validDualWeekPeriod("2026-11-17","2026-11-20")).toBe(true);
+    expect(validDualWeekPeriod("2026-11-16","2026-11-19")).toBe(false);
+    expect(validDualWeekPeriod("2026-11-17","2026-11-21")).toBe(false);
   });
 });
