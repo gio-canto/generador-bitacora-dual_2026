@@ -355,6 +355,18 @@ export function reactivateStudent(student) {
   };
 }
 
+/** En Registro Dual las jornadas válidas van de martes a viernes. */
+export function validDualWeekPeriod(startDate,endDate) {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(startDate)||!/^\d{4}-\d{2}-\d{2}$/.test(endDate))return false;
+  const start=new Date(startDate+"T12:00:00Z");
+  const end=new Date(endDate+"T12:00:00Z");
+  if(!Number.isFinite(+start)||!Number.isFinite(+end)||
+    start.toISOString().slice(0,10)!==startDate||end.toISOString().slice(0,10)!==endDate||
+    start.getUTCDay()!==2)return false;
+  start.setUTCDate(start.getUTCDate()+3);
+  return start.toISOString().slice(0,10)===endDate;
+}
+
 export function createWeek(data = {}) {
   const startDate = clean(data.startDate, 10);
   const endDate =
