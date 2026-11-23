@@ -14,26 +14,32 @@ function iso(y,m,d){
    ?result.toISOString().slice(0,10):"";
 }
 const MONTH_PATTERN="(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)";
-const DATE_SOURCE="(?:20\\d{2}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}[-/.]\\d{1,2}[-/.](?:20\\d{2}|\\d{2})|\\d{1,2}(?:\\s*[/.-]\\s*|\\s+de\\s+)"+MONTH_PATTERN+"(?:\\s*[/.-]\\s*|\\s+de\\s+)(?:20\\d{2}|\\d{2}))";
+const SEP="[-/.*°º]";
+const DATE_SOURCE="(?:20\\d{2}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}"+SEP+"\\d{1,2}"+SEP+"(?:20\\d{2}|\\d{2})|\\d{1,2}(?:\\s*[/.-]\\s*|\\s+de\\s+)"+MONTH_PATTERN+"(?:\\s*[/.-]\\s*|\\s+de\\s+)(?:20\\d{2}|\\d{2}))";
 export const DATE_GLOBAL=new RegExp("\\b"+DATE_SOURCE+"\\b","gi");
+const PARTIAL_DATE=/^(\d{1,2})[-/.*°º](\d{1,2})(?=\s|$)/;
 const expandedYear=value=>Number(value)<100?2000+Number(value):Number(value);
-export function dateFromExternal(value){
+export function dateFromExternal(value,contextYear=null){
  const clean=String(value??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()
   .replace(/^(?:lunes|martes|miercoles|jueves|viernes|sabado|domingo)\s*[,.:;-]?\s*/,"")
   .replace(/^(?:fecha|dia|jornada)\s*[:\-]?\s*/,"");
  let match=clean.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})$/);
  if(match)return iso(match[1],match[2],match[3]);
- match=clean.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2}|20\d{2})$/);
+ match=clean.match(/^(\d{1,2})[-/.*°º](\d{1,2})[-/.*°º](\d{2}|20\d{2})$/);
  if(match)return iso(expandedYear(match[3]),match[2],match[1]);
  match=clean.match(new RegExp("^(\\d{1,2})(?:\\s*[/.-]\\s*|\\s+de\\s+)("+MONTH_PATTERN+")(?:\\s*[/.-]\\s*|\\s+de\\s+)(\\d{2}|20\\d{2})$","i"));
- return match?iso(expandedYear(match[3]),MONTHS[match[2]],match[1]):"";
+ if(match)return iso(expandedYear(match[3]),MONTHS[match[2]],match[1]);
+ match=clean.match(/^(\d{1,2})[-/.*°º](\d{1,2})$/);
+ return match&&Number.isInteger(contextYear)&&contextYear>=2000&&contextYear<=2100
+   ?iso(contextYear,match[2],match[1]):"";
 }
 function datesIn(value){
  return [...String(value).matchAll(DATE_GLOBAL)].map(match=>dateFromExternal(match[0])).filter(Boolean);
 }
-// Formatos calibrados con el lote 01: 9a.m.-3p.m., 09:00-14:00 y Entrada/Salida.
+// Reconocimiento de horarios del lote 01 y 02, incluidos segmentos múltiples.
 const CLOCK_TOKEN="\\d{1,2}(?:(?:[:.]\\d{2})(?:\\s*[ap]\\.?\\s*m\\.?)?|\\s*[ap]\\.?\\s*m\\.?)";
 const CLOCK_GLOBAL=new RegExp("(^|[^0-9a-z])("+CLOCK_TOKEN+")","gi");
+const CLOCK_RANGE=new RegExp("("+CLOCK_TOKEN+")\\s*(?:-|–|—|\\ba\\b|\\bal\\b)\\s*("+CLOCK_TOKEN+")","gi");
 function timeFromPart(value){
  const match=String(value||"").trim().match(/^(\d{1,2})(?:[:.](\d{2}))?\s*([ap])?\.?\s*(m)?\.?$/i);
  if(!match)return "";
@@ -45,27 +51,48 @@ function timeFromPart(value){
  if(meridian==="a"&&h===12)h=0;
  return String(h).padStart(2,"0")+":"+String(minutes).padStart(2,"0");
 }
+function minuteOf(value){
+ if(!value)return NaN;
+ return Number(value.slice(0,2))*60+Number(value.slice(3));
+}
+export function timeBlocksFromExternal(value){
+ const text=String(value||"");
+ return [...text.matchAll(CLOCK_RANGE)].map(match=>{
+   const start=timeFromPart(match[1]),end=timeFromPart(match[2]);
+   const minutes=minuteOf(end)-minuteOf(start);
+   return {start,end,hours:start&&end&&minutes>0?String(minutes/60):"",raw:match[0]};
+ }).slice(0,16);
+}
 export function timesFromExternal(value){
  const text=String(value||"");
+ const blocks=timeBlocksFromExternal(text);
+ if(blocks.length){
+   const safe=blocks.every((block,index)=>
+     block.hours!==""&&(!index||minuteOf(block.start)>=minuteOf(blocks[index-1].end)));
+   if(!safe)return {start:blocks[0].start,end:"",hours:"",blocks,ambiguous:true};
+   const minutes=blocks.reduce((total,block)=>total+Number(block.hours)*60,0);
+   return {start:blocks[0].start,end:blocks.at(-1).end,hours:String(minutes/60),blocks,ambiguous:false};
+ }
  const startMatch=text.match(new RegExp("(?:entrada|ingreso|inicio)\\s*[:\\-]?\\s*("+CLOCK_TOKEN+")","i"));
  const endMatch=text.match(new RegExp("(?:salida|egreso|termino|término|fin)\\s*[:\\-]?\\s*("+CLOCK_TOKEN+")","i"));
  const all=[...text.matchAll(CLOCK_GLOBAL)].map(match=>timeFromPart(match[2])).filter(Boolean);
  const start=timeFromPart(startMatch?.[1])||all[0]||"";
  const end=timeFromPart(endMatch?.[1])||all[1]||"";
- // "9:00-2:00" es ambiguo: no se interpreta automáticamente como 14:00.
- if(!start||!end||end<=start)return {start,end:"",hours:""};
- const [sh,sm]=start.split(":").map(Number),[eh,em]=end.split(":").map(Number);
- return {start,end,hours:String(((eh-sh)*60+em-sm)/60)};
+ if(!start||!end||end<=start)return {start,end:"",hours:"",blocks:[],ambiguous:true};
+ return {start,end,hours:String((minuteOf(end)-minuteOf(start))/60),blocks:[],ambiguous:false};
 }
 function dayIndexFromLine(line){
  const key=externalKey(line);
  const match=key.match(/^(?:(?:dia|fecha|jornada)\s*)?(martes|miercoles|jueves|viernes)\b/);
  return match?DAYS.indexOf(match[1]):-1;
 }
-function dateAtLineStart(line){
- const lead=String(line||"").replace(/^(?:fecha|dia|día|jornada)\s*[:\-]?\s*/i,"").trim();
+function dateAtLineStart(line,contextYear=null){
+ const lead=String(line||"").replace(/^(?:fecha|dia|día|jornada)\s*[:\-]?\s*/i,"")
+   .replace(/^(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s*[,.:;-]?\s*/i,"").trim();
  const match=[...lead.matchAll(DATE_GLOBAL)][0];
- return match?.index===0?dateFromExternal(match[0]):"";
+ if(match?.index===0)return dateFromExternal(match[0]);
+ const partial=lead.match(PARTIAL_DATE);
+ return partial?dateFromExternal(partial[0],contextYear):"";
 }
 function lineField(lines,label){
  const reg=new RegExp("^(?:"+label+")\\s*[:\\-–]\\s*(.+)$","i");
@@ -93,14 +120,24 @@ export function extractExternalFields(raw){
  const text=String(raw||"").replace(/\r/g,"").slice(0,EXTERNAL_TEXT_LIMIT);
  const lines=text.split(/\n/).map(externalClean).filter(Boolean);
  const days=Array.from({length:4},emptyDay);
- const allDates=datesIn(text);
+ const explicitDates=datesIn(text);
+ const candidateYears=[...new Set(explicitDates.map(date=>Number(date.slice(0,4))))];
+ const contextYear=candidateYears.length===1?candidateYears[0]:null;
+ const allDates=[...explicitDates];
+ const uncertainShortDates=[];
  const segments=[];let current=null;
  for(const line of lines){
    let index=dayIndexFromLine(line);
-   const date=dateAtLineStart(line);
+   const date=dateAtLineStart(line,contextYear);
+   if(!date&&/^\s*\d{1,2}[-/.*°º]\d{1,2}(?=\s|$)/.test(line))
+     uncertainShortDates.push(line);
+   if(date&&!allDates.includes(date))allDates.push(date);
    if(index<0&&date){
      const dow=new Date(date+"T12:00:00Z").getUTCDay();
      index=dow>=2&&dow<=5?dow-2:-1;
+   } else if(index>=0&&date){
+     const dow=new Date(date+"T12:00:00Z").getUTCDay();
+     if(dow!==index+2){uncertainShortDates.push("Día y fecha no coinciden: "+line);index=-1;}
    }
    if(date&&index<0){
      // Una fecha visible fuera de martes-viernes no debe mezclarse con otra jornada.
@@ -126,13 +163,19 @@ export function extractExternalFields(raw){
    const date=seg.date||dates[0]||"";
    const times=timesFromExternal(all);
    const area=lineField(seg.lines,"(?:[aá]rea|departamento|secci[oó]n)");
-   const reason=/\b(falta|inasistencia)\b/i.test(all)?"falta":/\b(d[ií]a inh[aá]bil)\b/i.test(all)?"inhabil":/\b(sin labores|no hubo labores|se suspendieron (?:las )?labores|se suspendieron (?:las )?actividades|suspensi[oó]n de (?:las )?actividades)\b/i.test(all)?"sin_labores":"";
+   const reason=/\b(falta|inasistencia)\b/i.test(all)?"falta":/\b(d[ií]a inh[aá]bil)\b/i.test(all)?"inhabil":
+     /\b(sin labores|no hubo labores|se suspendieron (?:las )?labores|se suspendieron (?:las )?actividades|suspensi[oó]n de (?:las )?(?:labores|actividades))\b/i.test(all)?"sin_labores":"";
+   const activityUncertain=reason===""&&/\b(?:no se realizaron actividades|sin actividades asignadas|no hubo actividades)\b/i.test(all);
+
    const activity=activityFromChunk(seg.lines);
    days[seg.index]={...days[seg.index],date,start:times.start,end:times.end,hours:times.hours,area,activity,
-     status:reason||(times.hours?"laboral":""),detected:true};
+     timeBlocks:times.blocks,needsReview:Boolean(times.ambiguous||activityUncertain),
+     status:activityUncertain?"":reason||(times.hours?"laboral":""),detected:true};
  }
  const recognized=days.filter(day=>day.detected).length;
  const warnings=[];
+ if(uncertainShortDates.length)
+   warnings.push("Hay fechas abreviadas sin año verificable o que no coinciden con el día: revisa las fechas.");
  if(allDates.some(date=>{const day=new Date(date+"T12:00:00Z").getUTCDay();return day<2||day>5;}))
    warnings.push("Hay fechas fuera de martes a viernes. Revisa el periodo antes de asignar la semana.");
  if(!getName(lines))warnings.push("No se encontró un nombre identificable.");
@@ -140,6 +183,8 @@ export function extractExternalFields(raw){
  if(recognized>0&&recognized<4)warnings.push("Se detectaron "+recognized+" de cuatro jornadas. Completa o deja sin estadísticas las restantes.");
  if(days.some(day=>day.detected&&!day.hours&&day.status!=="inhabil"&&day.status!=="falta"&&day.status!=="sin_labores"))
    warnings.push("Algunas jornadas no tienen horarios legibles.");
+ if(days.some(day=>day.needsReview))
+   warnings.push("Hay horarios con varios tramos o actividades suspendidas que requieren confirmar el estado y las horas.");
  return {name:getName(lines),company:getCompany(lines),dates:[...new Set(allDates)],days,warnings,recognized,text};
 }
 export function suggestExternalStudent(extracted,students){
@@ -169,6 +214,8 @@ export function externalDaysToStatistics(days){
  if(!Array.isArray(days)||days.length!==4)return null;
  if(days.every(day=>!day.status))return null;
  if(days.some(day=>!day.status))return null;
+ if(days.some(day=>["laboral","evento"].includes(day.status)&&
+   (!Number.isFinite(Number(day.hours))||Number(day.hours)<=0)))return null;
  return days.map(day=>({status:day.status,hours:day.hours,reasonCode:day.reasonCode||"0",
     eventPhase:day.eventPhase||"no_aplica",eventDiscipline:day.eventDiscipline||"No aplica",
     eventMode:"con",eventResult:day.eventResult||""}));
