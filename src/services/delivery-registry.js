@@ -255,11 +255,39 @@ export function normalizeGroup(value) {
   return clean(withSemester ? withSemester[1] : raw, 30);
 }
 
+export function studentAliases(value) {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  return value.map(item => clean(item, 120)).filter(alias => {
+    const key = normalizeName(alias);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 25);
+}
+
+/** Se exige unicidad global para que un alias nunca registre a la persona equivocada. */
+export function addStudentAlias(students, studentId, rawAlias) {
+  const alias = clean(rawAlias, 120);
+  const key = normalizeName(alias);
+  const target = students.find(student => student.id === studentId);
+  if (!target) throw new Error("No se encontró el alumno.");
+  if (!key || key === normalizeName(target.name)) return students;
+  if (students.some(student => student.id !== studentId &&
+    (normalizeName(student.name) === key || (student.aliases || []).some(other => normalizeName(other) === key))))
+    throw new Error("Este alias corresponde a otro alumno del padrón.");
+  if ((target.aliases || []).some(other => normalizeName(other) === key)) return students;
+  if ((target.aliases || []).length >= 25) throw new Error("El alumno alcanzó el límite de 25 alias.");
+  return students.map(student => student.id === studentId
+    ? {...student, aliases: studentAliases([...(student.aliases || []), alias])} : student);
+}
+
 export function createStudent(data = {}) {
   const dualStatus = data.dualStatus === "desisted" ? "desisted" : "active";
   return {
     id: typeof data.id === "string" && data.id ? data.id : uid(),
     name: clean(data.name, 180),
+    aliases: studentAliases(data.aliases).filter(alias => normalizeName(alias) !== normalizeName(data.name)),
     specialty: clean(data.specialty, 120),
     company: clean(data.company, 220),
     group: normalizeGroup(data.group || data.semesterGroup),
@@ -781,6 +809,14 @@ export function findStudentByMatrixValue(students, rawValue) {
     }
     return byName.length === 1 ? byName[0] : null;
   }
+
+  // Alias confirmados en escaneos anteriores; se exige coincidencia única
+  // y metadatos compatibles para matrices modernas.
+  const byAlias = students.filter(student =>
+    (student.aliases || []).some(alias => normalizeName(alias) === nameKey) &&
+    (payload.version < 3 || matrixMetadataMatchesStudent(student, payload)));
+  if (byAlias.length === 1) return byAlias[0];
+  if (byAlias.length > 1) return null;
 
   // Las inversiones deben ser únicas y corroborarse por especialidad y empresa.
   // Los códigos antiguos pasan a sugerencias para confirmación manual.
