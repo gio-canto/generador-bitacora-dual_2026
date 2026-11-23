@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState} from "react";
-import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,
+import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,applyExternalLearning,
   externalDaysToStatistics,externalReviewMetadata} from "../services/external-bitacora.js";
 import {readExternalBitacora,createExternalWorker,externalFileKind} from "../services/external-ocr.js";
 import {buildManualStatistics,reasonsForStatus,MANUAL_DAYS} from "../services/manual-statistics.js";
@@ -15,7 +15,7 @@ function duration(start,end){
  const b=Number(end.slice(0,2))*60+Number(end.slice(3));
  return b>a?String((b-a)/60):"";
 }
-export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,onClose,onSave,onCreateWeek}){
+export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,onClose,onSave,onCreateWeek,learningExamples=[]}){
  const [items,setItems]=useState([]);
  const [selected,setSelected]=useState(0);
  const [busy,setBusy]=useState(false);
@@ -76,11 +76,12 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          });
          const extracted=extractExternalFields(result.text);
          const studentId=suggestExternalStudent(extracted,students);
+         const learned=applyExternalLearning(extracted,learningExamples,studentId);
          const weekId=suggestExternalWeek(extracted,weeks);
          const proposedWeek=suggestExternalWeekPeriod(extracted);
          const current={key:(globalThis.crypto?.randomUUID?.()||"external-"+Date.now()+"-"+added),filename:file.name,kind,url,
            pages:result.pages,method:result.method,truncated:result.truncated,
-           text:result.text,proposedWeek,observedName:extracted.name,observedCompany:extracted.company,learnAlias:false,form:{name:extracted.name,company:extracted.company,
+           text:result.text,proposedWeek,observedName:extracted.name,observedCompany:extracted.company,learnAlias:false,form:{name:extracted.name,company:learned.company,
              studentId,weekId,days:extracted.days},warnings:extracted.warnings,
            state:"ready"};
          if(mounted.current){setItems(prev=>[...prev,current]);setSelected(items.length+added);added++;}
@@ -110,7 +111,9 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  };
  const reanalyze=()=>{
    const extracted=extractExternalFields(item.text);
-   updateItem({...item,form:{...item.form,name:extracted.name,company:extracted.company,
+   const learned=applyExternalLearning(extracted,learningExamples,item.form.studentId);
+   updateItem({...item,observedName:extracted.name,observedCompany:extracted.company,
+     form:{...item.form,name:extracted.name,company:learned.company,
      days:extracted.days},warnings:extracted.warnings});
    setNotice("El texto fue analizado nuevamente. Revisa los campos antes de guardar.");
  };
