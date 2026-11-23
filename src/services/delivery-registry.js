@@ -306,6 +306,28 @@ export function createStudent(data = {}) {
   };
 }
 
+/** Aprendizaje supervisado: conserva pares de campos OCR confirmados, no fotografías. */
+export function learnExternalExample(state, studentId, observed = {}, reviewed = {}) {
+  const student=state.students.find(item=>item.id===studentId);
+  if(!student)throw new Error("Selecciona el alumno antes de aprender una lectura.");
+  const students=observed.name
+    ?addStudentAlias(state.students,studentId,observed.name)
+    :state.students;
+  const example={
+    studentId,method:clean(observed.method,20),
+    observedName:clean(observed.name,120),
+    confirmedName:clean(student.name,120),
+    observedCompany:clean(observed.company,160),
+    confirmedCompany:clean(reviewed.company,160),
+    reviewedAt:new Date().toISOString(),
+  };
+  const previous=Array.isArray(state.ocrLearning?.examples)?state.ocrLearning.examples:[];
+  const signature=value=>[value.studentId,normalizeName(value.observedName),
+    normalizeName(value.observedCompany),normalizeName(value.confirmedCompany)].join("|");
+  const examples=[...previous.filter(value=>signature(value)!==signature(example)),example].slice(-100);
+  return {...state,students,ocrLearning:{examples}};
+}
+
 export function studentIsActive(student) {
   return student?.dualStatus !== "desisted";
 }
@@ -486,6 +508,16 @@ export function sanitizeDeliveryState(raw) {
     ),
     students,
     weeks,
+    ocrLearning:{examples:(Array.isArray(raw.ocrLearning?.examples)?raw.ocrLearning.examples:[])
+      .filter(example=>example&&typeof example==="object"&&students.some(s=>s.id===example.studentId))
+      .slice(-100).map(example=>({
+        studentId:clean(example.studentId,100),method:clean(example.method,20),
+        observedName:clean(example.observedName,120),
+        confirmedName:clean(example.confirmedName,120),
+        observedCompany:clean(example.observedCompany,160),
+        confirmedCompany:clean(example.confirmedCompany,160),
+        reviewedAt:clean(example.reviewedAt,40)
+      }))},
     announcements:Array.isArray(raw.announcements) ? raw.announcements.slice(0,200)
       .map(normalizeAnnouncement).filter(Boolean) : [],
     settings: {
