@@ -34,6 +34,7 @@ import {
   contextIsComplete,
   createRegistryContext,
   createWeek,
+  validDualWeekPeriod,
   addStudentAlias,
   studentAliases,
   normalizeName,
@@ -774,7 +775,7 @@ export default function DeliveryRegistry({ onClose }) {
     );
     if (!targetWeek) {
       const period=matrixPeriodLabel(rawValue);
-      if(payload.startDate&&payload.endDate) {
+      if(validDualWeekPeriod(payload.startDate,payload.endDate)) {
         setMissingWeekLabel("Semana "+(state.weeks.length+1));
         setMissingWeekDueAt("");
         setMissingWeekScan({studentId:student.id,rawValue,payload,rawKey,points});
@@ -866,7 +867,7 @@ export default function DeliveryRegistry({ onClose }) {
     const request=missingWeekScan;
     if(!request)return;
     const {startDate,endDate}=request.payload;
-    if(!startDate||!endDate)return;
+    if(!validDualWeekPeriod(startDate,endDate)){setScanMessage("El periodo del código no es un martes a viernes válido.");setMissingWeekScan(null);return;}
     const existing=state.weeks.find(w=>w.startDate===startDate&&w.endDate===endDate);
     const week=existing||createWeek({
       label:missingWeekLabel.trim()||"Semana "+(state.weeks.length+1),
@@ -1922,7 +1923,7 @@ export default function DeliveryRegistry({ onClose }) {
     }
   };
   const createExternalWeek=({startDate,label,dueAt=""})=>{
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(startDate))return "";
+    if(!validDualWeekPeriod(startDate,createWeek({startDate}).endDate))return "";
     const week=createWeek({startDate,label:label||"Semana "+(state.weeks.length+1),
       dueAt:dueAt?new Date(dueAt).toISOString():""});
     const existing=state.weeks.find(w=>w.startDate===week.startDate&&w.endDate===week.endDate);
