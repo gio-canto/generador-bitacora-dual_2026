@@ -650,7 +650,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
   const openTutorial=()=>{setTutorialStep(0);setTutorialOpen(true);};
   const openNewestScan=()=>{
-    if(!state.weeks.length||!activeStudents.length)return;
+    if(!activeStudents.length)return;
     setActiveWeekId(state.weeks.at(-1)?.id||"");setView("scanner");
   };
   useEffect(()=>{
@@ -2971,7 +2971,7 @@ export default function DeliveryRegistry({ onClose }) {
             {isMobileLayout&&<section className="delivery-mobile-welcome" aria-label="Inicio móvil">
               <h1>{greeting}</h1>
               <p>{(shortSchool(state.context.school)||"Registro Dual").replace(/CBTis No\.\s*/i,"CBTIS ")}</p>
-              <button type="button" className="btn primary" disabled={!state.weeks.length||!activeStudents.length}
+              <button type="button" className="btn primary" disabled={!activeStudents.length}
                 onClick={()=>{setActiveWeekId(state.weeks.at(-1)?.id||"");setView("scanner");}}>
                 <Scan size={21}/> Escanear bitácora
               </button>
@@ -3033,10 +3033,10 @@ export default function DeliveryRegistry({ onClose }) {
                 <button
                   className="btn primary"
                   type="button"
-                  disabled={!state.weeks.length || !activeStudents.length}
+                  disabled={!activeStudents.length}
                   onClick={() => {
                     const week = state.weeks.at(-1);
-                    setActiveWeekId(week.id);
+                    setActiveWeekId(week?.id||"");
                     setView("scanner");
                   }}
                 >
@@ -3583,7 +3583,7 @@ export default function DeliveryRegistry({ onClose }) {
           </>
         )}
 
-        {view === "scanner" && state.weeks.length > 0 && (
+        {view === "scanner" && (
           <section className="delivery-scanner-page">
             <div className="delivery-scanner-head">
               <div>
@@ -3830,7 +3830,7 @@ export default function DeliveryRegistry({ onClose }) {
               (id==="more"&&view==="announcements");
             return <button type="button" key={id} className={current?"active":""}
               aria-current={current?"page":undefined}
-              disabled={id==="scanner"&&(!state.weeks.length||!activeStudents.length)}
+              disabled={id==="scanner"&&!activeStudents.length}
               onClick={()=>{if(id==="scanner")setActiveWeekId(state.weeks.at(-1)?.id||"");
                 setView(id);}}>
               <Icon size={23} weight={current?"fill":"regular"}/><span>{label}</span>
