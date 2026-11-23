@@ -3951,6 +3951,7 @@ export default function DeliveryRegistry({ onClose }) {
          onClose={()=>setExternalOpen(false)}
          onSave={commitExternalEntry}
           onCreateWeek={createExternalWeek}
+          learningExamples={state.ocrLearning?.examples||[]}
        />}
        {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
         <ManualDeliveryDialog
