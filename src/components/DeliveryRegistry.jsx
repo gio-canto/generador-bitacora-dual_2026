@@ -55,6 +55,7 @@ import {
   registerDelivery,
   saveManualDelivery,
   saveExternalDelivery,
+  learnExternalExample,
   removeDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
@@ -1891,7 +1892,7 @@ export default function DeliveryRegistry({ onClose }) {
     if (weekCaptureQueue.length) advanceWeekCapture(saved);
     else setManualTarget(null);
   };
-  const commitExternalEntry = ({studentId,weekId,statistics,metadata}) => {
+  const commitExternalEntry = ({studentId,weekId,statistics,metadata,learnAlias=false,observedName="",observedCompany=""}) => {
     const week=state.weeks.find(item=>item.id===weekId);
     if(!week||!state.students.some(item=>item.id===studentId)){
       showNotice("warning","Revisa el alumno y la semana.");
@@ -1900,7 +1901,12 @@ export default function DeliveryRegistry({ onClose }) {
     try{
       const updated=saveExternalDelivery(week,studentId,{statistics,metadata});
       const weeks=state.weeks.map(item=>item.id===weekId?updated:item);
-      commit({...state,weeks});
+      const next={...state,weeks};
+      const trained=learnAlias
+        ?learnExternalExample(next,studentId,{name:observedName,company:observedCompany,method:metadata?.method},
+           {company:metadata?.company})
+        :next;
+      commit(trained);
       setActiveWeekId(weekId);
       notify("success","Bitácora externa registrada",state.students.find(x=>x.id===studentId)?.name||"");
       return true;
@@ -1908,6 +1914,17 @@ export default function DeliveryRegistry({ onClose }) {
       showNotice("error","No se pudo registrar la lectura",error?.message||"Revisa la información.");
       return false;
     }
+  };
+  const createExternalWeek=({startDate,label,dueAt=""})=>{
+    if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(startDate))return "";
+    const week=createWeek({startDate,label:label||"Semana "+(state.weeks.length+1),
+      dueAt:dueAt?new Date(dueAt).toISOString():""});
+    const existing=state.weeks.find(w=>w.startDate===week.startDate&&w.endDate===week.endDate);
+    if(existing)return existing.id;
+    commit({...state,weeks:[...state.weeks,week]});
+    setActiveWeekId(week.id);
+    notify("success","Semana creada",week.label);
+    return week.id;
   };
   const startDueAtEdit = () => {
     if (!activeWeek) return;
@@ -3926,6 +3943,7 @@ export default function DeliveryRegistry({ onClose }) {
          loadPdfJs={ensurePdfJs}
          onClose={()=>setExternalOpen(false)}
          onSave={commitExternalEntry}
+          onCreateWeek={createExternalWeek}
        />}
        {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
         <ManualDeliveryDialog
