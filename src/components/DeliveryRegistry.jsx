@@ -34,6 +34,9 @@ import {
   contextIsComplete,
   createRegistryContext,
   createWeek,
+  addStudentAlias,
+  studentAliases,
+  normalizeName,
   deliveryStatus,
   exportDeliveryState,
   exportWeekCsv,
@@ -521,6 +524,7 @@ export default function DeliveryRegistry({ onClose }) {
     group: "",
     gender: "",
     usageMode: "unknown",
+    aliasesText: "",
   });
   const [weekForm, setWeekForm] = useState({
     label: "",
@@ -553,6 +557,10 @@ export default function DeliveryRegistry({ onClose }) {
   const [rosterBusy,setRosterBusy] = useState(false);
   const [scanQueue, setScanQueue] = useState([]);
   const [fuzzyPrompt, setFuzzyPrompt] = useState(null);
+  const [rememberScannedAlias,setRememberScannedAlias] = useState(false);
+  const [missingWeekScan,setMissingWeekScan] = useState(null);
+  const [missingWeekLabel,setMissingWeekLabel] = useState("");
+  const [missingWeekDueAt,setMissingWeekDueAt] = useState("");
   const [scanMessage, setScanMessage] = useState("Apunta la cámara al Data Matrix.");
   const [scanTone, setScanTone] = useState("");
   const [scanBox, setScanBox] = useState(null);
@@ -600,7 +608,7 @@ export default function DeliveryRegistry({ onClose }) {
     {};
   const fuzzySuggestion =
     fuzzyPrompt?.suggestions?.[fuzzyPrompt.index] || null;
-  const fuzzyCandidate = fuzzySuggestion?.student || null;
+  const fuzzyCandidate=state.students.find(student=>student.id===fuzzyPrompt?.manualStudentId)||fuzzySuggestion?.student||null;
 
   const commit = (producer) => {
     const next =
@@ -754,22 +762,27 @@ export default function DeliveryRegistry({ onClose }) {
     payload,
     rawKey,
     points,
+    preferredWeek = null,
   ) => {
     if (!student || !studentIsActive(student)) return;
 
-    const targetWeek = findWeekByMatrixValue(
+    const targetWeek = preferredWeek || findWeekByMatrixValue(
       state.weeks,
       rawValue,
       activeWeekId,
     );
     if (!targetWeek) {
-      const period = matrixPeriodLabel(rawValue);
-      setScanMessage(
-        period
-          ? "No existe una semana para " + period + "."
-          : "Este código antiguo necesita una semana seleccionada.",
-      );
-      showDetection("error");
+      const period=matrixPeriodLabel(rawValue);
+      if(payload.startDate&&payload.endDate) {
+        setMissingWeekLabel("Semana "+(state.weeks.length+1));
+        setMissingWeekDueAt("");
+        setMissingWeekScan({studentId:student.id,rawValue,payload,rawKey,points});
+        setScanMessage("Semana no registrada: "+period+".");
+        showDetection("seen");
+      } else {
+        setScanMessage("Selecciona una semana para este código antiguo.");
+        showDetection("error");
+      }
       return;
     }
 
@@ -832,22 +845,39 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const confirmFuzzyStudent = () => {
-    const prompt = fuzzyPromptRef.current || fuzzyPrompt;
-    const suggestion = prompt?.suggestions?.[prompt.index];
-    const candidate = suggestion?.student;
-    if (!prompt || !candidate) {
-      closeFuzzyPrompt();
-      return;
+    const prompt=fuzzyPromptRef.current||fuzzyPrompt;
+    const candidate=state.students.find(s=>s.id===prompt?.manualStudentId)||prompt?.suggestions?.[prompt.index]?.student;
+    if(!prompt||!candidate)return;
+    if(rememberScannedAlias&&prompt.payload?.name) {
+      try{
+        const students=addStudentAlias(state.students,candidate.id,prompt.payload.name);
+        if(students!==state.students)commit({...state,students});
+      }catch(error){
+        showNotice("warning","Alias no guardado",error?.message||"Revisa el nombre.");
+        return;
+      }
     }
+    closeFuzzyPrompt();setRememberScannedAlias(false);
+    completeScanForStudent(candidate,prompt.rawValue,prompt.payload,prompt.rawKey,prompt.points);
+  };
 
-    closeFuzzyPrompt();
+  const createWeekFromScan=()=>{
+    const request=missingWeekScan;
+    if(!request)return;
+    const {startDate,endDate}=request.payload;
+    if(!startDate||!endDate)return;
+    const existing=state.weeks.find(w=>w.startDate===startDate&&w.endDate===endDate);
+    const week=existing||createWeek({
+      label:missingWeekLabel.trim()||"Semana "+(state.weeks.length+1),
+      startDate,endDate,
+      dueAt:missingWeekDueAt?new Date(missingWeekDueAt).toISOString():"",
+    });
+    if(!existing)commit({...state,weeks:[...state.weeks,week]});
+    setActiveWeekId(week.id);setMissingWeekScan(null);
     completeScanForStudent(
-      candidate,
-      prompt.rawValue,
-      prompt.payload,
-      prompt.rawKey,
-      prompt.points,
-    );
+      state.students.find(student=>student.id===request.studentId),
+      request.rawValue,request.payload,request.rawKey,request.points,week);
+    notify("success",existing?"Semana encontrada":"Semana creada",week.label);
   };
 
   const rejectFuzzyStudent = () => {
@@ -873,7 +903,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const processScanValue = (rawValue, points) => {
-    if (tutorialOpenRef.current || fuzzyPromptRef.current) return;
+    if (tutorialOpenRef.current || fuzzyPromptRef.current || missingWeekScan) return;
     const payload = parseMatrixPayload(rawValue);
     const rawKey = String(rawValue || "").trim();
     let student = findStudentByMatrixValue(state.students, rawValue);
@@ -906,7 +936,8 @@ export default function DeliveryRegistry({ onClose }) {
         3,
       );
 
-      if (suggestions.length) {
+      if (suggestions.length || payload.name) {
+        setRememberScannedAlias(false);
         const prompt = {
           rawValue,
           payload,
@@ -917,11 +948,10 @@ export default function DeliveryRegistry({ onClose }) {
         };
         fuzzyPromptRef.current = prompt;
         setFuzzyPrompt(prompt);
-        setScanMessage(
-          suggestions[0].nameOrderInverted
-            ? "Nombre con apellidos primero. Confirma la persona."
-            : "Coincidencia aproximada encontrada. Confirma la persona.",
-        );
+        setScanMessage(suggestions[0]?.nameOrderInverted
+          ?"Nombre con apellidos primero. Confirma la persona."
+          :suggestions.length?"Coincidencia aproximada. Confirma la persona."
+          :"Selecciona al alumno y, si corresponde, guarda el alias.");
         showDetection(
           "seen",
           resultBoxFromPoints(videoRef.current, points),
@@ -1579,6 +1609,7 @@ export default function DeliveryRegistry({ onClose }) {
       group: String(studentForm.group || "").trim(),
       gender: studentForm.gender || "",
       usageMode: studentForm.usageMode || "unknown",
+      aliases:studentAliases((studentForm.aliasesText||"").split(/[\n,;]/)),
     };
     if (!nextStudent.name || !nextStudent.specialty || !nextStudent.company) {
       showNotice(
@@ -1589,6 +1620,14 @@ export default function DeliveryRegistry({ onClose }) {
       return;
     }
 
+    const conflictAlias=nextStudent.aliases.find(alias=>state.students.some(student=>
+      student.id!==editingStudentId &&
+      (normalizeName(student.name)===normalizeName(alias)||
+       (student.aliases||[]).some(a=>normalizeName(a)===normalizeName(alias)))));
+    if(conflictAlias){
+      showNotice("warning","Alias duplicado",conflictAlias+" pertenece a otro alumno.");
+      return;
+    }
     if (editingStudentId) {
       const duplicate = state.students.some(
         (student) =>
@@ -1645,6 +1684,7 @@ export default function DeliveryRegistry({ onClose }) {
       group: student.group || "",
       gender: student.gender || "",
       usageMode: student.usageMode || "unknown",
+      aliasesText:(student.aliases||[]).join("\n"),
     });
     setContextForm(state.context);
     setSetupStep(1);
@@ -2636,7 +2676,12 @@ export default function DeliveryRegistry({ onClose }) {
                       ))}
                     </select>
                   </label>
-                  <label className="delivery-field"><span>Grupo</span><input value={studentForm.group || ""} maxLength={30} placeholder="A" onChange={event=>setStudentForm({...studentForm,group:event.target.value})}/></label>
+                  <label className="delivery-field"><span>Alias del escáner (uno por línea)</span>
+                     <textarea rows={2} value={studentForm.aliasesText||""}
+                       placeholder="Otros nombres detectados por el lector"
+                       onChange={event=>setStudentForm({...studentForm,aliasesText:event.target.value})}/>
+                   </label>
+                   <label className="delivery-field"><span>Grupo</span><input value={studentForm.group || ""} maxLength={30} placeholder="A" onChange={event=>setStudentForm({...studentForm,group:event.target.value})}/></label>
                   <label className="delivery-field">
                     <span>Género</span>
                     <select
