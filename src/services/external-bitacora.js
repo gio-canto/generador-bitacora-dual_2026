@@ -15,7 +15,7 @@ function iso(y,m,d){
 }
 const MONTH_PATTERN="(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)";
 const SEP="[-/.*°º]";
-const DATE_SOURCE="(?:20\\d{2}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}"+SEP+"\\d{1,2}"+SEP+"(?:20\\d{2}|\\d{2})|\\d{1,2}(?:\\s*[/.-]\\s*|\\s+de\\s+)"+MONTH_PATTERN+"(?:\\s*[/.-]\\s*|\\s+de\\s+)(?:20\\d{2}|\\d{2}))";
+const DATE_SOURCE="(?:20\\d{2}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}"+SEP+"\\d{1,2}"+SEP+"(?:20\\d{2}|\\d{2})|\\d{1,2}(?:\\s*[/.-]\\s*|\\s+de\\s+)"+MONTH_PATTERN+"(?:\\s*[/.-]\\s*|\\s+de(?:l)?\\s+)(?:20\\d{2}|\\d{2}))";
 export const DATE_GLOBAL=new RegExp("\\b"+DATE_SOURCE+"\\b","gi");
 const PARTIAL_DATE=/^(\d{1,2})[-/.*°º](\d{1,2})(?=\s|$)/;
 const expandedYear=value=>Number(value)<100?2000+Number(value):Number(value);
@@ -27,7 +27,7 @@ export function dateFromExternal(value,contextYear=null){
  if(match)return iso(match[1],match[2],match[3]);
  match=clean.match(/^(\d{1,2})[-/.*°º](\d{1,2})[-/.*°º](\d{2}|20\d{2})$/);
  if(match)return iso(expandedYear(match[3]),match[2],match[1]);
- match=clean.match(new RegExp("^(\\d{1,2})(?:\\s*[/.-]\\s*|\\s+de\\s+)("+MONTH_PATTERN+")(?:\\s*[/.-]\\s*|\\s+de\\s+)(\\d{2}|20\\d{2})$","i"));
+ match=clean.match(new RegExp("^(\\d{1,2})(?:\\s*[/.-]\\s*|\\s+de\\s+)("+MONTH_PATTERN+")(?:\\s*[/.-]\\s*|\\s+de(?:l)?\\s+)(\\d{2}|20\\d{2})$","i"));
  if(match)return iso(expandedYear(match[3]),MONTHS[match[2]],match[1]);
  match=clean.match(/^(\d{1,2})[-/.*°º](\d{1,2})$/);
  return match&&Number.isInteger(contextYear)&&contextYear>=2000&&contextYear<=2100
@@ -115,7 +115,7 @@ function activityFromChunk(lines){
     .map(line=>line.replace(DATE_GLOBAL,"").replace(/\b\d{1,2}[:.]\d{2}(?:\s*[ap]\.?m\.?)?/gi,""))
     .join(" ")).slice(0,900);
 }
-function emptyDay(){return {status:"",hours:"",reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"con",eventResult:"",date:"",start:"",end:"",area:"",activity:"",detected:false};}
+function emptyDay(){return {status:"",hours:"",timeBlocks:[],needsReview:false,reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"con",eventResult:"",date:"",start:"",end:"",area:"",activity:"",detected:false};}
 export function extractExternalFields(raw){
  const text=String(raw||"").replace(/\r/g,"").slice(0,EXTERNAL_TEXT_LIMIT);
  const lines=text.split(/\n/).map(externalClean).filter(Boolean);
@@ -231,7 +231,11 @@ export function externalReviewMetadata(item,days){
    company:keep(item.company).slice(0,160),
    days:days.map(d=>({date:keep(d.date).slice(0,10),status:d.status||"",
      start:keep(d.start).slice(0,5),end:keep(d.end).slice(0,5),
-     area:keep(d.area).slice(0,150),activity:keep(d.activity).slice(0,900)})),
+     area:keep(d.area).slice(0,150),activity:keep(d.activity).slice(0,900),
+     timeBlocks:Array.isArray(d.timeBlocks)?d.timeBlocks.slice(0,12).map(block=>({
+       start:keep(block.start).slice(0,5),end:keep(block.end).slice(0,5),
+       hours:keep(block.hours).slice(0,16),raw:keep(block.raw).slice(0,80)
+     })):[]})),
  };
 }
 /** Propone martes-viernes solamente cuando las fechas legibles pertenecen a un mismo periodo. */
