@@ -165,7 +165,7 @@ export function suggestExternalWeekPeriod(extracted) {
  const dates=[...new Set(extracted?.dates||[])].sort();
  if(!dates.length)return null;
  const starts=dates.map(value=>{
-   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value))return "";
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return "";
    const date=new Date(value+"T12:00:00Z");
    if(date.toISOString().slice(0,10)!==value)return "";
    const dow=date.getUTCDay();
