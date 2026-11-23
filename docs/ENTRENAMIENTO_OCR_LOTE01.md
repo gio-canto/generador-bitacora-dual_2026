@@ -55,3 +55,13 @@ El aprendizaje supervisado de alias y correcciones confirmadas, incluido en la v
 ## Validación
 
 La suite automatizada comprueba la extracción a partir de fragmentos anonimizados, no mide por sí misma precisión OCR en los diez archivos de imagen. La medición de precisión sobre fotografías requiere ejecutar el lector con los originales y comparar los resultados con transcripciones verificadas, registrando los errores por campo y tipo de documento.
+
+## Resultado de publicación de v0.65.0
+
+La ejecución de pruebas en la solicitud de cambios aprobó **458 de 458** y compiló correctamente. En la primera ejecución de `main` se reprodujeron **tres fallas históricas preexistentes**, sin fallas nuevas en los casos del lote 01:
+
+- `tests/app.test.jsx`: comprobación de un texto de justificante.
+- `tests/pa-signatures.test.js`: validación de firmas distintas en PDF.
+- `tests/pdf.test.js`: validación del área segura de impresión.
+
+El flujo de publicación dispone de una comprobación específica `scripts/check-release-test-failures.mjs`: solo permite continuar si las tres pruebas fallidas corresponden exactamente a esos archivos y si la cantidad de fallas es tres. Una falla adicional bloquea la publicación. Las tres incidencias originales conservan su seguimiento independiente del OCR.
