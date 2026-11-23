@@ -93,3 +93,13 @@
 .external-delivery-detail{max-width:245px;margin:5px 0;font-size:.73rem;color:#62748a}
 .external-delivery-detail summary{cursor:pointer;color:#294d80;font-weight:600}
 .external-delivery-detail span{display:block;overflow-wrap:anywhere;margin-top:4px}
+
+/* Registro guiado de semanas y aprendizaje revisado, usable en escritorio/móvil. */
+.external-week-create{margin:13px 0;padding:12px;border:1px solid #dce5f0;border-radius:11px;background:#f5f8fd}
+.external-week-create p{margin:0 0 9px;font-size:.83rem;color:#52657c}
+.external-week-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.external-week-fields label{display:flex;flex-direction:column;gap:5px;font-size:.8rem}
+.external-week-fields input{width:100%;box-sizing:border-box;min-height:42px;border:1px solid #d8e0ea;border-radius:9px;padding:9px}
+.external-learning-check{display:flex;align-items:center;gap:9px;margin-top:13px;font-size:.83rem;color:#344258;line-height:1.4}
+.external-learning-check input{width:18px;height:18px;flex-shrink:0}
+@media(max-width:480px){.external-week-fields{grid-template-columns:minmax(0,1fr)}}
