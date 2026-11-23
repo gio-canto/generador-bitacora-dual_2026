@@ -2700,3 +2700,9 @@ button.delivery-action-tile{cursor:pointer}
   .delivery-layout-mobile .delivery-bottom-navigation button{font-size:9px}
 }
 @media(prefers-reduced-transparency:reduce){.delivery-layout-mobile .delivery-bottom-navigation{backdrop-filter:none;-webkit-backdrop-filter:none}}
+
+/* Confirmación de alias persistentes en el lector Data Matrix. */
+.delivery-match-alias{display:flex;align-items:center;gap:9px;margin:12px 0;font-size:.86rem;line-height:1.4}
+.delivery-match-alias input{width:19px;height:19px;flex-shrink:0}
+.delivery-match-card .delivery-field{margin:12px 0}
+.delivery-match-card .delivery-field input,.delivery-match-card .delivery-field select{width:100%;min-height:42px;box-sizing:border-box}
