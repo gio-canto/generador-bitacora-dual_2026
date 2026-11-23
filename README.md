@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.65.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.66.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.66.0 · Segundo lote de entrenamiento fotográfico
+
+Se revisaron **10 fotografías adicionales**, de las cuales seis son manuscritas y cuatro impresas. El lector admite fechas sin año únicamente con contexto verificable, horarios compactos y distintos tramos de tiempo por día. Las actividades suspendidas con horario consignado se dejan para revisión cuando la clasificación no está confirmada.
+
+Los nuevos casos se documentan en [`ENTRENAMIENTO_OCR_LOTE02.md`](docs/ENTRENAMIENTO_OCR_LOTE02.md) y en el [corpus anonimizado](src/data/ocr-training-lote02.json). Son 20 referencias fotográficas acumuladas en dos lotes. El motor Tesseract.js sigue usando sus pesos habituales; las mejoras corresponden a extracción, reglas y regresiones.
 
 ## v0.65.0 · Primer lote de entrenamiento fotográfico
 
