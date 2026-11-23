@@ -13,35 +13,49 @@ function iso(y,m,d){
  return +y>=2000&&+y<=2100&&result.getUTCFullYear()===+y&&result.getUTCMonth()+1===+m&&result.getUTCDate()===+d
    ?result.toISOString().slice(0,10):"";
 }
+const MONTH_PATTERN="(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)";
+const DATE_SOURCE="(?:20\\d{2}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}[-/.]\\d{1,2}[-/.](?:20\\d{2}|\\d{2})|\\d{1,2}(?:\\s*[/.-]\\s*|\\s+de\\s+)"+MONTH_PATTERN+"(?:\\s*[/.-]\\s*|\\s+de\\s+)(?:20\\d{2}|\\d{2}))";
+export const DATE_GLOBAL=new RegExp("\\b"+DATE_SOURCE+"\\b","gi");
+const expandedYear=value=>Number(value)<100?2000+Number(value):Number(value);
 export function dateFromExternal(value){
- const raw=externalClean(value).replace(/\s/g,"");
- let match=raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+ const clean=String(value??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()
+  .replace(/^(?:lunes|martes|miercoles|jueves|viernes|sabado|domingo)\s*[,.:;-]?\s*/,"")
+  .replace(/^(?:fecha|dia|jornada)\s*[:\-]?\s*/,"");
+ let match=clean.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})$/);
  if(match)return iso(match[1],match[2],match[3]);
- match=raw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
- if(match)return iso(match[3],match[2],match[1]);
- match=externalKey(value).match(/^(\d{1,2})\s+de\s+([a-z]+)\s+de\s+(\d{4})$/);
- return match&&MONTHS[match[2]]?iso(match[3],MONTHS[match[2]],match[1]):"";
+ match=clean.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2}|20\d{2})$/);
+ if(match)return iso(expandedYear(match[3]),match[2],match[1]);
+ match=clean.match(new RegExp("^(\\d{1,2})(?:\\s*[/.-]\\s*|\\s+de\\s+)("+MONTH_PATTERN+")(?:\\s*[/.-]\\s*|\\s+de\\s+)(\\d{2}|20\\d{2})$","i"));
+ return match?iso(expandedYear(match[3]),MONTHS[match[2]],match[1]):"";
 }
-const DATE_GLOBAL=/\b(?:20\d{2}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]20\d{2}|\d{1,2}\s+de\s+[a-záéíóú]+\s+de\s+20\d{2})\b/gi;
 function datesIn(value){
  return [...String(value).matchAll(DATE_GLOBAL)].map(match=>dateFromExternal(match[0])).filter(Boolean);
 }
+// Formatos calibrados con el lote 01: 9a.m.-3p.m., 09:00-14:00 y Entrada/Salida.
+const CLOCK_TOKEN="\\d{1,2}(?:(?:[:.]\\d{2})(?:\\s*[ap]\\.?\\s*m\\.?)?|\\s*[ap]\\.?\\s*m\\.?)";
+const CLOCK_GLOBAL=new RegExp("(^|[^0-9a-z])("+CLOCK_TOKEN+")","gi");
 function timeFromPart(value){
- const m=String(value||"").match(/\b(\d{1,2})(?::|\.)(\d{2})\s*(a\.?\s*m\.?|p\.?\s*m\.?)?/i);
- if(!m)return "";
- let h=+m[1],min=+m[2];
- if(min>59||h>23)return "";
- const meridian=externalKey(m[3]||"").replace(/ /g,"");
- if(meridian&&h>=1&&h<=12){if(meridian.startsWith("p")&&h!==12)h+=12;else if(meridian.startsWith("a")&&h===12)h=0;}
- return String(h).padStart(2,"0")+":"+String(min).padStart(2,"0");
+ const match=String(value||"").trim().match(/^(\d{1,2})(?:[:.](\d{2}))?\s*([ap])?\.?\s*(m)?\.?$/i);
+ if(!match)return "";
+ const meridian=match[3]&&match[4]?match[3].toLowerCase():"";
+ if(!match[2]&&!meridian)return "";
+ let h=+match[1],minutes=+(match[2]||0);
+ if(minutes>59||h>23||(meridian&&(h<1||h>12)))return "";
+ if(meridian==="p"&&h!==12)h+=12;
+ if(meridian==="a"&&h===12)h=0;
+ return String(h).padStart(2,"0")+":"+String(minutes).padStart(2,"0");
 }
 export function timesFromExternal(value){
  const text=String(value||"");
- const a=text.match(/(?:entrada|ingreso|inicio)\s*[:\-]?\s*(\d{1,2}[:.]\d{2}(?:\s*[ap]\.?m\.?)?)/i);
- const b=text.match(/(?:salida|egreso|termino|término|fin)\s*[:\-]?\s*(\d{1,2}[:.]\d{2}(?:\s*[ap]\.?m\.?)?)/i);
- const all=[...text.matchAll(/\b\d{1,2}[:.]\d{2}(?:\s*[ap]\.?m\.?)?/gi)].map(x=>timeFromPart(x[0])).filter(Boolean);
- const start=timeFromPart(a?.[1])||all[0]||"",end=timeFromPart(b?.[1])||all[1]||"";
- return start&&end&&end>start?{start,end,hours:String((+end.slice(0,2)*60+(+end.slice(3))-(+start.slice(0,2)*60+(+start.slice(3))))/60)}:{start,end:"",hours:""};
+ const startMatch=text.match(new RegExp("(?:entrada|ingreso|inicio)\\s*[:\\-]?\\s*("+CLOCK_TOKEN+")","i"));
+ const endMatch=text.match(new RegExp("(?:salida|egreso|termino|término|fin)\\s*[:\\-]?\\s*("+CLOCK_TOKEN+")","i"));
+ const all=[...text.matchAll(CLOCK_GLOBAL)].map(match=>timeFromPart(match[2])).filter(Boolean);
+ const start=timeFromPart(startMatch?.[1])||all[0]||"";
+ const end=timeFromPart(endMatch?.[1])||all[1]||"";
+ // "9:00-2:00" es ambiguo: no se interpreta automáticamente como 14:00.
+ if(!start||!end||end<=start)return {start,end:"",hours:""};
+ const [sh,sm]=start.split(":").map(Number),[eh,em]=end.split(":").map(Number);
+ return {start,end,hours:String(((eh-sh)*60+em-sm)/60)};
 }
 function dayIndexFromLine(line){
  const key=externalKey(line);
@@ -49,9 +63,9 @@ function dayIndexFromLine(line){
  return match?DAYS.indexOf(match[1]):-1;
 }
 function dateAtLineStart(line){
- const lead=String(line||"").replace(/^(?:fecha|dia|día|jornada)\s*[:\-]?\s*/i,"");
- const candidate=lead.match(/^\s*(20\d{2}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]20\d{2})\b/);
- return candidate?dateFromExternal(candidate[0]):"";
+ const lead=String(line||"").replace(/^(?:fecha|dia|día|jornada)\s*[:\-]?\s*/i,"").trim();
+ const match=[...lead.matchAll(DATE_GLOBAL)][0];
+ return match?.index===0?dateFromExternal(match[0]):"";
 }
 function lineField(lines,label){
  const reg=new RegExp("^(?:"+label+")\\s*[:\\-–]\\s*(.+)$","i");
@@ -62,7 +76,7 @@ function getName(lines){
  return found ? found.replace(/\s+(?:grupo|semestre|especialidad)\s*:.*/i,"").slice(0,120):"";
 }
 function getCompany(lines){
- return lineField(lines,"(?:empresa|instituci[oó]n receptora|unidad econ[oó]mica|centro de trabajo|raz[oó]n social)").slice(0,160);
+ return lineField(lines,"(?:nombre\\s+de\\s+la\\s+empresa|empresa|instituci[oó]n receptora|unidad econ[oó]mica|centro de trabajo|raz[oó]n social)").slice(0,160);
 }
 function activityFromChunk(lines){
  const idx=lines.findIndex(l=>/^\s*(?:actividad(?:es)?(?: realizadas)?|descripci[oó]n|labores)\s*[:\-]/i.test(l));
@@ -88,6 +102,17 @@ export function extractExternalFields(raw){
      const dow=new Date(date+"T12:00:00Z").getUTCDay();
      index=dow>=2&&dow<=5?dow-2:-1;
    }
+   if(date&&index<0){
+     // Una fecha visible fuera de martes-viernes no debe mezclarse con otra jornada.
+     if(current)segments.push(current);
+     current=null;
+     continue;
+   }
+   if(/^\s*(?:firma del|firma de vinculaci[oó]n|firma del asesor)/i.test(line)){
+     if(current)segments.push(current);
+     current=null;
+     continue;
+   }
    if(index>=0){
      if(current)segments.push(current);
      current={index,lines:[line],date};
@@ -108,6 +133,8 @@ export function extractExternalFields(raw){
  }
  const recognized=days.filter(day=>day.detected).length;
  const warnings=[];
+ if(allDates.some(date=>{const day=new Date(date+"T12:00:00Z").getUTCDay();return day<2||day>5;}))
+   warnings.push("Hay fechas fuera de martes a viernes. Revisa el periodo antes de asignar la semana.");
  if(!getName(lines))warnings.push("No se encontró un nombre identificable.");
  if(recognized===0)warnings.push("No se identificaron jornadas; revisa la transcripción y captura las fechas manualmente.");
  if(recognized>0&&recognized<4)warnings.push("Se detectaron "+recognized+" de cuatro jornadas. Completa o deja sin estadísticas las restantes.");
