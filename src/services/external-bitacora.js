@@ -178,3 +178,14 @@ export function suggestExternalWeekPeriod(extracted) {
  end.setUTCDate(end.getUTCDate()+3);
  return {startDate:starts[0],endDate:end.toISOString().slice(0,10)};
 }
+
+/** Aplica únicamente correcciones únicas confirmadas; nunca sustituye nombres ambiguos. */
+export function applyExternalLearning(extracted,examples=[],studentId="") {
+ const rawCompany=externalKey(extracted?.company);
+ if(!rawCompany||!Array.isArray(examples))return extracted;
+ const applicable=examples.filter(example=>
+   externalKey(example.observedCompany)===rawCompany &&
+   (!studentId||example.studentId===studentId));
+ const options=[...new Set(applicable.map(example=>externalClean(example.confirmedCompany)).filter(Boolean))];
+ return options.length===1?{...extracted,company:options[0]}:extracted;
+}
