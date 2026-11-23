@@ -3815,7 +3815,7 @@ export default function DeliveryRegistry({ onClose }) {
           })}
         </nav>}
 
-      {fuzzyPrompt && fuzzyCandidate && (
+      {fuzzyPrompt && (
         <div
           className="delivery-match-overlay"
           role="dialog"
@@ -3828,11 +3828,11 @@ export default function DeliveryRegistry({ onClose }) {
                 <WarningCircle size={24} weight="fill" />
               </div>
               <span className="delivery-kicker">Lector Data Matrix</span>
-              <h2 id="delivery-match-title">¿Es esta persona?</h2>
+              <h2 id="delivery-match-title">{fuzzyCandidate?"¿Es esta persona?":"Selecciona al alumno"}</h2>
               <p>
                 {fuzzySuggestion?.nameOrderInverted
                   ? "Los apellidos aparecen primero. Confirma la persona antes de registrar."
-                  : "No encontré una coincidencia exacta. Revisa la sugerencia antes de registrar la entrega."}
+                  : "Revisa el nombre detectado. Puedes seleccionar al alumno correcto y guardar un alias."}
               </p>
 
               <div className="delivery-match-read">
@@ -3842,12 +3842,11 @@ export default function DeliveryRegistry({ onClose }) {
                 </strong>
               </div>
 
-              <div className="delivery-match-candidate">
+              {fuzzyCandidate && <div className="delivery-match-candidate">
                 <Blobatar name={fuzzyCandidate.name || "Alumno"} size={58} />
                 <div>
                   <span>
-                    Posible coincidencia · {fuzzyPrompt.index + 1} de{" "}
-                    {fuzzyPrompt.suggestions.length}
+                    Alumno seleccionado · {fuzzyPrompt.suggestions.length ? (fuzzyPrompt.index+1)+" de "+fuzzyPrompt.suggestions.length : "manual"}
                   </span>
                   <strong>{fuzzyCandidate.name}</strong>
                   <small>
@@ -3862,20 +3861,35 @@ export default function DeliveryRegistry({ onClose }) {
                 <b>
                   {fuzzySuggestion?.nameOrderInverted
                     ? "Orden invertido"
-                    : Math.round((fuzzySuggestion?.similarity || 0) * 100) + "%"}
+                    : fuzzySuggestion?Math.round((fuzzySuggestion.similarity||0)*100)+"%":"Manual"}
                 </b>
-              </div>
-
+              </div>}
+              <label className="delivery-field"><span>Seleccionar alumno del padrón</span>
+                <select aria-label="Seleccionar alumno detectado" value={fuzzyPrompt.manualStudentId||""}
+                  onChange={event=>{
+                    const next={...fuzzyPrompt,manualStudentId:event.target.value};
+                    fuzzyPromptRef.current=next;setFuzzyPrompt(next);
+                  }}>
+                  <option value="">Usar sugerencia{!fuzzySuggestion?" (selecciona alumno)":""}</option>
+                  {activeStudents.map(student=><option key={student.id} value={student.id}>{student.name}</option>)}
+                </select>
+              </label>
+              <label className="delivery-match-alias">
+                <input type="checkbox" checked={rememberScannedAlias}
+                  onChange={event=>setRememberScannedAlias(event.target.checked)}/>
+                Guardar el nombre leído como alias permanente
+              </label>
               <div className="delivery-match-actions">
                 <button className="btn" type="button" onClick={rejectFuzzyStudent}>
                   {fuzzyPrompt.index < fuzzyPrompt.suggestions.length - 1
                     ? "No, siguiente"
-                    : "No corresponde"}
+                    : "Cancelar"}
                 </button>
                 <button
                   className="btn primary"
                   type="button"
                   onClick={confirmFuzzyStudent}
+                  disabled={!fuzzyCandidate}
                 >
                   <CheckCircle size={18} />
                   Sí, registrar
@@ -3886,6 +3900,25 @@ export default function DeliveryRegistry({ onClose }) {
         </div>
       )}
 
+      {missingWeekScan && <div className="delivery-match-overlay" role="dialog" aria-modal="true"
+        aria-labelledby="scan-new-week-title">
+        <div className="delivery-match-stage"><article className="delivery-match-card">
+          <span className="delivery-kicker">Registro Dual · Semana nueva</span>
+          <h2 id="scan-new-week-title">¿Quieres crear esta semana?</h2>
+          <p>El código indica del {missingWeekScan.payload.startDate} al {missingWeekScan.payload.endDate}.
+            El periodo todavía no existe en Registro Dual.</p>
+          <label className="delivery-field"><span>Nombre de la semana</span>
+            <input aria-label="Nombre de la nueva semana" value={missingWeekLabel}
+              onChange={event=>setMissingWeekLabel(event.target.value)}/></label>
+          <label className="delivery-field"><span>Fecha límite de entrega (opcional)</span>
+            <input aria-label="Fecha límite de la nueva semana" type="datetime-local"
+              value={missingWeekDueAt} onChange={event=>setMissingWeekDueAt(event.target.value)}/></label>
+          <div className="delivery-match-actions">
+            <button type="button" className="btn" onClick={()=>setMissingWeekScan(null)}>Cancelar</button>
+            <button type="button" className="btn primary" onClick={createWeekFromScan}>Crear semana y registrar</button>
+          </div>
+        </article></div>
+      </div>}
       {externalOpen && <ExternalBitacoraDialog
          students={state.students.filter(student=>studentIsActive(student))}
          weeks={state.weeks}
