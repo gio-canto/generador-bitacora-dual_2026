@@ -416,6 +416,10 @@ function normalizeExternalReview(value){
      status:statuses.includes(day?.status)?day.status:"",
      start:clean(day?.start,5),end:clean(day?.end,5),
      area:clean(day?.area,150),activity:clean(day?.activity,900),
+     timeBlocks:Array.isArray(day?.timeBlocks)?day.timeBlocks.slice(0,12).map(block=>({
+       start:clean(block?.start,5),end:clean(block?.end,5),
+       hours:clean(block?.hours,16),raw:clean(block?.raw,80)
+     })):[],
    })),
  };
 }

@@ -1,4 +1,12 @@
-# Lector de bitácoras externas · v0.65.0
+# Lector de bitácoras externas · v0.66.0
+
+## Mejoras del segundo lote fotográfico
+
+A partir de diez fotografías adicionales, el lector admite fechas cortas con año contextual, separadores especiales y múltiples intervalos de tiempo en una misma jornada. Muestra los tramos reconocidos para confirmar el total. Las horas ambiguas o la anotación «No se realizaron actividades» con horario consignado permanecen pendientes de clasificación, sin sumar horas o asignar una falta automáticamente.
+
+Los tramos confirmados se conservan en el respaldo JSON. La colección pública de pruebas tiene ejemplos anonimizados. Consulte [Entrenamiento OCR · Lote 02](ENTRENAMIENTO_OCR_LOTE02.md) y el corpus `src/data/ocr-training-lote02.json`. Las imágenes originales no se publican.
+
+
 
 ## Calibración con fotografías reales (lote 01)
 

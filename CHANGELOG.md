@@ -1,5 +1,18 @@
 # Notas de versión
 
+## 0.66.0 · Segundo lote fotográfico OCR · 2026-11-23
+
+- Se analizaron diez fotografías reales nuevas (6 manuscritas y 4 impresas), elevando a veinte las referencias de los dos primeros lotes. Los originales permanecen fuera del repositorio.
+- Se registró `src/data/ocr-training-lote02.json` con casos anonimizados y pruebas del formato observado, sin nombres ni firmas.
+- Detección de `10-11`, `17°11°26` y fechas escritas con «del»; el año ausente solo se completa cuando hay una referencia única en el mismo documento.
+- Lectura de varios horarios por día: calcula la suma cuando los intervalos son válidos y no se traslapan; conserva los tramos originales en el respaldo.
+- Horarios con meridiano ambiguo (como `1:00-2:00` tras una jornada matutina) quedan pendientes de confirmación.
+- Las leyendas «No se realizaron actividades» con horarios consignados requieren revisión; «Suspensión de labores» se reconoce como jornada sin labores.
+- La interfaz muestra los tramos detectados y su necesidad de revisión en escritorio y móvil.
+- Se amplían pruebas de extracción, fechas parciales, jornadas ambiguas y restauración JSON; documentación en `docs/ENTRENAMIENTO_OCR_LOTE02.md`.
+- El lote mejora reglas y pruebas del OCR existente; no constituye entrenamiento de pesos de reconocimiento manuscrito (HTR).
+
+
 ## 0.65.0 · Entrenamiento OCR con lote fotográfico 01 · 2026-11-23
 
 - Primera colección observacional de 10 fotografías reales de bitácoras externas, con 6 variantes de diseño y 2 documentos de escritura manuscrita; etiquetas y ejemplos anonimizados en `src/data/ocr-training-lote01.json`.

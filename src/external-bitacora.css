@@ -107,3 +107,5 @@
 .external-learning-only{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
 .external-learning-only span{font-size:.75rem;color:#607086}
 .external-learning-only button{min-height:42px}
+
+.external-time-blocks{grid-column:1/-1;margin:2px 0 8px;color:#576780;font-size:.8rem;line-height:1.55}
