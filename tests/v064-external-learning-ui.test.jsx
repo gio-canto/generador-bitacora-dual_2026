@@ -51,4 +51,25 @@ describe("v0.64.0 · lector externo y aprendizaje supervisado",()=>{
      observedName:"Maria Lpez Grcia",observedCompany:"Arch1vo",
    });
  });
+
+ it("aprende de una fotografía sin crear una entrega",async()=>{
+   const onLearn=vi.fn(()=>true),onSave=vi.fn(),onCreateWeek=vi.fn(),onClose=vi.fn();
+   render(<ExternalBitacoraDialog students={[student]} weeks={[]} school="CBTis No. 134"
+      loadPdfJs={vi.fn()} onSave={onSave} onLearn={onLearn}
+      onCreateWeek={onCreateWeek} onClose={onClose}/>);
+   fireEvent.change(screen.getByLabelText("Cargar PDF, Word o fotografías"),{
+     target:{files:[new File(["imagen"],"evidencia-historica.jpg",{type:"image/jpeg"})]}
+   });
+   expect(await screen.findByText("Datos por confirmar")).toBeTruthy();
+   fireEvent.change(screen.getByLabelText("Alumno del padrón *"),{target:{value:student.id}});
+   fireEvent.click(screen.getByRole("button",{name:"Guardar ejemplo sin registrar entrega"}));
+   await waitFor(()=>expect(onLearn).toHaveBeenCalledTimes(1));
+   expect(onLearn.mock.calls[0][0]).toMatchObject({
+     studentId:student.id,observedName:"Maria Lpez Grcia",
+     observedCompany:"Arch1vo",method:"ocr"
+   });
+   expect(onSave).not.toHaveBeenCalled();
+   expect(onCreateWeek).not.toHaveBeenCalled();
+   expect(screen.getByText(/No se registró ninguna entrega/)).toBeTruthy();
+ });
 });
