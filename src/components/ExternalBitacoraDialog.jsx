@@ -350,7 +350,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                    {item.learned?"Ejemplo guardado":"Guardar ejemplo sin registrar entrega"}
                  </button>
                  <span>Para utilizar fotografías como referencia sin alterar las entregas.</span>
-               </div>
+               </div>}
                <div className="external-save">
                  <p>{item.saved?"Este documento ya fue registrado.":!externalDaysToStatistics(item.form.days)
                    ?"La entrega se guardará sin estadísticas si no completas las cuatro jornadas.":"Se guardarán las jornadas confirmadas y sus horas."}</p>
