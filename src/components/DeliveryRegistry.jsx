@@ -884,6 +884,12 @@ export default function DeliveryRegistry({ onClose }) {
   const rejectFuzzyStudent = () => {
     const prompt = fuzzyPromptRef.current || fuzzyPrompt;
     if (!prompt) return;
+    if(prompt.manualStudentId){
+      closeFuzzyPrompt();
+      setRememberScannedAlias(false);
+      setScanMessage("Selección cancelada.");
+      return;
+    }
     const nextIndex = prompt.index + 1;
 
     if (nextIndex < prompt.suggestions.length) {
@@ -1912,11 +1918,11 @@ export default function DeliveryRegistry({ onClose }) {
       return true;
     }catch(error){
       showNotice("error","No se pudo registrar la lectura",error?.message||"Revisa la información.");
-      return false;
+      throw error;
     }
   };
   const createExternalWeek=({startDate,label,dueAt=""})=>{
-    if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(startDate))return "";
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(startDate))return "";
     const week=createWeek({startDate,label:label||"Semana "+(state.weeks.length+1),
       dueAt:dueAt?new Date(dueAt).toISOString():""});
     const existing=state.weeks.find(w=>w.startDate===week.startDate&&w.endDate===week.endDate);
