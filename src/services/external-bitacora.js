@@ -126,7 +126,7 @@ export function extractExternalFields(raw){
    const date=seg.date||dates[0]||"";
    const times=timesFromExternal(all);
    const area=lineField(seg.lines,"(?:[aá]rea|departamento|secci[oó]n)");
-   const reason=/\b(falta|inasistencia)\b/i.test(all)?"falta":/\b(d[ií]a inh[aá]bil)\b/i.test(all)?"inhabil":/\b(sin labores|suspensi[oó]n de actividades)\b/i.test(all)?"sin_labores":"";
+   const reason=/\b(falta|inasistencia)\b/i.test(all)?"falta":/\b(d[ií]a inh[aá]bil)\b/i.test(all)?"inhabil":/\b(sin labores|no hubo labores|se suspendieron (?:las )?labores|se suspendieron (?:las )?actividades|suspensi[oó]n de (?:las )?actividades)\b/i.test(all)?"sin_labores":"";
    const activity=activityFromChunk(seg.lines);
    days[seg.index]={...days[seg.index],date,start:times.start,end:times.end,hours:times.hours,area,activity,
      status:reason||(times.hours?"laboral":""),detected:true};
