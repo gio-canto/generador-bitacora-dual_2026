@@ -1,5 +1,16 @@
 # Notas de versión
 
+## 0.65.0 · Entrenamiento OCR con lote fotográfico 01 · 2026-11-23
+
+- Primera colección observacional de 10 fotografías reales de bitácoras externas, con 6 variantes de diseño y 2 documentos de escritura manuscrita; etiquetas y ejemplos anonimizados en `src/data/ocr-training-lote01.json`.
+- Fechas: interpreta `10/11/26`, `17/noviembre/2026`, `01/septiembre/2026` y fechas completas con nombre del día, además de formatos anteriores.
+- Horarios: interpreta `9a.m.-3p.m.`, `09:00-14:00`, `Entrada:9:00 am Salida:3:00 pm` y variantes con AM/PM; la salida ambigua `9:00-2:00` permanece sin calcular.
+- Jornadas: reconoce «Se suspendieron labores» y «Se suspendieron las labores» como sin labores. Señala fechas que caen fuera de martes a viernes y evita incorporarlas a la jornada equivocada.
+- OCR de fotografías: si la primera lectura no identifica suficientes jornadas, realiza una segunda pasada con mejora de contraste y utiliza la que detecta más datos estructurados.
+- Se agrega una suite de regresión sobre los diez casos anonimizados y una guía de incorporación de lotes futuros.
+- Las fotografías y firmas originales no se incorporan al repositorio público. La colección permite mejorar reglas y verificar regresiones; todavía no entrena un modelo HTR específico de manuscritos.
+
+
 ## 0.64.0 · Escáner adaptable y aprendizaje OCR · 2026-11-23
 
 - Escáner Data Matrix: al encontrar un periodo sin semana registrada, solicita crearla con nombre y fecha límite opcional, y registra la entrega pendiente sin descartar la lectura.

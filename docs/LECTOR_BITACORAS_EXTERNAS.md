@@ -1,4 +1,12 @@
-# Lector de bitácoras externas · v0.64.0
+# Lector de bitácoras externas · v0.65.0
+
+## Calibración con fotografías reales (lote 01)
+
+Se revisaron diez fotografías externas de bitácoras impresas y manuscritas. El lector ahora contempla años de dos dígitos, fechas con nombres de meses escritos, horarios abreviados AM/PM y suspensiones de labores redactadas en texto libre. Cuando la lectura fotográfica es deficiente, realiza una segunda interpretación en alto contraste y elige la que identifica más fechas y jornadas. Una fecha fuera de martes a viernes se reporta para revisión, sin trasladarla automáticamente a otra jornada.
+
+El lote y su metodología están documentados en [Entrenamiento OCR Lote 01](ENTRENAMIENTO_OCR_LOTE01.md). Las anotaciones están anonimizadas; las fotografías originales no se publican. El tratamiento de escritura manuscrita sigue siendo OCR general con corrección supervisada, no un modelo HTR entrenado.
+
+
 
 ## Novedades de v0.64.0
 

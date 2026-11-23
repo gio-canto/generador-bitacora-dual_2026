@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.64.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.65.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,14 @@
 </div>
 
 ---
+
+## v0.65.0 · Primer lote de entrenamiento fotográfico
+
+Se revisaron **10 fotografías reales** de bitácoras externas, con seis variantes de diseño: documentos impresos horizontales y verticales, tablas a color y dos ejemplos manuscritos. El lector incorpora los formatos observados de fechas y horarios, una segunda pasada OCR de contraste adaptativo y revisión de periodos fuera de martes a viernes.
+
+Las diez muestras anonimizadas alimentan las pruebas del algoritmo en [`ocr-training-lote01.json`](src/data/ocr-training-lote01.json). **No se publican las fotografías, nombres ni firmas**. Es una calibración del preprocesamiento y del análisis de texto, no un reentrenamiento de pesos de reconocimiento de escritura manual.
+
+[Documentación del lote 01](docs/ENTRENAMIENTO_OCR_LOTE01.md) · [Lector externo](docs/LECTOR_BITACORAS_EXTERNAS.md)
 
 ## v0.64.0 · Semanas detectadas y aprendizaje del lector
 

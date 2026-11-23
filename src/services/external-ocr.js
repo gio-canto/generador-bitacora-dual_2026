@@ -1,5 +1,5 @@
 import {PDF_SCAN_LIMIT_BYTES,PDF_SCAN_LIMIT_PAGES,scanFileKind} from "./scanned-pdf.js";
-import {EXTERNAL_TEXT_LIMIT} from "./external-bitacora.js";
+import {EXTERNAL_TEXT_LIMIT,extractExternalFields} from "./external-bitacora.js";
 
 /** Motor OCR descargado sólo al solicitar lectura externa. */
 export const OCR_SOURCES=[
@@ -83,6 +83,63 @@ async function imageToCanvas(file){
  finally{cleanup();}
  return canvas;
 }
+/** Puntuación conservadora: prioriza fechas y jornadas reconocidas sobre el texto de relleno. */
+export function externalOcrQuality(result){
+ const raw=String(result?.data?.text||"");
+ if(!raw.trim())return 0;
+ const fields=extractExternalFields(raw);
+ const confidence=Number(result?.data?.confidence);
+ return fields.recognized*20+fields.dates.length*4+
+   (fields.name?8:0)+(fields.company?4:0)+
+   (Number.isFinite(confidence)?Math.max(0,Math.min(100,confidence))/25:0);
+}
+/** Segunda pasada de alto contraste para documentos fotografiados con tintes azules/sombras. */
+export function enhanceExternalPhotoCanvas(canvas){
+ const copy=document.createElement("canvas");
+ copy.width=canvas.width;copy.height=canvas.height;
+ const context=copy.getContext("2d",{willReadFrequently:true});
+ if(!context)return null;
+ context.drawImage(canvas,0,0);
+ let image;
+ try{image=context.getImageData(0,0,copy.width,copy.height);}
+ catch{return null;}
+ const pixels=image.data,histogram=new Uint32Array(256);
+ for(let i=0;i<pixels.length;i+=4){
+   const brightness=Math.round(.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2]);
+   histogram[brightness]++;
+ }
+ const total=pixels.length/4;
+ const quantile=part=>{
+   let count=0;
+   for(let i=0;i<256;i++){count+=histogram[i];if(count>=total*part)return i;}
+   return 255;
+ };
+ const low=quantile(.03),high=quantile(.97);
+ if(high<=low+16)return null;
+ const factor=255/(high-low);
+ for(let i=0;i<pixels.length;i+=4){
+   const v=Math.round(.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2]);
+   const stretch=Math.max(0,Math.min(255,Math.round((v-low)*factor)));
+   pixels[i]=stretch;pixels[i+1]=stretch;pixels[i+2]=stretch;
+ }
+ context.putImageData(image,0,0);
+ return copy;
+}
+async function recognizeExternalPhoto(worker,canvas){
+ const first=await worker.recognize(canvas);
+ const fields=extractExternalFields(first?.data?.text||"");
+ const confidence=Number(first?.data?.confidence);
+ if(fields.recognized>=3&&fields.name&&(!Number.isFinite(confidence)||confidence>=55))
+   return first;
+ let enhanced;
+ try{enhanced=enhanceExternalPhotoCanvas(canvas);}
+ catch{return first;}
+ if(!enhanced)return first;
+ try{
+   const next=await worker.recognize(enhanced);
+   return externalOcrQuality(next)>externalOcrQuality(first)?next:first;
+ }finally{enhanced.width=1;enhanced.height=1;}
+}
 function textLinesFromPdf(items){
  const lines=[];let last=null;
  for(const item of items||[]){
@@ -116,7 +173,7 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
    onProgress({stage:"ocr",page:1,pages:1});
    const canvas=await imageToCanvas(file);
    try{
-     const recognized=await worker.recognize(canvas);
+     const recognized=await recognizeExternalPhoto(worker,canvas);
      chunks.push(String(recognized?.data?.text||""));
      ocrText++;
    }finally{canvas.width=1;canvas.height=1;}
