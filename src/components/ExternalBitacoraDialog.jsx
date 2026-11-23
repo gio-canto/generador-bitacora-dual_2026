@@ -295,6 +295,11 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                          <input type="date" aria-label={MANUAL_DAYS[i]+" · fecha externa"}
                            value={day.date||""} onChange={e=>updateDay(i,{date:e.target.value})}/>
                        </label>
+                       {Array.isArray(day.timeBlocks)&&day.timeBlocks.length>1&&
+                         <p className="external-time-blocks">
+                           Tramos detectados: {day.timeBlocks.map(block=>block.raw).join(" · ")}.
+                           {day.needsReview?" Confirma los horarios y el total antes de registrar.":" Revisa el total calculado."}
+                         </p>}
                        {["laboral","evento"].includes(day.status)&&<>
                          <label>Entrada <input type="time" aria-label={MANUAL_DAYS[i]+" · entrada externa"}
                            value={day.start||""} onChange={e=>updateDay(i,{start:e.target.value})}/></label>
