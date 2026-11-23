@@ -1,0 +1,211 @@
+{
+  "version": 2,
+  "batch": "Lote 02",
+  "date": "2026-11-23",
+  "count": 10,
+  "privateImages": true,
+  "publicContent": "extractos_sinteticos_anonimizados",
+  "note": "Muestras sintéticas construidas a partir de la estructura visual observada en 10 fotografías. No son OCR literal ni transcripción íntegra, no contienen nombres, firmas o fotografías. Años ausentes o meridianos ambiguos quedan para revisión.",
+  "samples": [
+    {
+      "id": "L02-01",
+      "photo": "IMG_5133.jpeg",
+      "writing": "impreso",
+      "layout": "horizontal_multiples_actividades",
+      "weekHint": "Semana 11 impresa; fecha real de noviembre 17-20",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\nMartes, 17 de Noviembre del 2026\n9:00 AM - 3:00 PM\nActividades: Revisión de materiales.\nÁrea: Sala de formación\nMiércoles, 18 de Noviembre del 2026\n9:00 AM - 3:00 PM\nActividades: Preparación de video y demostración.\nÁrea: Sala de formación\nJueves, 19 de Noviembre del 2026\n9:00 AM - 3:00 PM\nActividades: Corrección de prototipo.\nÁrea: Sala de formación\nViernes, 20 de Noviembre del 2026\nActividades: Suspensión de labores por calendario.\nÁrea: Sin actividades",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedHours": [
+        "6",
+        "6",
+        "6",
+        ""
+      ],
+      "expectedStatus": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "sin_labores"
+      ],
+      "expectedPeriod": "2026-11-17",
+      "note": "El encabezado Semana 11 no debe sustituir las fechas explícitas."
+    },
+    {
+      "id": "L02-02",
+      "photo": "IMG_5132.jpeg",
+      "writing": "manuscrito",
+      "layout": "renglones_multitramo",
+      "weekHint": "10-13 nov",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n10/11/26\n9:00-11:30\n11:30-12:30\n1:00-2:00\nActividades: Conciliación y revisión de documentación.\nÁrea: Área administrativa\n11/11/26\n9:00-11:00\n11:00-12:30\n1:00-2:00\nActividades: Conciliación y complementos de pago.\nÁrea: Área administrativa\n12/11/26\n9:00-12:30\n1:00-1:30\n1:30-2:00\nActividades: Reenvío y clasificación.\nÁrea: Área administrativa\n13/11/26\n9:00-10:30\n10:30-12:30\n12:30-2:00\nActividades: Conciliación, clasificación y facturación.\nÁrea: Área administrativa",
+      "expectedDates": [
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13"
+      ],
+      "expectedPeriod": "2026-11-10",
+      "expectAmbiguousBlocks": true,
+      "expectedStatusesUnknown": true,
+      "note": "Distintos tramos manuscritos; horas de tarde sin AM/PM no se convierten automáticamente."
+    },
+    {
+      "id": "L02-03",
+      "photo": "IMG_5131.jpeg",
+      "writing": "manuscrito",
+      "layout": "renglones_multitramo",
+      "weekHint": "10-13 nov",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n10/11/26\n9:00-11:30\n11:30-12:30\n1:00-2:00\nActividades: Conciliación de cortes y movimientos.\nÁrea: Área administrativa\n11/11/26\n9:00-11:30\n11:30-12:30\n1:00-2:00\nActividades: Organización de tickets y facturas.\nÁrea: Área administrativa\n12/11/26\n9:00-12:30\n1:00-1:30\n1:30-2:00\nActividades: Reenvío y organización.\nÁrea: Área administrativa\n13/11/26\n9:00-10:30\n10:30-12:30\n1:00-2:00\nActividades: Clasificación y revisión.\nÁrea: Área administrativa",
+      "expectedDates": [
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13"
+      ],
+      "expectedPeriod": "2026-11-10",
+      "expectAmbiguousBlocks": true
+    },
+    {
+      "id": "L02-04",
+      "photo": "IMG_5130.jpeg",
+      "writing": "manuscrito",
+      "layout": "renglones_multitramo",
+      "weekHint": "17-20 nov",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n17/11/26\n9:00-11:00\n11:00-12:30\n1:00-2:00\nActividades: Conciliación y pagos.\nÁrea: Área administrativa\n18/11/26\n9:00-10:30\n10:30-12:30\n1:00-2:00\nActividades: Clasificación de tickets.\nÁrea: Área administrativa\n19/11/26\n9:00-12:30\n1:00-2:00\nActividades: Revisión documental.\nÁrea: Área administrativa\n20/11/26\n9:00-11:30\n11:30-12:30\n1:00-2:00\nActividades: Facturas y conciliación.\nÁrea: Área administrativa",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedPeriod": "2026-11-17",
+      "expectAmbiguousBlocks": true
+    },
+    {
+      "id": "L02-05",
+      "photo": "IMG_5129.jpeg",
+      "writing": "manuscrito",
+      "layout": "renglones_multitramo",
+      "weekHint": "17-20 nov",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n17/11/26\n9:00-11:00\n11:00-12:30\n1:00-2:00\nActividades: Corte, pago y tickets.\nÁrea: Área administrativa\n18/11/26\n9:00-10:30\n10:30-12:30\n1:00-2:00\nActividades: Facturas y pagos.\nÁrea: Área administrativa\n19/11/26\n9:00-11:00\n11:00-12:30\n1:00-2:00\nActividades: Clasificación y reenvío.\nÁrea: Área administrativa\n20/11/26\n9:00-11:30\n11:30-12:30\n1:00-2:00\nActividades: Facturación y revisión.\nÁrea: Área administrativa",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedPeriod": "2026-11-17",
+      "expectAmbiguousBlocks": true
+    },
+    {
+      "id": "L02-06",
+      "photo": "IMG_5128.jpeg",
+      "writing": "impreso",
+      "layout": "vertical_fecha_separador_especial",
+      "weekHint": "17-20 nov",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n17°11°26\n10:00AM-03:00PM\nActividades: Limpieza y orden.\nÁrea: Laboratorio\n18°11°26\n10:00AM-03:00PM\nActividades: No se realizaron actividades por asamblea general.\nÁrea: Laboratorio\n19°11°26\n10:00AM-03:00PM\nActividades: Registro de acceso.\nÁrea: Laboratorio\n20°11°26\n10:00AM-03:00PM\nActividades: Limpieza y orden.\nÁrea: Laboratorio",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedHours": [
+        "5",
+        "5",
+        "5",
+        "5"
+      ],
+      "expectedStatus": [
+        "laboral",
+        "",
+        "laboral",
+        "laboral"
+      ],
+      "expectedPeriod": "2026-11-17",
+      "note": "Día sin actividades en el laboratorio con horario declarado se deja sin clasificar para revisión."
+    },
+    {
+      "id": "L02-07",
+      "photo": "IMG_5127.jpeg",
+      "writing": "impreso",
+      "layout": "vertical_laboratorio",
+      "weekHint": "10-13 nov",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n10/11/2026\n10:00AM-03:00PM\nActividades: Registro de actividades.\nÁrea: Laboratorio\n11/11/2026\n10:00AM-03:00PM\nActividades: No se realizaron actividades en el laboratorio por reunión de académicas.\nÁrea: Laboratorio\n12/11/2026\n10:00AM-03:00PM\nActividades: Revisión y organización.\nÁrea: Laboratorio\n13/11/2026\n10:00AM-03:00PM\nActividades: Limpieza y registro de acceso.\nÁrea: Laboratorio",
+      "expectedDates": [
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13"
+      ],
+      "expectedHours": [
+        "5",
+        "5",
+        "5",
+        "5"
+      ],
+      "expectedStatus": [
+        "laboral",
+        "",
+        "laboral",
+        "laboral"
+      ],
+      "expectedPeriod": "2026-11-10"
+    },
+    {
+      "id": "L02-08",
+      "photo": "IMG_5126.jpeg",
+      "writing": "manuscrito",
+      "layout": "renglones_fecha_sin_anio",
+      "weekHint": "17-20 nov, año ausente",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n17-11\n10:00am - 3:00pm\nActividades: Archivo de documentos.\nÁrea: Contabilidad\n18-11\n10:00am - 3:00pm\nActividades: Archivo de expedientes.\nÁrea: Contabilidad\n19-11\nActividades: Revisión de facturas.\nÁrea: Contabilidad\n20-11\n10:00am - 3:00pm\nActividades: Control de documentos.\nÁrea: Contabilidad",
+      "expectedDates": null,
+      "expectedPeriod": null,
+      "expectMissingYear": true,
+      "note": "Fechas sin año en la hoja. No se deduce el año por el contexto de otras fotografías."
+    },
+    {
+      "id": "L02-09",
+      "photo": "IMG_5125.jpeg",
+      "writing": "manuscrito",
+      "layout": "renglones_fecha_sin_anio",
+      "weekHint": "10-13 nov, año ausente",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n10-11\n10:00am - 3:00pm\nActividades: Archivo de facturas.\nÁrea: Contabilidad\n11-11\n10:00am - 3:00pm\nActividades: Registro de expedientes.\nÁrea: Contabilidad\n12-11\n10:00am - 3:00pm\nActividades: Archivo y clasificación.\nÁrea: Contabilidad\n13-11\n10:00am - 3:00pm\nActividades: Revisión de facturas.\nÁrea: Contabilidad",
+      "expectedDates": null,
+      "expectedPeriod": null,
+      "expectMissingYear": true,
+      "note": "La interpretación del año exige evidencia dentro de la propia bitácora o confirmación manual."
+    },
+    {
+      "id": "L02-10",
+      "photo": "IMG_5124.jpeg",
+      "writing": "impreso",
+      "layout": "horizontal_coloreado_foto_azulada",
+      "weekHint": "10-13 nov",
+      "text": "NOMBRE DEL ALUMNO: PERSONA DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n10/11/2026\n9:00 am A 3:00 pm\nActividades: Materiales de exposición.\nÁrea: Instalaciones\n11/11/2026\n8:30 am A 1:00 pm\nActividades: Exhibición de materiales.\nÁrea: Centro\n12/11/2026\n7:45 am A 1:00 pm\nActividades: Presentación de material.\nÁrea: Centro\n13/11/2026\n8:30 am A 1:00 pm\nActividades: Demostración y cierre.\nÁrea: Centro",
+      "expectedDates": [
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13"
+      ],
+      "expectedHours": [
+        "6",
+        "4.5",
+        "5.25",
+        "4.5"
+      ],
+      "expectedStatus": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "laboral"
+      ],
+      "expectedPeriod": "2026-11-10"
+    }
+  ]
+}
