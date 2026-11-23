@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState} from "react";
-import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,
+import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,
   externalDaysToStatistics,externalReviewMetadata} from "../services/external-bitacora.js";
 import {readExternalBitacora,createExternalWorker,externalFileKind} from "../services/external-ocr.js";
 import {buildManualStatistics,reasonsForStatus,MANUAL_DAYS} from "../services/manual-statistics.js";
@@ -15,13 +15,14 @@ function duration(start,end){
  const b=Number(end.slice(0,2))*60+Number(end.slice(3));
  return b>a?String((b-a)/60):"";
 }
-export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,onClose,onSave}){
+export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,onClose,onSave,onCreateWeek}){
  const [items,setItems]=useState([]);
  const [selected,setSelected]=useState(0);
  const [busy,setBusy]=useState(false);
  const [progress,setProgress]=useState("");
  const [error,setError]=useState("");
  const [notice,setNotice]=useState("");
+ const [weekDraft,setWeekDraft]=useState(null);
  const workerRef=useRef(null),mounted=useRef(true),urls=useRef([]);
  const onCloseRef=useRef(onClose);onCloseRef.current=onClose;
  const busyRef=useRef(busy);busyRef.current=busy;
@@ -76,9 +77,10 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          const extracted=extractExternalFields(result.text);
          const studentId=suggestExternalStudent(extracted,students);
          const weekId=suggestExternalWeek(extracted,weeks);
+         const proposedWeek=suggestExternalWeekPeriod(extracted);
          const current={key:(globalThis.crypto?.randomUUID?.()||"external-"+Date.now()+"-"+added),filename:file.name,kind,url,
            pages:result.pages,method:result.method,truncated:result.truncated,
-           text:result.text,form:{name:extracted.name,company:extracted.company,
+           text:result.text,proposedWeek,observedName:extracted.name,observedCompany:extracted.company,learnAlias:false,form:{name:extracted.name,company:extracted.company,
              studentId,weekId,days:extracted.days},warnings:extracted.warnings,
            state:"ready"};
          if(mounted.current){setItems(prev=>[...prev,current]);setSelected(items.length+added);added++;}
@@ -112,6 +114,17 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      days:extracted.days},warnings:extracted.warnings});
    setNotice("El texto fue analizado nuevamente. Revisa los campos antes de guardar.");
  };
+ const makeWeek=()=>{
+   if(!weekDraft?.startDate||!onCreateWeek)return;
+   setError("");
+   try{
+     const id=onCreateWeek(weekDraft);
+     if(!id){setError("Introduce una fecha de inicio válida.");return;}
+     updateForm({weekId:id});
+     setWeekDraft(null);
+     setNotice("Semana creada o recuperada. Revisa las jornadas antes de confirmar.");
+   }catch(error){setError(error?.message||"No se pudo crear la semana.");}
+ };
  const submit=()=>{
    setError("");setNotice("");
    if(!item||item.state!=="ready")return;
@@ -136,7 +149,8 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      const captured=externalDaysToStatistics(days);
      const statistics=captured?buildManualStatistics(captured):null;
      const metadata=externalReviewMetadata({...item,name,company},days);
-     const saved=onSave({studentId,weekId,statistics,metadata,replace:duplicate});
+     const saved=onSave({studentId,weekId,statistics,metadata,replace:duplicate,
+       learnAlias:item.learnAlias,observedName:item.observedName,observedCompany:item.observedCompany});
      if(saved===false)return;
      const next=items.findIndex((x,i)=>i>selected&&x.state==="ready"&&!x.saved);
      updateItem({saved:true});
@@ -175,7 +189,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
        <div className="external-queue" role="tablist" aria-label="Documentos cargados">
          {items.map((x,i)=><button key={x.key} role="tab" type="button"
            aria-selected={i===selected} className={"external-queue-item "+(i===selected?"active":"")}
-           onClick={()=>{setSelected(i);setError("");setNotice("");}}>
+           onClick={()=>{setSelected(i);setWeekDraft(null);setError("");setNotice("");}}>
            {x.saved?"Registrado · ":""}{x.filename}{x.state==="error"?" · Error":""}
          </button>)}
        </div>
@@ -220,6 +234,28 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                    </select>
                  </label>
                </div>
+               {!item.form.weekId&&<div className="external-week-create">
+                   <p>No se encontró una semana compatible. Puedes crearla desde este documento.</p>
+                   {!weekDraft?<button className="btn" type="button" onClick={()=>setWeekDraft({
+                     startDate:item.proposedWeek?.startDate||"",label:"Semana "+(weeks.length+1),dueAt:""
+                   })}>Crear semana</button>:
+                     <div className="external-week-fields">
+                       <label>Inicio del periodo (martes)
+                         <input type="date" aria-label="Inicio de la nueva semana externa"
+                           value={weekDraft.startDate} onChange={e=>setWeekDraft({...weekDraft,startDate:e.target.value})}/>
+                       </label>
+                       <label>Nombre de la semana
+                         <input aria-label="Nombre de la nueva semana externa" value={weekDraft.label}
+                           onChange={e=>setWeekDraft({...weekDraft,label:e.target.value})}/>
+                       </label>
+                       <label>Fecha límite (opcional)
+                         <input type="datetime-local" aria-label="Límite de la nueva semana externa"
+                           value={weekDraft.dueAt} onChange={e=>setWeekDraft({...weekDraft,dueAt:e.target.value})}/>
+                       </label>
+                       <button className="btn primary" type="button" onClick={makeWeek}>Crear y seleccionar</button>
+                       <button className="btn" type="button" onClick={()=>setWeekDraft(null)}>Cancelar</button>
+                     </div>}
+                 </div>}
                <div className="external-days">
                  <h3>Jornadas de la bitácora</h3>
                  <p>Los campos sin lectura quedan vacíos. Para contabilizar horas se necesitan cuatro jornadas completas; si faltan datos puedes registrar sólo la entrega.</p>
@@ -285,6 +321,11 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                    </div>;
                  })}
                </div>
+               <label className="external-learning-check">
+                 <input type="checkbox" checked={Boolean(item.learnAlias)}
+                   onChange={e=>updateItem({learnAlias:e.target.checked})}/>
+                 Aprender de esta lectura confirmada (nombre detectado y correcciones)
+               </label>
                <div className="external-save">
                  <p>{item.saved?"Este documento ya fue registrado.":!externalDaysToStatistics(item.form.days)
                    ?"La entrega se guardará sin estadísticas si no completas las cuatro jornadas.":"Se guardarán las jornadas confirmadas y sus horas."}</p>
