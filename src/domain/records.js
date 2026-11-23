@@ -2,8 +2,8 @@ import { validSpecialEvent } from "../services/special-events.js";
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
 import { LIMBO_COMPANY } from "../services/delivery-registry.js";
-export const VERSION = "0.63.0";
-export const RELEASE = "Lector de bitácoras externas";
+export const VERSION = "0.64.0";
+export const RELEASE = "Aprendizaje OCR y escáner adaptable";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {

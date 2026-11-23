@@ -34,6 +34,10 @@ import {
   contextIsComplete,
   createRegistryContext,
   createWeek,
+  validDualWeekPeriod,
+  addStudentAlias,
+  studentAliases,
+  normalizeName,
   deliveryStatus,
   exportDeliveryState,
   exportWeekCsv,
@@ -52,6 +56,7 @@ import {
   registerDelivery,
   saveManualDelivery,
   saveExternalDelivery,
+  learnExternalExample,
   removeDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
@@ -521,6 +526,7 @@ export default function DeliveryRegistry({ onClose }) {
     group: "",
     gender: "",
     usageMode: "unknown",
+    aliasesText: "",
   });
   const [weekForm, setWeekForm] = useState({
     label: "",
@@ -553,6 +559,10 @@ export default function DeliveryRegistry({ onClose }) {
   const [rosterBusy,setRosterBusy] = useState(false);
   const [scanQueue, setScanQueue] = useState([]);
   const [fuzzyPrompt, setFuzzyPrompt] = useState(null);
+  const [rememberScannedAlias,setRememberScannedAlias] = useState(false);
+  const [missingWeekScan,setMissingWeekScan] = useState(null);
+  const [missingWeekLabel,setMissingWeekLabel] = useState("");
+  const [missingWeekDueAt,setMissingWeekDueAt] = useState("");
   const [scanMessage, setScanMessage] = useState("Apunta la cámara al Data Matrix.");
   const [scanTone, setScanTone] = useState("");
   const [scanBox, setScanBox] = useState(null);
@@ -600,7 +610,7 @@ export default function DeliveryRegistry({ onClose }) {
     {};
   const fuzzySuggestion =
     fuzzyPrompt?.suggestions?.[fuzzyPrompt.index] || null;
-  const fuzzyCandidate = fuzzySuggestion?.student || null;
+  const fuzzyCandidate=state.students.find(student=>student.id===fuzzyPrompt?.manualStudentId)||fuzzySuggestion?.student||null;
 
   const commit = (producer) => {
     const next =
@@ -641,7 +651,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
   const openTutorial=()=>{setTutorialStep(0);setTutorialOpen(true);};
   const openNewestScan=()=>{
-    if(!state.weeks.length||!activeStudents.length)return;
+    if(!activeStudents.length)return;
     setActiveWeekId(state.weeks.at(-1)?.id||"");setView("scanner");
   };
   useEffect(()=>{
@@ -754,22 +764,27 @@ export default function DeliveryRegistry({ onClose }) {
     payload,
     rawKey,
     points,
+    preferredWeek = null,
   ) => {
     if (!student || !studentIsActive(student)) return;
 
-    const targetWeek = findWeekByMatrixValue(
+    const targetWeek = preferredWeek || findWeekByMatrixValue(
       state.weeks,
       rawValue,
       activeWeekId,
     );
     if (!targetWeek) {
-      const period = matrixPeriodLabel(rawValue);
-      setScanMessage(
-        period
-          ? "No existe una semana para " + period + "."
-          : "Este código antiguo necesita una semana seleccionada.",
-      );
-      showDetection("error");
+      const period=matrixPeriodLabel(rawValue);
+      if(validDualWeekPeriod(payload.startDate,payload.endDate)) {
+        setMissingWeekLabel("Semana "+(state.weeks.length+1));
+        setMissingWeekDueAt("");
+        setMissingWeekScan({studentId:student.id,rawValue,payload,rawKey,points});
+        setScanMessage("Semana no registrada: "+period+".");
+        showDetection("seen");
+      } else {
+        setScanMessage("Selecciona una semana para este código antiguo.");
+        showDetection("error");
+      }
       return;
     }
 
@@ -832,27 +847,50 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const confirmFuzzyStudent = () => {
-    const prompt = fuzzyPromptRef.current || fuzzyPrompt;
-    const suggestion = prompt?.suggestions?.[prompt.index];
-    const candidate = suggestion?.student;
-    if (!prompt || !candidate) {
-      closeFuzzyPrompt();
-      return;
+    const prompt=fuzzyPromptRef.current||fuzzyPrompt;
+    const candidate=state.students.find(s=>s.id===prompt?.manualStudentId)||prompt?.suggestions?.[prompt.index]?.student;
+    if(!prompt||!candidate)return;
+    if(rememberScannedAlias&&prompt.payload?.name) {
+      try{
+        const students=addStudentAlias(state.students,candidate.id,prompt.payload.name);
+        if(students!==state.students)commit({...state,students});
+      }catch(error){
+        showNotice("warning","Alias no guardado",error?.message||"Revisa el nombre.");
+        return;
+      }
     }
+    closeFuzzyPrompt();setRememberScannedAlias(false);
+    completeScanForStudent(candidate,prompt.rawValue,prompt.payload,prompt.rawKey,prompt.points);
+  };
 
-    closeFuzzyPrompt();
+  const createWeekFromScan=()=>{
+    const request=missingWeekScan;
+    if(!request)return;
+    const {startDate,endDate}=request.payload;
+    if(!validDualWeekPeriod(startDate,endDate)){setScanMessage("El periodo del código no es un martes a viernes válido.");setMissingWeekScan(null);return;}
+    const existing=state.weeks.find(w=>w.startDate===startDate&&w.endDate===endDate);
+    const week=existing||createWeek({
+      label:missingWeekLabel.trim()||"Semana "+(state.weeks.length+1),
+      startDate,endDate,
+      dueAt:missingWeekDueAt?new Date(missingWeekDueAt).toISOString():"",
+    });
+    if(!existing)commit({...state,weeks:[...state.weeks,week]});
+    setActiveWeekId(week.id);setMissingWeekScan(null);
     completeScanForStudent(
-      candidate,
-      prompt.rawValue,
-      prompt.payload,
-      prompt.rawKey,
-      prompt.points,
-    );
+      state.students.find(student=>student.id===request.studentId),
+      request.rawValue,request.payload,request.rawKey,request.points,week);
+    notify("success",existing?"Semana encontrada":"Semana creada",week.label);
   };
 
   const rejectFuzzyStudent = () => {
     const prompt = fuzzyPromptRef.current || fuzzyPrompt;
     if (!prompt) return;
+    if(prompt.manualStudentId){
+      closeFuzzyPrompt();
+      setRememberScannedAlias(false);
+      setScanMessage("Selección cancelada.");
+      return;
+    }
     const nextIndex = prompt.index + 1;
 
     if (nextIndex < prompt.suggestions.length) {
@@ -873,7 +911,7 @@ export default function DeliveryRegistry({ onClose }) {
   };
 
   const processScanValue = (rawValue, points) => {
-    if (tutorialOpenRef.current || fuzzyPromptRef.current) return;
+    if (tutorialOpenRef.current || fuzzyPromptRef.current || missingWeekScan) return;
     const payload = parseMatrixPayload(rawValue);
     const rawKey = String(rawValue || "").trim();
     let student = findStudentByMatrixValue(state.students, rawValue);
@@ -906,7 +944,8 @@ export default function DeliveryRegistry({ onClose }) {
         3,
       );
 
-      if (suggestions.length) {
+      if (suggestions.length || payload.name) {
+        setRememberScannedAlias(false);
         const prompt = {
           rawValue,
           payload,
@@ -917,11 +956,10 @@ export default function DeliveryRegistry({ onClose }) {
         };
         fuzzyPromptRef.current = prompt;
         setFuzzyPrompt(prompt);
-        setScanMessage(
-          suggestions[0].nameOrderInverted
-            ? "Nombre con apellidos primero. Confirma la persona."
-            : "Coincidencia aproximada encontrada. Confirma la persona.",
-        );
+        setScanMessage(suggestions[0]?.nameOrderInverted
+          ?"Nombre con apellidos primero. Confirma la persona."
+          :suggestions.length?"Coincidencia aproximada. Confirma la persona."
+          :"Selecciona al alumno y, si corresponde, guarda el alias.");
         showDetection(
           "seen",
           resultBoxFromPoints(videoRef.current, points),
@@ -1579,6 +1617,7 @@ export default function DeliveryRegistry({ onClose }) {
       group: String(studentForm.group || "").trim(),
       gender: studentForm.gender || "",
       usageMode: studentForm.usageMode || "unknown",
+      aliases:studentAliases((studentForm.aliasesText||"").split(/[\n,;]/)),
     };
     if (!nextStudent.name || !nextStudent.specialty || !nextStudent.company) {
       showNotice(
@@ -1589,6 +1628,14 @@ export default function DeliveryRegistry({ onClose }) {
       return;
     }
 
+    const conflictAlias=nextStudent.aliases.find(alias=>state.students.some(student=>
+      student.id!==editingStudentId &&
+      (normalizeName(student.name)===normalizeName(alias)||
+       (student.aliases||[]).some(a=>normalizeName(a)===normalizeName(alias)))));
+    if(conflictAlias){
+      showNotice("warning","Alias duplicado",conflictAlias+" pertenece a otro alumno.");
+      return;
+    }
     if (editingStudentId) {
       const duplicate = state.students.some(
         (student) =>
@@ -1645,6 +1692,7 @@ export default function DeliveryRegistry({ onClose }) {
       group: student.group || "",
       gender: student.gender || "",
       usageMode: student.usageMode || "unknown",
+      aliasesText:(student.aliases||[]).join("\n"),
     });
     setContextForm(state.context);
     setSetupStep(1);
@@ -1851,7 +1899,7 @@ export default function DeliveryRegistry({ onClose }) {
     if (weekCaptureQueue.length) advanceWeekCapture(saved);
     else setManualTarget(null);
   };
-  const commitExternalEntry = ({studentId,weekId,statistics,metadata}) => {
+  const commitExternalEntry = ({studentId,weekId,statistics,metadata,learnAlias=false,observedName="",observedCompany=""}) => {
     const week=state.weeks.find(item=>item.id===weekId);
     if(!week||!state.students.some(item=>item.id===studentId)){
       showNotice("warning","Revisa el alumno y la semana.");
@@ -1860,14 +1908,43 @@ export default function DeliveryRegistry({ onClose }) {
     try{
       const updated=saveExternalDelivery(week,studentId,{statistics,metadata});
       const weeks=state.weeks.map(item=>item.id===weekId?updated:item);
-      commit({...state,weeks});
+      const next={...state,weeks};
+      const trained=learnAlias
+        ?learnExternalExample(next,studentId,{name:observedName,company:observedCompany,method:metadata?.method},
+           {company:metadata?.company})
+        :next;
+      commit(trained);
       setActiveWeekId(weekId);
       notify("success","Bitácora externa registrada",state.students.find(x=>x.id===studentId)?.name||"");
       return true;
     }catch(error){
       showNotice("error","No se pudo registrar la lectura",error?.message||"Revisa la información.");
-      return false;
+      throw error;
     }
+  };
+  const commitExternalLearning=({studentId,observedName="",observedCompany="",confirmedCompany="",method=""})=>{
+    try{
+      const learned=learnExternalExample(state,studentId,
+        {name:observedName,company:observedCompany,method},
+        {company:confirmedCompany});
+      commit(learned);
+      notify("success","Ejemplo OCR guardado","No se registró ninguna entrega.");
+      return true;
+    }catch(error){
+      showNotice("error","No se pudo guardar el aprendizaje",error?.message||"Revisa el alumno.");
+      throw error;
+    }
+  };
+  const createExternalWeek=({startDate,label,dueAt=""})=>{
+    if(!validDualWeekPeriod(startDate,createWeek({startDate}).endDate))return "";
+    const week=createWeek({startDate,label:label||"Semana "+(state.weeks.length+1),
+      dueAt:dueAt?new Date(dueAt).toISOString():""});
+    const existing=state.weeks.find(w=>w.startDate===week.startDate&&w.endDate===week.endDate);
+    if(existing)return existing.id;
+    commit({...state,weeks:[...state.weeks,week]});
+    setActiveWeekId(week.id);
+    notify("success","Semana creada",week.label);
+    return week.id;
   };
   const startDueAtEdit = () => {
     if (!activeWeek) return;
@@ -2636,7 +2713,12 @@ export default function DeliveryRegistry({ onClose }) {
                       ))}
                     </select>
                   </label>
-                  <label className="delivery-field"><span>Grupo</span><input value={studentForm.group || ""} maxLength={30} placeholder="A" onChange={event=>setStudentForm({...studentForm,group:event.target.value})}/></label>
+                  <label className="delivery-field"><span>Alias del escáner (uno por línea)</span>
+                     <textarea rows={2} value={studentForm.aliasesText||""}
+                       placeholder="Otros nombres detectados por el lector"
+                       onChange={event=>setStudentForm({...studentForm,aliasesText:event.target.value})}/>
+                   </label>
+                   <label className="delivery-field"><span>Grupo</span><input value={studentForm.group || ""} maxLength={30} placeholder="A" onChange={event=>setStudentForm({...studentForm,group:event.target.value})}/></label>
                   <label className="delivery-field">
                     <span>Género</span>
                     <select
@@ -2903,7 +2985,7 @@ export default function DeliveryRegistry({ onClose }) {
             {isMobileLayout&&<section className="delivery-mobile-welcome" aria-label="Inicio móvil">
               <h1>{greeting}</h1>
               <p>{(shortSchool(state.context.school)||"Registro Dual").replace(/CBTis No\.\s*/i,"CBTIS ")}</p>
-              <button type="button" className="btn primary" disabled={!state.weeks.length||!activeStudents.length}
+              <button type="button" className="btn primary" disabled={!activeStudents.length}
                 onClick={()=>{setActiveWeekId(state.weeks.at(-1)?.id||"");setView("scanner");}}>
                 <Scan size={21}/> Escanear bitácora
               </button>
@@ -2965,10 +3047,10 @@ export default function DeliveryRegistry({ onClose }) {
                 <button
                   className="btn primary"
                   type="button"
-                  disabled={!state.weeks.length || !activeStudents.length}
+                  disabled={!activeStudents.length}
                   onClick={() => {
                     const week = state.weeks.at(-1);
-                    setActiveWeekId(week.id);
+                    setActiveWeekId(week?.id||"");
                     setView("scanner");
                   }}
                 >
@@ -3515,7 +3597,7 @@ export default function DeliveryRegistry({ onClose }) {
           </>
         )}
 
-        {view === "scanner" && state.weeks.length > 0 && (
+        {view === "scanner" && (
           <section className="delivery-scanner-page">
             <div className="delivery-scanner-head">
               <div>
@@ -3762,7 +3844,7 @@ export default function DeliveryRegistry({ onClose }) {
               (id==="more"&&view==="announcements");
             return <button type="button" key={id} className={current?"active":""}
               aria-current={current?"page":undefined}
-              disabled={id==="scanner"&&(!state.weeks.length||!activeStudents.length)}
+              disabled={id==="scanner"&&!activeStudents.length}
               onClick={()=>{if(id==="scanner")setActiveWeekId(state.weeks.at(-1)?.id||"");
                 setView(id);}}>
               <Icon size={23} weight={current?"fill":"regular"}/><span>{label}</span>
@@ -3770,7 +3852,7 @@ export default function DeliveryRegistry({ onClose }) {
           })}
         </nav>}
 
-      {fuzzyPrompt && fuzzyCandidate && (
+      {fuzzyPrompt && (
         <div
           className="delivery-match-overlay"
           role="dialog"
@@ -3783,11 +3865,11 @@ export default function DeliveryRegistry({ onClose }) {
                 <WarningCircle size={24} weight="fill" />
               </div>
               <span className="delivery-kicker">Lector Data Matrix</span>
-              <h2 id="delivery-match-title">¿Es esta persona?</h2>
+              <h2 id="delivery-match-title">{fuzzyCandidate?"¿Es esta persona?":"Selecciona al alumno"}</h2>
               <p>
                 {fuzzySuggestion?.nameOrderInverted
                   ? "Los apellidos aparecen primero. Confirma la persona antes de registrar."
-                  : "No encontré una coincidencia exacta. Revisa la sugerencia antes de registrar la entrega."}
+                  : "Revisa el nombre detectado. Puedes seleccionar al alumno correcto y guardar un alias."}
               </p>
 
               <div className="delivery-match-read">
@@ -3797,12 +3879,11 @@ export default function DeliveryRegistry({ onClose }) {
                 </strong>
               </div>
 
-              <div className="delivery-match-candidate">
+              {fuzzyCandidate && <div className="delivery-match-candidate">
                 <Blobatar name={fuzzyCandidate.name || "Alumno"} size={58} />
                 <div>
                   <span>
-                    Posible coincidencia · {fuzzyPrompt.index + 1} de{" "}
-                    {fuzzyPrompt.suggestions.length}
+                    Alumno seleccionado · {fuzzyPrompt.suggestions.length ? (fuzzyPrompt.index+1)+" de "+fuzzyPrompt.suggestions.length : "manual"}
                   </span>
                   <strong>{fuzzyCandidate.name}</strong>
                   <small>
@@ -3817,20 +3898,35 @@ export default function DeliveryRegistry({ onClose }) {
                 <b>
                   {fuzzySuggestion?.nameOrderInverted
                     ? "Orden invertido"
-                    : Math.round((fuzzySuggestion?.similarity || 0) * 100) + "%"}
+                    : fuzzySuggestion?Math.round((fuzzySuggestion.similarity||0)*100)+"%":"Manual"}
                 </b>
-              </div>
-
+              </div>}
+              <label className="delivery-field"><span>Seleccionar alumno del padrón</span>
+                <select aria-label="Seleccionar alumno detectado" value={fuzzyPrompt.manualStudentId||""}
+                  onChange={event=>{
+                    const next={...fuzzyPrompt,manualStudentId:event.target.value};
+                    fuzzyPromptRef.current=next;setFuzzyPrompt(next);
+                  }}>
+                  <option value="">Usar sugerencia{!fuzzySuggestion?" (selecciona alumno)":""}</option>
+                  {activeStudents.map(student=><option key={student.id} value={student.id}>{student.name}</option>)}
+                </select>
+              </label>
+              <label className="delivery-match-alias">
+                <input type="checkbox" checked={rememberScannedAlias}
+                  onChange={event=>setRememberScannedAlias(event.target.checked)}/>
+                Guardar el nombre leído como alias permanente
+              </label>
               <div className="delivery-match-actions">
                 <button className="btn" type="button" onClick={rejectFuzzyStudent}>
                   {fuzzyPrompt.index < fuzzyPrompt.suggestions.length - 1
                     ? "No, siguiente"
-                    : "No corresponde"}
+                    : "Cancelar"}
                 </button>
                 <button
                   className="btn primary"
                   type="button"
                   onClick={confirmFuzzyStudent}
+                  disabled={!fuzzyCandidate}
                 >
                   <CheckCircle size={18} />
                   Sí, registrar
@@ -3841,6 +3937,25 @@ export default function DeliveryRegistry({ onClose }) {
         </div>
       )}
 
+      {missingWeekScan && <div className="delivery-match-overlay" role="dialog" aria-modal="true"
+        aria-labelledby="scan-new-week-title">
+        <div className="delivery-match-stage"><article className="delivery-match-card">
+          <span className="delivery-kicker">Registro Dual · Semana nueva</span>
+          <h2 id="scan-new-week-title">¿Quieres crear esta semana?</h2>
+          <p>El código indica del {missingWeekScan.payload.startDate} al {missingWeekScan.payload.endDate}.
+            El periodo todavía no existe en Registro Dual.</p>
+          <label className="delivery-field"><span>Nombre de la semana</span>
+            <input aria-label="Nombre de la nueva semana" value={missingWeekLabel}
+              onChange={event=>setMissingWeekLabel(event.target.value)}/></label>
+          <label className="delivery-field"><span>Fecha límite de entrega (opcional)</span>
+            <input aria-label="Fecha límite de la nueva semana" type="datetime-local"
+              value={missingWeekDueAt} onChange={event=>setMissingWeekDueAt(event.target.value)}/></label>
+          <div className="delivery-match-actions">
+            <button type="button" className="btn" onClick={()=>setMissingWeekScan(null)}>Cancelar</button>
+            <button type="button" className="btn primary" onClick={createWeekFromScan}>Crear semana y registrar</button>
+          </div>
+        </article></div>
+      </div>}
       {externalOpen && <ExternalBitacoraDialog
          students={state.students.filter(student=>studentIsActive(student))}
          weeks={state.weeks}
@@ -3848,6 +3963,9 @@ export default function DeliveryRegistry({ onClose }) {
          loadPdfJs={ensurePdfJs}
          onClose={()=>setExternalOpen(false)}
          onSave={commitExternalEntry}
+          onCreateWeek={createExternalWeek}
+          onLearn={commitExternalLearning}
+          learningExamples={state.ocrLearning?.examples||[]}
        />}
        {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
         <ManualDeliveryDialog

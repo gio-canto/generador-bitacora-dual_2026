@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.63.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.64.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.64.0 · Semanas detectadas y aprendizaje del lector
+
+**Registro Dual:** el escáner propone crear las semanas inexistentes a partir del periodo incluido en el Data Matrix, con nombre y fecha límite editables. Los alumnos admiten alias persistentes, editables en el padrón, para variantes de nombres detectados. El lector de bitácoras externas también ofrece crear semanas desde fechas reconocidas y registrar correcciones supervisadas de OCR (nombre y empresa) en los respaldos JSON, sin conservar las fotografías originales.
+
+[Guía de lector externo](docs/LECTOR_BITACORAS_EXTERNAS.md) · [Historial](CHANGELOG.md)
 
 ## v0.63.0 · Lector de bitácoras externas
 

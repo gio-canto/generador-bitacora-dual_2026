@@ -121,8 +121,15 @@ export function suggestExternalStudent(extracted,students){
  if(name){
    const exact=students.filter(s=>externalKey(s.name)===name);
    if(exact.length===1)return exact[0].id;
+   if(exact.length>1)return "";
+   const aliases=students.filter(s=>(s.aliases||[]).some(a=>externalKey(a)===name));
+   if(aliases.length===1)return aliases[0].id;
+   if(aliases.length>1)return "";
  }
- const matches=students.filter(s=>{const key=externalKey(s.name);return key.length>=9&&doc.includes(key);});
+ const matches=students.filter(s=>{
+   const keys=[s.name,...(s.aliases||[])].map(externalKey).filter(key=>key.length>=9);
+   return keys.some(key=>doc.includes(key));
+ });
  return matches.length===1?matches[0].id:"";
 }
 export function suggestExternalWeek(extracted,weeks){
@@ -152,4 +159,33 @@ export function externalReviewMetadata(item,days){
      start:keep(d.start).slice(0,5),end:keep(d.end).slice(0,5),
      area:keep(d.area).slice(0,150),activity:keep(d.activity).slice(0,900)})),
  };
+}
+/** Propone martes-viernes solamente cuando las fechas legibles pertenecen a un mismo periodo. */
+export function suggestExternalWeekPeriod(extracted) {
+ const dates=[...new Set(extracted?.dates||[])].sort();
+ if(!dates.length)return null;
+ const starts=dates.map(value=>{
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return "";
+   const date=new Date(value+"T12:00:00Z");
+   if(date.toISOString().slice(0,10)!==value)return "";
+   const dow=date.getUTCDay();
+   if(dow<2||dow>5)return "";
+   date.setUTCDate(date.getUTCDate()-(dow-2));
+   return date.toISOString().slice(0,10);
+ });
+ if(starts.some(value=>!value)||new Set(starts).size!==1)return null;
+ const end=new Date(starts[0]+"T12:00:00Z");
+ end.setUTCDate(end.getUTCDate()+3);
+ return {startDate:starts[0],endDate:end.toISOString().slice(0,10)};
+}
+
+/** Aplica únicamente correcciones únicas confirmadas; nunca sustituye nombres ambiguos. */
+export function applyExternalLearning(extracted,examples=[],studentId="") {
+ const rawCompany=externalKey(extracted?.company);
+ if(!rawCompany||!Array.isArray(examples))return extracted;
+ const applicable=examples.filter(example=>
+   externalKey(example.observedCompany)===rawCompany &&
+   (!studentId||example.studentId===studentId));
+ const options=[...new Set(applicable.map(example=>externalClean(example.confirmedCompany)).filter(Boolean))];
+ return options.length===1?{...extracted,company:options[0]}:extracted;
 }

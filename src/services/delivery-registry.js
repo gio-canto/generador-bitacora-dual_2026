@@ -255,11 +255,39 @@ export function normalizeGroup(value) {
   return clean(withSemester ? withSemester[1] : raw, 30);
 }
 
+export function studentAliases(value) {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  return value.map(item => clean(item, 120)).filter(alias => {
+    const key = normalizeName(alias);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 25);
+}
+
+/** Se exige unicidad global para que un alias nunca registre a la persona equivocada. */
+export function addStudentAlias(students, studentId, rawAlias) {
+  const alias = clean(rawAlias, 120);
+  const key = normalizeName(alias);
+  const target = students.find(student => student.id === studentId);
+  if (!target) throw new Error("No se encontró el alumno.");
+  if (!key || key === normalizeName(target.name)) return students;
+  if (students.some(student => student.id !== studentId &&
+    (normalizeName(student.name) === key || (student.aliases || []).some(other => normalizeName(other) === key))))
+    throw new Error("Este alias corresponde a otro alumno del padrón.");
+  if ((target.aliases || []).some(other => normalizeName(other) === key)) return students;
+  if ((target.aliases || []).length >= 25) throw new Error("El alumno alcanzó el límite de 25 alias.");
+  return students.map(student => student.id === studentId
+    ? {...student, aliases: studentAliases([...(student.aliases || []), alias])} : student);
+}
+
 export function createStudent(data = {}) {
   const dualStatus = data.dualStatus === "desisted" ? "desisted" : "active";
   return {
     id: typeof data.id === "string" && data.id ? data.id : uid(),
     name: clean(data.name, 180),
+    aliases: studentAliases(data.aliases).filter(alias => normalizeName(alias) !== normalizeName(data.name)),
     specialty: clean(data.specialty, 120),
     company: clean(data.company, 220),
     group: normalizeGroup(data.group || data.semesterGroup),
@@ -276,6 +304,28 @@ export function createStudent(data = {}) {
         ? data.createdAt
         : new Date().toISOString(),
   };
+}
+
+/** Aprendizaje supervisado: conserva pares de campos OCR confirmados, no fotografías. */
+export function learnExternalExample(state, studentId, observed = {}, reviewed = {}) {
+  const student=state.students.find(item=>item.id===studentId);
+  if(!student)throw new Error("Selecciona el alumno antes de aprender una lectura.");
+  const students=observed.name
+    ?addStudentAlias(state.students,studentId,observed.name)
+    :state.students;
+  const example={
+    studentId,method:clean(observed.method,20),
+    observedName:clean(observed.name,120),
+    confirmedName:clean(student.name,120),
+    observedCompany:clean(observed.company,160),
+    confirmedCompany:clean(reviewed.company,160),
+    reviewedAt:new Date().toISOString(),
+  };
+  const previous=Array.isArray(state.ocrLearning?.examples)?state.ocrLearning.examples:[];
+  const signature=value=>[value.studentId,normalizeName(value.observedName),
+    normalizeName(value.observedCompany),normalizeName(value.confirmedCompany)].join("|");
+  const examples=[...previous.filter(value=>signature(value)!==signature(example)),example].slice(-100);
+  return {...state,students,ocrLearning:{examples}};
 }
 
 export function studentIsActive(student) {
@@ -303,6 +353,18 @@ export function reactivateStudent(student) {
     dualStatus: "active",
     desistedAt: "",
   };
+}
+
+/** En Registro Dual las jornadas válidas van de martes a viernes. */
+export function validDualWeekPeriod(startDate,endDate) {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(startDate)||!/^\d{4}-\d{2}-\d{2}$/.test(endDate))return false;
+  const start=new Date(startDate+"T12:00:00Z");
+  const end=new Date(endDate+"T12:00:00Z");
+  if(!Number.isFinite(+start)||!Number.isFinite(+end)||
+    start.toISOString().slice(0,10)!==startDate||end.toISOString().slice(0,10)!==endDate||
+    start.getUTCDay()!==2)return false;
+  start.setUTCDate(start.getUTCDate()+3);
+  return start.toISOString().slice(0,10)===endDate;
 }
 
 export function createWeek(data = {}) {
@@ -458,6 +520,16 @@ export function sanitizeDeliveryState(raw) {
     ),
     students,
     weeks,
+    ocrLearning:{examples:(Array.isArray(raw.ocrLearning?.examples)?raw.ocrLearning.examples:[])
+      .filter(example=>example&&typeof example==="object"&&students.some(s=>s.id===example.studentId))
+      .slice(-100).map(example=>({
+        studentId:clean(example.studentId,100),method:clean(example.method,20),
+        observedName:clean(example.observedName,120),
+        confirmedName:clean(example.confirmedName,120),
+        observedCompany:clean(example.observedCompany,160),
+        confirmedCompany:clean(example.confirmedCompany,160),
+        reviewedAt:clean(example.reviewedAt,40)
+      }))},
     announcements:Array.isArray(raw.announcements) ? raw.announcements.slice(0,200)
       .map(normalizeAnnouncement).filter(Boolean) : [],
     settings: {
@@ -781,6 +853,14 @@ export function findStudentByMatrixValue(students, rawValue) {
     }
     return byName.length === 1 ? byName[0] : null;
   }
+
+  // Alias confirmados en escaneos anteriores; se exige coincidencia única
+  // y metadatos compatibles para matrices modernas.
+  const byAlias = students.filter(student =>
+    (student.aliases || []).some(alias => normalizeName(alias) === nameKey) &&
+    (payload.version < 3 || matrixMetadataMatchesStudent(student, payload)));
+  if (byAlias.length === 1) return byAlias[0];
+  if (byAlias.length > 1) return null;
 
   // Las inversiones deben ser únicas y corroborarse por especialidad y empresa.
   // Los códigos antiguos pasan a sugerencias para confirmación manual.

@@ -1,5 +1,15 @@
 # Notas de versión
 
+## 0.64.0 · Escáner adaptable y aprendizaje OCR · 2026-11-23
+
+- Escáner Data Matrix: al encontrar un periodo sin semana registrada, solicita crearla con nombre y fecha límite opcional, y registra la entrega pendiente sin descartar la lectura.
+- Alias persistentes por alumno: alta y modificación desde el padrón o la confirmación de lecturas ambiguas. Se requiere confirmación y se rechazan alias que identifiquen a otra persona.
+- Normalización de mayúsculas y acentos en nombres y alias para Data Matrix y OCR.
+- Bitácoras externas: creación guiada de semanas a partir de las fechas detectadas y confirmación de una lectura fotográfica, PDF o DOCX.
+- Modo de aprendizaje independiente: acepta fotografías reales como ejemplos, sin crear ni modificar entregas.\n- Aprendizaje supervisado opcional: guarda hasta 100 ejemplos de campos OCR corregidos y asocia variantes de nombre al alumno y reutiliza correcciones únicas de empresa; se incluyen en el respaldo JSON. No se guarda la imagen original ni se reentrena el motor Tesseract.
+- Integración en pantallas móviles y de escritorio; casos automatizados sobre alias, semanas, aprendizaje y restauración.
+
+
 ## 0.63.0 · Lector de bitácoras externas · 2026-11-20
 
 - Lector OCR complementario de Registro Dual sin Data Matrix, accesible desde Escáner y Semana, en escritorio y dispositivos móviles.
