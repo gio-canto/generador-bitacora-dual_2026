@@ -1,0 +1,288 @@
+{
+  "version": 1,
+  "batch": "Lote 01",
+  "date": "2026-11-23",
+  "count": 10,
+  "visibility": "anonymized_text_only",
+  "imagesInPublicRepo": false,
+  "note": "Fragmentos sintéticos anonimizados que preservan la estructura, escritura, periodos y formatos observados. No son transcripciones íntegramente literales ni contienen nombres o firmas. Las fechas manuscritas dudosas NO se usan como datos confirmados.",
+  "samples": [
+    {
+      "id": "L01-01",
+      "photo": "IMG_5145.jpeg",
+      "layout": "horizontal_impreso",
+      "writing": "impreso",
+      "orientation": "horizontal",
+      "weekLabel": "Semana 11",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\nSEMANA 11\n10/11/26\n9a.m.-3p.m.\nActividades: Preparación de materiales.\nÁrea: Sala de cómputo\n11/11/26\n7a.m.-1p.m.\nActividades: Exposición en el centro.\nÁrea: Zócalo\n12/11/26\n7a.m.-1p.m.\nActividades: Demostración de tecnología.\nÁrea: Zócalo\n13/11/26\n7a.m.-1p.m.\nActividades: Presentación al público.\nÁrea: Zócalo",
+      "expectedStart": "2026-11-10",
+      "expectedDates": [
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13"
+      ],
+      "expectedHours": [
+        "6",
+        "6",
+        "6",
+        "6"
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "laboral"
+      ],
+      "confidence": "estructura_verificada"
+    },
+    {
+      "id": "L01-02",
+      "photo": "IMG_5144.jpeg",
+      "layout": "horizontal_impreso",
+      "writing": "impreso",
+      "orientation": "horizontal",
+      "weekLabel": "Semana 12",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\nSEMANA 12\n17/11/26\n9a.m.-3p.m.\nActividades: Revisión de prototipo.\nÁrea: Sala de formación\n18/11/26\n9a.m.-3p.m.\nActividades: Grabación de presentación.\nÁrea: Sala de formación\n19/11/26\n9a.m.-3p.m.\nActividades: Edición de video.\nÁrea: Sala de formación\n20/11/26\nActividades: Sin labores por calendario.\nÁrea: Sin labores",
+      "expectedStart": "2026-11-17",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedHours": [
+        "6",
+        "6",
+        "6",
+        ""
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "sin_labores"
+      ],
+      "confidence": "estructura_verificada"
+    },
+    {
+      "id": "L01-03",
+      "photo": "IMG_5143.jpeg",
+      "layout": "manual_renglones",
+      "writing": "manuscrito",
+      "orientation": "vertical",
+      "weekLabel": "Sin número claro",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\nBITÁCORA SEMANAL\n20/11/26\n9:00-2:00\nActividades: Organización de expedientes.\nÁrea: RH\n21/11/26\n9:00-2:00\nActividades: Registro de incidencias.\n22/11/26\n09-2:00\n23/11/26\n09-2:00",
+      "expectedStart": null,
+      "expectedDates": null,
+      "expectedHours": null,
+      "expectedStatuses": null,
+      "confidence": "fechas_y_horarios_no_confirmados",
+      "notes": "Ejemplo de lectura potencialmente fuera de martes-viernes: verificar fecha manuscrita, no deducir 14:00 de 2:00."
+    },
+    {
+      "id": "L01-04",
+      "photo": "IMG_5142.jpeg",
+      "layout": "manual_renglones",
+      "writing": "manuscrito",
+      "orientation": "vertical",
+      "weekLabel": "Sin número claro",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\nBITÁCORA SEMANAL\n17/11/26\n09:00-14:00\nActividades: Organización de expedientes.\nÁrea: Área de RH\n18/11/26\n09:00-14:00\nActividades: Organización de horas.\nÁrea: Área de RH\n19/11/26\n09:00-14:00\nActividades: Actualización de incidencias.\nÁrea: Área de RH\n20/11/26\n09:00-14:00\nActividades: Clasificación de documentos.\nÁrea: Área de RH",
+      "expectedStart": "2026-11-17",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedHours": [
+        "5",
+        "5",
+        "5",
+        "5"
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "laboral"
+      ],
+      "confidence": "estructura_verificada"
+    },
+    {
+      "id": "L01-05",
+      "photo": "IMG_5140.jpeg",
+      "layout": "horizontal_tabla_color",
+      "writing": "impreso",
+      "orientation": "horizontal",
+      "weekLabel": "Semana 11",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\nSemana 11\nMartes, 10 de Noviembre de 2026\n9:00 AM - 3:00 PM\nActividades: Armado de materiales.\nÁrea: Sala de formación\nMiércoles, 11 de Noviembre de 2026\n8:00 AM - 1:00 PM\nActividades: Exhibición de modelos.\nÁrea: Explanada\nJueves, 12 de Noviembre de 2026\n8:00 AM - 1:00 PM\nActividades: Demostración de prototipos.\nÁrea: Explanada\nViernes, 13 de Noviembre de 2026\n7:45 AM - 1:00 PM\nActividades: Interacción con visitantes.\nÁrea: Explanada",
+      "expectedStart": "2026-11-10",
+      "expectedDates": [
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13"
+      ],
+      "expectedHours": [
+        "6",
+        "5",
+        "5",
+        "5.25"
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "laboral"
+      ],
+      "confidence": "estructura_verificada"
+    },
+    {
+      "id": "L01-06",
+      "photo": "IMG_5139.jpeg",
+      "layout": "vertical_impreso_cuatro_celdas",
+      "writing": "impreso",
+      "orientation": "vertical",
+      "weekLabel": "Semana 12",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n17/11/2026\nEntrada:9:00 am Salida:3:00 pm\nActividades: Planeación de grabación.\nÁrea: Sala de formación\n18/11/2026\nEntrada:9:00 am Salida:3:00 pm\nActividades: Grabación de video.\nÁrea: Sala de formación\n19/11/2026\nEntrada:9:00 am Salida:3:00 pm\nActividades: Revisión de dispositivos.\nÁrea: Sala de formación\n20/11/2026\nActividades: Sin labores por calendario.\nÁrea: Sin labores",
+      "expectedStart": "2026-11-17",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedHours": [
+        "6",
+        "6",
+        "6",
+        ""
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "sin_labores"
+      ],
+      "confidence": "estructura_verificada"
+    },
+    {
+      "id": "L01-07",
+      "photo": "IMG_5138.jpeg",
+      "layout": "vertical_impreso_cuatro_celdas",
+      "writing": "impreso",
+      "orientation": "vertical",
+      "weekLabel": "Semana 11",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n10/11/2026\nEntrada:9:00 am Salida:3:00 pm\nActividades: Preparación de prototipos.\nÁrea: Laboratorio de cómputo\n11/11/2026\nEntrada:7:00 am Salida:1:00 pm\nActividades: Presentación en el centro.\nÁrea: Zócalo\n12/11/2026\nEntrada:7:00 am Salida:1:00 pm\nActividades: Exhibición de prototipos.\nÁrea: Zócalo\n13/11/2026\nEntrada:7:00 am Salida:1:00 pm\nActividades: Revisión de exposiciones.\nÁrea: Zócalo",
+      "expectedStart": "2026-11-10",
+      "expectedDates": [
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13"
+      ],
+      "expectedHours": [
+        "6",
+        "6",
+        "6",
+        "6"
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "laboral"
+      ],
+      "confidence": "estructura_verificada"
+    },
+    {
+      "id": "L01-08",
+      "photo": "IMG_5137.jpeg",
+      "layout": "vertical_impreso_fecha_mes_letras",
+      "writing": "impreso",
+      "orientation": "vertical",
+      "weekLabel": "Septiembre",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n01/septiembre/2026\n09:00-15:00\nActividades: Corte de materiales.\nÁrea: Sala de formación\n02/septiembre/2026\n08:00-13:00\nActividades: Demostración de herramientas.\nÁrea: Explanada\n03/septiembre/2026\n07:45-13:00\nActividades: Preparación de presentación.\nÁrea: Explanada\n04/septiembre/2026\n08:30-13:00\nActividades: Visita de muestra.\nÁrea: Explanada",
+      "expectedStart": "2026-09-01",
+      "expectedDates": [
+        "2026-09-01",
+        "2026-09-02",
+        "2026-09-03",
+        "2026-09-04"
+      ],
+      "expectedHours": [
+        "6",
+        "5",
+        "5.25",
+        "4.5"
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "laboral"
+      ],
+      "confidence": "estructura_verificada",
+      "notes": "En la foto original existen menciones de ausencia en actividades; requieren revisión y no se convierten a faltas por palabra aislada."
+    },
+    {
+      "id": "L01-09",
+      "photo": "IMG_5136.jpeg",
+      "layout": "vertical_impreso_fecha_mes_letras",
+      "writing": "impreso",
+      "orientation": "vertical",
+      "weekLabel": "Semana 12",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n17/noviembre/2026\n09:00-10:00\nActividades: Revisión de prototipo.\nÁrea: Sala de formación\n18/noviembre/2026\n09:00-15:00\nActividades: Impresión de modelo.\nÁrea: Sala de formación\n19/noviembre/2026\n09:00-15:00\nActividades: Evaluación de conexiones.\nÁrea: Sala de formación\n20/noviembre/2026\nActividades: Se suspendieron las labores.",
+      "expectedStart": "2026-11-17",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedHours": [
+        "1",
+        "6",
+        "6",
+        ""
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "sin_labores"
+      ],
+      "confidence": "estructura_verificada"
+    },
+    {
+      "id": "L01-10",
+      "photo": "IMG_5135.jpeg",
+      "layout": "vertical_tabla_color",
+      "writing": "impreso",
+      "orientation": "vertical",
+      "weekLabel": "Semana 12",
+      "text": "NOMBRE DEL ALUMNO: ALUMNO DE PRUEBA\nNOMBRE DE LA EMPRESA: EMPRESA DE EJEMPLO\n17/11/26\n9:00 am A 3:00 pm\nActividades: Investigación de proyecto.\nÁrea: Instalaciones de la empresa\n18/11/26\n9:00 am A 3:00 pm\nActividades: Elaboración de video.\nÁrea: Instalaciones de la empresa\n19/11/26\n9:00 am A 3:00 pm\nActividades: Correcciones del proyecto.\nÁrea: Instalaciones de la empresa\n20/11/26\nActividades: Se suspendieron labores. Sin labores.\nÁrea: No se realizó actividad",
+      "expectedStart": "2026-11-17",
+      "expectedDates": [
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20"
+      ],
+      "expectedHours": [
+        "6",
+        "6",
+        "6",
+        ""
+      ],
+      "expectedStatuses": [
+        "laboral",
+        "laboral",
+        "laboral",
+        "sin_labores"
+      ],
+      "confidence": "estructura_verificada"
+    }
+  ]
+}
