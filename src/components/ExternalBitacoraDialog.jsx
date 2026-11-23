@@ -15,7 +15,7 @@ function duration(start,end){
  const b=Number(end.slice(0,2))*60+Number(end.slice(3));
  return b>a?String((b-a)/60):"";
 }
-export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,onClose,onSave,onCreateWeek,learningExamples=[]}){
+export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,onClose,onSave,onCreateWeek,onLearn,learningExamples=[]}){
  const [items,setItems]=useState([]);
  const [selected,setSelected]=useState(0);
  const [busy,setBusy]=useState(false);
@@ -127,6 +127,21 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      setWeekDraft(null);
      setNotice("Semana creada o recuperada. Revisa las jornadas antes de confirmar.");
    }catch(error){setError(error?.message||"No se pudo crear la semana.");}
+ };
+ const learnWithoutDelivery=()=>{
+   if(!item||item.state!=="ready"||!onLearn)return;
+   const studentId=item.form?.studentId;
+   if(!students.some(student=>student.id===studentId)){
+     setError("Selecciona el alumno correcto para guardar el ejemplo.");return;
+   }
+   setError("");setNotice("");
+   try{
+     const saved=onLearn({studentId,observedName:item.observedName,
+       observedCompany:item.observedCompany,confirmedCompany:item.form.company,method:item.method});
+     if(saved===false)return;
+     updateItem({learned:true});
+     setNotice("Ejemplo incorporado al aprendizaje. No se registró ninguna entrega.");
+   }catch(error){setError(error?.message||"No se pudo guardar el ejemplo.");}
  };
  const submit=()=>{
    setError("");setNotice("");
@@ -329,6 +344,13 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                    onChange={e=>updateItem({learnAlias:e.target.checked})}/>
                  Aprender de esta lectura confirmada (nombre detectado y correcciones)
                </label>
+               {onLearn&&<div className="external-learning-only">
+                 <button className="btn" type="button" onClick={learnWithoutDelivery}
+                   disabled={busy||Boolean(item.learned)}>
+                   {item.learned?"Ejemplo guardado":"Guardar ejemplo sin registrar entrega"}
+                 </button>
+                 <span>Para utilizar fotografías como referencia sin alterar las entregas.</span>
+               </div>
                <div className="external-save">
                  <p>{item.saved?"Este documento ya fue registrado.":!externalDaysToStatistics(item.form.days)
                    ?"La entrega se guardará sin estadísticas si no completas las cuatro jornadas.":"Se guardarán las jornadas confirmadas y sus horas."}</p>
