@@ -1922,6 +1922,19 @@ export default function DeliveryRegistry({ onClose }) {
       throw error;
     }
   };
+  const commitExternalLearning=({studentId,observedName="",observedCompany="",confirmedCompany="",method=""})=>{
+    try{
+      const learned=learnExternalExample(state,studentId,
+        {name:observedName,company:observedCompany,method},
+        {company:confirmedCompany});
+      commit(learned);
+      notify("success","Ejemplo OCR guardado","No se registró ninguna entrega.");
+      return true;
+    }catch(error){
+      showNotice("error","No se pudo guardar el aprendizaje",error?.message||"Revisa el alumno.");
+      throw error;
+    }
+  };
   const createExternalWeek=({startDate,label,dueAt=""})=>{
     if(!validDualWeekPeriod(startDate,createWeek({startDate}).endDate))return "";
     const week=createWeek({startDate,label:label||"Semana "+(state.weeks.length+1),
@@ -3951,6 +3964,7 @@ export default function DeliveryRegistry({ onClose }) {
          onClose={()=>setExternalOpen(false)}
          onSave={commitExternalEntry}
           onCreateWeek={createExternalWeek}
+          onLearn={commitExternalLearning}
           learningExamples={state.ocrLearning?.examples||[]}
        />}
        {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
