@@ -2,8 +2,8 @@ import { validSpecialEvent } from "../services/special-events.js";
 import { DEFAULTS, INHABIL_JUSTIFICATION } from "../data/defaults.js";
 import {isDifferentSigner} from "./signing.js";
 import { LIMBO_COMPANY } from "../services/delivery-registry.js";
-export const VERSION = "0.66.0";
-export const RELEASE = "OCR adaptativo · segundo lote fotográfico";
+export const VERSION = "0.67.0";
+export const RELEASE = "Lectura OCR de tablas por coordenadas";
 export const MAX_DAYS = 4;
 export const uid = () => crypto.randomUUID();
 export function blankRecord() {
