@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.68.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.69.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.69.0 · Reconocimiento automático y ajustes de interfaz
+
+El lector externo selecciona automáticamente la semana registrada por las fechas del documento; si no existen fechas legibles, utiliza un número de semana explícito y único. Reconoce equivalentes de «sin labores» y no acumula horas cuando la jornada está suspendida. En escritorio, la lectura usa Sileo Promise; en móvil conserva la animación actual. Se corrigen desbordamientos y se centran botones del lector y del escáner, incluido «Terminar» y el nuevo cierre de lote «Terminar todo».
+
+El reconocimiento espacial introducido en versiones anteriores y la validación manual de campos ambiguos permanecen disponibles. Consulta [la documentación del lector](docs/LECTOR_BITACORAS_EXTERNAS.md).
 
 ## v0.68.0 · Lector externo más simple y adaptable
 
