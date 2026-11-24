@@ -4,7 +4,7 @@
 
 Si un PDF digital contiene texto suficiente, pero faltan las horas, un nombre identificable o alguna de las cuatro jornadas, se ejecuta otra pasada de OCR sobre la página. El lector compara la transcripción digital, la general y la obtenida de las celdas, combinando información de la misma jornada sin mezclar semanas.
 
-La búsqueda del alumno en el padrón admite pequeñas equivocaciones de reconocimiento del nombre completo, pero no selecciona automáticamente candidatos ambiguos. Las fechas vacías se completan a partir de una semana ya seleccionada; las discrepancias entre la semana y el documento requieren una acción explícita de corrección.
+La búsqueda del alumno en el padrón admite pequeñas equivocaciones de reconocimiento del nombre completo, pero no selecciona automáticamente candidatos ambiguos. Las fechas vacías de jornadas identificadas se completan a partir de una semana ya seleccionada, pero los días ausentes continúan vacíos; las discrepancias entre la semana y el documento requieren una acción explícita de corrección.
 
 Los metadatos de cada jornada guardan también las horas confirmadas, incluso si se captura únicamente la entrega por tener alguna jornada incompleta. Se conservan las horas en respaldo e importación. Al cambiar manualmente el estado a `sin_labores`, `falta` o `inhabil`, se retiran las horas y el intervalo anterior de esa jornada.
 
