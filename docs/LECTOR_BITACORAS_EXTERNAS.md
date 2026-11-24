@@ -1,4 +1,16 @@
-# Lector de bitácoras externas · v0.67.0
+# Lector de bitácoras externas · v0.68.0
+
+## Interfaz de lectura de documentos
+
+Al agregar un archivo se muestra un indicador de proceso con su etapa hasta que termina la lectura. El formulario se presenta antes del documento original en teléfonos y los días se revisan mediante secciones plegables. El panel deja una separación superior adecuada para pantallas móviles con zona segura, y conserva una presentación de dos columnas en computadoras.
+
+La empresa detectada se coteja con las existentes en el padrón sin distinguir mayúsculas ni acentos. También puede seleccionarse otra empresa o escribirse manualmente. La búsqueda de alumnos sigue utilizando nombres y alias.
+
+La fecha admite formatos `DD-MM-AA`, `DD-MM-AAAA`, `AAAA-MM-DD`, fechas con barras o puntos y otros separadores reconocidos. El reloj acepta `7pm`, `7:00PM`, `7 p. m.` y formato de 24 horas. Si falta información para distinguir el meridiano o el año, se conserva la necesidad de revisión. Los estados de jornada se proponen de acuerdo con el texto detectado.
+
+El campo de área ya no forma parte de la captura externa. El lector conserva actividad, fecha, estado y horarios. Se retiraron los controles de aprendizaje del usuario: las mejoras del OCR y los lotes reales los incorpora el mantenedor mediante el código y las pruebas.
+
+
 
 ## Lectura por coordenadas de tablas impresas
 
