@@ -60,9 +60,12 @@ describe("v0.66.0 · lote 02, diez fotografías verificadas por estructura",()=>
    const susp=extractExternalFields("17/11/26\n09:00-15:00\nActividades: Suspensión de labores");
    expect(susp.days[0].status).toBe("sin_labores");
    const meeting=extractExternalFields("17/11/26\n10:00AM-03:00PM\nActividades: No se realizaron actividades por asamblea general");
-   expect(meeting.days[0].status).toBe("");
-   expect(meeting.days[0].needsReview).toBe(true);
-   expect(externalDaysToStatistics([meeting.days[0],...meeting.days.slice(1)])).toBeNull();
+   expect(meeting.days[0].status).toBe("sin_labores");
+   expect(meeting.days[0].hours).toBe("");
+   const local=extractExternalFields("17/11/26\n10:00AM-03:00PM\nActividades: No se realizaron actividades en el laboratorio por asamblea");
+   expect(local.days[0].status).toBe("");
+   expect(local.days[0].needsReview).toBe(true);
+   expect(externalDaysToStatistics([local.days[0],...local.days.slice(1)])).toBeNull();
  });
  it("guarda tramos en respaldo, sin imágenes originales",()=>{
    const entry=extractExternalFields("17/11/26\n09:00-11:00\n11:00-13:00\nActividades: Archivo");
