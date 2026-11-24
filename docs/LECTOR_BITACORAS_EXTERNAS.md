@@ -1,4 +1,12 @@
-# Lector de bitácoras externas · v0.66.0
+# Lector de bitácoras externas · v0.67.0
+
+## Lectura por coordenadas de tablas impresas
+
+Cuando el documento tiene una cuadrícula reconocible, el motor separa fechas, actividades, horarios y áreas por celda antes de interpretar las jornadas. Las horas pequeñas se reconocen en un recorte ampliado, con caracteres propios de un reloj de 12 o 24 horas. Si el archivo PDF contiene varias páginas, cada una aparece por separado para seleccionar su semana.
+
+La nueva implementación y el caso del documento de dos semanas están descritos en [OCR de tablas por coordenadas](OCR_TABLAS_COORDENADAS.md). Los originales privados no se agregan al repositorio.
+
+
 
 ## Mejoras del segundo lote fotográfico
 

@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.67.0 · OCR por coordenadas de columnas y jornadas · 2026-11-23
+
+- Nuevo detector espacial de tablas impresas: localiza cinco bordes verticales, las cuatro jornadas y la inclinación ligera del papel.
+- Se asignan palabras a cada celda utilizando cajas de OCR, en lugar de interpretar como una sola línea la transcripción de toda la página.
+- Refuerzo selectivo de horarios y fechas: recorte y ampliación de la celda con reconocimiento restringido a números, separadores y AM/PM.
+- Las lecturas admiten tanto relojes de 12 horas como de 24 horas; no se infieren meridianos no explícitos.
+- Los PDF escaneados de varias páginas se dividen por página en el lector externo, para registrar por separado semanas diferentes.
+- Se mantienen los datos y el flujo anterior si la tabla no tiene coordenadas suficientes o la nueva lectura no mejora los campos validados.
+- Se agregan pruebas de geometría inclinada, cuatro jornadas, horas de 12/24 h, lectura por columna y múltiples páginas PDF.
+- Referencia técnica y caso del PDF recibido: `docs/OCR_TABLAS_COORDENADAS.md`. El original privado no se sube al repositorio.
+
+
 ## 0.66.0 · Segundo lote fotográfico OCR · 2026-11-23
 
 - Se analizaron diez fotografías reales nuevas (6 manuscritas y 4 impresas), elevando a veinte las referencias de los dos primeros lotes. Los originales permanecen fuera del repositorio.

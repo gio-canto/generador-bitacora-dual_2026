@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.66.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.67.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.67.0 · Lectura de tablas escaneadas por coordenadas
+
+El OCR ahora puede reconocer **columnas, celdas y filas de bitácoras impresas**, reforzar los horarios difíciles con una lectura ampliada de su propia celda y conservar formatos de 12 y 24 horas. Un PDF con páginas correspondientes a semanas diferentes se divide en registros independientes. Si no hay geometría confiable, conserva el lector anterior y solicita revisar los datos.
+
+Caso de prueba: dos páginas con las semanas 11 y 12, cuatro fechas por hoja y horarios `9a.m.-3p.m.` y `7a.m.-1p.m.`. Documentación en [OCR por coordenadas](docs/OCR_TABLAS_COORDENADAS.md).
 
 ## v0.66.0 · Segundo lote de entrenamiento fotográfico
 
