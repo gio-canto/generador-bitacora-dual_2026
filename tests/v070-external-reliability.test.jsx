@@ -62,10 +62,10 @@ describe("v0.70 · campos OCR y copias de seguridad",()=>{
    expect(suggestExternalStudent({name:"",text:"Alumno Luis Arturo Pérez Morales"},roster)).toBe("C");
  });
  it("rellena fechas vacías sin reemplazar las del documento",()=>{
-   const days=extractExternalFields("Martes
+   const days=extractExternalFields(`Martes
 9am-3pm
 Miércoles
-No hubo labores").days;
+No hubo labores`).days;
    const fixed=alignExternalDaysToWeek(days,week);
    expect(fixed.map(d=>d.date)).toEqual(["2026-11-17","2026-11-18","2026-11-19","2026-11-20"]);
    expect(fixed[0].hours).toBe("6");
