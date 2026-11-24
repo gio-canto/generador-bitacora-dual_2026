@@ -59,12 +59,16 @@ export async function spatialExternalTableText(worker,canvas,recognized,{onProgr
    const activity=textFromTableCell(blocks,grid,1,row);
    const area=textFromTableCell(blocks,grid,3,row);
    if(!parsedDate(date)){
-     const corrected=await readCell(worker,canvas,tableCellRect(grid,0,row),"date");
-     if(parsedDate(corrected))date=corrected;
+     try{
+       const corrected=await readCell(worker,canvas,tableCellRect(grid,0,row),"date");
+       if(parsedDate(corrected))date=corrected;
+     }catch(error){if(signal?.aborted)throw error;}
    }
    if(!validTimeCell(time)){
-     const corrected=await readCell(worker,canvas,tableCellRect(grid,2,row),"hours");
-     if(validTimeCell(corrected)||timesFromExternal(corrected).start)time=corrected;
+     try{
+       const corrected=await readCell(worker,canvas,tableCellRect(grid,2,row),"hours");
+       if(validTimeCell(corrected)||timesFromExternal(corrected).start)time=corrected;
+     }catch(error){if(signal?.aborted)throw error;}
    }
    rows.push({date:parsedDate(date),time,activity,area});
  }
