@@ -1,5 +1,18 @@
 # Notas de versión
 
+## 0.70.0 · Recuperación del lector externo · 2026-11-23
+
+- Se detectaron fallas en PDF digitales que se aceptaban por cantidad de caracteres aunque faltaran jornadas u horarios. Ahora se solicita una lectura OCR adicional cuando están incompletos.
+- Se combinan los datos recuperables del texto digital, OCR general y lectura espacial, por página, sin cruzar semanas de documentos distintos.
+- Si falla el OCR adicional y existe texto digital, se conserva la lectura y aparece un aviso para confirmar horarios y fechas.
+- La coincidencia de alumnos admite diferencias OCR pequeñas solo cuando existe una coincidencia única suficientemente separada de los otros nombres del padrón.
+- Se corrige una pérdida de información: las horas confirmadas permanecen en los metadatos y respaldos, incluso si la semana no tiene todas las jornadas para construir estadísticas.
+- La semana seleccionada completa únicamente fechas vacías. Si las fechas del documento contradicen el periodo, se muestra un botón de ajuste explícito.
+- Cambiar el estado manualmente a falta, inhábil o sin labores elimina los horarios antiguos para evitar que aparezcan horas en una jornada suspendida.
+- Se mejora la selección por lote y se desplaza el lector al inicio al cambiar de documento.
+- Pruebas nuevas para lectura incompleta, fusión por página, respaldo de horas, alumnos con OCR imperfecto, selección de semana y recuperación tras errores del motor.
+
+
 ## 0.69.0 · Semanas y estados automáticos · 2026-11-23
 
 - Se asigna automáticamente la semana de Registro Dual a partir de las fechas del documento y el periodo martes-viernes. Si no hay fechas legibles, se admite un número de semana explícito únicamente cuando existe una coincidencia única. Si hay contradicciones, se solicita revisión.
