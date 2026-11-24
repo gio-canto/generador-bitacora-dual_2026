@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState} from "react";
-import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,applyExternalLearning,externalCompanyOptions,suggestExternalCompany,
+import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,applyExternalLearning,externalCompanyOptions,suggestExternalCompany,externalKey,
   externalDaysToStatistics,externalReviewMetadata} from "../services/external-bitacora.js";
 import {readExternalBitacora,createExternalWorker,externalFileKind} from "../services/external-ocr.js";
 import {buildManualStatistics,reasonsForStatus,MANUAL_DAYS} from "../services/manual-statistics.js";
@@ -257,8 +257,8 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                  </label>
                  <label>Empresa
                    <select aria-label="Empresa de la bitácora"
-                     value={companyOptions.some(company=>company.toLowerCase()===String(item.form.company||"").toLowerCase())
-                       ?companyOptions.find(company=>company.toLowerCase()===String(item.form.company||"").toLowerCase())
+                     value={companyOptions.some(company=>externalKey(company)===externalKey(item.form.company||""))
+                       ?companyOptions.find(company=>externalKey(company)===externalKey(item.form.company||""))
                        :item.form.company?"__manual":""}
                      onChange={e=>updateForm({company:e.target.value==="__manual"?"":e.target.value})}>
                      <option value="">Seleccionar empresa…</option>
@@ -266,7 +266,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                      <option value="__manual">Otra empresa</option>
                    </select>
                  </label>
-                 {(!item.form.company||!companyOptions.some(company=>company.toLowerCase()===String(item.form.company).toLowerCase()))&&
+                 {(!item.form.company||!companyOptions.some(company=>externalKey(company)===externalKey(item.form.company)))&&
                    <label>Escribir empresa
                      <input aria-label="Escribir empresa" value={item.form.company||""}
                        placeholder="Nombre de la empresa" maxLength={160}
