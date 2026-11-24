@@ -1,5 +1,5 @@
 import {afterEach,describe,expect,it,vi} from "vitest";
-import {readExternalBitacora} from "../src/services/external-ocr.js";
+import {readExternalBitacora,textLinesFromPdf} from "../src/services/external-ocr.js";
 import {extractExternalFields} from "../src/services/external-bitacora.js";
 
 const digital=[
@@ -41,6 +41,26 @@ function documentAndCanvas(){
    arrayBuffer:async()=>new ArrayBuffer(16)};
  return {render,pdf,pdfjs};
 }
+describe("v0.70 · reconstrucción de texto fragmentado de PDF.js",()=>{
+ it("mantiene nombre y empresa en el mismo renglón aunque el fin de línea esté en el segundo fragmento",()=>{
+   const items=[
+     {str:"Nombre del alumno: ",transform:[1,0,0,1,20,500],hasEOL:false},
+     {str:"Persona de prueba",transform:[1,0,0,1,155,500],hasEOL:true},
+     {str:"Empresa: ",transform:[1,0,0,1,20,480],hasEOL:false},
+     {str:"Institución de ejemplo",transform:[1,0,0,1,95,480],hasEOL:true},
+     {str:"Martes 17/11/2026",transform:[1,0,0,1,20,450],hasEOL:true},
+   ];
+   const restored=textLinesFromPdf(items);
+   expect(restored.split("\n")).toEqual([
+     "Nombre del alumno: Persona de prueba",
+     "Empresa: Institución de ejemplo",
+     "Martes 17/11/2026",
+   ]);
+   expect(extractExternalFields(restored)).toMatchObject({
+     name:"Persona de prueba",company:"Institución de ejemplo",
+   });
+ });
+});
 describe("v0.70 · segunda lectura de PDF con texto incompleto",()=>{
  it("recupera horarios con OCR aunque el PDF ya contenga muchas palabras",async()=>{
    const {pdf,pdfjs,render}=documentAndCanvas();
