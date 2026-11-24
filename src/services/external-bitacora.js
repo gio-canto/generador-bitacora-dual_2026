@@ -95,7 +95,7 @@ function dateAtLineStart(line,contextYear=null){
  return partial?dateFromExternal(partial[0],contextYear):"";
 }
 function lineField(lines,label){
- const reg=new RegExp("^(?:"+label+")\\s*[:\\-–]\\s*(.+)$","i");
+ const reg=new RegExp("^(?:"+label+")(?:\\s*[:\\-–]\\s*|\\s+)(.+)$","i");
  return lines.map(x=>String(x).match(reg)?.[1]?.trim()).find(Boolean)||"";
 }
 function getName(lines){
