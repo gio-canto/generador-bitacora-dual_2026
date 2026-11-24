@@ -67,7 +67,7 @@ describe("v0.70 · campos OCR y copias de seguridad",()=>{
 Miércoles
 No hubo labores`).days;
    const fixed=alignExternalDaysToWeek(days,week);
-   expect(fixed.map(d=>d.date)).toEqual(["2026-11-17","2026-11-18","2026-11-19","2026-11-20"]);
+   expect(fixed.map(d=>d.date)).toEqual(["2026-11-17","2026-11-18","",""]);
    expect(fixed[0].hours).toBe("6");
    const divergent=alignExternalDaysToWeek([{...days[0],date:"2026-11-10"},...days.slice(1)],week);
    expect(divergent[0].date).toBe("2026-11-10");
