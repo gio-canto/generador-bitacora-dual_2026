@@ -21,7 +21,7 @@ export function externalTranscriptQuality(text){
 }
 export function externalTextNeedsOcr(text){
  const parsed=extractExternalFields(text);
- if(parsed.recognized<3||!parsed.name)return true;
+ if(parsed.recognized<4||!parsed.name)return true;
  return parsed.days.some(day=>day.detected&&
    !nonWork.has(day.status)&&(!day.hours||day.needsReview));
 }
