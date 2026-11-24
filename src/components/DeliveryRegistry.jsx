@@ -56,7 +56,6 @@ import {
   registerDelivery,
   saveManualDelivery,
   saveExternalDelivery,
-  learnExternalExample,
   removeDelivery,
   setDeliveryStatus,
   statusFromTimestamp,
@@ -1919,19 +1918,6 @@ export default function DeliveryRegistry({ onClose }) {
       return true;
     }catch(error){
       showNotice("error","No se pudo registrar la lectura",error?.message||"Revisa la información.");
-      throw error;
-    }
-  };
-  const commitExternalLearning=({studentId,observedName="",observedCompany="",confirmedCompany="",method=""})=>{
-    try{
-      const learned=learnExternalExample(state,studentId,
-        {name:observedName,company:observedCompany,method},
-        {company:confirmedCompany});
-      commit(learned);
-      notify("success","Ejemplo OCR guardado","No se registró ninguna entrega.");
-      return true;
-    }catch(error){
-      showNotice("error","No se pudo guardar el aprendizaje",error?.message||"Revisa el alumno.");
       throw error;
     }
   };
@@ -3964,7 +3950,6 @@ export default function DeliveryRegistry({ onClose }) {
          onClose={()=>setExternalOpen(false)}
          onSave={commitExternalEntry}
           onCreateWeek={createExternalWeek}
-          onLearn={commitExternalLearning}
           learningExamples={state.ocrLearning?.examples||[]}
        />}
        {manualTarget && activeWeek && state.students.some(student=>student.id===manualTarget.studentId) && (
