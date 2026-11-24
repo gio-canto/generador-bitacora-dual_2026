@@ -21,13 +21,13 @@ const recognized=[
 ].join("\n");
 
 beforeEach(()=>{
-  vi.stubGlobal("URL",Object.assign(URL,{createObjectURL:vi.fn(()=>"blob:photo"),revokeObjectURL:vi.fn()}));
-  readExternalBitacora.mockResolvedValue({text:recognized,method:"ocr",pages:1,truncated:false});
+ vi.stubGlobal("URL",Object.assign(URL,{createObjectURL:vi.fn(()=>"blob:photo"),revokeObjectURL:vi.fn()}));
+ readExternalBitacora.mockResolvedValue({text:recognized,method:"ocr",pages:1,truncated:false});
 });
 afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.clearAllMocks();});
 
-describe("v0.64.0 · lector externo y aprendizaje supervisado",()=>{
- it("propone nueva semana para fotografía, permite aprender corrección y registra",async()=>{
+describe("v0.68 · lector sin controles públicos de entrenamiento",()=>{
+ it("ofrece crear la semana y registra sin activar aprendizaje",async()=>{
    const onSave=vi.fn(()=>true),onCreateWeek=vi.fn(()=>week.id),onClose=vi.fn();
    const props={students:[student],weeks:[],school:"CBTis No. 134",loadPdfJs:vi.fn(),
      onSave,onCreateWeek,onClose};
@@ -43,33 +43,23 @@ describe("v0.64.0 · lector externo y aprendizaje supervisado",()=>{
    expect(onCreateWeek).toHaveBeenCalledWith(expect.objectContaining({startDate:"2026-11-17"}));
    view.rerender(<ExternalBitacoraDialog {...props} weeks={[week]}/>);
    fireEvent.change(screen.getByLabelText("Alumno del padrón *"),{target:{value:student.id}});
-   fireEvent.click(screen.getByLabelText(/Aprender de esta lectura confirmada/));
+   expect(screen.queryByLabelText(/Aprender de esta lectura confirmada/)).toBeNull();
    fireEvent.click(screen.getByRole("button",{name:"Confirmar y registrar"}));
    await waitFor(()=>expect(onSave).toHaveBeenCalledTimes(1));
-   expect(onSave.mock.calls[0][0]).toMatchObject({
-     studentId:student.id,weekId:week.id,learnAlias:true,
-     observedName:"Maria Lpez Grcia",observedCompany:"Arch1vo",
-   });
+   expect(onSave.mock.calls[0][0]).toMatchObject({studentId:student.id,weekId:week.id});
+   expect(onSave.mock.calls[0][0]).not.toHaveProperty("learnAlias");
  });
-
- it("aprende de una fotografía sin crear una entrega",async()=>{
-   const onLearn=vi.fn(()=>true),onSave=vi.fn(),onCreateWeek=vi.fn(),onClose=vi.fn();
+ it("no permite entrenar con fotografías desde la interfaz pública",async()=>{
+   const onLearn=vi.fn(),onSave=vi.fn(),onCreateWeek=vi.fn(),onClose=vi.fn();
    render(<ExternalBitacoraDialog students={[student]} weeks={[]} school="CBTis No. 134"
-      loadPdfJs={vi.fn()} onSave={onSave} onLearn={onLearn}
-      onCreateWeek={onCreateWeek} onClose={onClose}/>);
+     loadPdfJs={vi.fn()} onSave={onSave} onLearn={onLearn}
+     onCreateWeek={onCreateWeek} onClose={onClose}/>);
    fireEvent.change(screen.getByLabelText("Cargar PDF, Word o fotografías"),{
      target:{files:[new File(["imagen"],"evidencia-historica.jpg",{type:"image/jpeg"})]}
    });
    expect(await screen.findByText("Datos por confirmar")).toBeTruthy();
-   fireEvent.change(screen.getByLabelText("Alumno del padrón *"),{target:{value:student.id}});
-   fireEvent.click(screen.getByRole("button",{name:"Guardar ejemplo sin registrar entrega"}));
-   await waitFor(()=>expect(onLearn).toHaveBeenCalledTimes(1));
-   expect(onLearn.mock.calls[0][0]).toMatchObject({
-     studentId:student.id,observedName:"Maria Lpez Grcia",
-     observedCompany:"Arch1vo",method:"ocr"
-   });
-   expect(onSave).not.toHaveBeenCalled();
-   expect(onCreateWeek).not.toHaveBeenCalled();
-   expect(screen.getByText(/No se registró ninguna entrega/)).toBeTruthy();
+   expect(screen.queryByRole("button",{name:"Guardar ejemplo sin registrar entrega"})).toBeNull();
+   expect(screen.queryByText(/Aprender de esta lectura/)).toBeNull();
+   expect(onLearn).not.toHaveBeenCalled();
  });
 });
