@@ -163,10 +163,11 @@ export function extractExternalFields(raw){
    const date=seg.date||dates[0]||"";
    const times=timesFromExternal(all);
    const area=lineField(seg.lines,"(?:[aá]rea|departamento|secci[oó]n)");
-   const reason=/\b(?:no asist[ií]|no me present[eé]|inasistencia|falta justificada|falta injustificada)\b/i.test(all)?"falta":
-     /\b(?:d[ií]a inh[aá]bil|d[ií]a festivo|descanso oficial|asueto)\b/i.test(all)?"inhabil":
-     /\b(?:sin labores|no hubo labores|sin actividades laborales|se suspendieron (?:las )?(?:labores|actividades)|suspensi[oó]n de (?:las )?(?:labores|actividades)|actividades suspendidas)\b/i.test(all)?"sin_labores":"";
-   const activityUncertain=reason===""&&/\b(?:no se realizaron actividades|sin actividades asignadas|no hubo actividades|no se trabaj[oó])\b/i.test(all);
+   const normalized=externalKey(all);
+   const reason=/\b(?:no asisti|no me presente|inasistencia|falta justificada|falta injustificada)\b/.test(normalized)?"falta":
+     /\b(?:dia inhabil|dia festivo|descanso oficial|asueto)\b/.test(normalized)?"inhabil":
+     /\b(?:sin labores|no hubo labores|sin actividades laborales|se suspendieron (?:las )?(?:labores|actividades)|suspension de (?:las )?(?:labores|actividades)|actividades suspendidas)\b/.test(normalized)?"sin_labores":"";
+   const activityUncertain=reason===""&&/\b(?:no se realizaron actividades|sin actividades asignadas|no hubo actividades|no se trabajo)\b/.test(normalized);
 
    const activity=activityFromChunk(seg.lines);
    days[seg.index]={...days[seg.index],date,start:times.start,end:times.end,hours:times.hours,area,activity,
