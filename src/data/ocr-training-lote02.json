@@ -116,18 +116,18 @@
       ],
       "expectedHours": [
         "5",
-        "5",
+        "",
         "5",
         "5"
       ],
       "expectedStatus": [
         "laboral",
-        "",
+        "sin_labores",
         "laboral",
         "laboral"
       ],
       "expectedPeriod": "2026-11-17",
-      "note": "Día sin actividades en el laboratorio con horario declarado se deja sin clasificar para revisión."
+      "note": "La frase expresa que no se realizaron actividades durante la jornada por asamblea. Se clasifica como sin labores sin sumar horas, aunque la plantilla indique un horario."
     },
     {
       "id": "L02-07",

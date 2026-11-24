@@ -34,6 +34,17 @@ export async function notify(kind, title, description = "") {
     notify.timer = setTimeout(() => el.remove(), 6000);
   }
 }
+/** Muestra Sileo Promise en escritorio sin cambiar la promesa de OCR. */
+export async function trackExternalPromise(promise){
+ if(typeof navigator!=="undefined"&&/jsdom/i.test(String(navigator.userAgent||"")))return promise;
+ try{
+   loaded??=import("./sileo-host.jsx");
+   const {showPromiseNotice}=await loaded;
+   return showPromiseNotice(promise);
+ }catch{
+   return promise;
+ }
+}
 export const notifyImported = () =>
   notify(
     "success",

@@ -171,3 +171,54 @@
 @media(prefers-reduced-motion:reduce){
  .external-spinner,.external-loading-track i{animation:none}
 }
+
+/* v0.69 · evitar que el visor supere el ancho o alto visible. */
+.external-overlay{box-sizing:border-box;width:100%;max-width:100vw;height:100dvh;overflow:hidden}
+.external-panel{box-sizing:border-box;min-width:0;max-width:100%;overflow-x:hidden}
+.external-panel *{min-width:0}
+.external-review,.external-fields,.external-day-fields,.external-week-fields{min-width:0;max-width:100%}
+.external-original,.external-data,.external-original-preview{box-sizing:border-box;max-width:100%;overflow-wrap:anywhere}
+.external-original-preview img{max-width:100%;height:auto}
+.external-queue,.external-day,.external-week-create,.external-save,.external-upload{box-sizing:border-box;max-width:100%}
+.external-queue-item:first-child:last-child{margin-inline:auto}
+.external-upload,.external-save{justify-content:center;text-align:center}
+.external-upload-btn,.external-save .btn,.external-week-fields .btn,
+.external-transcript .btn,.external-close,.external-complete .btn{
+ display:inline-flex!important;justify-content:center;align-items:center;text-align:center;
+ box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere
+}
+.external-week-fields input,.external-fields input,.external-fields select,
+.external-day-fields input,.external-day-fields select,.external-day-fields textarea,
+.external-transcript textarea{width:100%;max-width:100%;box-sizing:border-box}
+.external-week-fields>button{justify-self:center;width:100%;max-width:300px}
+.external-week-create>button{display:flex;margin-inline:auto}
+.external-transcript button{display:flex;margin:10px auto 0}
+.external-complete{display:flex;justify-content:center;align-items:center;gap:10px;padding:12px 16px 20px}
+.external-complete .btn{width:min(280px,100%);min-height:46px}
+.external-save .btn{flex:0 1 200px}
+.delivery-sileo-host{position:relative;z-index:100030}
+@media(max-width:900px){
+ .external-overlay{padding-top:calc(env(safe-area-inset-top,0px) + 40px);
+   padding-right:12px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px);padding-left:12px}
+ .external-panel{height:100%;max-height:100%;min-height:0;overflow-y:auto;overflow-x:hidden}
+ .external-review{min-width:0;width:100%;max-width:100%;padding-inline:12px}
+ .external-data,.external-original{width:100%;max-width:100%}
+ .external-upload-tip{flex-basis:100%;text-align:center}
+ .external-save .btn{flex:1 1 100%;max-width:100%}
+}
+@media(max-width:480px){
+ .external-overlay{padding-top:calc(env(safe-area-inset-top,0px) + 50px);
+   padding-right:8px;padding-left:8px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
+ .external-review{padding:9px 8px 16px}
+ .external-original,.external-data{padding:10px}
+ .external-upload{padding-inline:9px}
+ .external-upload-btn{flex:1 1 calc(50% - 8px);font-size:.79rem;line-height:1.25}
+ .external-week-fields,.external-fields,.external-day-fields{grid-template-columns:minmax(0,1fr)}
+ .external-week-fields label{min-width:0}
+ .external-save .btn{flex:1 1 100%;width:100%}
+ .external-complete{padding:10px 12px 18px}
+}
+@media(max-width:350px){
+ .external-upload-btn{flex-basis:100%}
+ .external-header{flex-wrap:wrap;justify-content:center;text-align:center}
+}

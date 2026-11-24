@@ -115,6 +115,21 @@ function activityFromChunk(lines){
     .map(line=>line.replace(DATE_GLOBAL,"").replace(/\b\d{1,2}[:.]\d{2}(?:\s*[ap]\.?m\.?)?/gi,""))
     .join(" ")).slice(0,900);
 }
+/** Estados normalizados de escritos impresos o manuscritos (sin distinguir acentos). */
+export function inferExternalStatus(text,times={hours:""},activity=""){
+ const key=externalKey(text),work=externalKey(activity);
+ if(/\b(?:no asisti|no me presente|inasistencia|falta(?:\s+(?:justificada|injustificada))?)\b/.test(key)&&
+   !/\bfalta de (?:material|equipo|tiempo|herramientas|personal)\b/.test(key))return "falta";
+ if(/\b(?:dia inhabil|dia festivo|descanso oficial|asueto|feriado)\b/.test(key))return "inhabil";
+ const closed=/\b(?:sin labores|no hubo labores|no hay labores|sin actividad laboral|sin actividades laborales|suspension (?:de|por) (?:las )?(?:labores|actividades)|labores suspendidas|actividades suspendidas|se suspendieron (?:las )?(?:labores|actividades)|se cancelaron (?:las )?(?:labores|actividades)|no se laboro|no laboramos|no hubo jornada|no se trabajo|no trabajamos|no tuvimos labores|sin trabajo por calendario)\b/.test(key);
+ if(closed)return "sin_labores";
+ const nothing=/\b(?:no se realizaron actividades|no se realizo ninguna actividad|no se llevaron a cabo actividades|no se llevo a cabo actividad alguna|no hubo actividades|sin actividades asignadas|no se realizaron labores|no se realizo actividad alguna)\b/.test(key);
+ // "En el laboratorio no se realizaron actividades" puede referirse solo al área.
+ const local=/\b(?:en el laboratorio|en la sala|en el area|en el departamento|en el salon)\b/.test(key);
+ if(nothing)return local&&times?.hours?"":"sin_labores";
+ if(times?.hours||/\b(?:actividades realizadas|realizamos|trabajamos|elaboracion|captura|registro|archivo|organizacion|revision|participamos|desarrollamos|asistimos|preparamos|realice|realizo)\b/.test(work))return "laboral";
+ return "";
+}
 function emptyDay(){return {status:"",hours:"",timeBlocks:[],needsReview:false,reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"con",eventResult:"",date:"",start:"",end:"",area:"",activity:"",detected:false};}
 export function extractExternalFields(raw){
  const text=String(raw||"").replace(/\r/g,"").slice(0,EXTERNAL_TEXT_LIMIT);
@@ -163,16 +178,15 @@ export function extractExternalFields(raw){
    const date=seg.date||dates[0]||"";
    const times=timesFromExternal(all);
    const area=lineField(seg.lines,"(?:[aá]rea|departamento|secci[oó]n)");
-   const normalized=externalKey(all);
-   const reason=/\b(?:no asisti|no me presente|inasistencia|falta justificada|falta injustificada)\b/.test(normalized)?"falta":
-     /\b(?:dia inhabil|dia festivo|descanso oficial|asueto)\b/.test(normalized)?"inhabil":
-     /\b(?:sin labores|no hubo labores|sin actividades laborales|se suspendieron (?:las )?(?:labores|actividades)|suspension de (?:las )?(?:labores|actividades)|actividades suspendidas)\b/.test(normalized)?"sin_labores":"";
-   const activityUncertain=reason===""&&/\b(?:no se realizaron actividades|sin actividades asignadas|no hubo actividades|no se trabajo)\b/.test(normalized);
-
    const activity=activityFromChunk(seg.lines);
-   days[seg.index]={...days[seg.index],date,start:times.start,end:times.end,hours:times.hours,area,activity,
-     timeBlocks:times.blocks,needsReview:Boolean(times.ambiguous||activityUncertain),
-     status:activityUncertain?"":reason||(times.hours||(/\b(?:actividad|trabajo|revisi[oó]n|registro|archivo|organizaci[oó]n)\b/i.test(activity))?"laboral":""),detected:true};
+   const status=inferExternalStatus(all,times,activity);
+   const uncertainStatus=status===""&&/\b(?:no se realizaron actividades|no hubo actividades|sin actividades asignadas)\b/.test(externalKey(all));
+   const nonWorking=["falta","sin_labores","inhabil"].includes(status);
+   days[seg.index]={...days[seg.index],date,
+     start:nonWorking?"":times.start,end:nonWorking?"":times.end,
+     hours:nonWorking?"":times.hours,area,activity,
+     timeBlocks:times.blocks,needsReview:Boolean(uncertainStatus||(!nonWorking&&times.ambiguous)),
+     status,detected:true};
  }
  const recognized=days.filter(day=>day.detected).length;
  const warnings=[];
@@ -232,10 +246,23 @@ export function suggestExternalStudent(extracted,students){
  });
  return matches.length===1?matches[0].id:"";
 }
-export function suggestExternalWeek(extracted,weeks){
- const dates=[...new Set(extracted?.dates||[])];
- if(!dates.length)return "";
- const matched=weeks.filter(week=>dates.every(date=>date>=week.startDate&&date<=week.endDate));
+export function suggestExternalWeek(extracted,weeks=[]){
+ const dates=[...new Set(extracted?.dates||[])].filter(Boolean);
+ if(dates.length){
+   const period=suggestExternalWeekPeriod(extracted);
+   if(!period)return ""; // Nunca sustituir fechas contradictorias por el número de semana.
+   const matched=weeks.filter(week=>week.startDate===period.startDate&&
+     dates.every(date=>date>=week.startDate&&date<=week.endDate));
+   return matched.length===1?matched[0].id:"";
+ }
+ // Con documentos sin fechas legibles, un número de semana explícito y único sí sirve.
+ const hint=externalKey(extracted?.text||"").match(/\bsemana\s*(?:numero|num|no|n)?\s*(\d{1,3})\b/);
+ if(!hint)return "";
+ const matched=weeks.filter(week=>{
+   const label=externalKey(week.label||"");
+   const number=label.match(/\bsemana\s*(?:numero|num|no|n)?\s*(\d{1,3})\b/);
+   return number&&Number(number[1])===Number(hint[1]);
+ });
  return matched.length===1?matched[0].id:"";
 }
 export function externalDaysToStatistics(days){
