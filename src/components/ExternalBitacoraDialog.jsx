@@ -40,7 +40,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      mounted.current=false;
      document.body.style.overflow=former;
      document.removeEventListener("keydown",key);
-     urls.current.forEach(url=>URL.revokeObjectURL(url));
+     [...new Set(urls.current)].forEach(url=>URL.revokeObjectURL(url));
      urls.current=[];
      workerRef.current?.terminate?.().catch(()=>{});
    };
@@ -71,20 +71,28 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          const result=await readExternalBitacora(file,{
            loadPdfJs,getWorker,
            onProgress:({stage,page,pages})=>mounted.current&&setProgress(
-             (stage==="ocr"?"Reconociendo texto":"Leyendo PDF")+
+             (["ocr","table"].includes(stage)?"Reconociendo texto":"Leyendo PDF")+
              " · "+file.name+(page?" · página "+page+" de "+pages:""))
          });
-         const extracted=extractExternalFields(result.text);
-         const studentId=suggestExternalStudent(extracted,students);
-         const learned=applyExternalLearning(extracted,learningExamples,studentId);
-         const weekId=suggestExternalWeek(extracted,weeks);
-         const proposedWeek=suggestExternalWeekPeriod(extracted);
-         const current={key:(globalThis.crypto?.randomUUID?.()||"external-"+Date.now()+"-"+added),filename:file.name,kind,url,
-           pages:result.pages,method:result.method,truncated:result.truncated,
-           text:result.text,proposedWeek,observedName:extracted.name,observedCompany:extracted.company,learnAlias:false,form:{name:extracted.name,company:learned.company,
-             studentId,weekId,days:extracted.days},warnings:extracted.warnings,
-           state:"ready"};
-         if(mounted.current){setItems(prev=>[...prev,current]);setSelected(items.length+added);added++;}
+         const docs=result.documents?.length?result.documents:[{page:1,text:result.text,method:result.method}];
+         for(const doc of docs){
+           if(items.length+added>=EXTERNAL_MAX_FILES){
+             setNotice("Se alcanzó el máximo de "+EXTERNAL_MAX_FILES+" páginas o documentos por lote.");
+             break;
+           }
+           const extracted=extractExternalFields(doc.text);
+           const studentId=suggestExternalStudent(extracted,students);
+           const learned=applyExternalLearning(extracted,learningExamples,studentId);
+           const weekId=suggestExternalWeek(extracted,weeks);
+           const proposedWeek=suggestExternalWeekPeriod(extracted);
+           const current={key:(globalThis.crypto?.randomUUID?.()||"external-"+Date.now()+"-"+added),
+             filename:result.pages>1?file.name+" · página "+doc.page:file.name,kind,url,
+             pageNumber:doc.page,pages:1,method:doc.method||result.method,truncated:result.truncated,
+             text:doc.text,proposedWeek,observedName:extracted.name,observedCompany:extracted.company,
+             learnAlias:false,form:{name:extracted.name,company:learned.company,
+               studentId,weekId,days:extracted.days},warnings:extracted.warnings,state:"ready"};
+           if(mounted.current){setItems(prev=>[...prev,current]);setSelected(items.length+added);added++;}
+         }
        }catch(e){
          if(mounted.current){
            setItems(prev=>[...prev,{key:(globalThis.crypto?.randomUUID?.()||"external-error-"+Date.now()+"-"+added),filename:file.name,kind,url,
@@ -178,7 +186,10 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  };
  const remove=()=>{
    if(!item)return;
-   URL.revokeObjectURL(item.url);urls.current=urls.current.filter(url=>url!==item.url);
+   if(!items.some((other,i)=>i!==selected&&other.url===item.url)){
+     URL.revokeObjectURL(item.url);
+     urls.current=urls.current.filter(url=>url!==item.url);
+   }
    setItems(current=>current.filter((_,i)=>i!==selected));
    setSelected(i=>Math.max(0,i-(i>0?1:0)));
    setError("");setNotice("");
