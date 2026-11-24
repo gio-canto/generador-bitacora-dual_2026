@@ -1,5 +1,18 @@
 # Notas de versión
 
+## 0.69.0 · Semanas y estados automáticos · 2026-11-23
+
+- Se asigna automáticamente la semana de Registro Dual a partir de las fechas del documento y el periodo martes-viernes. Si no hay fechas legibles, se admite un número de semana explícito únicamente cuando existe una coincidencia única. Si hay contradicciones, se solicita revisión.
+- Se vuelve a comprobar la semana cuando se crea una nueva desde el lector, sin sobrescribir las selecciones manuales existentes.
+- Se amplía la detección de «sin labores» y sus equivalentes: no se trabajó, no se laboró, no hubo actividades, sin actividades asignadas, labores suspendidas, cancelación y otras variantes de escritura con o sin acentos.
+- Los estados de ausencia, día inhábil y sin labores se diferencian por las frases del documento; las suspensiones locales con horario pueden quedar para revisión.
+- Una jornada sin labores no suma las horas que el OCR haya encontrado en la tabla.
+- En computadora se usa `sileo.promise()` para presentar el estado de lectura, éxito y error. En dispositivos móviles se conserva el indicador de carga anterior.
+- Se corrigen anchos excesivos, desbordamientos, paneles y campos cortados en pantallas pequeñas. Los botones se centran en el lector y el escáner, incluido «Terminar».
+- El lector dispone del botón centrado «Terminar todo» para cerrar el lote; si existen documentos pendientes pide confirmación.
+- Se agregan pruebas de semanas, equivalentes de estado, carga diferenciada por dispositivo y CSS responsivo.
+
+
 ## 0.68.0 · Rediseño del lector de bitácoras externas · 2026-11-23
 
 - Nuevo estado de carga visible durante la lectura asincrónica de PDF, Word o fotografías: indicador animado, archivo actual y etapa del OCR. Se desactiva al concluir o fallar.
