@@ -145,15 +145,17 @@ async function recognizeExternalPhoto(worker,canvas){
    return merged&&merged!==best.data?.text?{...best,data:{...best.data,text:merged}}:best;
  }finally{enhanced.width=1;enhanced.height=1;}
 }
-function textLinesFromPdf(items){
- const lines=[];let last=null;
+/** PDF.js marca el fin de línea DESPUÉS del fragmento actual, no antes. */
+export function textLinesFromPdf(items){
+ const lines=[];let last=null,breakBefore=false;
  for(const item of items||[]){
    const text=String(item.str||"").trim();
-   if(!text)continue;
+   if(!text){if(item.hasEOL)breakBefore=true;continue;}
    const y=Number(item.transform?.[5]);
-   if(!last||(!Number.isFinite(y))||Math.abs(last.y-y)>3||item.hasEOL){
+   if(!last||breakBefore||!Number.isFinite(y)||Math.abs(last.y-y)>3){
      last={y:Number.isFinite(y)?y:0,text};lines.push(last);
    }else last.text+=" "+text;
+   breakBefore=Boolean(item.hasEOL);
  }
  return lines.map(x=>x.text).join("\n");
 }
