@@ -225,7 +225,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
        </div>
        {item&&<div className="external-review">
          <details className="external-original">
-           <summary>Documento original · {item.filename}</summary>
+           <summary><strong>Documento original</strong><span> · {item.filename}</span></summary>
            <div className="external-original-preview">
            {item.kind==="image"?<img src={item.url} alt={"Fotografía original: "+item.filename}/>:
              <div className="external-pdf-preview"><strong>{item.kind==="docx"?"DOCX":"PDF"}</strong><span>{item.kind==="docx"?"Documento Word":(item.pages||"?")+" páginas revisadas"}</span>
