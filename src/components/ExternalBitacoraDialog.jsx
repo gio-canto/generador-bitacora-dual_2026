@@ -4,6 +4,7 @@ import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestE
 import {readExternalBitacora,createExternalWorker,externalFileKind} from "../services/external-ocr.js";
 import {buildManualStatistics,reasonsForStatus,MANUAL_DAYS} from "../services/manual-statistics.js";
 import {eventsForSchool,EVENT_PHASE_LABELS,specialEventByCode} from "../services/special-events.js";
+import {trackExternalPromise} from "../services/rare-notification.jsx";
 import "../external-bitacora.css";
 
 function statusLabel(value){
@@ -19,6 +20,8 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  const [items,setItems]=useState([]);
  const [selected,setSelected]=useState(0);
  const [busy,setBusy]=useState(false);
+ const [desktop,setDesktop]=useState(()=>typeof window!=="undefined"&&
+   typeof window.matchMedia==="function"&&window.matchMedia("(min-width: 901px)").matches);
  const [progress,setProgress]=useState("");
  const [error,setError]=useState("");
  const [notice,setNotice]=useState("");
@@ -30,6 +33,28 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  const item=items[selected]||null;
  const events=eventsForSchool(school);
  const companyOptions=externalCompanyOptions(students);
+ useEffect(()=>{
+   if(typeof window==="undefined"||typeof window.matchMedia!=="function")return;
+   const mq=window.matchMedia("(min-width: 901px)");
+   const onChange=()=>setDesktop(mq.matches);
+   onChange();
+   mq.addEventListener?.("change",onChange);
+   return ()=>mq.removeEventListener?.("change",onChange);
+ },[]);
+ useEffect(()=>{
+   // Si se creó una semana durante la lectura, asignarla al documento pendiente.
+   setItems(previous=>{
+     let changed=false;
+     const updated=previous.map(document=>{
+       if(document.state!=="ready"||document.form?.weekId)return document;
+       const match=suggestExternalWeek(extractExternalFields(document.text),weeks);
+       if(!match)return document;
+       changed=true;
+       return {...document,form:{...document.form,weekId:match}};
+     });
+     return changed?updated:previous;
+   });
+ },[weeks]);
  useEffect(()=>{
    mounted.current=true;
    const former=document.body.style.overflow;
@@ -61,8 +86,8 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    }
    setBusy(true);
    setProgress("Preparando archivos…");
-   let added=0;
-   try{
+   const processBatch=async()=>{
+     let added=0,errors=0;
      for(const [fileIndex,file] of picked.entries()){
        if(!mounted.current)break;
        const kind=externalFileKind(file);
@@ -97,6 +122,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
            if(mounted.current){setItems(prev=>[...prev,current]);setSelected(items.length+added);added++;}
          }
        }catch(e){
+         errors++;
          if(mounted.current){
            setItems(prev=>[...prev,{key:(globalThis.crypto?.randomUUID?.()||"external-error-"+Date.now()+"-"+added),filename:file.name,kind,url,
              state:"error",message:e?.message||"No se pudo leer el archivo."}]);
@@ -104,6 +130,12 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          }
        }
      }
+     return {errors};
+   };
+   try{
+     const task=processBatch();
+     if(desktop)await trackExternalPromise(task);
+     else await task;
    }finally{if(mounted.current){setBusy(false);setProgress("");}}
  };
  const updateItem=patch=>setItems(current=>current.map((x,i)=>i===selected?{...x,...patch}:x));
@@ -125,7 +157,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    const learned=applyExternalLearning(extracted,learningExamples,item.form.studentId);
    updateItem({...item,observedName:extracted.name,observedCompany:extracted.company,
      form:{...item.form,name:extracted.name,company:suggestExternalCompany(learned,students,item.form.studentId),
-     days:extracted.days},warnings:extracted.warnings});
+     weekId:item.form.weekId||suggestExternalWeek(extracted,weeks),days:extracted.days},warnings:extracted.warnings});
    setNotice("El texto fue analizado nuevamente. Revisa los campos antes de guardar.");
  };
  const makeWeek=()=>{
@@ -205,7 +237,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
        <input id="external-camera" ref={photoRef} type="file" accept="image/*" capture="environment" onChange={onFiles} disabled={busy}/>
        <span className="external-upload-tip">PDF, Word o imagen · hasta 12 archivos</span>
      </div>
-     {busy&&<div className="external-loading-layer" role="status" aria-live="polite" aria-label="Leyendo bitácoras externas">
+     {busy&&!desktop&&<div className="external-loading-layer" role="status" aria-live="polite" aria-label="Leyendo bitácoras externas">
        <div className="external-loading-content">
          <span className="external-spinner" aria-hidden="true"/>
          <strong>Procesando bitácoras</strong>
@@ -380,6 +412,14 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          </div>
        </div>}
      </>}
+     {items.length>0&&<div className="external-complete">
+       <button type="button" className="btn primary" disabled={busy}
+         onClick={()=>{
+           if(items.some(x=>x.state==="ready"&&!x.saved)&&
+             !window.confirm("Hay bitácoras sin registrar. ¿Quieres terminar de todas formas?"))return;
+           onClose();
+         }}>Terminar todo</button>
+     </div>}
      {!items.length&&!busy&&<div className="external-empty">Agrega una bitácora para comenzar.</div>}
    </section>
  </div>;
