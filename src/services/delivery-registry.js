@@ -415,6 +415,7 @@ function normalizeExternalReview(value){
      date:validIsoDate(day?.date)?day.date:"",
      status:statuses.includes(day?.status)?day.status:"",
      start:clean(day?.start,5),end:clean(day?.end,5),
+     hours:day?.hours!==""&&Number.isFinite(Number(day?.hours))&&Number(day.hours)>=0&&Number(day.hours)<=24?clean(day.hours,16):"",
      area:clean(day?.area,150),activity:clean(day?.activity,900),
      timeBlocks:Array.isArray(day?.timeBlocks)?day.timeBlocks.slice(0,12).map(block=>({
        start:clean(block?.start,5),end:clean(block?.end,5),
