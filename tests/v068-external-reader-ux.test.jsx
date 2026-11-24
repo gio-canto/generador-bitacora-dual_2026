@@ -66,7 +66,7 @@ describe("v0.68 · fechas, horas y estados",()=>{
    expect(extracted.company).toBe("uágro VIRTUAL");
    expect(extractExternalFields("17/11/2026\nDía inhábil").days[0].status).toBe("inhabil");
    expect(extractExternalFields("17/11/2026\nNo asistí por motivos personales").days[0].status).toBe("falta");
-   expect(extractExternalFields("17/11/2026\nNo se realizaron actividades en el laboratorio por asamblea").days[0].status).toBe("");
+   expect(extractExternalFields("17/11/2026\nNo se realizaron actividades en el laboratorio por asamblea").days[0].status).toBe("sin_labores");
  });
  it("normaliza nombres de empresas y no requiere el área en la metadata",()=>{
    const companies=externalCompanyOptions([student,other,
