@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from "react";
 import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,applyExternalLearning,externalCompanyOptions,suggestExternalCompany,externalKey,
-  externalDaysToStatistics,externalReviewMetadata} from "../services/external-bitacora.js";
+  externalDaysToStatistics,externalReviewMetadata,alignExternalDaysToWeek} from "../services/external-bitacora.js";
 import {readExternalBitacora,createExternalWorker,externalFileKind} from "../services/external-ocr.js";
 import {buildManualStatistics,reasonsForStatus,MANUAL_DAYS} from "../services/manual-statistics.js";
 import {eventsForSchool,EVENT_PHASE_LABELS,specialEventByCode} from "../services/special-events.js";
@@ -33,6 +33,13 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  const item=items[selected]||null;
  const events=eventsForSchool(school);
  const companyOptions=externalCompanyOptions(students);
+ const selectedWeek=weeks.find(week=>week.id===item?.form?.weekId);
+ const dateConflict=Boolean(item?.state==="ready"&&selectedWeek&&item.form.days.some((day,index)=>{
+   if(!day.date)return false;
+   const expected=new Date(selectedWeek.startDate+"T12:00:00Z");
+   expected.setUTCDate(expected.getUTCDate()+index);
+   return day.date!==expected.toISOString().slice(0,10);
+ }));
  useEffect(()=>{
    if(typeof window==="undefined"||typeof window.matchMedia!=="function")return;
    const mq=window.matchMedia("(min-width: 901px)");
@@ -85,6 +92,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      setError("Puedes revisar hasta "+EXTERNAL_MAX_FILES+" documentos por lote.");return;
    }
    setBusy(true);
+   busyRef.current=true;
    setProgress("Preparando archivos…");
    const processBatch=async()=>{
      let added=0,errors=0;
@@ -118,7 +126,8 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
              pageNumber:doc.page,pages:1,method:doc.method||result.method,truncated:result.truncated,
              text:doc.text,proposedWeek,observedName:extracted.name,observedCompany:extracted.company,
              learnAlias:false,form:{name:extracted.name,company:suggestExternalCompany(learned,students,studentId),
-               studentId,weekId,days:extracted.days},warnings:extracted.warnings,state:"ready"};
+               studentId,weekId,days:alignExternalDaysToWeek(extracted.days,weeks.find(week=>week.id===weekId))},
+             warnings:[...(extracted.warnings||[]),...(doc.warning?[doc.warning]:[])],state:"ready"};
            if(mounted.current){setItems(prev=>[...prev,current]);setSelected(items.length+added);added++;}
          }
        }catch(e){
@@ -136,10 +145,14 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      const task=processBatch();
      if(desktop)await trackExternalPromise(task);
      else await task;
-   }finally{if(mounted.current){setBusy(false);setProgress("");}}
+   }finally{busyRef.current=false;if(mounted.current){setBusy(false);setProgress("");}}
  };
  const updateItem=patch=>setItems(current=>current.map((x,i)=>i===selected?{...x,...patch}:x));
  const updateForm=patch=>updateItem({form:{...item.form,...patch}});
+ const chooseWeek=id=>{
+   const week=weeks.find(x=>x.id===id);
+   updateForm({weekId:id,days:alignExternalDaysToWeek(item.form.days,week)});
+ };
  const updateDay=(index,patch)=>{
    const days=item.form.days.map((day,i)=>{
      if(i!==index)return day;
@@ -147,6 +160,12 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      if(Object.hasOwn(patch,"start")||Object.hasOwn(patch,"end"))
        next.hours=duration(next.start,next.end);
      if(Object.hasOwn(patch,"status")&&patch.status!=="evento")next.reasonCode="0";
+     if(Object.hasOwn(patch,"status")){
+       next.needsReview=false;
+       if(["falta","sin_labores","inhabil"].includes(patch.status)){
+         next.start="";next.end="";next.hours="";next.timeBlocks=[];
+       }
+     }
      if(patch.status==="evento"){next.eventMode="con";}
      return next;
    });
@@ -157,7 +176,10 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    const learned=applyExternalLearning(extracted,learningExamples,item.form.studentId);
    updateItem({...item,observedName:extracted.name,observedCompany:extracted.company,
      form:{...item.form,name:extracted.name,company:suggestExternalCompany(learned,students,item.form.studentId),
-     weekId:item.form.weekId||suggestExternalWeek(extracted,weeks),days:extracted.days},warnings:extracted.warnings});
+     weekId:item.form.weekId||suggestExternalWeek(extracted,weeks),
+     days:alignExternalDaysToWeek(extracted.days,weeks.find(week=>
+       week.id===(item.form.weekId||suggestExternalWeek(extracted,weeks))))},
+     warnings:extracted.warnings});
    setNotice("El texto fue analizado nuevamente. Revisa los campos antes de guardar.");
  };
  const makeWeek=()=>{
@@ -166,7 +188,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    try{
      const id=onCreateWeek(weekDraft);
      if(!id){setError("Introduce una fecha de inicio válida.");return;}
-     updateForm({weekId:id});
+     updateForm({weekId:id,days:alignExternalDaysToWeek(item.form.days,{startDate:weekDraft.startDate})});
      setWeekDraft(null);
      setNotice("Semana creada o recuperada. Revisa las jornadas antes de confirmar.");
    }catch(error){setError(error?.message||"No se pudo crear la semana.");}
@@ -222,6 +244,9 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    setError("");setNotice("");
  };
  const onFiles=e=>{const files=e.target.files;enqueue(files||[]);e.target.value="";};
+ useEffect(()=>{
+   if(!busy&&items.length)scrollRef.current?.scrollTo?.({top:0,behavior:"instant"});
+ },[selected,busy]);
  return <div className="external-overlay" role="presentation">
    <section className="external-panel" role="dialog" aria-modal="true" aria-label="Lector de bitácoras externas" tabIndex={-1} ref={scrollRef}>
      <header className="external-header">
@@ -305,12 +330,19 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                        onChange={e=>updateForm({company:e.target.value})}/>
                    </label>}
                  <label>Semana del registro *
-                   <select value={item.form.weekId||""} onChange={e=>updateForm({weekId:e.target.value})}>
+                   <select value={item.form.weekId||""} onChange={e=>chooseWeek(e.target.value)}>
                      <option value="">Selecciona semana…</option>
                      {weeks.map(w=><option key={w.id} value={w.id}>{w.label} · {w.startDate} a {w.endDate}{w.closedAt?" (cerrada)":""}</option>)}
                    </select>
                  </label>
                </div>
+               {dateConflict&&<div className="external-week-create" role="status">
+                   <p>Las fechas leídas no coinciden con la semana seleccionada.</p>
+                   <button type="button" className="btn" onClick={()=>
+                     updateForm({days:alignExternalDaysToWeek(item.form.days,selectedWeek,{replace:true})})}>
+                     Usar fechas de esta semana
+                   </button>
+                 </div>}
                {!item.form.weekId&&<div className="external-week-create">
                    <p>Semana no registrada.</p>
                    {!weekDraft?<button className="btn" type="button" onClick={()=>setWeekDraft({

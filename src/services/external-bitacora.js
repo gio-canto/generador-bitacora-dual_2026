@@ -229,21 +229,55 @@ export function suggestExternalCompany(extracted,students=[],studentId=""){
  }
  return externalClean(students.find(x=>x.id===studentId)?.company||"");
 }
-export function suggestExternalStudent(extracted,students){
+function limitedDistance(a,b,limit){
+ if(Math.abs(a.length-b.length)>limit)return limit+1;
+ let previous=Array.from({length:b.length+1},(_,i)=>i);
+ for(let i=1;i<=a.length;i++){
+   const current=[i];
+   for(let j=1;j<=b.length;j++)
+     current[j]=Math.min(current[j-1]+1,previous[j]+1,
+       previous[j-1]+(a[i-1]===b[j-1]?0:1));
+   if(Math.min(...current)>limit)return limit+1;
+   previous=current;
+ }
+ return previous[b.length];
+}
+/** Compara nombres OCR de forma conservadora: un único candidato separado del segundo. */
+export function suggestExternalStudent(extracted,students=[]){
  const name=externalKey(extracted?.name);
  const doc=externalKey(extracted?.text||"");
  if(name){
-   const exact=students.filter(s=>externalKey(s.name)===name);
-   if(exact.length===1)return exact[0].id;
-   if(exact.length>1)return "";
-   const aliases=students.filter(s=>(s.aliases||[]).some(a=>externalKey(a)===name));
-   if(aliases.length===1)return aliases[0].id;
-   if(aliases.length>1)return "";
+   const known=students.flatMap(student=>
+     [student.name,...(student.aliases||[])].map(alias=>({student,key:externalKey(alias)})));
+   const exact=known.filter(c=>c.key===name);
+   if(exact.length&&new Set(exact.map(c=>c.student.id)).size===1)return exact[0].student.id;
+   if(exact.length)return "";
+   // Solo una o dos letras OCR alteradas: nunca adivinar entre nombres cercanos.
+   if(name.length>=12){
+     const simple=name.replace(/\s+/g,"");
+     const limit=Math.min(3,Math.max(1,Math.floor(simple.length*.12)));
+     const ranked=students.map(student=>{
+       const options=[student.name,...(student.aliases||[])];
+       const distances=options.map(alias=>{
+         const key=externalKey(alias).replace(/\s+/g,"");
+         if(!key)return limit+1;
+         const direct=limitedDistance(simple,key,limit);
+         const sorted=limitedDistance(name.split(" ").sort().join(""),
+           externalKey(alias).split(" ").sort().join(""),limit);
+         return Math.min(direct,sorted);
+       });
+       return {id:student.id,distance:Math.min(...distances)};
+     }).sort((a,b)=>a.distance-b.distance);
+     if(ranked.length&&ranked[0].distance<=limit&&
+       (!ranked[1]||ranked[1].distance-ranked[0].distance>=2))
+       return ranked[0].id;
+   }
+   // Un nombre escrito pero incierto NO debe sustituirse por otro mencionado en la actividad.
+   return "";
  }
- const matches=students.filter(s=>{
-   const keys=[s.name,...(s.aliases||[])].map(externalKey).filter(key=>key.length>=9);
-   return keys.some(key=>doc.includes(key));
- });
+ const matches=students.filter(student=>
+   [student.name,...(student.aliases||[])].map(externalKey)
+     .filter(key=>key.length>=12).some(key=>doc.includes(key)));
  return matches.length===1?matches[0].id:"";
 }
 export function suggestExternalWeek(extracted,weeks=[]){
@@ -265,6 +299,22 @@ export function suggestExternalWeek(extracted,weeks=[]){
  });
  return matched.length===1?matched[0].id:"";
 }
+/** Completa solo fechas vacías; no modifica fechas leídas ni horarios. */
+export function alignExternalDaysToWeek(days,week,{replace=false}={}){
+ if(!Array.isArray(days)||days.length!==4||!week?.startDate||
+   !/^\d{4}-\d{2}-\d{2}$/.test(week.startDate))return days;
+ const start=new Date(week.startDate+"T12:00:00Z");
+ if(!Number.isFinite(+start)||start.toISOString().slice(0,10)!==week.startDate||
+   start.getUTCDay()!==2)return days;
+ return days.map((day,i)=>{
+   if(day.date&&!replace)return day;
+   // Un día totalmente ausente del documento no debe inventarse como jornada capturada.
+   if(!day.detected&&!day.date&&!day.status&&!day.activity)return day;
+   const date=new Date(start);
+   date.setUTCDate(date.getUTCDate()+i);
+   return {...day,date:date.toISOString().slice(0,10)};
+ });
+}
 export function externalDaysToStatistics(days){
  if(!Array.isArray(days)||days.length!==4)return null;
  if(days.every(day=>!day.status))return null;
@@ -285,7 +335,7 @@ export function externalReviewMetadata(item,days){
    name:keep(item.name).slice(0,120),
    company:keep(item.company).slice(0,160),
    days:days.map(d=>({date:keep(d.date).slice(0,10),status:d.status||"",
-     start:keep(d.start).slice(0,5),end:keep(d.end).slice(0,5),
+     start:keep(d.start).slice(0,5),end:keep(d.end).slice(0,5),hours:keep(d.hours).slice(0,16),
      activity:keep(d.activity).slice(0,900),
      timeBlocks:Array.isArray(d.timeBlocks)?d.timeBlocks.slice(0,12).map(block=>({
        start:keep(block.start).slice(0,5),end:keep(block.end).slice(0,5),

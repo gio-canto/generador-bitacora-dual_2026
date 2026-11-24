@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.69.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.70.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.70.0 · Reparación del lector de bitácoras externas
+
+Se corrigieron fallas de reconocimiento y persistencia en el lector: archivos PDF con texto legible pero con horarios o jornadas incompletas intentan OCR adicional; el programa combina la información disponible de ambas lecturas por página y conserva el texto incrustado si falla el OCR de refuerzo. Se recuperan nombres con errores menores del OCR cuando la coincidencia del padrón es inequívoca.
+
+Las horas revisadas se conservan también en registros de cuatro jornadas parcialmente incompletos, aunque todavía no produzcan estadísticas de la semana. Se completan fechas vacías a partir del periodo registrado y se ofrece una acción explícita para corregir fechas contradictorias. Cambiar una jornada a «Sin labores» limpia horarios anteriores. Las pantallas móvil y de computadora conservan sus indicadores de carga establecidos.
 
 ## v0.69.0 · Reconocimiento automático y ajustes de interfaz
 
