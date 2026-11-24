@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState} from "react";
-import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,applyExternalLearning,
+import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,applyExternalLearning,externalCompanyOptions,suggestExternalCompany,
   externalDaysToStatistics,externalReviewMetadata} from "../services/external-bitacora.js";
 import {readExternalBitacora,createExternalWorker,externalFileKind} from "../services/external-ocr.js";
 import {buildManualStatistics,reasonsForStatus,MANUAL_DAYS} from "../services/manual-statistics.js";
@@ -15,7 +15,7 @@ function duration(start,end){
  const b=Number(end.slice(0,2))*60+Number(end.slice(3));
  return b>a?String((b-a)/60):"";
 }
-export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,onClose,onSave,onCreateWeek,onLearn,learningExamples=[]}){
+export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,onClose,onSave,onCreateWeek,learningExamples=[]}){
  const [items,setItems]=useState([]);
  const [selected,setSelected]=useState(0);
  const [busy,setBusy]=useState(false);
@@ -29,6 +29,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  const fileRef=useRef(null),photoRef=useRef(null),scrollRef=useRef(null);
  const item=items[selected]||null;
  const events=eventsForSchool(school);
+ const companyOptions=externalCompanyOptions(students);
  useEffect(()=>{
    mounted.current=true;
    const former=document.body.style.overflow;
@@ -59,20 +60,22 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      setError("Puedes revisar hasta "+EXTERNAL_MAX_FILES+" documentos por lote.");return;
    }
    setBusy(true);
+   setProgress("Preparando archivos…");
    let added=0;
    try{
-     for(const file of picked){
+     for(const [fileIndex,file] of picked.entries()){
        if(!mounted.current)break;
        const kind=externalFileKind(file);
        if(!kind){setError("Archivo no compatible: "+file.name);continue;}
        const url=URL.createObjectURL(file);urls.current.push(url);
-       setProgress("Leyendo "+file.name+"…");
+       setProgress("Archivo "+(fileIndex+1)+" de "+picked.length+" · "+file.name);
        try{
          const result=await readExternalBitacora(file,{
            loadPdfJs,getWorker,
-           onProgress:({stage,page,pages})=>mounted.current&&setProgress(
-             (["ocr","table"].includes(stage)?"Reconociendo texto":"Leyendo PDF")+
-             " · "+file.name+(page?" · página "+page+" de "+pages:""))
+           onProgress:({stage,page,pages,row,rows})=>mounted.current&&setProgress(
+             (stage==="table"?"Leyendo la tabla":stage==="ocr"?"Reconociendo texto":stage==="docx"?"Leyendo Word":"Leyendo PDF")+
+             " · "+file.name+(page?" · página "+page+" de "+pages:"")+
+             (row?" · fila "+row+" de "+rows:""))
          });
          const docs=result.documents?.length?result.documents:[{page:1,text:result.text,method:result.method}];
          for(const doc of docs){
@@ -89,7 +92,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
              filename:result.pages>1?file.name+" · página "+doc.page:file.name,kind,url,
              pageNumber:doc.page,pages:1,method:doc.method||result.method,truncated:result.truncated,
              text:doc.text,proposedWeek,observedName:extracted.name,observedCompany:extracted.company,
-             learnAlias:false,form:{name:extracted.name,company:learned.company,
+             learnAlias:false,form:{name:extracted.name,company:suggestExternalCompany(learned,students,studentId),
                studentId,weekId,days:extracted.days},warnings:extracted.warnings,state:"ready"};
            if(mounted.current){setItems(prev=>[...prev,current]);setSelected(items.length+added);added++;}
          }
@@ -121,7 +124,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    const extracted=extractExternalFields(item.text);
    const learned=applyExternalLearning(extracted,learningExamples,item.form.studentId);
    updateItem({...item,observedName:extracted.name,observedCompany:extracted.company,
-     form:{...item.form,name:extracted.name,company:learned.company,
+     form:{...item.form,name:extracted.name,company:suggestExternalCompany(learned,students,item.form.studentId),
      days:extracted.days},warnings:extracted.warnings});
    setNotice("El texto fue analizado nuevamente. Revisa los campos antes de guardar.");
  };
@@ -136,20 +139,13 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      setNotice("Semana creada o recuperada. Revisa las jornadas antes de confirmar.");
    }catch(error){setError(error?.message||"No se pudo crear la semana.");}
  };
- const learnWithoutDelivery=()=>{
-   if(!item||item.state!=="ready"||!onLearn)return;
-   const studentId=item.form?.studentId;
-   if(!students.some(student=>student.id===studentId)){
-     setError("Selecciona el alumno correcto para guardar el ejemplo.");return;
-   }
-   setError("");setNotice("");
-   try{
-     const saved=onLearn({studentId,observedName:item.observedName,
-       observedCompany:item.observedCompany,confirmedCompany:item.form.company,method:item.method});
-     if(saved===false)return;
-     updateItem({learned:true});
-     setNotice("Ejemplo incorporado al aprendizaje. No se registró ninguna entrega.");
-   }catch(error){setError(error?.message||"No se pudo guardar el ejemplo.");}
+ const selectStudent=id=>{
+   const found=students.find(student=>student.id===id);
+   const currentCompany=item.form.company||"";
+   const observed=suggestExternalCompany({company:item.observedCompany},students,item.form.studentId);
+   const fallback=!currentCompany||currentCompany===observed;
+   updateForm({studentId:id,company:fallback?suggestExternalCompany(
+     {company:item.observedCompany},students,id):currentCompany});
  };
  const submit=()=>{
    setError("");setNotice("");
@@ -175,8 +171,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      const captured=externalDaysToStatistics(days);
      const statistics=captured?buildManualStatistics(captured):null;
      const metadata=externalReviewMetadata({...item,name,company},days);
-     const saved=onSave({studentId,weekId,statistics,metadata,replace:duplicate,
-       learnAlias:item.learnAlias,observedName:item.observedName,observedCompany:item.observedCompany});
+     const saved=onSave({studentId,weekId,statistics,metadata,replace:duplicate});
      if(saved===false)return;
      const next=items.findIndex((x,i)=>i>selected&&x.state==="ready"&&!x.saved);
      updateItem({saved:true});
@@ -198,8 +193,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  return <div className="external-overlay" role="presentation">
    <section className="external-panel" role="dialog" aria-modal="true" aria-label="Lector de bitácoras externas" tabIndex={-1} ref={scrollRef}>
      <header className="external-header">
-       <div><span className="delivery-kicker">Registro Dual · OCR</span><h2>Bitácoras externas</h2>
-         <p>Lee archivos sin Data Matrix, confirma sus datos y registra la entrega.</p></div>
+       <div><h2>Bitácoras externas</h2></div>
        <button type="button" className="btn external-close" onClick={onClose} disabled={busy} aria-label="Cerrar lector externo">Cerrar</button>
      </header>
      <div className="external-upload">
@@ -209,9 +203,16 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
        <input id="external-files" ref={fileRef} type="file" multiple accept=".pdf,.docx,application/pdf,image/*,.heic,.heif" onChange={onFiles} disabled={busy}/>
        <label className="btn external-upload-btn" htmlFor="external-camera">Tomar fotografía</label>
        <input id="external-camera" ref={photoRef} type="file" accept="image/*" capture="environment" onChange={onFiles} disabled={busy}/>
-       <span className="external-upload-tip">Hasta 12 archivos · PDF máx. 18 MB · DOCX/imagen máx. 12 MB. La primera lectura OCR requiere internet.</span>
+       <span className="external-upload-tip">PDF, Word o imagen · hasta 12 archivos</span>
      </div>
-     {busy&&<p className="external-progress" role="status">{progress||"Procesando archivos…"}</p>}
+     {busy&&<div className="external-loading-layer" role="status" aria-live="polite" aria-label="Leyendo bitácoras externas">
+       <div className="external-loading-content">
+         <span className="external-spinner" aria-hidden="true"/>
+         <strong>Procesando bitácoras</strong>
+         <span>{progress||"Leyendo archivo…"}</span>
+         <div className="external-loading-track" aria-hidden="true"><i/></div>
+       </div>
+     </div>}
      {error&&<p className="external-error" role="alert">{error}</p>}
      {notice&&<p className="external-notice" role="status">{notice}</p>}
      {items.length>0&&<>
@@ -223,8 +224,9 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          </button>)}
        </div>
        {item&&<div className="external-review">
-         <div className="external-original">
-           <div className="external-part-title"><strong>Documento original</strong><span>{item.filename}</span></div>
+         <details className="external-original">
+           <summary>Documento original · {item.filename}</summary>
+           <div className="external-original-preview">
            {item.kind==="image"?<img src={item.url} alt={"Fotografía original: "+item.filename}/>:
              <div className="external-pdf-preview"><strong>{item.kind==="docx"?"DOCX":"PDF"}</strong><span>{item.kind==="docx"?"Documento Word":(item.pages||"?")+" páginas revisadas"}</span>
                <a className="btn" href={item.url} target="_blank" rel="noopener noreferrer">Abrir documento original</a></div>}
@@ -233,12 +235,13 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                onChange={e=>updateItem({text:e.target.value.slice(0,20000)})}/>
              <button className="btn" type="button" onClick={reanalyze}>Volver a detectar campos</button>
            </details>}
-         </div>
+           </div>
+         </details>
          <div className="external-data">
            {item.state==="error"?<div role="alert"><strong>No se pudo leer este documento.</strong><p>{item.message}</p>
                <p>Puedes capturar la entrega mediante el registro manual mientras consigues otra imagen.</p></div>:
              <>
-               <div className="external-part-title"><strong>Datos por confirmar</strong><span>Revisa antes de registrar</span></div>
+               <div className="external-part-title"><strong>Datos por confirmar</strong></div>
                {item.truncated&&<p className="external-warning">Se revisaron las primeras 16 páginas del PDF.</p>}
                {item.warnings?.length>0&&<ul className="external-warnings">{item.warnings.map((x,i)=><li key={i}>{x}</li>)}</ul>}
                <div className="external-fields">
@@ -247,15 +250,28 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                      placeholder="Nombre detectado en el documento" onChange={e=>updateForm({name:e.target.value})}/>
                  </label>
                  <label>Alumno del padrón *
-                   <select value={item.form.studentId||""} onChange={e=>updateForm({studentId:e.target.value})}>
+                   <select value={item.form.studentId||""} onChange={e=>selectStudent(e.target.value)}>
                      <option value="">Selecciona alumno…</option>
                      {students.map(x=><option key={x.id} value={x.id}>{x.name} · {x.specialty||"Sin especialidad"}</option>)}
                    </select>
                  </label>
-                 <label>Empresa leída
-                   <input value={item.form.company||""} maxLength={160}
-                     placeholder="Empresa o institución" onChange={e=>updateForm({company:e.target.value})}/>
+                 <label>Empresa
+                   <select aria-label="Empresa de la bitácora"
+                     value={companyOptions.some(company=>company.toLowerCase()===String(item.form.company||"").toLowerCase())
+                       ?companyOptions.find(company=>company.toLowerCase()===String(item.form.company||"").toLowerCase())
+                       :item.form.company?"__manual":""}
+                     onChange={e=>updateForm({company:e.target.value==="__manual"?"":e.target.value})}>
+                     <option value="">Seleccionar empresa…</option>
+                     {companyOptions.map(company=><option key={company} value={company}>{company}</option>)}
+                     <option value="__manual">Otra empresa</option>
+                   </select>
                  </label>
+                 {(!item.form.company||!companyOptions.some(company=>company.toLowerCase()===String(item.form.company).toLowerCase()))&&
+                   <label>Escribir empresa
+                     <input aria-label="Escribir empresa" value={item.form.company||""}
+                       placeholder="Nombre de la empresa" maxLength={160}
+                       onChange={e=>updateForm({company:e.target.value})}/>
+                   </label>}
                  <label>Semana del registro *
                    <select value={item.form.weekId||""} onChange={e=>updateForm({weekId:e.target.value})}>
                      <option value="">Selecciona semana…</option>
@@ -264,7 +280,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                  </label>
                </div>
                {!item.form.weekId&&<div className="external-week-create">
-                   <p>No se encontró una semana compatible. Puedes crearla desde este documento.</p>
+                   <p>Semana no registrada.</p>
                    {!weekDraft?<button className="btn" type="button" onClick={()=>setWeekDraft({
                      startDate:item.proposedWeek?.startDate||"",label:"Semana "+(weeks.length+1),dueAt:""
                    })}>Crear semana</button>:
@@ -286,13 +302,12 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                      </div>}
                  </div>}
                <div className="external-days">
-                 <h3>Jornadas de la bitácora</h3>
-                 <p>Los campos sin lectura quedan vacíos. Para contabilizar horas se necesitan cuatro jornadas completas; si faltan datos puedes registrar sólo la entrega.</p>
+                 <h3>Jornadas</h3>
                  {item.form.days.map((day,i)=>{
                    const event=specialEventByCode(day.reasonCode);
-                   return <div className="external-day" key={i}>
-                     <div className="external-day-head"><strong>{MANUAL_DAYS[i]}</strong>
-                       <span>{day.detected?"Texto detectado":"Por revisar"}</span></div>
+                   return <details className="external-day" key={item.key+"-"+i} open={i===0}>
+                     <summary className="external-day-head"><strong>{MANUAL_DAYS[i]}</strong>
+                       <span>{statusLabel(day.status)}{day.hours?" · "+day.hours+" h":""}</span></summary>
                      <div className="external-day-fields">
                        <label>Estado
                          <select aria-label={MANUAL_DAYS[i]+" · estado externo"} value={day.status}
@@ -345,31 +360,17 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
                          <label>Resultado <input value={day.eventResult||""} maxLength={120}
                            onChange={e=>updateDay(i,{eventResult:e.target.value})} placeholder="Opcional"/></label>
                        </>}
-                       <label className="external-field-wide">Área <input value={day.area||""} maxLength={150}
-                         onChange={e=>updateDay(i,{area:e.target.value})} placeholder="Área del documento"/></label>
                        <label className="external-field-wide">Actividades transcritas
                          <textarea value={day.activity||""} maxLength={900} rows={2}
                            onChange={e=>updateDay(i,{activity:e.target.value})}
                            placeholder="Transcripción original, editable"/></label>
                      </div>
-                   </div>;
+                   </details>;
                  })}
                </div>
-               <label className="external-learning-check">
-                 <input type="checkbox" checked={Boolean(item.learnAlias)}
-                   onChange={e=>updateItem({learnAlias:e.target.checked})}/>
-                 Aprender de esta lectura confirmada (nombre detectado y correcciones)
-               </label>
-               {onLearn&&<div className="external-learning-only">
-                 <button className="btn" type="button" onClick={learnWithoutDelivery}
-                   disabled={busy||Boolean(item.learned)}>
-                   {item.learned?"Ejemplo guardado":"Guardar ejemplo sin registrar entrega"}
-                 </button>
-                 <span>Para utilizar fotografías como referencia sin alterar las entregas.</span>
-               </div>}
                <div className="external-save">
-                 <p>{item.saved?"Este documento ya fue registrado.":!externalDaysToStatistics(item.form.days)
-                   ?"La entrega se guardará sin estadísticas si no completas las cuatro jornadas.":"Se guardarán las jornadas confirmadas y sus horas."}</p>
+                 {!externalDaysToStatistics(item.form.days)&&!item.saved&&
+                   <p>Faltan datos para calcular las horas.</p>}
                  <button className="btn" type="button" onClick={remove} disabled={busy}>Quitar documento</button>
                  <button className="btn primary" type="button" onClick={submit} disabled={busy||item.saved}>
                    {item.saved?"Registrado":"Confirmar y registrar"}
@@ -379,8 +380,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
          </div>
        </div>}
      </>}
-     {!items.length&&!busy&&<div className="external-empty"><strong>Selecciona una bitácora para comenzar</strong>
-       <p>Se admiten archivos individuales o varios documentos. La lectura automática es una propuesta de datos que tendrás que confirmar; el documento original permanece en tu dispositivo.</p></div>}
+     {!items.length&&!busy&&<div className="external-empty">Agrega una bitácora para comenzar.</div>}
    </section>
  </div>;
 }
