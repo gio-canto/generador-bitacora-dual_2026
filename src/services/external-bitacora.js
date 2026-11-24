@@ -15,7 +15,7 @@ function iso(y,m,d){
 }
 const MONTH_PATTERN="(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)";
 const SEP="[-/.*°º]";
-const DATE_SOURCE="(?:20\\d{2}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}"+SEP+"\\d{1,2}"+SEP+"(?:20\\d{2}|\\d{2})|\\d{1,2}(?:\\s*[/.-]\\s*|\\s+de\\s+)"+MONTH_PATTERN+"(?:\\s*[/.-]\\s*|\\s+de(?:l)?\\s+)(?:20\\d{2}|\\d{2}))";
+const DATE_SOURCE="(?:20\\d{2}"+SEP+"\\d{1,2}"+SEP+"\\d{1,2}|\\d{1,2}"+SEP+"\\d{1,2}"+SEP+"(?:20\\d{2}|\\d{2})|\\d{1,2}(?:\\s*[/.-]\\s*|\\s+de\\s+)"+MONTH_PATTERN+"(?:\\s*[/.-]\\s*|\\s+de(?:l)?\\s+)(?:20\\d{2}|\\d{2}))";
 export const DATE_GLOBAL=new RegExp("\\b"+DATE_SOURCE+"\\b","gi");
 const PARTIAL_DATE=/^(\d{1,2})[-/.*°º](\d{1,2})(?=\s|$)/;
 const expandedYear=value=>Number(value)<100?2000+Number(value):Number(value);
@@ -23,7 +23,7 @@ export function dateFromExternal(value,contextYear=null){
  const clean=String(value??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()
   .replace(/^(?:lunes|martes|miercoles|jueves|viernes|sabado|domingo)\s*[,.:;-]?\s*/,"")
   .replace(/^(?:fecha|dia|jornada)\s*[:\-]?\s*/,"");
- let match=clean.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+ let match=clean.match(/^(20\d{2})[-/.*°º](\d{1,2})[-/.*°º](\d{1,2})$/);
  if(match)return iso(match[1],match[2],match[3]);
  match=clean.match(/^(\d{1,2})[-/.*°º](\d{1,2})[-/.*°º](\d{2}|20\d{2})$/);
  if(match)return iso(expandedYear(match[3]),match[2],match[1]);
@@ -163,14 +163,15 @@ export function extractExternalFields(raw){
    const date=seg.date||dates[0]||"";
    const times=timesFromExternal(all);
    const area=lineField(seg.lines,"(?:[aá]rea|departamento|secci[oó]n)");
-   const reason=/\b(falta|inasistencia)\b/i.test(all)?"falta":/\b(d[ií]a inh[aá]bil)\b/i.test(all)?"inhabil":
-     /\b(sin labores|no hubo labores|se suspendieron (?:las )?labores|se suspendieron (?:las )?actividades|suspensi[oó]n de (?:las )?(?:labores|actividades))\b/i.test(all)?"sin_labores":"";
-   const activityUncertain=reason===""&&/\b(?:no se realizaron actividades|sin actividades asignadas|no hubo actividades)\b/i.test(all);
+   const reason=/\b(?:no asist[ií]|no me present[eé]|inasistencia|falta justificada|falta injustificada)\b/i.test(all)?"falta":
+     /\b(?:d[ií]a inh[aá]bil|d[ií]a festivo|descanso oficial|asueto)\b/i.test(all)?"inhabil":
+     /\b(?:sin labores|no hubo labores|sin actividades laborales|se suspendieron (?:las )?(?:labores|actividades)|suspensi[oó]n de (?:las )?(?:labores|actividades)|actividades suspendidas)\b/i.test(all)?"sin_labores":"";
+   const activityUncertain=reason===""&&/\b(?:no se realizaron actividades|sin actividades asignadas|no hubo actividades|no se trabaj[oó])\b/i.test(all);
 
    const activity=activityFromChunk(seg.lines);
    days[seg.index]={...days[seg.index],date,start:times.start,end:times.end,hours:times.hours,area,activity,
      timeBlocks:times.blocks,needsReview:Boolean(times.ambiguous||activityUncertain),
-     status:activityUncertain?"":reason||(times.hours?"laboral":""),detected:true};
+     status:activityUncertain?"":reason||(times.hours||(/\b(?:actividad|trabajo|revisi[oó]n|registro|archivo|organizaci[oó]n)\b/i.test(activity))?"laboral":""),detected:true};
  }
  const recognized=days.filter(day=>day.detected).length;
  const warnings=[];
@@ -186,6 +187,32 @@ export function extractExternalFields(raw){
  if(days.some(day=>day.needsReview))
    warnings.push("Hay horarios con varios tramos o actividades suspendidas que requieren confirmar el estado y las horas.");
  return {name:getName(lines),company:getCompany(lines),dates:[...new Set(allDates)],days,warnings,recognized,text};
+}
+
+/** Catálogo sugerido desde las empresas ya registradas, sin diferencias por acento o caja. */
+export function externalCompanyOptions(students=[]){
+ const seen=new Set();
+ return students.map(student=>externalClean(student.company||"")).filter(company=>{
+   const key=externalKey(company);
+   if(!key||seen.has(key))return false;
+   seen.add(key);return true;
+ }).sort((a,b)=>a.localeCompare(b,"es",{sensitivity:"base"}));
+}
+export function suggestExternalCompany(extracted,students=[],studentId=""){
+ const read=externalClean(extracted?.company||"");
+ const key=externalKey(read);
+ const options=externalCompanyOptions(students);
+ if(key){
+   const exact=options.filter(x=>externalKey(x)===key);
+   if(exact.length===1)return exact[0];
+   const approx=key.length>=5?options.filter(x=>{
+     const candidate=externalKey(x);
+     return candidate.includes(key)||key.includes(candidate);
+   }):[];
+   if(approx.length===1)return approx[0];
+   return read;
+ }
+ return externalClean(students.find(x=>x.id===studentId)?.company||"");
 }
 export function suggestExternalStudent(extracted,students){
  const name=externalKey(extracted?.name);
@@ -231,7 +258,7 @@ export function externalReviewMetadata(item,days){
    company:keep(item.company).slice(0,160),
    days:days.map(d=>({date:keep(d.date).slice(0,10),status:d.status||"",
      start:keep(d.start).slice(0,5),end:keep(d.end).slice(0,5),
-     area:keep(d.area).slice(0,150),activity:keep(d.activity).slice(0,900),
+     activity:keep(d.activity).slice(0,900),
      timeBlocks:Array.isArray(d.timeBlocks)?d.timeBlocks.slice(0,12).map(block=>({
        start:keep(block.start).slice(0,5),end:keep(block.end).slice(0,5),
        hours:keep(block.hours).slice(0,16),raw:keep(block.raw).slice(0,80)
