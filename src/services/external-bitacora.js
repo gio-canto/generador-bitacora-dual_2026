@@ -308,6 +308,8 @@ export function alignExternalDaysToWeek(days,week,{replace=false}={}){
    start.getUTCDay()!==2)return days;
  return days.map((day,i)=>{
    if(day.date&&!replace)return day;
+   // Un día totalmente ausente del documento no debe inventarse como jornada capturada.
+   if(!day.detected&&!day.date&&!day.status&&!day.activity)return day;
    const date=new Date(start);
    date.setUTCDate(date.getUTCDate()+i);
    return {...day,date:date.toISOString().slice(0,10)};
