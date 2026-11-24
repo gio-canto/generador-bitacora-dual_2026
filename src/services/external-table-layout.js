@@ -65,7 +65,7 @@ export function detectFourDayTable(canvas){
  try{image=canvas.getContext("2d",{willReadFrequently:true})?.getImageData(0,0,canvas.width,canvas.height);}
  catch{return null;}
  if(!image?.data)return null;
- const {width:w,height:h}=canvas,data=image;
+ const {width:w,height:h}=canvas,data=image.data;
  const columns=tableCandidate(verticalLines(data,w,h),w);
  if(!columns)return null;
  const datePeaks=horizontalLines(data,w,h,columns[0],columns[1]);
