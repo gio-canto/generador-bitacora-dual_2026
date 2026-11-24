@@ -103,6 +103,9 @@
 .external-time-blocks{grid-column:1/-1;margin:2px 0 8px;color:#576780;font-size:.8rem;line-height:1.55}
 
 /* v0.68.0 · lector externo, escritorio y teléfono */
+.external-review{grid-template-columns:minmax(0,1.6fr) minmax(240px,.75fr)}
+.external-data{order:0}
+.external-original{order:1}
 .external-panel{position:relative}
 .external-header{position:sticky;top:0;z-index:5;align-items:center;box-sizing:border-box}
 .external-header h2{margin:0;font-size:clamp(1.15rem,2.4vw,1.5rem)}
