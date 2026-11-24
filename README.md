@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.67.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.68.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,12 @@
 </div>
 
 ---
+
+## v0.68.0 · Lector externo más simple y adaptable
+
+Se rediseñó la lectura de bitácoras externas para celular y computadora: espacio superior en móvil, formulario antes del documento, jornadas plegables y un indicador de procesamiento durante la carga. Se agregó selección de empresa desde el padrón, tolerancia a mayúsculas y acentos, más variantes de fechas y horas (12 y 24 horas) y clasificación automática de estados cuando el texto lo permite. Ya no se muestra el área ni los controles públicos de aprendizaje.
+
+El entrenamiento técnico continúa con lotes incorporados y documentados por el mantenedor. Consulta [la guía del lector](docs/LECTOR_BITACORAS_EXTERNAS.md) y [los cambios de la versión](CHANGELOG.md).
 
 ## v0.67.0 · Lectura de tablas escaneadas por coordenadas
 

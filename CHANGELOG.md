@@ -1,5 +1,19 @@
 # Notas de versión
 
+## 0.68.0 · Rediseño del lector de bitácoras externas · 2026-11-23
+
+- Nuevo estado de carga visible durante la lectura asincrónica de PDF, Word o fotografías: indicador animado, archivo actual y etapa del OCR. Se desactiva al concluir o fallar.
+- Pantallas pequeñas: margen superior con respeto a la zona segura, encabezado accesible, formulario antes del original y revisión por jornadas plegables. Mejoras equivalentes de distribución y legibilidad en escritorio.
+- El documento original se abre cuando se necesita; desaparecen instrucciones repetidas y textos accesorios.
+- Detecta empresas e instituciones del documento y las compara contra las registradas, ignorando acentos y mayúsculas. Permite elegir una empresa del padrón o escribir otra.
+- Amplía las variantes de fechas con guiones, puntos, barras y separadores especiales, en orden día-mes-año o año-mes-día.
+- Admite horarios de 12 horas (7pm, 7:00PM, 7 p. m.) y 24 horas (07:00, 19:00, 23:00), conservando revisión para intervalos ambiguos.
+- Mejora la identificación de faltas, suspensión de labores, días inhábiles y actividades realizadas cuando existe evidencia textual suficiente.
+- Se elimina el campo «Área» de captura y del nuevo metadato de bitácoras externas, sin alterar registros anteriores.
+- Se retiran los botones y controles de aprendizaje del usuario; el corpus de entrenamiento queda a cargo del mantenimiento del programa.
+- Nuevas pruebas para carga asíncrona, reconocimiento de empresa, horas, fechas, estados y disposición móvil.
+
+
 ## 0.67.0 · OCR por coordenadas de columnas y jornadas · 2026-11-23
 
 - Nuevo detector espacial de tablas impresas: localiza cinco bordes verticales, las cuatro jornadas y la inclinación ligera del papel.
