@@ -51,6 +51,7 @@ export function mergeExternalPageText(primary,secondary){
      detected:old.detected||newer.detected,
      start:nonWork.has(selectedStatus)?"":preferredTime.start,
      end:nonWork.has(selectedStatus)?"":preferredTime.end,
+     timeBlocks:nonWork.has(selectedStatus)?[]:preferredTime.timeBlocks||[],
      status:selectedStatus,
      activity:selectedActivity,
    };
@@ -66,7 +67,9 @@ export function mergeExternalPageText(primary,secondary){
  rows.forEach((day,i)=>{
    if(!day.detected)return;
    lines.push(day.date||days[i]);
-   if(day.start&&day.end)lines.push("Entrada: "+day.start+"\nSalida: "+day.end);
+   if(day.timeBlocks?.length>1&&day.timeBlocks.every(block=>block.start&&block.end&&block.hours)){
+     lines.push(...day.timeBlocks.map(block=>block.start+"-"+block.end));
+   }else if(day.start&&day.end)lines.push("Entrada: "+day.start+"\nSalida: "+day.end);
    if(day.status==="sin_labores"&&!/sin labores|no se labor|sin actividades|suspens|no hubo|no se realiz|no trabaj/i.test(day.activity))
      lines.push("Sin labores");
    else if(day.status==="inhabil"&&!/inh[aá]bil|feriado|festivo|asueto/i.test(day.activity))
