@@ -49,8 +49,7 @@ describe("v0.68 · fechas, horas y estados",()=>{
      ["7pm-11pm","19:00","23:00","4"],
      ["7:00PM-11:00PM","19:00","23:00","4"],
      ["7 p.m. - 11 p.m.","19:00","23:00","4"],
-     ["Entrada: 7pm
-Salida: 11pm","19:00","23:00","4"],
+     ["Entrada: 7pm\nSalida: 11pm","19:00","23:00","4"],
      ["17:00-23:00","17:00","23:00","6"],
      ["07:00-15:00","07:00","15:00","8"],
      ["7am-1pm","07:00","13:00","6"],
@@ -65,12 +64,9 @@ Salida: 11pm","19:00","23:00","4"],
    expect(extracted.days.map(day=>day.status)).toEqual(["laboral","laboral","laboral","sin_labores"]);
    expect(extracted.days.map(day=>day.hours)).toEqual(["4","4","6",""]);
    expect(extracted.company).toBe("uágro VIRTUAL");
-   expect(extractExternalFields("17/11/2026
-Día inhábil").days[0].status).toBe("inhabil");
-   expect(extractExternalFields("17/11/2026
-No asistí por motivos personales").days[0].status).toBe("falta");
-   expect(extractExternalFields("17/11/2026
-No se realizaron actividades en el laboratorio por asamblea").days[0].status).toBe("");
+   expect(extractExternalFields("17/11/2026\nDía inhábil").days[0].status).toBe("inhabil");
+   expect(extractExternalFields("17/11/2026\nNo asistí por motivos personales").days[0].status).toBe("falta");
+   expect(extractExternalFields("17/11/2026\nNo se realizaron actividades en el laboratorio por asamblea").days[0].status).toBe("");
  });
  it("normaliza nombres de empresas y no requiere el área en la metadata",()=>{
    const companies=externalCompanyOptions([student,other,
