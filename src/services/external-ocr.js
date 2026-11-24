@@ -1,5 +1,6 @@
 import {PDF_SCAN_LIMIT_BYTES,PDF_SCAN_LIMIT_PAGES,scanFileKind} from "./scanned-pdf.js";
 import {EXTERNAL_TEXT_LIMIT,extractExternalFields} from "./external-bitacora.js";
+import {spatialExternalTableText} from "./external-table-ocr.js";
 
 /** Motor OCR descargado sólo al solicitar lectura externa. */
 export const OCR_SOURCES=[
@@ -126,7 +127,7 @@ export function enhanceExternalPhotoCanvas(canvas){
  return copy;
 }
 async function recognizeExternalPhoto(worker,canvas){
- const first=await worker.recognize(canvas);
+ const first=await worker.recognize(canvas,{}, {text:true,blocks:true});
  const fields=extractExternalFields(first?.data?.text||"");
  const confidence=Number(first?.data?.confidence);
  if(fields.recognized>=3&&fields.name&&(!Number.isFinite(confidence)||confidence>=55))
@@ -136,7 +137,7 @@ async function recognizeExternalPhoto(worker,canvas){
  catch{return first;}
  if(!enhanced)return first;
  try{
-   const next=await worker.recognize(enhanced);
+   const next=await worker.recognize(enhanced,{}, {text:true,blocks:true});
    return externalOcrQuality(next)>externalOcrQuality(first)?next:first;
  }finally{enhanced.width=1;enhanced.height=1;}
 }
@@ -161,12 +162,13 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
  if(kind==="image"&&file.size>EXTERNAL_IMAGE_LIMIT_BYTES)throw new Error("La imagen supera el máximo de 12 MB.");
  if(signal?.aborted)throw new Error("Lectura cancelada.");
  let pages=1,pdfText=0,ocrText=0,method="ocr",truncated=false;
- const chunks=[];
+ const chunks=[],documents=[];
  if(kind==="docx"){
    const mammoth=await ensureDocxReader();
    onProgress({stage:"docx",page:1,pages:1});
    const result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});
    chunks.push(String(result?.value||""));
+   documents.push({page:1,text:String(result?.value||""),method:"docx-text"});
    method="docx-text";
  }else if(kind==="image"){
    const worker=await getWorker();
@@ -174,7 +176,10 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
    const canvas=await imageToCanvas(file);
    try{
      const recognized=await recognizeExternalPhoto(worker,canvas);
-     chunks.push(String(recognized?.data?.text||""));
+     const structured=await spatialExternalTableText(worker,canvas,recognized,{onProgress,signal});
+     const pageText=structured||String(recognized?.data?.text||"");
+     chunks.push(pageText);
+     documents.push({page:1,text:pageText,method:"ocr"});
      ocrText++;
    }finally{canvas.width=1;canvas.height=1;}
  }else{
@@ -193,7 +198,7 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
          const content=await page.getTextContent();
          const text=textLinesFromPdf(content.items);
          if(text.replace(/\s/g,"").length>=65){
-           chunks.push(text);pdfText++;
+           chunks.push(text);documents.push({page:i,text,method:"pdf-text"});pdfText++;
            continue;
          }
          const natural=page.getViewport({scale:1});
@@ -205,8 +210,12 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
            await page.render({canvasContext:canvas.getContext("2d"),viewport}).promise;
            const worker=await getWorker();
            onProgress({stage:"ocr",page:i,pages});
-           const result=await worker.recognize(canvas);
-           chunks.push(String(result?.data?.text||text));ocrText++;
+           const result=await recognizeExternalPhoto(worker,canvas);
+           const structured=await spatialExternalTableText(worker,canvas,result,{onProgress,signal});
+           const pageText=structured||String(result?.data?.text||text);
+           chunks.push(pageText);
+           documents.push({page:i,text:pageText,method:"ocr"});
+           ocrText++;
          }finally{canvas.width=1;canvas.height=1;}
        }finally{page.cleanup?.();}
      }
@@ -215,5 +224,5 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
  }
  const text=chunks.join("\n\n").slice(0,EXTERNAL_TEXT_LIMIT);
  if(!text.trim())throw new Error("No se reconoció texto. Prueba una fotografía más nítida o captura la entrega manualmente.");
- return {text,pages,method,truncated};
+ return {text,pages,method,truncated,documents};
 }
