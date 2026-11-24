@@ -105,6 +105,20 @@ Viernes 20/11/2026
    expect(parsed.days[2].status).toBe("sin_labores");
    expect(externalTranscriptQuality(result)).toBeGreaterThan(externalTranscriptQuality(weak));
  });
+ it("conserva intervalos separados y no suma la pausa entre tramos",()=>{
+   const base=[
+     "Nombre del alumno: Luis Arturo Pérez Morales",
+     "Martes 17/11/2026",
+     "09:00-11:00",
+     "13:00-15:00",
+     "Actividades: Clasificación de documentos",
+   ].join("\n");
+   const extra="Martes 17/11/2026\n09:00-11:00\n13:00-15:00\nActividades: Archivo";
+   const merged=mergeExternalPageText(base,extra);
+   const day=extractExternalFields(merged).days[0];
+   expect(day.hours).toBe("4");
+   expect(day.timeBlocks).toHaveLength(2);
+ });
  it("no une datos de semanas contradictorias",()=>{
    const other=full.replaceAll("17/11/2026","10/11/2026")
      .replaceAll("18/11/2026","11/11/2026")
