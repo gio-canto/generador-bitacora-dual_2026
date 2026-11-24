@@ -2,6 +2,7 @@
 
 ## 0.70.0 · Recuperación del lector externo · 2026-11-23
 
+- Se corrige la reconstrucción de texto fragmentado de PDF.js: el fin de línea se aplica después del fragmento actual. Evita separar nombres, empresas y horarios entre renglones.
 - Se detectaron fallas en PDF digitales que se aceptaban por cantidad de caracteres aunque faltaran jornadas u horarios. Ahora se solicita una lectura OCR adicional cuando están incompletos.
 - Se combinan los datos recuperables del texto digital, OCR general y lectura espacial, por página, sin cruzar semanas de documentos distintos.
 - Si falla el OCR adicional y existe texto digital, se conserva la lectura y aparece un aviso para confirmar horarios y fechas.
