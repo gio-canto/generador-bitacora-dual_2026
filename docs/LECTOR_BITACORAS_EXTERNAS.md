@@ -1,4 +1,16 @@
-# Lector de bitácoras externas · v0.68.0
+# Lector de bitácoras externas · v0.69.0
+
+## Semana automática y estado de jornada
+
+Al leer una bitácora, el lector obtiene su semana de las fechas explícitas y la vincula únicamente si existe un periodo del padrón con el mismo martes inicial. Si faltan fechas, puede utilizar un encabezado como `SEMANA 11` siempre que corresponda a una sola semana registrada. No se usa el número de semana para reemplazar fechas contradictorias. Cuando se crea una semana pendiente, el selector puede sincronizarse con el nuevo periodo.
+
+Las expresiones `sin labores`, `no hubo actividades`, `no se laboró`, `sin actividades asignadas`, `actividades suspendidas`, `se cancelaron las labores` y equivalentes normalizados se clasifican como `sin_labores`. La jornada no suma horas. Las anotaciones sobre suspensiones exclusivamente en un laboratorio o área que aún registran horas permanecen por confirmar.
+
+## Estado de carga según pantalla
+
+En escritorio el procesamiento se muestra mediante la biblioteca Sileo, usando su notificación Promise. En móvil se conserva el indicador modal. Los campos, las listas y los botones se mantienen dentro del ancho visible, con márgenes seguros y centrados. El escáner dispone de botones centrados, incluyendo «Terminar». El lector incorpora «Terminar todo», que confirma antes de cerrar un lote con documentos sin registrar.
+
+
 
 ## Interfaz de lectura de documentos
 
