@@ -7,7 +7,7 @@
 - Si falla el OCR adicional y existe texto digital, se conserva la lectura y aparece un aviso para confirmar horarios y fechas.
 - La coincidencia de alumnos admite diferencias OCR pequeñas solo cuando existe una coincidencia única suficientemente separada de los otros nombres del padrón.
 - Se corrige una pérdida de información: las horas confirmadas permanecen en los metadatos y respaldos, incluso si la semana no tiene todas las jornadas para construir estadísticas.
-- La semana seleccionada completa únicamente fechas vacías. Si las fechas del documento contradicen el periodo, se muestra un botón de ajuste explícito.
+- La semana seleccionada completa únicamente fechas vacías de jornadas identificadas, sin inventar los días ausentes. Si las fechas del documento contradicen el periodo, se muestra un botón de ajuste explícito.
 - Cambiar el estado manualmente a falta, inhábil o sin labores elimina los horarios antiguos para evitar que aparezcan horas en una jornada suspendida.
 - Se mejora la selección por lote y se desplaza el lector al inicio al cambiar de documento.
 - Pruebas nuevas para lectura incompleta, fusión por página, respaldo de horas, alumnos con OCR imperfecto, selección de semana y recuperación tras errores del motor.
