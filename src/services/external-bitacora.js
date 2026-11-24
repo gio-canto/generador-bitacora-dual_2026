@@ -123,7 +123,7 @@ export function inferExternalStatus(text,times={hours:""},activity=""){
  if(/\b(?:dia inhabil|dia festivo|descanso oficial|asueto|feriado)\b/.test(key))return "inhabil";
  const closed=/\b(?:sin labores|no hubo labores|no hay labores|sin actividad laboral|sin actividades laborales|suspension (?:de|por) (?:las )?(?:labores|actividades)|labores suspendidas|actividades suspendidas|se suspendieron (?:las )?(?:labores|actividades)|se cancelaron (?:las )?(?:labores|actividades)|no se laboro|no laboramos|no hubo jornada|no se trabajo|no trabajamos|no tuvimos labores|sin trabajo por calendario)\b/.test(key);
  if(closed)return "sin_labores";
- const nothing=/\b(?:no se realizaron actividades|no se realizo ninguna actividad|no se llevaron a cabo actividades|no hubo actividades|sin actividades asignadas|no se realizaron labores|no se realizo actividad alguna)\b/.test(key);
+ const nothing=/\b(?:no se realizaron actividades|no se realizo ninguna actividad|no se llevaron a cabo actividades|no se llevo a cabo actividad alguna|no hubo actividades|sin actividades asignadas|no se realizaron labores|no se realizo actividad alguna)\b/.test(key);
  // "En el laboratorio no se realizaron actividades" puede referirse solo al área.
  const local=/\b(?:en el laboratorio|en la sala|en el area|en el departamento|en el salon)\b/.test(key);
  if(nothing)return local&&times?.hours?"":"sin_labores";
