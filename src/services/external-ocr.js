@@ -1,6 +1,7 @@
 import {PDF_SCAN_LIMIT_BYTES,PDF_SCAN_LIMIT_PAGES,scanFileKind} from "./scanned-pdf.js";
 import {EXTERNAL_TEXT_LIMIT,extractExternalFields} from "./external-bitacora.js";
 import {spatialExternalTableText} from "./external-table-ocr.js";
+import {externalTextNeedsOcr,externalTranscriptQuality,mergeExternalPageText} from "./external-merge.js";
 
 /** Motor OCR descargado sólo al solicitar lectura externa. */
 export const OCR_SOURCES=[
@@ -90,7 +91,7 @@ export function externalOcrQuality(result){
  if(!raw.trim())return 0;
  const fields=extractExternalFields(raw);
  const confidence=Number(result?.data?.confidence);
- return fields.recognized*20+fields.dates.length*4+
+ return fields.recognized*20+fields.dates.length*4+fields.days.filter(day=>day.hours).length*9+
    (fields.name?8:0)+(fields.company?4:0)+
    (Number.isFinite(confidence)?Math.max(0,Math.min(100,confidence))/25:0);
 }
@@ -130,7 +131,7 @@ async function recognizeExternalPhoto(worker,canvas){
  const first=await worker.recognize(canvas,{}, {text:true,blocks:true});
  const fields=extractExternalFields(first?.data?.text||"");
  const confidence=Number(first?.data?.confidence);
- if(fields.recognized>=3&&fields.name&&(!Number.isFinite(confidence)||confidence>=55))
+ if(fields.recognized>=3&&fields.name&&!externalTextNeedsOcr(first?.data?.text||"")&&(!Number.isFinite(confidence)||confidence>=55))
    return first;
  let enhanced;
  try{enhanced=enhanceExternalPhotoCanvas(canvas);}
@@ -138,7 +139,10 @@ async function recognizeExternalPhoto(worker,canvas){
  if(!enhanced)return first;
  try{
    const next=await worker.recognize(enhanced,{}, {text:true,blocks:true});
-   return externalOcrQuality(next)>externalOcrQuality(first)?next:first;
+   const best=externalOcrQuality(next)>externalOcrQuality(first)?next:first;
+   const other=best===first?next:first;
+   const merged=mergeExternalPageText(String(best.data?.text||""),String(other.data?.text||""));
+   return merged&&merged!==best.data?.text?{...best,data:{...best.data,text:merged}}:best;
  }finally{enhanced.width=1;enhanced.height=1;}
 }
 function textLinesFromPdf(items){
@@ -177,7 +181,8 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
    try{
      const recognized=await recognizeExternalPhoto(worker,canvas);
      const structured=await spatialExternalTableText(worker,canvas,recognized,{onProgress,signal});
-     const pageText=structured||String(recognized?.data?.text||"");
+     const pageText=mergeExternalPageText(
+       String(recognized?.data?.text||""),structured||"");
      chunks.push(pageText);
      documents.push({page:1,text:pageText,method:"ocr"});
      ocrText++;
@@ -197,7 +202,8 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
        try{
          const content=await page.getTextContent();
          const text=textLinesFromPdf(content.items);
-         if(text.replace(/\s/g,"").length>=65){
+         const readable=text.replace(/\s/g,"").length>=65;
+         if(readable&&!externalTextNeedsOcr(text)){
            chunks.push(text);documents.push({page:i,text,method:"pdf-text"});pdfText++;
            continue;
          }
@@ -212,10 +218,18 @@ export async function readExternalBitacora(file,{loadPdfJs,getWorker,onProgress=
            onProgress({stage:"ocr",page:i,pages});
            const result=await recognizeExternalPhoto(worker,canvas);
            const structured=await spatialExternalTableText(worker,canvas,result,{onProgress,signal});
-           const pageText=structured||String(result?.data?.text||text);
+           const recognizedText=mergeExternalPageText(String(result?.data?.text||""),structured||"");
+           const pageText=mergeExternalPageText(text,recognizedText);
            chunks.push(pageText);
-           documents.push({page:i,text:pageText,method:"ocr"});
+           documents.push({page:i,text:pageText,method:readable?"mixed":"ocr"});
            ocrText++;
+         }catch(error){
+           if(signal?.aborted||!readable)throw error;
+           // El texto incrustado sigue siendo utilizable aunque falle la lectura OCR.
+           chunks.push(text);
+           documents.push({page:i,text,method:"pdf-text",
+             warning:"El reconocimiento adicional no se completó en esta página; revisa fechas y horarios."});
+           pdfText++;
          }finally{canvas.width=1;canvas.height=1;}
        }finally{page.cleanup?.();}
      }
