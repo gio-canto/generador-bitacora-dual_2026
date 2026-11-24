@@ -185,7 +185,7 @@ export function extractExternalFields(raw){
    days[seg.index]={...days[seg.index],date,
      start:nonWorking?"":times.start,end:nonWorking?"":times.end,
      hours:nonWorking?"":times.hours,area,activity,
-     timeBlocks:times.blocks,needsReview:Boolean(uncertainStatus||(status!=="sin_labores"&&times.ambiguous)),
+     timeBlocks:times.blocks,needsReview:Boolean(uncertainStatus||(!nonWorking&&times.ambiguous)),
      status,detected:true};
  }
  const recognized=days.filter(day=>day.detected).length;
