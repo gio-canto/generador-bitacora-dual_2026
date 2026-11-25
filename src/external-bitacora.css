@@ -222,3 +222,13 @@
  .external-upload-btn{flex-basis:100%}
  .external-header{flex-wrap:wrap;justify-content:center;text-align:center}
 }
+
+/* 0.10.0 · Aviso persistente del lector externo en desarrollo. */
+.external-development-note{
+  box-sizing:border-box;margin:0;padding:10px 24px;
+  border-bottom:1px solid #e5d7b4;background:#fff9eb;color:#684c1c;
+  font-size:.82rem;line-height:1.45;overflow-wrap:anywhere;
+}
+.external-development-note strong{font-weight:700}
+@media(max-width:900px){.external-development-note{padding:10px 16px}}
+@media(max-width:480px){.external-development-note{padding:9px 12px;font-size:.77rem}}

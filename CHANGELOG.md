@@ -1,5 +1,17 @@
 # Notas de versión
 
+## 0.10.0 · Revisión metodológica del lector externo · 2026-11-24
+
+- Se adopta la numeración **0.10.X** para las siguientes versiones; la serie histórica 0.70.X permanece en el registro de cambios.
+- Se incorpora un aviso visible y permanente en la ventana del lector: «Función en desarrollo. El lector de bitácoras externas sigue en proceso de mejora. Revisa los datos reconocidos antes de registrarlos».
+- Se revisa la identificación de jornadas en dos etapas: primero sin hipótesis de año y después con el año de una semana única detectada o seleccionada.
+- Se recuperan fechas escritas sin año, por ejemplo `17-11` o `17/11`, únicamente cuando coinciden de manera inequívoca con una semana ya registrada. Encabezados como `BITÁCORA SEMANAL-12` también se aceptan.
+- Se aíslan las líneas de horario de las descripciones de actividades para evitar que horas citadas en un relato sean interpretadas como entrada y salida.
+- Al seleccionar manualmente una semana, se recuperan jornadas ocultas por fechas incompletas, conservando los cambios manuales realizados.
+- Se comprueban los 20 ejemplos de transcripciones anonimizadas disponibles en los dos lotes del proyecto, además de pruebas específicas de selección y ambigüedades.
+- Se documenta el alcance del OCR actual y los límites de la evaluación por transcripciones.
+
+
 ## 0.70.0 · Recuperación del lector externo · 2026-11-23
 
 - Se corrige la reconstrucción de texto fragmentado de PDF.js: el fin de línea se aplica después del fragmento actual. Evita separar nombres, empresas y horarios entre renglones.

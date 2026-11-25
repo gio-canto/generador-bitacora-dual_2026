@@ -105,6 +105,21 @@ function getName(lines){
 function getCompany(lines){
  return lineField(lines,"(?:nombre\\s+de\\s+la\\s+empresa|empresa|instituci[oó]n receptora|unidad econ[oó]mica|centro de trabajo|raz[oó]n social)").slice(0,160);
 }
+/** Solo toma horas de celdas/etiquetas de horario, no de frases sobre actividades. */
+export function timeTextFromExternalSegment(lines){
+ const clock=new RegExp(CLOCK_RANGE.source,"i");
+ const explicit=lines.filter(line=>/\b(?:horario(?:s)?|hora(?:s)?|entrada|salida|ingreso|egreso|inicio de jornada|fin de jornada)\s*[:\-]?\s*\d{1,2}/i.test(line));
+ if(explicit.length)return explicit.join("\n");
+ const ranges=lines.filter(line=>{
+   if(!clock.test(line))return false;
+   // Fecha o nombre del día seguido de horario, o línea que solo contiene tramos.
+   const clean=line.replace(DATE_GLOBAL,"")
+     .replace(/^(?:martes|mi[eé]rcoles|jueves|viernes|fecha|d[ií]a)\b[\s,:\-]*/i,"").trim();
+   return /^[\d\s:.,apmAPM\-–—/]+$/.test(clean)||
+      /^(?:de|desde|turno|horario|jornada)\s+/i.test(clean);
+ });
+ return ranges.join("\n");
+}
 function activityFromChunk(lines){
  const idx=lines.findIndex(l=>/^\s*(?:actividad(?:es)?(?: realizadas)?|descripci[oó]n|labores)\s*[:\-]/i.test(l));
  if(idx>=0){
@@ -131,13 +146,15 @@ export function inferExternalStatus(text,times={hours:""},activity=""){
  return "";
 }
 function emptyDay(){return {status:"",hours:"",timeBlocks:[],needsReview:false,reasonCode:"0",eventPhase:"no_aplica",eventDiscipline:"No aplica",eventMode:"con",eventResult:"",date:"",start:"",end:"",area:"",activity:"",detected:false};}
-export function extractExternalFields(raw){
+/** Año de contexto: solo cuando lo sustenta una semana identificada; no se deduce del reloj del equipo. */
+export function extractExternalFields(raw,{referenceYear=null}={}){
  const text=String(raw||"").replace(/\r/g,"").slice(0,EXTERNAL_TEXT_LIMIT);
  const lines=text.split(/\n/).map(externalClean).filter(Boolean);
  const days=Array.from({length:4},emptyDay);
  const explicitDates=datesIn(text);
  const candidateYears=[...new Set(explicitDates.map(date=>Number(date.slice(0,4))))];
- const contextYear=candidateYears.length===1?candidateYears[0]:null;
+ const contextYear=candidateYears.length===1?candidateYears[0]:
+   candidateYears.length===0&&Number.isInteger(referenceYear)&&referenceYear>=2000&&referenceYear<=2100?referenceYear:null;
  const allDates=[...explicitDates];
  const uncertainShortDates=[];
  const segments=[];let current=null;
@@ -176,7 +193,7 @@ export function extractExternalFields(raw){
    const all=seg.lines.join("\n");
    const dates=datesIn(all);
    const date=seg.date||dates[0]||"";
-   const times=timesFromExternal(all);
+   const times=timesFromExternal(timeTextFromExternalSegment(seg.lines));
    const area=lineField(seg.lines,"(?:[aá]rea|departamento|secci[oó]n)");
    const activity=activityFromChunk(seg.lines);
    const status=inferExternalStatus(all,times,activity);
@@ -280,24 +297,58 @@ export function suggestExternalStudent(extracted,students=[]){
      .filter(key=>key.length>=12).some(key=>doc.includes(key)));
  return matches.length===1?matches[0].id:"";
 }
+function externalWeekNumber(value){
+ const found=externalKey(value).match(/\bsemana(?:l)?\s*(?:numero|num|no|n)?\s*(\d{1,3})\b/);
+ return found?Number(found[1]):null;
+}
+function shortDatesWithoutYear(text){
+ return String(text||"").split(/\n/).map(line=>{
+   const lead=line.replace(/^(?:fecha|d[ií]a|jornada)\s*[:\-]?\s*/i,"")
+     .replace(/^(?:martes|mi[eé]rcoles|jueves|viernes)\s*[,.:;\-]?\s*/i,"").trim();
+   const match=lead.match(PARTIAL_DATE);
+   return match?{day:Number(match[1]),month:Number(match[2])}:null;
+ }).filter(Boolean);
+}
 export function suggestExternalWeek(extracted,weeks=[]){
  const dates=[...new Set(extracted?.dates||[])].filter(Boolean);
  if(dates.length){
    const period=suggestExternalWeekPeriod(extracted);
-   if(!period)return ""; // Nunca sustituir fechas contradictorias por el número de semana.
+   if(!period)return "";
    const matched=weeks.filter(week=>week.startDate===period.startDate&&
      dates.every(date=>date>=week.startDate&&date<=week.endDate));
    return matched.length===1?matched[0].id:"";
  }
- // Con documentos sin fechas legibles, un número de semana explícito y único sí sirve.
- const hint=externalKey(extracted?.text||"").match(/\bsemana\s*(?:numero|num|no|n)?\s*(\d{1,3})\b/);
- if(!hint)return "";
- const matched=weeks.filter(week=>{
-   const label=externalKey(week.label||"");
-   const number=label.match(/\bsemana\s*(?:numero|num|no|n)?\s*(\d{1,3})\b/);
-   return number&&Number(number[1])===Number(hint[1]);
- });
+ const shortDates=shortDatesWithoutYear(extracted?.text);
+ const hint=externalWeekNumber(extracted?.text||"");
+ // Fechas breves sin año son válidas SOLO si señalan inequívocamente un periodo del padrón.
+ if(shortDates.length){
+   const matches=weeks.filter(week=>{
+     const start=new Date(week.startDate+"T12:00:00Z");
+     if(!Number.isFinite(+start)||start.getUTCDay()!==2)return false;
+     const expected=Array.from({length:4},(_,i)=>{
+       const day=new Date(start);day.setUTCDate(day.getUTCDate()+i);
+       return {day:day.getUTCDate(),month:day.getUTCMonth()+1};
+     });
+     return shortDates.every(short=>expected.some(date=>date.day===short.day&&date.month===short.month));
+   });
+   const unique=matches.length===1?matches:
+     hint===null?[]:matches.filter(week=>externalWeekNumber(week.label)===hint);
+   return unique.length===1?unique[0].id:"";
+ }
+ if(hint===null)return "";
+ const matched=weeks.filter(week=>externalWeekNumber(week.label)===hint);
  return matched.length===1?matched[0].id:"";
+}
+/** Una misma lectura se evalúa primero sin hipótesis y después con el año de una semana única. */
+export function analyzeExternalDocument(raw,weeks=[]){
+ const preliminary=extractExternalFields(raw);
+ const suggestedWeek=suggestExternalWeek(preliminary,weeks);
+ const week=weeks.find(candidate=>candidate.id===suggestedWeek);
+ const year=week?Number(week.startDate.slice(0,4)):null;
+ const extracted=year?extractExternalFields(raw,{referenceYear:year}):preliminary;
+ const verified=suggestExternalWeek(extracted,weeks);
+ return {extracted,weekId:verified||(!extracted.dates.length?suggestedWeek:""),
+   proposedWeek:suggestExternalWeekPeriod(extracted)};
 }
 /** Completa solo fechas vacías; no modifica fechas leídas ni horarios. */
 export function alignExternalDaysToWeek(days,week,{replace=false}={}){

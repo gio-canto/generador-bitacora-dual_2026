@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from "react";
 import {EXTERNAL_MAX_FILES,extractExternalFields,suggestExternalStudent,suggestExternalWeek,suggestExternalWeekPeriod,applyExternalLearning,externalCompanyOptions,suggestExternalCompany,externalKey,
-  externalDaysToStatistics,externalReviewMetadata,alignExternalDaysToWeek} from "../services/external-bitacora.js";
+  externalDaysToStatistics,externalReviewMetadata,alignExternalDaysToWeek,analyzeExternalDocument} from "../services/external-bitacora.js";
 import {readExternalBitacora,createExternalWorker,externalFileKind} from "../services/external-ocr.js";
 import {buildManualStatistics,reasonsForStatus,MANUAL_DAYS} from "../services/manual-statistics.js";
 import {eventsForSchool,EVENT_PHASE_LABELS,specialEventByCode} from "../services/special-events.js";
@@ -54,10 +54,15 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
      let changed=false;
      const updated=previous.map(document=>{
        if(document.state!=="ready"||document.form?.weekId)return document;
-       const match=suggestExternalWeek(extractExternalFields(document.text),weeks);
-       if(!match)return document;
+       const analysis=analyzeExternalDocument(document.text,weeks);
+       if(!analysis.weekId)return document;
+       const week=weeks.find(x=>x.id===analysis.weekId);
+       const days=document.form.days.map((day,i)=>
+         !day.detected&&analysis.extracted.days[i].detected?analysis.extracted.days[i]:
+         {...day,date:day.date||analysis.extracted.days[i].date});
        changed=true;
-       return {...document,form:{...document.form,weekId:match}};
+       return {...document,form:{...document.form,weekId:analysis.weekId,
+         days:alignExternalDaysToWeek(days,week)},warnings:analysis.extracted.warnings};
      });
      return changed?updated:previous;
    });
@@ -116,11 +121,10 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
              setNotice("Se alcanzó el máximo de "+EXTERNAL_MAX_FILES+" páginas o documentos por lote.");
              break;
            }
-           const extracted=extractExternalFields(doc.text);
+           const analysis=analyzeExternalDocument(doc.text,weeks);
+           const {extracted,weekId,proposedWeek}=analysis;
            const studentId=suggestExternalStudent(extracted,students);
            const learned=applyExternalLearning(extracted,learningExamples,studentId);
-           const weekId=suggestExternalWeek(extracted,weeks);
-           const proposedWeek=suggestExternalWeekPeriod(extracted);
            const current={key:(globalThis.crypto?.randomUUID?.()||"external-"+Date.now()+"-"+added),
              filename:result.pages>1?file.name+" · página "+doc.page:file.name,kind,url,
              pageNumber:doc.page,pages:1,method:doc.method||result.method,truncated:result.truncated,
@@ -151,7 +155,11 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
  const updateForm=patch=>updateItem({form:{...item.form,...patch}});
  const chooseWeek=id=>{
    const week=weeks.find(x=>x.id===id);
-   updateForm({weekId:id,days:alignExternalDaysToWeek(item.form.days,week)});
+   const parsed=week?extractExternalFields(item.text,{
+     referenceYear:Number(week.startDate.slice(0,4))}):null;
+   const days=item.form.days.map((day,i)=>!day.detected&&parsed?.days[i]?.detected?
+     parsed.days[i]:{...day,date:day.date||parsed?.days[i]?.date||""});
+   updateForm({weekId:id,days:alignExternalDaysToWeek(days,week)});
  };
  const updateDay=(index,patch)=>{
    const days=item.form.days.map((day,i)=>{
@@ -172,13 +180,15 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
    updateForm({days});
  };
  const reanalyze=()=>{
-   const extracted=extractExternalFields(item.text);
+   const analysis=analyzeExternalDocument(item.text,weeks);
+   const selectedYear=weeks.find(week=>week.id===item.form.weekId)?.startDate?.slice(0,4);
+   const extracted=selectedYear?extractExternalFields(item.text,{referenceYear:Number(selectedYear)}):analysis.extracted;
    const learned=applyExternalLearning(extracted,learningExamples,item.form.studentId);
    updateItem({...item,observedName:extracted.name,observedCompany:extracted.company,
      form:{...item.form,name:extracted.name,company:suggestExternalCompany(learned,students,item.form.studentId),
-     weekId:item.form.weekId||suggestExternalWeek(extracted,weeks),
+     weekId:item.form.weekId||analysis.weekId,
      days:alignExternalDaysToWeek(extracted.days,weeks.find(week=>
-       week.id===(item.form.weekId||suggestExternalWeek(extracted,weeks))))},
+       week.id===(item.form.weekId||analysis.weekId)))},
      warnings:extracted.warnings});
    setNotice("El texto fue analizado nuevamente. Revisa los campos antes de guardar.");
  };
@@ -253,6 +263,7 @@ export default function ExternalBitacoraDialog({students,weeks,school,loadPdfJs,
        <div><h2>Bitácoras externas</h2></div>
        <button type="button" className="btn external-close" onClick={onClose} disabled={busy} aria-label="Cerrar lector externo">Cerrar</button>
      </header>
+     <p className="external-development-note" role="note"><strong>Función en desarrollo.</strong> El lector de bitácoras externas sigue en proceso de mejora. Revisa los datos reconocidos antes de registrarlos.</p>
      <div className="external-upload">
        <label className="btn primary external-upload-btn" htmlFor="external-files">
          Cargar PDF, Word o fotografías
