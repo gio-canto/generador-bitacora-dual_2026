@@ -1,4 +1,22 @@
-# Lector de bitácoras externas · v0.70.0
+# Lector de bitácoras externas · v0.10.0
+
+## Estado de la función
+
+**En desarrollo.** La ventana indica: «El lector de bitácoras externas sigue en proceso de mejora. Revisa los datos reconocidos antes de registrarlos».
+
+## Método de reconocimiento revisado
+
+1. **Documento y transcripción:** se extrae texto de PDFs y Word; las fotografías y las páginas escaneadas se reconocen mediante Tesseract con varias pasadas de mejora de contraste y lectura espacial cuando la tabla es detectable.
+2. **Estructura:** el texto se divide en encabezado y jornadas independientes. Se buscan fechas, horas y estados. Las menciones de horas dentro de la narración de actividades se excluyen del cómputo del horario.
+3. **Periodo:** se intenta identificar la semana con fechas completas. Las fechas abreviadas sin año (por ejemplo, `17-11`) se relacionan con el padrón de semanas solo cuando la coincidencia es única. También se usan encabezados como `SEMANA 12` o `SEMANAL-12` si no hay fechas suficientes. Luego se analiza nuevamente el documento usando ese año verificado.
+4. **Revisión:** se conservan las jornadas incompletas y las contradicciones para revisión manual. Seleccionar una semana puede recuperar las jornadas con fechas sin año, sin modificar campos ya revisados ni inventar días.
+5. **Registro:** solo se calculan las estadísticas cuando hay cuatro estados completos y las jornadas laborales tienen horas válidas. Se conservan los datos parciales para su revisión.
+
+## Evaluación y límites actuales
+
+Los lotes 01 y 02 contienen **20 transcripciones de referencia anonimizadas** derivadas de fotografías, con expectativas para fechas, horarios y estados. Sirven para evaluar reglas de análisis de texto de forma reproducible. No son un entrenamiento de pesos del OCR ni demuestran una tasa de aciertos sobre imágenes manuscritas reales; esa precisión requiere comparar cada foto directamente con una transcripción corregida. No se incluyen fotografías originales ni firmas en el repositorio.
+
+
 
 ## Recuperación de texto y conservación de registros
 
