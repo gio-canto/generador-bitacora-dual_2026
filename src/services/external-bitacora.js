@@ -108,7 +108,7 @@ function getCompany(lines){
 /** Solo toma horas de celdas/etiquetas de horario, no de frases sobre actividades. */
 export function timeTextFromExternalSegment(lines){
  const clock=new RegExp(CLOCK_RANGE.source,"i");
- const explicit=lines.filter(line=>/\b(?:horario(?:s)?|hora(?:s)?|entrada|salida|ingreso|egreso|inicio de jornada|fin de jornada)\s*[:\-]/i.test(line));
+ const explicit=lines.filter(line=>/\b(?:horario(?:s)?|hora(?:s)?|entrada|salida|ingreso|egreso|inicio de jornada|fin de jornada)\s*[:\-]?\s*\d{1,2}/i.test(line));
  if(explicit.length)return explicit.join("\n");
  const ranges=lines.filter(line=>{
    if(!clock.test(line))return false;
