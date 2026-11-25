@@ -6,7 +6,7 @@
 
 **Genera, conserva y registra bitácoras de Educación Dual desde el navegador.**
 
-[![Beta](https://img.shields.io/badge/version-0.70.0-0066cc)](CHANGELOG.md)
+[![Beta](https://img.shields.io/badge/version-0.10.0-0066cc)](CHANGELOG.md)
 [![Verificación y Pages](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml/badge.svg)](https://github.com/gio-canto/generador-bitacora-dual_2026/actions/workflows/pages.yml)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](package.json)
@@ -22,6 +22,16 @@
 </div>
 
 ---
+
+## v0.10.0 · Revisión del método del lector externo
+
+A partir de esta actualización se utilizará exclusivamente la serie de versiones `0.10.X`.
+
+El lector de bitácoras externas sigue **en desarrollo** y lo indica visiblemente en su ventana, tanto en computadora como en móvil. Se revisó el reconocimiento en etapas: reconstrucción del texto, aislamiento de horarios de las actividades, detección y validación de fechas, identificación de semana y verificación por jornadas.
+
+Se corrigió la lectura de documentos que escriben fechas como `17-11` sin año. Se utiliza únicamente un periodo inequívoco del padrón para recuperar el año, y la selección manual de semana permite volver a interpretar las fechas, sin inventar jornadas ausentes. También se evita tomar horas mencionadas dentro de la narración de actividades como horarios de trabajo.
+
+Se mantiene el cotejo contra los dos lotes de transcripciones anonimizadas de bitácoras externas: **20 casos** con estructura y resultados esperados. Estos ejemplos verifican el analizador textual; por sí solos no miden la precisión del OCR sobre las fotografías reales. Consulta [la metodología documentada](docs/LECTOR_BITACORAS_EXTERNAS.md).
 
 ## v0.70.0 · Reparación del lector de bitácoras externas
 
